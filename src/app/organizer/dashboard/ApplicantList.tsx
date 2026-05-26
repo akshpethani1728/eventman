@@ -157,10 +157,14 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
 
               {expanded === app.id && (
                 <div className="text-xs text-gray-500 space-y-1.5 pt-2 border-t border-gray-100">
+                  {app.profile.bio && <p className="italic">{app.profile.bio}</p>}
                   {app.profile.skills && app.profile.skills.length > 0 && (
                     <p>Skills: {app.profile.skills.join(", ")}</p>
                   )}
                   {app.profile.experience && <p>Experience: {app.profile.experience}</p>}
+                  {app.profile.availability && (
+                    <p>Availability: <span className="capitalize">{app.profile.availability}</span></p>
+                  )}
                   {app.profile.area && (
                     <p className="flex items-center gap-1">
                       <MapPin className="w-3 h-3" /> {app.profile.area}

@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { LogOut, Plus, Copy, Edit3, Trash2, XCircle, Users, MapPin, Calendar, Clock, LayoutDashboard } from "lucide-react";
+import { LogOut, Plus, Copy, Edit3, Trash2, XCircle, Users, MapPin, Calendar, Clock, LayoutDashboard, User } from "lucide-react";
 import { toast } from "sonner";
 import type { Profile, Event, Application } from "@/lib/supabase/types";
 import CreateEventModal from "./CreateEventModal";
@@ -12,7 +13,7 @@ import ApplicantList from "./ApplicantList";
 
 export default function OrganizerDashboard() {
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [events, setEvents] = useState<(Event & { applicantCount?: number })[]>([]);
+  const [events, setEvents] = useState<(Event & { applicantCount?: number; approvedCount?: number })[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
@@ -44,11 +45,16 @@ export default function OrganizerDashboard() {
 
     const eventsWithCounts = await Promise.all(
       (evts || []).map(async (event) => {
-        const { count } = await supabase
+        const { count: totalCount } = await supabase
           .from("applications")
           .select("*", { count: "exact", head: true })
           .eq("event_id", event.id);
-        return { ...event, applicantCount: count || 0 };
+        const { count: approvedCount } = await supabase
+          .from("applications")
+          .select("*", { count: "exact", head: true })
+          .eq("event_id", event.id)
+          .eq("status", "approved");
+        return { ...event, applicantCount: totalCount || 0, approvedCount: approvedCount || 0 };
       })
     );
 
@@ -63,6 +69,8 @@ export default function OrganizerDashboard() {
     const { error } = await supabase.from("events").insert({
       organizer_id: user.id,
       title: event.title,
+      category: event.category,
+      application_deadline: event.application_deadline,
       location: event.location,
       date: event.date,
       time: event.time,
@@ -125,8 +133,10 @@ export default function OrganizerDashboard() {
       <header className="sticky top-0 bg-white border-b border-gray-200 z-10">
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
           <h1 className="font-bold text-lg">EventMan</h1>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500 truncate max-w-[120px]">{profile?.full_name}</span>
+          <div className="flex items-center gap-1">
+            <Link href="/organizer/profile" className="p-2 text-gray-500 hover:text-gray-900">
+              <User className="w-4 h-4" />
+            </Link>
             <button onClick={signOut} className="p-2 text-gray-500 hover:text-gray-900">
               <LogOut className="w-4 h-4" />
             </button>
@@ -212,11 +222,25 @@ export default function OrganizerDashboard() {
             </div>
 
             {/* Description */}
-            <p className="text-sm text-gray-500 mb-3">
-              {event.worker_count} workers needed
-              {event.gender_requirement && ` · ${event.gender_requirement}`}
-              {(event.min_age || event.max_age) && ` · Age ${event.min_age || 0}-${event.max_age || 99}`}
-            </p>
+            <div className="text-sm text-gray-500 mb-3 space-y-1">
+              <p>
+                {event.worker_count} workers needed
+                {event.gender_requirement && ` · ${event.gender_requirement}`}
+                {(event.min_age || event.max_age) && ` · Age ${event.min_age || 0}-${event.max_age || 99}`}
+              </p>
+              <div className="flex gap-2">
+                {event.category && (
+                  <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full capitalize">
+                    {event.category.replace(/_/g, " ")}
+                  </span>
+                )}
+                {event.approvedCount !== undefined && (
+                  <span className="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full">
+                    {event.approvedCount} of {event.worker_count} filled
+                  </span>
+                )}
+              </div>
+            </div>
 
             {/* Actions */}
             <div className="flex gap-2 pt-3 border-t border-gray-100">

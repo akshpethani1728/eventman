@@ -1,0 +1,146 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+import { ArrowLeft, Save, User, Phone, Mail, MapPin } from "lucide-react";
+import { toast } from "sonner";
+import type { Profile } from "@/lib/supabase/types";
+
+export default function OrganizerProfilePage() {
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({
+    full_name: "",
+    phone: "",
+    city: "",
+    area: "",
+  });
+  const router = useRouter();
+  const supabase = createClient();
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  const loadProfile = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { router.push("/login"); return; }
+
+    const { data: prof } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("user_id", user.id)
+      .single();
+
+    if (!prof || prof.role !== "organizer") { router.push("/login"); return; }
+    setProfile(prof);
+    setForm({
+      full_name: prof.full_name || "",
+      phone: prof.phone || "",
+      city: prof.city || "",
+      area: prof.area || "",
+    });
+    setLoading(false);
+  };
+
+  const saveProfile = async () => {
+    setSaving(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase.from("profiles").update({
+      full_name: form.full_name,
+      phone: form.phone || null,
+      city: form.city || null,
+      area: form.area || null,
+    }).eq("user_id", user.id);
+
+    setSaving(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Profile saved");
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-500">Loading...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 pb-24">
+      <header className="sticky top-0 bg-white border-b border-gray-200 z-10">
+        <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
+          <Link href="/organizer/dashboard" className="p-1 -ml-1">
+            <ArrowLeft className="w-5 h-5 text-gray-700" />
+          </Link>
+          <h1 className="font-semibold">My Profile</h1>
+        </div>
+      </header>
+
+      <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
+          <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
+            <User className="w-8 h-8 text-blue-600" />
+          </div>
+          <p className="font-semibold text-lg">{profile?.full_name}</p>
+          <p className="text-sm text-gray-500 capitalize">{profile?.role}</p>
+          {profile?.is_trusted_organizer && (
+            <span className="text-xs text-blue-600 font-medium mt-1 inline-block">Trusted Organizer</span>
+          )}
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Full Name</label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input value={form.full_name} onChange={e => setForm(p => ({ ...p, full_name: e.target.value }))}
+                className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm" />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Phone</label>
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
+                placeholder="9876543210"
+                className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm" />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">City</label>
+            <div className="relative">
+              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))}
+                placeholder="Ahmedabad"
+                className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm" />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Area</label>
+            <input value={form.area} onChange={e => setForm(p => ({ ...p, area: e.target.value }))}
+              placeholder="e.g., Navrangpura"
+              className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
+          </div>
+        </div>
+
+        <button
+          onClick={saveProfile}
+          disabled={saving}
+          className="w-full h-12 rounded-xl bg-blue-600 text-white font-medium flex items-center justify-center gap-2 disabled:opacity-50 active:bg-blue-700"
+        >
+          <Save className="w-4 h-4" />
+          {saving ? "Saving..." : "Save Profile"}
+        </button>
+      </main>
+    </div>
+  );
+}

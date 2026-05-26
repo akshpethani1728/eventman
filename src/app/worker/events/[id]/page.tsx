@@ -15,6 +15,7 @@ export default function EventDetailPage() {
   const [event, setEvent] = useState<Event | null>(null);
   const [organizer, setOrganizer] = useState<Profile | null>(null);
   const [application, setApplication] = useState<Application | null>(null);
+  const [approvedCount, setApprovedCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState(false);
 
@@ -31,6 +32,13 @@ export default function EventDetailPage() {
 
     if (!evt) { router.push("/worker/dashboard"); return; }
     setEvent(evt);
+
+    const { count } = await supabase
+      .from("applications")
+      .select("id", { count: "exact", head: true })
+      .eq("event_id", id)
+      .eq("status", "approved");
+    setApprovedCount(count || 0);
 
     const { data: org } = await supabase
       .from("profiles")
@@ -96,6 +104,21 @@ export default function EventDetailPage() {
         {/* Title & Status */}
         <div className="bg-white border border-gray-200 rounded-xl p-5 mb-3">
           <h2 className="text-lg font-bold mb-1">{event.title}</h2>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {event.category && (
+              <span className="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full capitalize">
+                {event.category.replace(/_/g, " ")}
+              </span>
+            )}
+            <span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">
+              {event.worker_count - approvedCount} of {event.worker_count} spots left
+            </span>
+          </div>
+          {event.application_deadline && (
+            <p className="text-xs text-amber-700 mt-2">
+              Apply by {new Date(event.application_deadline).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+            </p>
+          )}
           {event.payment_info && (
             <p className="text-green-700 font-medium text-sm flex items-center gap-1.5 mt-2">
               <IndianRupee className="w-4 h-4" />
@@ -114,6 +137,14 @@ export default function EventDetailPage() {
               <div>
                 <p className="text-gray-500 text-xs">Location</p>
                 <p className="font-medium">{event.location}</p>
+                <a
+                  href={`https://www.google.com/maps/search/${encodeURIComponent(event.location)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-blue-600 font-medium mt-0.5 inline-block"
+                >
+                  Open in Google Maps &rarr;
+                </a>
               </div>
             </div>
             <div className="flex items-start gap-3">

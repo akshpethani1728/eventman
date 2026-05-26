@@ -13,6 +13,8 @@ interface Props {
 export default function CreateEventModal({ onClose, onCreated }: Props) {
   const [form, setForm] = useState({
     title: "",
+    category: "",
+    application_deadline: "",
     location: "",
     date: "",
     time: "",
@@ -39,6 +41,8 @@ export default function CreateEventModal({ onClose, onCreated }: Props) {
     const { error } = await supabase.from("events").insert({
       organizer_id: user.id,
       title: form.title,
+      category: form.category || null,
+      application_deadline: form.application_deadline || null,
       location: form.location,
       date: form.date,
       time: form.time,
@@ -85,6 +89,35 @@ export default function CreateEventModal({ onClose, onCreated }: Props) {
                 onChange={e => update("title", e.target.value)}
                 className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm"
                 placeholder="e.g., Promoter for Music Festival"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1 text-gray-700">Category</label>
+              <select
+                value={form.category}
+                onChange={e => update("category", e.target.value)}
+                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm"
+              >
+                <option value="">Select category</option>
+                <option value="promotion">Promotion</option>
+                <option value="event_setup">Event Setup</option>
+                <option value="crowd_management">Crowd Management</option>
+                <option value="registration">Registration</option>
+                <option value="hospitality">Hospitality</option>
+                <option value="cleaning">Cleaning</option>
+                <option value="security">Security</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1 text-gray-700">Application Deadline</label>
+              <input
+                type="date"
+                value={form.application_deadline}
+                onChange={e => update("application_deadline", e.target.value)}
+                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm"
               />
             </div>
 

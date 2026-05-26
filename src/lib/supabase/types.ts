@@ -21,6 +21,7 @@ export interface Profile {
   skills: string[] | null;
   experience: string | null;
   availability: string | null;
+  bio: string | null;
   status: UserStatus;
   is_trusted_organizer: boolean;
   created_at: string;
@@ -40,6 +41,8 @@ export interface Event {
   max_age: number | null;
   dress_code: string | null;
   required_documents: string[] | null;
+  category: string | null;
+  application_deadline: string | null;
   payment_info: string | null;
   reporting_details: string | null;
   instructions: string | null;
