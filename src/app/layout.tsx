@@ -23,6 +23,7 @@ export default function RootLayout({
       <body>
         {children}
         <Toaster richColors position="top-center" />
+        <div id="build-id" className="fixed bottom-2 left-2 z-50 text-[8px] text-gray-300 bg-white/80 px-1.5 py-0.5 rounded">v3</div>
       </body>
     </html>
   );
