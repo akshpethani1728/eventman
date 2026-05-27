@@ -8,7 +8,7 @@ import {
   LogOut, MapPin, Calendar, Clock, Users, IndianRupee, Star, ShieldCheck,
   UtensilsCrossed, Car, Timer, TrendingUp, Zap, CheckCircle,
   XCircle, Hourglass, ArrowUpRight, Clock3, Send, AlertCircle, Sparkles,
-  Heart, Flame, Gauge
+  Heart, Flame, Gauge, Bell
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Profile, Event, Application } from "@/lib/supabase/types";
@@ -183,6 +183,7 @@ export default function WorkerDashboard() {
   const [applyingId, setApplyingId] = useState<string | null>(null);
   const [cancelTarget, setCancelTarget] = useState<{ appId: string; title: string; status: string; eventId: string } | null>(null);
   const [cancelling, setCancelling] = useState(false);
+  const [unreadNotifCount, setUnreadNotifCount] = useState(0);
   const router = useRouter();
   const supabase = createClient();
 
@@ -195,6 +196,9 @@ export default function WorkerDashboard() {
     const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
     if (!prof || prof.role !== "worker") { router.push("/login"); return; }
     setProfile(prof);
+
+    const { count } = await supabase.from("notifications").select("*", { count: "exact", head: true }).eq("user_id", user.id).eq("read", false);
+    setUnreadNotifCount(count || 0);
 
     const { data: apps } = await supabase.from("applications").select("*").eq("worker_id", user.id);
     const appMap: Record<string, Application> = {};
@@ -315,6 +319,7 @@ export default function WorkerDashboard() {
               </div>
             </div>
             <div className="w-7 h-7 rounded-full bg-gray-200 animate-pulse" />
+            <div className="w-7 h-7 rounded-full bg-gray-200 animate-pulse" />
           </div>
         </header>
         <main className="max-w-lg mx-auto px-4 py-4 pb-28 space-y-4">
@@ -344,11 +349,21 @@ export default function WorkerDashboard() {
           </div>
           <div className="flex items-center gap-0.5">
             {profile && (
-              <Link href="/worker/profile" className="flex items-center gap-2 p-1.5 hover:bg-gray-100 rounded-xl transition-colors">
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-[11px] shadow-sm">
-                  {profile.full_name?.charAt(0) || "W"}
-                </div>
-              </Link>
+              <>
+                <Link href="/worker/notifications" className="relative p-2 text-gray-400 hover:text-gray-600 rounded-xl hover:bg-gray-100 transition-colors">
+                  <Bell className="w-4 h-4" />
+                  {unreadNotifCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center shadow-sm shadow-red-500/30">
+                      {unreadNotifCount > 9 ? "9+" : unreadNotifCount}
+                    </span>
+                  )}
+                </Link>
+                <Link href="/worker/profile" className="flex items-center gap-2 p-1.5 hover:bg-gray-100 rounded-xl transition-colors">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-[11px] shadow-sm">
+                    {profile.full_name?.charAt(0) || "W"}
+                  </div>
+                </Link>
+              </>
             )}
             <button onClick={signOut} className="p-2 text-gray-400 hover:text-gray-600 rounded-xl hover:bg-gray-100 transition-colors">
               <LogOut className="w-4 h-4" />
