@@ -2,7 +2,7 @@ export type Role = "worker" | "organizer" | "admin";
 
 export type UserStatus = "unverified" | "basic_verified" | "trusted";
 
-export type EventStatus = "upcoming" | "ongoing" | "completed" | "cancelled";
+export type EventStatus = "draft" | "published" | "filling" | "full" | "closed" | "completed" | "cancelled";
 
 export type ApplicationStatus = "pending" | "approved" | "rejected" | "cancelled";
 
@@ -43,6 +43,16 @@ export interface Event {
   required_documents: string[] | null;
   category: string | null;
   application_deadline: string | null;
+  experience_required: string | null;
+  skill_requirements: string[] | null;
+  grooming_notes: string | null;
+  food_included: boolean | null;
+  travel_included: boolean | null;
+  overtime_info: string | null;
+  contact_person_notes: string | null;
+  google_maps_link: string | null;
+  is_template: boolean | null;
+  template_name: string | null;
   payment_info: string | null;
   reporting_details: string | null;
   instructions: string | null;

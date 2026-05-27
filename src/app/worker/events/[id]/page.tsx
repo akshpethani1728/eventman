@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ArrowLeft, MapPin, Calendar, Clock, Users, IndianRupee, Shirt, FileText, AlertCircle, Phone, User } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Clock, Users, IndianRupee, Shirt, FileText, AlertCircle, Phone, User, Briefcase, Award } from "lucide-react";
 import { toast } from "sonner";
 import type { Event, Application, Profile } from "@/lib/supabase/types";
 
@@ -172,7 +172,7 @@ export default function EventDetailPage() {
         </div>
 
         {/* Requirements */}
-        {(event.gender_requirement || event.min_age || event.max_age || event.dress_code) && (
+        {(event.gender_requirement || event.min_age || event.max_age || event.dress_code || event.experience_required || event.skill_requirements || event.grooming_notes) && (
           <div className="bg-white border border-gray-200 rounded-xl p-5 mb-3 space-y-4">
             <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wide">Requirements</h3>
             <div className="space-y-3 text-sm">
@@ -194,12 +194,43 @@ export default function EventDetailPage() {
                   </div>
                 </div>
               )}
+              {event.experience_required && (
+                <div className="flex items-start gap-3">
+                  <Briefcase className="w-4 h-4 mt-0.5 text-gray-400 shrink-0" />
+                  <div>
+                    <p className="text-gray-500 text-xs">Experience Required</p>
+                    <p className="font-medium">{event.experience_required}</p>
+                  </div>
+                </div>
+              )}
+              {event.skill_requirements && event.skill_requirements.length > 0 && (
+                <div className="flex items-start gap-3">
+                  <Award className="w-4 h-4 mt-0.5 text-gray-400 shrink-0" />
+                  <div>
+                    <p className="text-gray-500 text-xs">Skills Required</p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {event.skill_requirements.map((s, i) => (
+                        <span key={i} className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">{s}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
               {event.dress_code && (
                 <div className="flex items-start gap-3">
                   <Shirt className="w-4 h-4 mt-0.5 text-gray-400 shrink-0" />
                   <div>
                     <p className="text-gray-500 text-xs">Dress Code</p>
                     <p className="font-medium">{event.dress_code}</p>
+                  </div>
+                </div>
+              )}
+              {event.grooming_notes && (
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-4 h-4 mt-0.5 text-gray-400 shrink-0" />
+                  <div>
+                    <p className="text-gray-500 text-xs">Grooming Notes</p>
+                    <p className="font-medium">{event.grooming_notes}</p>
                   </div>
                 </div>
               )}
@@ -275,7 +306,7 @@ export default function EventDetailPage() {
       </main>
 
       {/* Bottom Apply Button */}
-      {!application && (
+      {!application && (event.status === "published" || event.status === "filling") && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
           <div className="max-w-lg mx-auto">
             <button
@@ -285,6 +316,16 @@ export default function EventDetailPage() {
             >
               {applying ? "Applying..." : "Apply for this Event"}
             </button>
+          </div>
+        </div>
+      )}
+
+      {!application && event.status === "full" && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+          <div className="max-w-lg mx-auto">
+            <div className="w-full h-12 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-700 font-medium text-sm">
+              Event is full — no more applications accepted
+            </div>
           </div>
         </div>
       )}

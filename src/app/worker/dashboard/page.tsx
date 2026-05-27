@@ -65,7 +65,7 @@ export default function WorkerDashboard() {
     const { data: evts } = await supabase
       .from("events")
       .select("*")
-      .eq("status", "upcoming")
+      .in("status", ["published", "filling"])
       .order("date", { ascending: true });
 
     const { data: counts } = await supabase
