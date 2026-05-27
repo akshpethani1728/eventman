@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ArrowLeft, MapPin, Calendar, Clock, Users, IndianRupee, Shirt, FileText, AlertCircle, Phone, User, Briefcase, Award } from "lucide-react";
+import { ArrowLeft, MapPin, Calendar, Clock, Users, IndianRupee, Shirt, FileText, AlertCircle, Phone, User, Briefcase, Award, Star, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import type { Event, Application, Profile } from "@/lib/supabase/types";
 
@@ -17,6 +17,8 @@ export default function EventDetailPage() {
   const [application, setApplication] = useState<Application | null>(null);
   const [approvedCount, setApprovedCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [organizerRating, setOrganizerRating] = useState(0);
+  const [organizerPastEvents, setOrganizerPastEvents] = useState(0);
   const [applying, setApplying] = useState(false);
 
   useEffect(() => {
@@ -45,7 +47,15 @@ export default function EventDetailPage() {
       .select("*")
       .eq("user_id", evt.organizer_id)
       .single();
-    if (org) setOrganizer(org);
+    if (org) {
+      setOrganizer(org);
+      const { data: revs } = await supabase.from("reviews").select("rating").eq("to_id", org.user_id);
+      if (revs && revs.length > 0) {
+        setOrganizerRating(Math.round(revs.reduce((s, r) => s + r.rating, 0) / revs.length * 10) / 10);
+      }
+      const { count: pc } = await supabase.from("events").select("*", { count: "exact", head: true }).eq("organizer_id", org.user_id).in("status", ["completed", "cancelled"]);
+      setOrganizerPastEvents(pc || 0);
+    }
 
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
@@ -273,14 +283,29 @@ export default function EventDetailPage() {
           <div className="bg-white border border-gray-200 rounded-xl p-5 mb-3 space-y-3">
             <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wide">Organized by</h3>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm">
-                {organizer.full_name?.charAt(0) || "O"}
-              </div>
-              <div>
-                <p className="font-medium text-sm">{organizer.full_name}</p>
-                {organizer.is_trusted_organizer && (
-                  <span className="text-xs text-blue-600 font-medium">Trusted Organizer</span>
-                )}
+              {organizer.avatar_url ? (
+                <img src={organizer.avatar_url} alt="" className="w-11 h-11 rounded-full object-cover ring-2 ring-gray-100" />
+              ) : (
+                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-base">
+                  {organizer.full_name?.charAt(0) || "O"}
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <p className="font-semibold text-sm truncate">{organizer.full_name}</p>
+                  {organizer.is_trusted_organizer && <ShieldCheck className="w-4 h-4 text-blue-500 shrink-0" />}
+                </div>
+                <div className="flex items-center gap-2 mt-0.5">
+                  {organizerRating > 0 && (
+                    <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-0.5">
+                        {[1,2,3,4,5].map(s => <Star key={s} className={`w-3 h-3 ${organizerRating >= s ? "fill-amber-400 text-amber-400" : "text-gray-300"}`} />)}
+                      </div>
+                      <span className="text-xs text-gray-500">{organizerRating}</span>
+                    </div>
+                  )}
+                  <span className="text-xs text-gray-400">{organizerPastEvents} past event{organizerPastEvents !== 1 ? "s" : ""}</span>
+                </div>
               </div>
             </div>
           </div>
