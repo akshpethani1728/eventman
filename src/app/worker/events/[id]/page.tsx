@@ -83,12 +83,17 @@ export default function EventDetailPage() {
     if (!application || !event) return;
     setCancelling(true);
     setShowCancelConfirm(false);
-    await supabase.from("applications").update({ status: "cancelled", updated_at: new Date().toISOString() }).eq("id", application.id);
-    await supabase.from("notifications").insert({
-      user_id: event.organizer_id, title: "Application Cancelled",
-      message: `A worker has cancelled their application for "${event.title}".`,
+    const res = await fetch("/api/cancel", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ appId: application.id }),
     });
     setCancelling(false);
+    if (!res.ok) {
+      const err = await res.json();
+      toast.error(err.error || "Failed to cancel");
+      return;
+    }
     toast.success("Application cancelled");
     loadEvent();
   };

@@ -163,17 +163,19 @@ export default function WorkerDashboard() {
 
   const confirmCancel = async () => {
     if (!cancelTarget) return;
-    const ev = events.find(e => e.id === cancelTarget.eventId);
-    if (!ev) return;
     setCancelling(true);
     setCancelTarget(null);
-    const s = createClient();
-    await s.from("applications").update({ status: "cancelled", updated_at: new Date().toISOString() }).eq("id", cancelTarget.appId);
-    await s.from("notifications").insert({
-      user_id: ev.organizer_id, title: "Application Cancelled",
-      message: `A worker has cancelled their application for "${ev.title}".`,
+    const res = await fetch("/api/cancel", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ appId: cancelTarget.appId }),
     });
     setCancelling(false);
+    if (!res.ok) {
+      const err = await res.json();
+      toast.error(err.error || "Failed to cancel");
+      return;
+    }
     toast.success("Cancelled successfully");
     loadData();
   };
