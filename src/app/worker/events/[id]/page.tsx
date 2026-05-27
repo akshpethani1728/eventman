@@ -19,6 +19,7 @@ export default function EventDetailPage() {
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [organizerRating, setOrganizerRating] = useState(0);
   const [organizerPastEvents, setOrganizerPastEvents] = useState(0);
 
@@ -75,8 +76,13 @@ export default function EventDetailPage() {
       toast.error("Cancellation unavailable within 12 hours of reporting time.");
       return;
     }
-    if (!confirm("Cancel your application for this event?")) return;
+    setShowCancelConfirm(true);
+  };
+
+  const confirmCancel = async () => {
+    if (!application || !event) return;
     setCancelling(true);
+    setShowCancelConfirm(false);
     await supabase.from("applications").update({ status: "cancelled", updated_at: new Date().toISOString() }).eq("id", application.id);
     await supabase.from("notifications").insert({
       user_id: event.organizer_id, title: "Application Cancelled",
@@ -324,6 +330,43 @@ export default function EventDetailPage() {
             {!canCancel && (
               <p className="text-[10px] text-gray-400 text-center">Cannot cancel within 12 hours of event</p>
             )}
+          </div>
+        </div>
+      )}
+
+      {showCancelConfirm && event && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+          onClick={() => setShowCancelConfirm(false)}>
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
+          <div className="relative bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl animate-slide-up"
+            onClick={(e) => e.stopPropagation()}>
+            <div className="flex flex-col items-center text-center">
+              <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mb-4">
+                <AlertCircle className="w-7 h-7 text-red-500" />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">Cancel {application?.status === "approved" ? "Participation" : "Application"}?</h3>
+              <p className="text-sm text-gray-500 mt-1.5 max-w-xs">
+                Withdraw from <span className="font-medium text-gray-700">&ldquo;{event.title}&rdquo;</span>?
+              </p>
+              {application?.status === "approved" && (
+                <div className="mt-3 bg-amber-50 rounded-xl px-4 py-2.5 text-xs text-amber-800 flex items-start gap-2 text-left">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span>You are currently approved. Cancelling will free your slot for other workers.</span>
+                </div>
+              )}
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button onClick={() => setShowCancelConfirm(false)}
+                className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                Keep
+              </button>
+              <button onClick={confirmCancel} disabled={cancelling}
+                className="flex-1 py-2.5 rounded-xl bg-red-600 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
+                {cancelling ? (
+                  <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Cancelling</>
+                ) : "Yes, cancel"}
+              </button>
+            </div>
           </div>
         </div>
       )}
