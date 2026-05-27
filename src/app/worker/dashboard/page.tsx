@@ -173,9 +173,6 @@ export default function WorkerDashboard() {
       user_id: ev.organizer_id, title: "Application Cancelled",
       message: `A worker has cancelled their application for "${ev.title}".`,
     });
-    if (ev.status === "full") {
-      await s.from("events").update({ status: "published", updated_at: new Date().toISOString() }).eq("id", ev.id);
-    }
     setCancelling(false);
     toast.success("Cancelled successfully");
     loadData();

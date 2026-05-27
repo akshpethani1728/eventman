@@ -88,9 +88,6 @@ export default function EventDetailPage() {
       user_id: event.organizer_id, title: "Application Cancelled",
       message: `A worker has cancelled their application for "${event.title}".`,
     });
-    if (event.status === "full") {
-      await supabase.from("events").update({ status: "published", updated_at: new Date().toISOString() }).eq("id", event.id);
-    }
     setCancelling(false);
     toast.success("Application cancelled");
     loadEvent();
