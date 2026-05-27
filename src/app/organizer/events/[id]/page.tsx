@@ -237,13 +237,13 @@ export default function OrganizerEventDetailPage() {
         </div>
 
         {/* Requirements */}
-        {(event.gender_requirement || event.min_age || event.max_age || event.experience_required || event.skill_requirements || event.dress_code) && (
+        {(event.gender_requirement || event.min_age || event.max_age || event.work_description || event.experience_required || event.skill_requirements || event.dress_code) && (
           <div className="bg-white border border-gray-200 rounded-xl p-4">
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Requirements</h3>
             <div className="flex flex-wrap gap-1.5 text-xs">
               {event.gender_requirement && <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full capitalize">{event.gender_requirement}</span>}
               {(event.min_age || event.max_age) && <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">{event.min_age || 0}-{event.max_age || 99} yrs</span>}
-              {event.experience_required && <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">{event.experience_required}</span>}
+              {(event.work_description || event.experience_required) && <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">{event.work_description || event.experience_required}</span>}
               {event.dress_code && <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">{event.dress_code}</span>}
               {event.skill_requirements?.map((s, i) => <span key={i} className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">{s}</span>)}
             </div>

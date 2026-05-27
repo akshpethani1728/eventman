@@ -174,13 +174,13 @@ export default function EventDetailPage() {
           </div>
         </div>
 
-        {(event.gender_requirement || event.min_age || event.max_age || event.dress_code || event.experience_required || event.skill_requirements || event.grooming_notes) && (
+        {(event.gender_requirement || event.min_age || event.max_age || event.dress_code || event.work_description || event.experience_required || event.skill_requirements || event.grooming_notes) && (
           <div className="bg-white border border-gray-200 rounded-xl p-5 mb-3 space-y-4">
             <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wide">Requirements</h3>
             <div className="space-y-3 text-sm">
               {event.gender_requirement && <div className="flex items-start gap-3"><User className="w-4 h-4 mt-0.5 text-gray-400 shrink-0" /><div><p className="text-gray-500 text-xs">Gender</p><p className="font-medium capitalize">{event.gender_requirement}</p></div></div>}
               {(event.min_age || event.max_age) && <div className="flex items-start gap-3"><AlertCircle className="w-4 h-4 mt-0.5 text-gray-400 shrink-0" /><div><p className="text-gray-500 text-xs">Age Range</p><p className="font-medium">{event.min_age || 0} - {event.max_age || 99} years</p></div></div>}
-              {event.experience_required && <div className="flex items-start gap-3"><Briefcase className="w-4 h-4 mt-0.5 text-gray-400 shrink-0" /><div><p className="text-gray-500 text-xs">Experience</p><p className="font-medium">{event.experience_required}</p></div></div>}
+              {(event.work_description || event.experience_required) && <div className="flex items-start gap-3"><Briefcase className="w-4 h-4 mt-0.5 text-gray-400 shrink-0" /><div><p className="text-gray-500 text-xs">Work Description</p><p className="font-medium whitespace-pre-wrap">{event.work_description || event.experience_required}</p></div></div>}
               {event.skill_requirements && event.skill_requirements.length > 0 && (
                 <div className="flex items-start gap-3">
                   <Award className="w-4 h-4 mt-0.5 text-gray-400 shrink-0" />

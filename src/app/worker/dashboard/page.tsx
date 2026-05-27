@@ -144,12 +144,20 @@ export default function WorkerDashboard() {
     setApplyingId(eventId);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setApplyingId(null); return; }
-    const { error } = await supabase.from("applications").insert({
-      event_id: eventId, worker_id: user.id, status: "pending",
-    });
-    setApplyingId(null);
-    if (error) { toast.error(error.message); return; }
-    toast.success("Applied successfully!");
+    const existing = events.find(e => e.id === eventId)?.application;
+    if (existing && existing.status === "cancelled") {
+      const { error } = await supabase.from("applications").update({ status: "pending", updated_at: new Date().toISOString() }).eq("id", existing.id);
+      setApplyingId(null);
+      if (error) { toast.error(error.message); return; }
+      toast.success("Re-applied successfully!");
+    } else {
+      const { error } = await supabase.from("applications").insert({
+        event_id: eventId, worker_id: user.id, status: "pending",
+      });
+      setApplyingId(null);
+      if (error) { toast.error(error.message); return; }
+      toast.success("Applied successfully!");
+    }
     loadData();
   };
 
@@ -175,11 +183,11 @@ export default function WorkerDashboard() {
 
   const signOut = async () => { await supabase.auth.signOut(); router.push("/login"); };
 
-  const appliedIds = new Set(events.filter(e => e.application).map(e => e.id));
+  const appliedIds = new Set(events.filter(e => e.application && e.application.status !== "cancelled").map(e => e.id));
   const allCategories = [...new Set(events.map(e => e.category).filter(Boolean))] as string[];
-  let browseEvents = events.filter(e => !appliedIds.has(e.id));
+  let browseEvents = events.filter(e => !e.application || e.application.status === "cancelled");
   if (categoryFilter) browseEvents = browseEvents.filter(e => e.category === categoryFilter);
-  const appliedEvents = events.filter(e => appliedIds.has(e.id));
+  const appliedEvents = events.filter(e => e.application && e.application.status !== "cancelled");
 
   const formatCount = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
 
@@ -498,7 +506,7 @@ export default function WorkerDashboard() {
                           <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         ) : (
                           <>
-                            Apply Now <ArrowUpRight className="w-3.5 h-3.5" />
+                            {event.application?.status === "cancelled" ? "Re-apply" : "Apply Now"} <ArrowUpRight className="w-3.5 h-3.5" />
                           </>
                         )}
                       </button>

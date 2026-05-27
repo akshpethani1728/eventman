@@ -46,6 +46,7 @@ export interface Event {
   category: string | null;
   application_deadline: string | null;
   experience_required: string | null;
+  work_description: string | null;
   skill_requirements: string[] | null;
   grooming_notes: string | null;
   food_included: boolean | null;

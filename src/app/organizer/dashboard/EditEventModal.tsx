@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
-import { X, Save } from "lucide-react";
+import { X, Save, Sparkles } from "lucide-react";
 import type { Event } from "@/lib/supabase/types";
 
 interface Props {
@@ -42,7 +42,7 @@ export default function EditEventModal({ event, onClose, onUpdated }: Props) {
     gender_requirement: event.gender_requirement || "",
     min_age: event.min_age !== null ? String(event.min_age) : "",
     max_age: event.max_age !== null ? String(event.max_age) : "",
-    experience_required: event.experience_required || "",
+    work_description: event.work_description || event.experience_required || "",
     skill_requirements: event.skill_requirements?.join(", ") || "",
     dress_code: event.dress_code || "",
     required_documents: event.required_documents?.join(", ") || "",
@@ -80,7 +80,7 @@ export default function EditEventModal({ event, onClose, onUpdated }: Props) {
       gender_requirement: form.gender_requirement || null,
       min_age: form.min_age ? parseInt(form.min_age) : null,
       max_age: form.max_age ? parseInt(form.max_age) : null,
-      experience_required: form.experience_required || null,
+      experience_required: form.work_description || null,
       skill_requirements: form.skill_requirements
         ? form.skill_requirements.split(",").map(s => s.trim()).filter(Boolean)
         : null,
@@ -106,164 +106,247 @@ export default function EditEventModal({ event, onClose, onUpdated }: Props) {
     onUpdated();
   };
 
-  const SectionLabel = ({ label }: { label: string }) => (
-    <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider pb-1 border-b border-gray-100 mb-3">
-      {label}
+  const SectionCard = ({ label, emoji, children, accentCls }: { label: string; emoji: string; children: React.ReactNode; accentCls: string }) => (
+    <div className="rounded-2xl bg-white border border-gray-200/80 overflow-hidden shadow-sm">
+      <div className={`flex items-center gap-2 px-4 py-3 ${accentCls} border-b border-gray-100/50`}>
+        <span className="text-lg">{emoji}</span>
+        <span className="text-xs font-bold uppercase tracking-widest text-gray-500/80">{label}</span>
+      </div>
+      <div className="p-4 space-y-3">{children}</div>
     </div>
   );
 
-  return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-8 p-3 overflow-y-auto">
-      <div className="w-full max-w-xl bg-white rounded-xl shadow-xl">
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 sticky top-0 bg-white z-10 rounded-t-xl">
-          <h2 className="font-semibold text-base truncate mr-2">Edit Event</h2>
-          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg shrink-0">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
+  const InputGroup = ({ children }: { children: React.ReactNode }) => (
+    <div className="grid grid-cols-2 gap-3">{children}</div>
+  );
 
-        <form onSubmit={handleSubmit} className="p-4 space-y-5">
-          {/* Status */}
-          <div className="flex items-center gap-2">
-            <label className="text-xs font-medium text-gray-600">Status:</label>
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-6 p-3 overflow-y-auto">
+      <div className="w-full max-w-xl">
+        {/* Header */}
+        <div className="bg-gradient-to-br from-violet-600 via-violet-700 to-purple-800 rounded-t-2xl px-5 py-5 text-white">
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center backdrop-blur-sm">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="font-bold text-lg">Edit Event</h2>
+                <p className="text-xs text-violet-200/80 mt-0.5 truncate max-w-[300px]">{event.title}</p>
+              </div>
+            </div>
+            <button onClick={onClose} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+          {/* Status selector inline */}
+          <div className="mt-3 flex items-center gap-3">
+            <span className="text-xs text-violet-200 font-medium">Status:</span>
             <select value={form.status} onChange={e => update("status", e.target.value)}
-              className="h-8 px-2 rounded-lg border border-gray-300 bg-white text-xs font-medium">
+              className="h-8 px-3 rounded-lg bg-white/15 border border-white/20 text-white text-xs font-medium backdrop-blur-sm outline-none">
               {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
           </div>
+        </div>
 
-          {/* A. Basic Event Info */}
-          <div>
-            <SectionLabel label="Basic Event Info" />
-            <div className="space-y-2.5">
-              <input required value={form.title} onChange={e => update("title", e.target.value)}
-                maxLength={100}
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
-              <div className="grid grid-cols-2 gap-2.5">
-                <select value={form.category} onChange={e => update("category", e.target.value)}
-                  className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm">
-                  <option value="">Category</option>
-                  {CATEGORIES.map(c => <option key={c} value={c}>{c.replace(/_/g, " ")}</option>)}
-                </select>
-                <input type="number" min={1} value={form.worker_count} onChange={e => update("worker_count", e.target.value)}
-                  required
-                  className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
+        {/* Form body */}
+        <div className="bg-gray-50 px-5 py-4 space-y-4 border-x border-gray-200/80">
+          <form onSubmit={handleSubmit} id="edit-event-form" className="space-y-4">
+
+            {/* A. Event Basics */}
+            <SectionCard emoji="📋" label="Event Basics" accentCls="bg-gradient-to-r from-blue-50/80 to-indigo-50/80">
+              <div>
+                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Event Title</label>
+                <input required value={form.title} onChange={e => update("title", e.target.value)}
+                  maxLength={100}
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all" />
+                <div className="text-right mt-1">
+                  <span className="text-[10px] text-gray-400">{form.title.length}/100</span>
+                </div>
               </div>
-              <div className="grid grid-cols-2 gap-2.5">
-                <input required type="date" value={form.date} onChange={e => update("date", e.target.value)}
-                  className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
-                <input required type="time" value={form.time} onChange={e => update("time", e.target.value)}
-                  className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
-              </div>
-              <input value={form.date_display} onChange={e => update("date_display", e.target.value)}
-                placeholder="Show dates as (e.g., 26,27,30 May)"
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
-              <div className="grid grid-cols-2 gap-2.5">
-                <input type="time" value={form.end_time} onChange={e => update("end_time", e.target.value)}
-                  placeholder="End time"
-                  className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
+              <InputGroup>
+                <div>
+                  <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Category</label>
+                  <select value={form.category} onChange={e => update("category", e.target.value)}
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                    <option value="">Select category</option>
+                    {CATEGORIES.map(c => <option key={c} value={c}>{c.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Workers Needed</label>
+                  <input type="number" min={1} value={form.worker_count} onChange={e => update("worker_count", e.target.value)}
+                    required
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all" />
+                </div>
+              </InputGroup>
+              <InputGroup>
+                <div>
+                  <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Event Date</label>
+                  <input required type="date" value={form.date} onChange={e => update("date", e.target.value)}
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all" />
+                </div>
+                <div>
+                  <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Start Time</label>
+                  <input required type="time" value={form.time} onChange={e => update("time", e.target.value)}
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all" />
+                </div>
+              </InputGroup>
+              <InputGroup>
+                <div>
+                  <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Display Date <span className="text-gray-400 normal-case font-normal">(e.g., 26,27,30 May)</span></label>
+                  <input value={form.date_display} onChange={e => update("date_display", e.target.value)}
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all" />
+                </div>
+                <div>
+                  <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">End Time <span className="text-gray-400 normal-case font-normal">(optional)</span></label>
+                  <input type="time" value={form.end_time} onChange={e => update("end_time", e.target.value)}
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all" />
+                </div>
+              </InputGroup>
+              <div>
+                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Application Deadline <span className="text-gray-400 normal-case font-normal">(optional)</span></label>
                 <input type="date" value={form.application_deadline} onChange={e => update("application_deadline", e.target.value)}
-                  className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all" />
               </div>
-              <input value={form.location} onChange={e => update("location", e.target.value)}
-                placeholder="Location *" required
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
-              <input value={form.google_maps_link} onChange={e => update("google_maps_link", e.target.value)}
-                placeholder="Google Maps link"
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
-            </div>
-          </div>
+            </SectionCard>
 
-          {/* B. Worker Requirements */}
-          <div>
-            <SectionLabel label="Worker Requirements" />
-            <div className="space-y-2.5">
-              <div className="grid grid-cols-3 gap-2.5">
-                <select value={form.gender_requirement} onChange={e => update("gender_requirement", e.target.value)}
-                  className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm">
-                  <option value="">Any gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
-                <input type="number" min={0} value={form.min_age} onChange={e => update("min_age", e.target.value)}
-                  placeholder="Min age"
-                  className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
-                <input type="number" min={0} value={form.max_age} onChange={e => update("max_age", e.target.value)}
-                  placeholder="Max age"
-                  className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
+            {/* B. Location */}
+            <SectionCard emoji="📍" label="Location" accentCls="bg-gradient-to-r from-teal-50/80 to-emerald-50/80">
+              <div>
+                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Venue / Location</label>
+                <input value={form.location} onChange={e => update("location", e.target.value)}
+                  required
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-teal-400 focus:ring-2 focus:ring-teal-100 outline-none transition-all" />
               </div>
-              <input value={form.experience_required} onChange={e => update("experience_required", e.target.value)}
-                placeholder="Experience required"
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
-              <input value={form.skill_requirements} onChange={e => update("skill_requirements", e.target.value)}
-                placeholder="Skills required (comma separated)"
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
-            </div>
-          </div>
+              <div>
+                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Google Maps Link <span className="text-gray-400 normal-case font-normal">(optional)</span></label>
+                <input value={form.google_maps_link} onChange={e => update("google_maps_link", e.target.value)}
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-teal-400 focus:ring-2 focus:ring-teal-100 outline-none transition-all" />
+              </div>
+            </SectionCard>
 
-          {/* C. Appearance & Documents */}
-          <div>
-            <SectionLabel label="Appearance & Documents" />
-            <div className="space-y-2.5">
-              <input value={form.dress_code} onChange={e => update("dress_code", e.target.value)}
-                placeholder="Dress code"
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
-              <input value={form.required_documents} onChange={e => update("required_documents", e.target.value)}
-                placeholder="Required documents (comma separated)"
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
-              <input value={form.grooming_notes} onChange={e => update("grooming_notes", e.target.value)}
-                placeholder="Grooming notes"
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
-            </div>
-          </div>
+            {/* C. Worker Requirements */}
+            <SectionCard emoji="👥" label="Worker Requirements" accentCls="bg-gradient-to-r from-purple-50/80 to-violet-50/80">
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Gender</label>
+                  <select value={form.gender_requirement} onChange={e => update("gender_requirement", e.target.value)}
+                    className="w-full h-11 px-3 rounded-xl border border-gray-200 bg-white text-sm focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none transition-all">
+                    <option value="">Any</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Min Age</label>
+                  <input type="number" min={0} value={form.min_age} onChange={e => update("min_age", e.target.value)}
+                    className="w-full h-11 px-3 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none transition-all" />
+                </div>
+                <div>
+                  <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Max Age</label>
+                  <input type="number" min={0} value={form.max_age} onChange={e => update("max_age", e.target.value)}
+                    className="w-full h-11 px-3 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none transition-all" />
+                </div>
+              </div>
 
-          {/* D. Payment Display */}
-          <div>
-            <SectionLabel label="Payment & Perks" />
-            <div className="space-y-2.5">
-              <input value={form.payment_info} onChange={e => update("payment_info", e.target.value)}
-                placeholder="Payment text"
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
-              <div className="flex gap-4">
-                <label className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input type="checkbox" checked={form.food_included} onChange={e => update("food_included", e.target.checked)}
-                    className="rounded border-gray-300" />
-                  Food
+              <div>
+                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Work Description</label>
+                <textarea value={form.work_description} onChange={e => update("work_description", e.target.value)}
+                  placeholder="Describe what workers will actually do — be specific so they know what to expect.&#10;&#10;Example:&#10;• Greet guests at the entrance (4 hrs)&#10;• Guide attendees to their tables&#10;• Assist with food serving during dinner&#10;• Help with cleanup after the event"
+                  className="w-full h-36 px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 leading-relaxed resize-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none transition-all" />
+              </div>
+
+              <div>
+                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Skills Required <span className="text-gray-400 normal-case font-normal">(comma separated)</span></label>
+                <input value={form.skill_requirements} onChange={e => update("skill_requirements", e.target.value)}
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none transition-all" />
+              </div>
+            </SectionCard>
+
+            {/* D. Appearance & Documents */}
+            <SectionCard emoji="👔" label="Appearance & Documents" accentCls="bg-gradient-to-r from-green-50/80 to-emerald-50/80">
+              <InputGroup>
+                <div>
+                  <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Dress Code</label>
+                  <input value={form.dress_code} onChange={e => update("dress_code", e.target.value)}
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-green-400 focus:ring-2 focus:ring-green-100 outline-none transition-all" />
+                </div>
+                <div>
+                  <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Required Documents</label>
+                  <input value={form.required_documents} onChange={e => update("required_documents", e.target.value)}
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-green-400 focus:ring-2 focus:ring-green-100 outline-none transition-all" />
+                </div>
+              </InputGroup>
+              <div>
+                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Grooming Notes <span className="text-gray-400 normal-case font-normal">(optional)</span></label>
+                <input value={form.grooming_notes} onChange={e => update("grooming_notes", e.target.value)}
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-green-400 focus:ring-2 focus:ring-green-100 outline-none transition-all" />
+              </div>
+            </SectionCard>
+
+            {/* E. Payment & Perks */}
+            <SectionCard emoji="💰" label="Payment & Perks" accentCls="bg-gradient-to-r from-amber-50/80 to-yellow-50/80">
+              <div>
+                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Payment</label>
+                <input value={form.payment_info} onChange={e => update("payment_info", e.target.value)}
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-100 outline-none transition-all" />
+              </div>
+              <div className="flex items-center gap-6">
+                <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                  <div className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${form.food_included ? "bg-emerald-500" : "bg-gray-200"}`}>
+                    <div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${form.food_included ? "translate-x-5" : ""}`} />
+                    <input type="checkbox" checked={form.food_included} onChange={e => update("food_included", e.target.checked)} className="sr-only" />
+                  </div>
+                  <span className="text-sm text-gray-700 font-medium">Food Included</span>
                 </label>
-                <label className="flex items-center gap-2 text-sm cursor-pointer">
-                  <input type="checkbox" checked={form.travel_included} onChange={e => update("travel_included", e.target.checked)}
-                    className="rounded border-gray-300" />
-                  Travel
+                <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                  <div className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${form.travel_included ? "bg-emerald-500" : "bg-gray-200"}`}>
+                    <div className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${form.travel_included ? "translate-x-5" : ""}`} />
+                    <input type="checkbox" checked={form.travel_included} onChange={e => update("travel_included", e.target.checked)} className="sr-only" />
+                  </div>
+                  <span className="text-sm text-gray-700 font-medium">Travel Included</span>
                 </label>
               </div>
-              <input value={form.overtime_info} onChange={e => update("overtime_info", e.target.value)}
-                placeholder="Overtime info"
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
-            </div>
-          </div>
+              <div>
+                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Overtime Info <span className="text-gray-400 normal-case font-normal">(optional)</span></label>
+                <input value={form.overtime_info} onChange={e => update("overtime_info", e.target.value)}
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-100 outline-none transition-all" />
+              </div>
+            </SectionCard>
 
-          {/* E. Reporting Instructions */}
-          <div>
-            <SectionLabel label="Reporting Instructions" />
-            <div className="space-y-2.5">
-              <textarea value={form.reporting_details} onChange={e => update("reporting_details", e.target.value)}
-                placeholder="Where to report, contact person at venue..."
-                className="w-full h-16 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm resize-none" />
-              <textarea value={form.instructions} onChange={e => update("instructions", e.target.value)}
-                placeholder="Special instructions for workers..."
-                className="w-full h-16 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm resize-none" />
-              <input value={form.contact_person_notes} onChange={e => update("contact_person_notes", e.target.value)}
-                placeholder="Contact person name & number"
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
-            </div>
-          </div>
+            {/* F. Reporting Instructions */}
+            <SectionCard emoji="📍" label="Reporting Instructions" accentCls="bg-gradient-to-r from-orange-50/80 to-red-50/80">
+              <div>
+                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Where to Report</label>
+                <textarea value={form.reporting_details} onChange={e => update("reporting_details", e.target.value)}
+                  className="w-full h-20 px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 leading-relaxed resize-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none transition-all" />
+              </div>
+              <div>
+                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Special Instructions</label>
+                <textarea value={form.instructions} onChange={e => update("instructions", e.target.value)}
+                  className="w-full h-20 px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 leading-relaxed resize-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none transition-all" />
+              </div>
+              <div>
+                <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Contact Person <span className="text-gray-400 normal-case font-normal">(on-site)</span></label>
+                <input value={form.contact_person_notes} onChange={e => update("contact_person_notes", e.target.value)}
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none transition-all" />
+              </div>
+            </SectionCard>
+          </form>
+        </div>
 
-          <button type="submit" disabled={loading}
-            className="w-full h-11 rounded-xl bg-blue-600 text-white font-medium text-sm flex items-center justify-center gap-2 disabled:opacity-50 active:bg-blue-700">
-            <Save className="w-4 h-4" />
-            {loading ? "Saving..." : "Save Changes"}
+        {/* Footer Actions */}
+        <div className="bg-white rounded-b-2xl px-5 py-4 border-t border-gray-200/80">
+          <button type="submit" form="edit-event-form" disabled={loading}
+            className="w-full h-12 rounded-xl bg-gradient-to-r from-violet-600 to-purple-700 text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50 hover:from-violet-700 hover:to-purple-800 active:scale-[0.98] transition-all shadow-lg shadow-violet-600/20">
+            {loading ? (
+              <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving...</>
+            ) : (
+              <><Save className="w-4 h-4" /> Save Changes</>
+            )}
           </button>
-        </form>
+        </div>
       </div>
     </div>
   );
