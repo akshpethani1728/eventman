@@ -150,28 +150,39 @@ export default function OrganizerDashboard() {
   );
   const templates = events.filter(e => e.is_template);
 
-  const upcomingEvents = activeEvents.filter(e => new Date(e.date) > new Date());
+  const todayStr = new Date().toISOString().split("T")[0];
   const totalWorkersNeeded = activeEvents.reduce((s, e) => s + Math.max(0, e.worker_count - (e.approvedCount || 0)), 0);
   const totalPendingApprovals = activeEvents.reduce((s, e) => s + (e.pendingCount || 0), 0);
 
-  const todayStr = new Date().toISOString().split("T")[0];
-  const alerts = activeEvents.flatMap(e => {
-    const items: { eventId: string; eventTitle: string; text: string; type: "urgent" | "warning" | "info" }[] = [];
+  const getUrgencyScore = (e: typeof activeEvents[number]): number => {
+    let score = 0;
+    if (e.date === todayStr) score += 100;
+    else if (new Date(e.date).getTime() - Date.now() < 86400000 * 2 && new Date(e.date) > new Date()) score += 50;
     const remaining = e.worker_count - (e.approvedCount || 0);
-    if (e.date === todayStr) items.push({ eventId: e.id, eventTitle: e.title, text: "Starts today", type: "urgent" });
-    else if (new Date(e.date).getTime() - Date.now() < 86400000 * 2 && new Date(e.date) > new Date())
-      items.push({ eventId: e.id, eventTitle: e.title, text: "Starts tomorrow", type: "warning" });
-    if (remaining <= 3 && remaining > 0)
-      items.push({ eventId: e.id, eventTitle: e.title, text: `Only ${remaining} seat${remaining !== 1 ? "s" : ""} left`, type: remaining <= 1 ? "urgent" : "warning" });
-    if (remaining <= 0) items.push({ eventId: e.id, eventTitle: e.title, text: "Event full", type: "info" });
-    if (e.application_deadline === todayStr)
-      items.push({ eventId: e.id, eventTitle: e.title, text: "Deadline today", type: "urgent" });
-    else if (e.application_deadline && new Date(e.application_deadline).getTime() - Date.now() < 86400000 * 3 && new Date(e.application_deadline) > new Date())
-      items.push({ eventId: e.id, eventTitle: e.title, text: "Deadline closing soon", type: "warning" });
-    if ((e.pendingCount || 0) > 0)
-      items.push({ eventId: e.id, eventTitle: e.title, text: `${e.pendingCount} pending approval${e.pendingCount !== 1 ? "s" : ""}`, type: "warning" });
-    return items;
+    if (remaining <= 0) score += 0;
+    else if (remaining <= 3) score += 40 - remaining * 10;
+    if (e.application_deadline === todayStr) score += 80;
+    else if (e.application_deadline && new Date(e.application_deadline).getTime() - Date.now() < 86400000 * 3 && new Date(e.application_deadline) > new Date()) score += 30;
+    if ((e.pendingCount || 0) > 0) score += 20;
+    return score;
+  };
+
+  const sortedActive = [...activeEvents].sort((a, b) => getUrgencyScore(b) - getUrgencyScore(a));
+
+  // Insight groups
+  const needsAttention = sortedActive.filter(e => {
+    const remaining = e.worker_count - (e.approvedCount || 0);
+    return (e.pendingCount || 0) > 0 || remaining <= 3 || e.date === todayStr || e.application_deadline === todayStr;
   });
+  const startingSoon = sortedActive.filter(e => {
+    const diff = new Date(e.date).getTime() - Date.now();
+    return diff > 0 && diff < 86400000 * 3;
+  });
+  const seatsOpen = sortedActive.filter(e => {
+    const remaining = e.worker_count - (e.approvedCount || 0);
+    return remaining > 0 && !needsAttention.includes(e);
+  });
+  const pendingApprovals = sortedActive.filter(e => (e.pendingCount || 0) > 0);
 
   if (loading) {
     return (
@@ -220,26 +231,10 @@ export default function OrganizerDashboard() {
             <p className="text-xs text-gray-500 mt-0.5">Pending approvals</p>
           </div>
           <div className="bg-white border border-gray-200 rounded-xl p-4">
-            <p className="text-2xl font-bold text-red-600">{alerts.length}</p>
+            <p className="text-2xl font-bold text-red-600">{needsAttention.length}</p>
             <p className="text-xs text-gray-500 mt-0.5">Needs attention</p>
           </div>
         </div>
-
-        {/* Alerts */}
-        {alerts.length > 0 && (
-          <div className="mb-4 space-y-1.5">
-            {alerts.slice(0, 4).map((alert, i) => (
-              <div key={i}
-                className={`text-xs px-3 py-2 rounded-lg flex items-center gap-2 ${
-                  alert.type === "urgent" ? "bg-red-50 text-red-700 border border-red-200" :
-                  alert.type === "warning" ? "bg-amber-50 text-amber-700 border border-amber-200" :
-                  "bg-blue-50 text-blue-700 border border-blue-200"
-                }`}>
-                <span className="font-medium truncate">{alert.eventTitle}:</span> {alert.text}
-              </div>
-            ))}
-          </div>
-        )}
 
         {/* Quick Actions */}
         <div className="flex gap-2 mb-4">
@@ -294,143 +289,97 @@ export default function OrganizerDashboard() {
           </div>
         )}
 
-        {/* Active / Past Events */}
-        {(tab === "active" || tab === "past") && (
-          <div className="space-y-3">
-            {(tab === "active" ? activeEvents : pastEvents).length === 0 && (
-              <div className="text-center py-16 text-gray-400">
-                <LayoutDashboard className="w-10 h-10 mx-auto mb-2 text-gray-300" />
-                <p className="text-sm">{tab === "active" ? "No active events" : "No past events"}</p>
+        {/* Active Tab */}
+        {tab === "active" && (
+          <div className="space-y-4">
+            {/* Insight sections */}
+            {pendingApprovals.length > 0 && (
+              <div>
+                <div className="flex items-center gap-1.5 mb-2"><Users className="w-3.5 h-3.5 text-blue-600" /><span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">Pending Approvals</span></div>
+                <div className="space-y-2">
+                  {pendingApprovals.map(event => (
+                    <Link key={event.id} href={`/organizer/events/${event.id}`} className="block bg-white border border-blue-200 rounded-xl p-3 active:bg-blue-50">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="font-medium text-sm text-gray-900 truncate">{event.title}</p>
+                        <span className="text-xs font-medium text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full shrink-0">{event.pendingCount} pending</span>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">{event.date} · {event.time}</p>
+                    </Link>
+                  ))}
+                </div>
               </div>
             )}
 
-            {(tab === "active" ? activeEvents : pastEvents).map(event => {
-              const remaining = event.worker_count - (event.approvedCount || 0);
-              const isFull = remaining <= 0;
-              const isToday = event.date === todayStr;
-              const isTomorrow = new Date(event.date).getTime() - Date.now() < 86400000 * 2 && new Date(event.date) > new Date();
-              const deadlineToday = event.application_deadline === todayStr;
-              const deadlineSoon = event.application_deadline && new Date(event.application_deadline).getTime() - Date.now() < 86400000 * 3 && new Date(event.application_deadline).getTime() > Date.now();
-
-              return (
-                <div key={event.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-                  {/* Top */}
-                  <div className="p-4 pb-3">
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="font-semibold text-base text-gray-900 truncate">{event.title}</h3>
-                          {event.category && (
-                            <span className="text-[11px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full capitalize shrink-0">
-                              {event.category.replace(/_/g, " ")}
-                            </span>
-                          )}
+            {needsAttention.length > 0 && needsAttention.length !== pendingApprovals.length && (
+              <div>
+                <div className="flex items-center gap-1.5 mb-2"><AlertTriangle className="w-3.5 h-3.5 text-amber-600" /><span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">Needs Attention</span></div>
+                <div className="space-y-2">
+                  {needsAttention.filter(e => !pendingApprovals.includes(e)).map(event => {
+                    const rem = event.worker_count - (event.approvedCount || 0);
+                    return (
+                      <Link key={event.id} href={`/organizer/events/${event.id}`} className="block bg-white border border-amber-200 rounded-xl p-3 active:bg-amber-50">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="font-medium text-sm text-gray-900 truncate">{event.title}</p>
+                          <span className="text-xs font-medium text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full shrink-0">{rem <= 3 ? `Only ${rem} left` : "Attention"}</span>
                         </div>
-                        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                          <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${STATUS_STYLES[event.status]}`}>
-                            {STATUS_LABELS[event.status]}
-                          </span>
-                          {isToday && event.status !== "completed" && event.status !== "cancelled" && (
-                            <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
-                              <Clock3 className="w-3 h-3" /> Today
-                            </span>
-                          )}
-                          {isTomorrow && (
-                            <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">Tomorrow</span>
-                          )}
-                        </div>
-                      </div>
-                      <button onClick={() => setSelectedEvent(event)}
-                        className="shrink-0 h-9 px-3 rounded-lg bg-blue-50 text-blue-700 text-sm font-medium flex items-center gap-1.5 active:bg-blue-100">
-                        <Users className="w-4 h-4" />
-                        {event.applicantCount}
-                      </button>
-                    </div>
-
-                    {/* Info grid */}
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm text-gray-600 mt-2">
-                      <div className="flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                        <span>{event.date}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                        <span>{event.time}{event.end_time ? `-${event.end_time}` : ""}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 col-span-2">
-                        <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                        <span className="truncate">{event.location}</span>
-                      </div>
-                    </div>
-
-                    {/* Operational indicators */}
-                    <div className="flex flex-wrap gap-1.5 mt-3">
-                      {remaining > 0 && event.status !== "completed" && event.status !== "cancelled" && event.status !== "closed" && (
-                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                          remaining <= 3 ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"
-                        }`}>
-                          {remaining <= 3 ? `Only ${remaining} left` : `${remaining} seats open`}
-                        </span>
-                      )}
-                      {isFull && event.status !== "completed" && (
-                        <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium">Full</span>
-                      )}
-                      {deadlineToday && (
-                        <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium">Deadline today</span>
-                      )}
-                      {deadlineSoon && !deadlineToday && (
-                        <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">Deadline closing</span>
-                      )}
-                      {event.payment_info && (
-                        <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">{event.payment_info}</span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-1.5 px-4 py-2.5 border-t border-gray-100 overflow-x-auto">
-                    <button onClick={() => setSelectedEvent(event)}
-                      className="h-8 px-3 rounded-lg bg-blue-50 text-blue-700 text-xs font-medium flex items-center gap-1.5 shrink-0 active:bg-blue-100">
-                      <Users className="w-3.5 h-3.5" /> {event.applicantCount} applicants
-                    </button>
-                    <button onClick={() => setEditingEvent(event)}
-                      className="h-8 px-3 rounded-lg bg-gray-100 text-gray-700 text-xs font-medium flex items-center gap-1.5 shrink-0 active:bg-gray-200">
-                      <Edit3 className="w-3.5 h-3.5" /> Edit
-                    </button>
-                    <button onClick={() => duplicateEvent(event)}
-                      className="h-8 px-3 rounded-lg bg-gray-100 text-gray-700 text-xs font-medium flex items-center gap-1.5 shrink-0 active:bg-gray-200">
-                      <Copy className="w-3.5 h-3.5" /> Copy
-                    </button>
-                    <button onClick={() => saveAsTemplate(event)}
-                      className="h-8 px-3 rounded-lg bg-gray-100 text-gray-700 text-xs font-medium flex items-center gap-1.5 shrink-0 active:bg-gray-200">
-                      <BookTemplate className="w-3.5 h-3.5" /> Template
-                    </button>
-                    {(event.status === "published" || event.status === "filling") && (
-                      <button onClick={() => updateEventStatus(event.id, "closed")}
-                        className="h-8 px-3 rounded-lg bg-amber-50 text-amber-700 text-xs font-medium flex items-center gap-1.5 shrink-0 active:bg-amber-100">
-                        <XCircle className="w-3.5 h-3.5" /> Close
-                      </button>
-                    )}
-                    {event.status === "draft" && (
-                      <button onClick={() => updateEventStatus(event.id, "published")}
-                        className="h-8 px-3 rounded-lg bg-green-100 text-green-700 text-xs font-medium flex items-center gap-1.5 shrink-0 active:bg-green-200">
-                        Publish
-                      </button>
-                    )}
-                    {event.status !== "completed" && event.status !== "cancelled" && event.status !== "draft" && (
-                      <button onClick={() => { if (confirm("Mark as completed?")) updateEventStatus(event.id, "completed"); }}
-                        className="h-8 px-3 rounded-lg bg-gray-100 text-gray-600 text-xs font-medium flex items-center gap-1.5 shrink-0 active:bg-gray-200">
-                        <CheckCircle className="w-3.5 h-3.5" /> Complete
-                      </button>
-                    )}
-                    <button onClick={() => deleteEvent(event.id)}
-                      className="h-8 px-3 rounded-lg bg-red-50 text-red-600 text-xs font-medium flex items-center gap-1.5 shrink-0 active:bg-red-100">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
+                        <p className="text-xs text-gray-500 mt-1">{event.date} · {event.time}{event.application_deadline === todayStr ? " · Deadline today" : ""}</p>
+                      </Link>
+                    );
+                  })}
                 </div>
-              );
-            })}
+              </div>
+            )}
+
+            {seatsOpen.length > 0 && (
+              <div>
+                <div className="flex items-center gap-1.5 mb-2"><Clock3 className="w-3.5 h-3.5 text-green-600" /><span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">Seats Open</span></div>
+                <div className="space-y-2">
+                  {seatsOpen.map(event => (
+                    <Link key={event.id} href={`/organizer/events/${event.id}`} className="block bg-white border border-gray-200 rounded-xl p-3 active:bg-gray-50">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="font-medium text-sm text-gray-900 truncate">{event.title}</p>
+                        <span className="text-xs font-medium text-green-700 bg-green-100 px-2 py-0.5 rounded-full shrink-0">{event.worker_count - (event.approvedCount || 0)} seats</span>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">{event.date} · {event.time}</p>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {sortedActive.length === 0 && (
+              <div className="text-center py-16 text-gray-400">
+                <LayoutDashboard className="w-10 h-10 mx-auto mb-2 text-gray-300" />
+                <p className="text-sm">No active events</p>
+                <button onClick={() => { setCreateFromTemplate(null); setShowCreate(true); }} className="mt-2 text-xs text-blue-600">Create your first event</button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Past Tab */}
+        {tab === "past" && (
+          <div className="space-y-2">
+            {pastEvents.length === 0 && (
+              <div className="text-center py-16 text-gray-400">
+                <LayoutDashboard className="w-10 h-10 mx-auto mb-2 text-gray-300" />
+                <p className="text-sm">No past events</p>
+              </div>
+            )}
+            {pastEvents.map(event => (
+              <Link key={event.id} href={`/organizer/events/${event.id}`}
+                className="block bg-white border border-gray-200 rounded-xl p-3.5 active:bg-gray-50">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-sm text-gray-900 truncate">{event.title}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{event.date} · {event.time}</p>
+                  </div>
+                  <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full shrink-0 ${STATUS_STYLES[event.status]}`}>
+                    {STATUS_LABELS[event.status]}
+                  </span>
+                </div>
+              </Link>
+            ))}
           </div>
         )}
       </main>

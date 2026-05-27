@@ -84,6 +84,16 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
           : `Your application for "${event.title}" has been rejected.`,
       });
     }
+
+    // Auto-mark Full when capacity reached
+    if (status === "approved") {
+      const newApprovedCount = applicants.filter(a => a.status === "approved" || a.id === applicationId).length;
+      if (newApprovedCount >= event.worker_count) {
+        await supabase.from("events").update({ status: "full", updated_at: new Date().toISOString() }).eq("id", event.id);
+        toast.success("Event is now full!");
+      }
+    }
+
     toast.success(`Worker ${status === "approved" ? "approved" : "rejected"}!`);
     loadApplicants();
     onUpdate();
