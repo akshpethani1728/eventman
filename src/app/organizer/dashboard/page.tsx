@@ -8,7 +8,7 @@ import {
   LogOut, Plus, Copy, Edit3, Trash2, XCircle, Users, MapPin, Calendar,
   Clock, LayoutDashboard, User, AlertTriangle, CheckCircle, Clock3,
   BookTemplate, Bell, Search, IndianRupee, ChevronRight, ArrowUpRight,
-  Hourglass, Filter, TrendingUp, Ban, ShieldCheck, Check, X
+  Hourglass
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Profile, Event, Application } from "@/lib/supabase/types";
