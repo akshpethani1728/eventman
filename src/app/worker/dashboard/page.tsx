@@ -4,56 +4,71 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { LogOut, MapPin, Calendar, Clock, Users, IndianRupee, User, Star, ShieldCheck, UtensilsCrossed, Car, Shirt, Timer, TrendingUp } from "lucide-react";
+import {
+  LogOut, MapPin, Calendar, Clock, Users, IndianRupee, Star, ShieldCheck,
+  UtensilsCrossed, Car, Shirt, Timer, TrendingUp, Zap, CheckCircle,
+  XCircle, Hourglass, ArrowUpRight, Clock3, Send, AlertCircle
+} from "lucide-react";
 import { toast } from "sonner";
 import type { Profile, Event, Application } from "@/lib/supabase/types";
 
-const CATEGORY_THEMES: Record<string, { gradient: string; bg: string; text: string; light: string }> = {
-  promotion:      { gradient: "from-blue-600 to-blue-400", bg: "bg-blue-50", text: "text-blue-700", light: "bg-blue-100" },
-  event_setup:   { gradient: "from-violet-600 to-purple-400", bg: "bg-purple-50", text: "text-purple-700", light: "bg-purple-100" },
-  crowd_management: { gradient: "from-orange-600 to-amber-400", bg: "bg-orange-50", text: "text-orange-700", light: "bg-orange-100" },
-  registration:  { gradient: "from-emerald-600 to-green-400", bg: "bg-green-50", text: "text-green-700", light: "bg-green-100" },
-  hospitality:   { gradient: "from-amber-600 to-yellow-400", bg: "bg-amber-50", text: "text-amber-700", light: "bg-amber-100" },
-  cleaning:      { gradient: "from-cyan-600 to-teal-400", bg: "bg-cyan-50", text: "text-cyan-700", light: "bg-cyan-100" },
-  security:      { gradient: "from-red-600 to-rose-400", bg: "bg-red-50", text: "text-red-700", light: "bg-red-100" },
-  other:         { gradient: "from-gray-600 to-gray-400", bg: "bg-gray-50", text: "text-gray-700", light: "bg-gray-100" },
+type ApplicationStatusDisplay = "pending" | "approved" | "rejected" | "cancelled";
+
+const STATUS_CONFIG: Record<ApplicationStatusDisplay, { label: string; bg: string; text: string; icon: any; border: string }> = {
+  pending:   { label: "Pending",   bg: "bg-amber-50", text: "text-amber-700", icon: Hourglass,  border: "border-amber-200" },
+  approved:  { label: "Approved",  bg: "bg-emerald-50", text: "text-emerald-700", icon: CheckCircle, border: "border-emerald-200" },
+  rejected:  { label: "Rejected",  bg: "bg-red-50", text: "text-red-700", icon: XCircle,  border: "border-red-200" },
+  cancelled: { label: "Cancelled", bg: "bg-gray-50", text: "text-gray-500", icon: XCircle, border: "border-gray-200" },
 };
 
-const DEFAULT_THEME = CATEGORY_THEMES["other"];
+const CATEGORY_LABELS: Record<string, string> = {
+  promotion: "Promotion", event_setup: "Setup", crowd_management: "Crowd Mgmt",
+  registration: "Registration", hospitality: "Hospitality", cleaning: "Cleaning",
+  security: "Security", other: "Other",
+};
+
+const CATEGORY_COLORS: Record<string, string> = {
+  promotion: "bg-blue-500/10 text-blue-600", event_setup: "bg-violet-500/10 text-violet-600",
+  crowd_management: "bg-orange-500/10 text-orange-600", registration: "bg-emerald-500/10 text-emerald-600",
+  hospitality: "bg-amber-500/10 text-amber-600", cleaning: "bg-cyan-500/10 text-cyan-600",
+  security: "bg-red-500/10 text-red-600", other: "bg-gray-500/10 text-gray-600",
+};
 
 function StarRating({ rating, size = "sm" }: { rating: number; size?: "sm" | "xs" }) {
   const cls = size === "sm" ? "w-3.5 h-3.5" : "w-3 h-3";
   return (
     <div className="flex items-center gap-0.5">
       {[1,2,3,4,5].map(s => (
-        <Star key={s} className={`${cls} ${rating >= s ? "fill-amber-400 text-amber-400" : "text-gray-300"}`} />
+        <Star key={s} className={`${cls} ${rating >= s ? "fill-amber-400 text-amber-400" : rating >= s - 0.5 ? "fill-amber-200 text-amber-300" : "text-gray-200"}`} />
       ))}
     </div>
   );
 }
 
-type ApplicationStatusDisplay = "pending" | "approved" | "rejected" | "cancelled";
-
-function StatusBadge({ status }: { status: ApplicationStatusDisplay }) {
-  const styles: Record<string, string> = {
-    pending: "bg-amber-100 text-amber-800",
-    approved: "bg-green-100 text-green-800",
-    rejected: "bg-red-100 text-red-800",
-    cancelled: "bg-gray-100 text-gray-600",
-  };
-  return (
-    <span className={`text-xs font-medium px-2.5 py-1 rounded-full capitalize ${styles[status] || styles.pending}`}>
-      {status}
-    </span>
-  );
+function CountdownTimer({ targetDate }: { targetDate: string }) {
+  const diff = new Date(targetDate).getTime() - Date.now();
+  if (diff <= 0) return <span className="text-red-600 font-medium">Deadline passed</span>;
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  if (days > 7) return <span>{days} days left</span>;
+  if (days > 0) return <span className="text-amber-600 font-medium">{days}d {hours}h left</span>;
+  return <span className="text-red-600 font-medium">{hours}h left</span>;
 }
 
 export default function WorkerDashboard() {
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [events, setEvents] = useState<(Event & { application?: Application; approved_count?: number; organizer?: Profile; organizer_rating?: number })[]>([]);
+  const [events, setEvents] = useState<(Event & {
+    application?: Application;
+    approved_count?: number;
+    total_applications?: number;
+    organizer?: Profile;
+    organizer_rating?: number;
+    organizer_past_events?: number;
+  })[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"browse" | "applied">("browse");
   const [categoryFilter, setCategoryFilter] = useState("");
+  const [applyingId, setApplyingId] = useState<string | null>(null);
   const router = useRouter();
   const supabase = createClient();
 
@@ -63,34 +78,36 @@ export default function WorkerDashboard() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.push("/login"); return; }
 
-    const { data: prof } = await supabase
-      .from("profiles").select("*").eq("user_id", user.id).single();
+    const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
     if (!prof || prof.role !== "worker") { router.push("/login"); return; }
     setProfile(prof);
 
-    const { data: apps } = await supabase
-      .from("applications").select("event_id, status, id, notes, created_at, updated_at").eq("worker_id", user.id);
-    const appMap: Record<string, any> = {};
-    apps?.forEach((a: any) => { appMap[a.event_id] = a; });
+    const { data: apps } = await supabase.from("applications").select("*").eq("worker_id", user.id);
+    const appMap: Record<string, Application> = {};
+    apps?.forEach((a: Application) => { appMap[a.event_id] = a; });
 
     const { data: evts } = await supabase
       .from("events").select("*").in("status", ["published", "filling"]).order("date", { ascending: true });
 
     if (!evts || evts.length === 0) { setEvents([]); setLoading(false); return; }
 
+    const eventIds = evts.map(e => e.id);
+
     const { data: counts } = await supabase
-      .from("applications").select("event_id, status").in("event_id", evts.map(e => e.id)).eq("status", "approved");
-    const countMap: Record<string, number> = {};
-    counts?.forEach((c: any) => { countMap[c.event_id] = (countMap[c.event_id] || 0) + 1; });
+      .from("applications").select("event_id, status").in("event_id", eventIds);
+    const approvedMap: Record<string, number> = {};
+    const totalMap: Record<string, number> = {};
+    counts?.forEach((c: any) => {
+      totalMap[c.event_id] = (totalMap[c.event_id] || 0) + 1;
+      if (c.status === "approved") approvedMap[c.event_id] = (approvedMap[c.event_id] || 0) + 1;
+    });
 
     const orgIds = [...new Set(evts.map(e => e.organizer_id))];
-    const { data: orgProfiles } = await supabase
-      .from("profiles").select("*").in("user_id", orgIds);
+    const { data: orgProfiles } = await supabase.from("profiles").select("*").in("user_id", orgIds);
     const orgMap: Record<string, Profile> = {};
     orgProfiles?.forEach(p => { orgMap[p.user_id] = p; });
 
-    const { data: reviews } = await supabase
-      .from("reviews").select("to_id, rating").in("to_id", orgIds);
+    const { data: reviews } = await supabase.from("reviews").select("to_id, rating").in("to_id", orgIds);
     const ratingSums: Record<string, { sum: number; count: number }> = {};
     reviews?.forEach(r => {
       if (!ratingSums[r.to_id]) ratingSums[r.to_id] = { sum: 0, count: 0 };
@@ -100,26 +117,35 @@ export default function WorkerDashboard() {
     const ratingMap: Record<string, number> = {};
     Object.entries(ratingSums).forEach(([id, v]) => { ratingMap[id] = Math.round((v.sum / v.count) * 10) / 10; });
 
+    const { data: pastCounts } = await supabase
+      .from("events").select("organizer_id").in("organizer_id", orgIds).in("status", ["completed", "cancelled"]);
+    const pastCountMap: Record<string, number> = {};
+    pastCounts?.forEach((e: any) => {
+      pastCountMap[e.organizer_id] = (pastCountMap[e.organizer_id] || 0) + 1;
+    });
+
     const enriched = evts.map(e => ({
       ...e,
       application: appMap[e.id] || undefined,
-      approved_count: countMap[e.id] || 0,
+      approved_count: approvedMap[e.id] || 0,
+      total_applications: totalMap[e.id] || 0,
       organizer: orgMap[e.organizer_id],
       organizer_rating: ratingMap[e.organizer_id] || 0,
+      organizer_past_events: pastCountMap[e.organizer_id] || 0,
     }));
 
     setEvents(enriched);
     setLoading(false);
   };
 
-  const apply = async (e: React.MouseEvent, eventId: string) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const apply = async (eventId: string) => {
+    setApplyingId(eventId);
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) { setApplyingId(null); return; }
     const { error } = await supabase.from("applications").insert({
       event_id: eventId, worker_id: user.id, status: "pending",
     });
+    setApplyingId(null);
     if (error) { toast.error(error.message); return; }
     toast.success("Applied successfully!");
     loadData();
@@ -133,55 +159,69 @@ export default function WorkerDashboard() {
   if (categoryFilter) browseEvents = browseEvents.filter(e => e.category === categoryFilter);
   const appliedEvents = events.filter(e => appliedIds.has(e.id));
 
+  const formatCount = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100">
-        <p className="text-gray-500">Loading...</p>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-10 h-10 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm text-gray-500">Finding events for you...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-[#f5f5f7]">
       {/* Header */}
-      <header className="sticky top-0 bg-white/80 backdrop-blur-lg border-b border-gray-200/80 z-10">
+      <header className="sticky top-0 bg-white/80 backdrop-blur-2xl border-b border-gray-200/60 z-20">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
-          <h1 className="font-bold text-lg">
-            <span className="text-blue-600">Event</span>Man
-          </h1>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center shadow-sm">
+              <Zap className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <h1 className="font-bold text-base leading-tight">EventMan</h1>
+              <p className="text-[10px] text-gray-400 -mt-0.5">Find work near you</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-0.5">
             {profile && (
-              <Link href="/worker/profile" className="flex items-center gap-2 p-1.5 hover:bg-gray-100 rounded-lg">
-                <div className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-xs">
+              <Link href="/worker/profile" className="flex items-center gap-2 p-1.5 hover:bg-gray-100 rounded-xl transition-colors">
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-[11px] shadow-sm">
                   {profile.full_name?.charAt(0) || "W"}
                 </div>
               </Link>
             )}
-            <button onClick={signOut} className="p-2 text-gray-500 hover:text-gray-900"><LogOut className="w-4 h-4" /></button>
+            <button onClick={signOut} className="p-2 text-gray-400 hover:text-gray-600 rounded-xl hover:bg-gray-100 transition-colors">
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-lg mx-auto px-4 py-4 pb-24">
-        {/* Welcome */}
-        {profile && tab === "browse" && (
-          <div className="mb-4">
-            <p className="text-sm text-gray-500">Hello, <span className="font-semibold text-gray-800">{profile.full_name?.split(" ")[0] || "there"}</span></p>
-            <p className="text-xs text-gray-400 mt-0.5">{browseEvents.length} event{browseEvents.length !== 1 ? "s" : ""} available for you</p>
+      <main className="max-w-lg mx-auto px-4 py-4 pb-28">
+        {/* Welcome banner */}
+        {profile && tab === "browse" && browseEvents.length > 0 && (
+          <div className="mb-4 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-4 text-white shadow-lg shadow-blue-600/20">
+            <p className="text-sm opacity-90">Hey <span className="font-semibold">{profile.full_name?.split(" ")[0] || "there"}</span></p>
+            <p className="text-lg font-bold mt-0.5">{browseEvents.length} event{browseEvents.length !== 1 ? "s" : ""} available</p>
+            <p className="text-xs opacity-75 mt-0.5">Find the perfect opportunity today</p>
           </div>
         )}
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-4 bg-white rounded-xl p-1 border border-gray-200/80">
+        <div className="flex gap-2 mb-4 bg-white/80 backdrop-blur-xl rounded-2xl p-1 border border-gray-200/60 shadow-sm">
           <button onClick={() => setTab("browse")}
-            className={`flex-1 h-10 rounded-lg text-sm font-medium transition-all ${
-              tab === "browse" ? "bg-blue-600 text-white shadow-sm" : "text-gray-600 hover:text-gray-900"
+            className={`flex-1 h-11 rounded-xl text-sm font-medium transition-all ${
+              tab === "browse" ? "bg-blue-600 text-white shadow-md shadow-blue-600/20" : "text-gray-500 hover:text-gray-800"
             }`}>
             Browse {browseEvents.length > 0 && `(${browseEvents.length})`}
           </button>
           <button onClick={() => setTab("applied")}
-            className={`flex-1 h-10 rounded-lg text-sm font-medium transition-all ${
-              tab === "applied" ? "bg-blue-600 text-white shadow-sm" : "text-gray-600 hover:text-gray-900"
+            className={`flex-1 h-11 rounded-xl text-sm font-medium transition-all ${
+              tab === "applied" ? "bg-blue-600 text-white shadow-md shadow-blue-600/20" : "text-gray-500 hover:text-gray-800"
             }`}>
             Applied {appliedEvents.length > 0 && `(${appliedEvents.length})`}
           </button>
@@ -192,210 +232,348 @@ export default function WorkerDashboard() {
           <>
             {/* Category filter */}
             {allCategories.length > 0 && (
-              <div className="mb-3 overflow-x-auto -mx-4 px-4">
+              <div className="mb-3 overflow-x-auto -mx-4 px-4 scrollbar-none">
                 <div className="flex gap-2 min-w-max pb-1">
                   <button onClick={() => setCategoryFilter("")}
-                    className={`h-8 px-3 rounded-full text-xs font-medium transition-colors ${
-                      !categoryFilter ? "bg-blue-600 text-white shadow-sm" : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300"
+                    className={`h-9 px-4 rounded-xl text-xs font-medium transition-all ${
+                      !categoryFilter ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20" : "bg-white text-gray-600 border border-gray-200/80 hover:border-gray-300 shadow-sm"
                     }`}>All</button>
                   {allCategories.map(cat => (
                     <button key={cat} onClick={() => setCategoryFilter(cat)}
-                      className={`h-8 px-3 rounded-full text-xs font-medium capitalize transition-colors ${
-                        categoryFilter === cat ? "bg-blue-600 text-white shadow-sm" : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300"
-                      }`}>{cat.replace(/_/g, " ")}</button>
+                      className={`h-9 px-4 rounded-xl text-xs font-medium capitalize transition-all whitespace-nowrap ${
+                        categoryFilter === cat ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20" : "bg-white text-gray-600 border border-gray-200/80 hover:border-gray-300 shadow-sm"
+                      }`}>{CATEGORY_LABELS[cat] || cat.replace(/_/g, " ")}</button>
                   ))}
                 </div>
               </div>
             )}
 
+            {/* Empty state */}
             {browseEvents.length === 0 && (
               <div className="text-center py-20">
-                <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
-                  <TrendingUp className="w-7 h-7 text-gray-400" />
+                <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mx-auto mb-4">
+                  <TrendingUp className="w-7 h-7 text-gray-300" />
                 </div>
-                <p className="text-base font-medium text-gray-900">No events right now</p>
-                <p className="text-sm text-gray-500 mt-1">Check back later for new opportunities</p>
+                <p className="text-base font-semibold text-gray-900">No events right now</p>
+                <p className="text-sm text-gray-500 mt-1">Check back soon for new opportunities</p>
+                {categoryFilter && (
+                  <button onClick={() => setCategoryFilter("")} className="mt-4 h-10 px-5 rounded-xl bg-blue-600 text-white text-sm font-medium shadow-sm">
+                    Clear filters
+                  </button>
+                )}
               </div>
             )}
 
-            {browseEvents.map(event => {
-              const remaining = event.worker_count - (event.approved_count || 0);
-              const fillPercent = Math.min(100, Math.round(((event.approved_count || 0) / event.worker_count) * 100));
-              const theme = CATEGORY_THEMES[event.category || "other"] || DEFAULT_THEME;
-              const daysUntil = Math.ceil((new Date(event.date).getTime() - Date.now()) / 86400000);
-              const isUrgent = daysUntil <= 2 && daysUntil > 0;
-              const isDeadlineSoon = event.application_deadline && new Date(event.application_deadline).getTime() - Date.now() < 86400000 * 3 && new Date(event.application_deadline) > new Date();
+            {/* Event Cards */}
+            <div className="space-y-4">
+              {browseEvents.map(event => {
+                const remaining = event.worker_count - (event.approved_count || 0);
+                const fillPercent = Math.min(100, Math.round(((event.approved_count || 0) / event.worker_count) * 100));
+                const daysUntil = Math.ceil((new Date(event.date).getTime() - Date.now()) / 86400000);
+                const isUrgent = daysUntil <= 2 && daysUntil > 0;
+                const isToday = daysUntil === 0;
+                const hoursUntilEvent = Math.round((new Date(event.date).getTime() - Date.now()) / 3600000);
+                const isNew = new Date(event.created_at).getTime() > Date.now() - 86400000 * 2;
+                const isPopular = (event.total_applications || 0) >= 5;
+                const deadlineSoon = event.application_deadline && new Date(event.application_deadline).getTime() - Date.now() < 86400000 * 3 && new Date(event.application_deadline).getTime() > Date.now();
+                const org = event.organizer;
+                const orgRating = event.organizer_rating || 0;
 
-              return (
-                <Link key={event.id} href={`/worker/events/${event.id}`}
-                  className="block bg-white rounded-2xl border border-gray-200/80 overflow-hidden mb-4 hover:shadow-lg hover:border-gray-300 transition-all duration-200 active:scale-[0.98]">
+                return (
+                  <Link key={event.id} href={`/worker/events/${event.id}`}
+                    className="block bg-white rounded-2xl border border-gray-200/70 overflow-hidden shadow-sm hover:shadow-lg hover:border-gray-300 transition-all duration-200 active:scale-[0.99]">
 
-                  {/* Color accent strip */}
-                  <div className={`h-1.5 bg-gradient-to-r ${theme.gradient}`} />
-
-                  <div className="p-4 space-y-3">
-                    {/* Urgency badge */}
-                    {isUrgent && (
-                      <div className="flex items-center gap-1.5 text-xs font-medium text-red-600 bg-red-50 px-2.5 py-1 rounded-full w-fit">
-                        <Timer className="w-3 h-3" /> {daysUntil === 0 ? "Happening today!" : daysUntil === 1 ? "Tomorrow!" : "In 2 days"}
-                      </div>
-                    )}
-
-                    {/* Title row */}
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <h3 className="font-bold text-base leading-snug text-gray-900">{event.title}</h3>
-                        {event.category && (
-                          <span className={`text-[10px] font-medium ${theme.text} ${theme.light} px-2 py-0.5 rounded-full capitalize mt-1.5 inline-block`}>
-                            {event.category.replace(/_/g, " ")}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Payment - prominent */}
-                    {event.payment_info && (
-                      <div className="flex items-center gap-1.5">
-                        <IndianRupee className="w-4 h-4 text-emerald-600" />
-                        <span className="text-lg font-bold text-emerald-700">{event.payment_info}</span>
-                      </div>
-                    )}
-
-                    {/* Date/Time/Location row */}
-                    <div className="space-y-1.5">
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <Calendar className="w-3.5 h-3.5 shrink-0 text-gray-400" />
-                        <span>{event.date_display || event.date}</span>
-                        <span className="text-gray-300">·</span>
-                        <Clock className="w-3.5 h-3.5 shrink-0 text-gray-400" />
-                        <span>{event.time}{event.end_time ? `-${event.end_time}` : ""}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <MapPin className="w-3.5 h-3.5 shrink-0 text-gray-400" />
-                        <span className="truncate">{event.location}</span>
-                      </div>
-                    </div>
-
-                    {/* Progress bar - seats */}
-                    <div>
-                      <div className="flex items-center justify-between text-xs mb-1.5">
-                        <div className="flex items-center gap-1">
-                          <Users className="w-3.5 h-3.5 text-gray-400" />
-                          <span className={`font-medium ${remaining === 0 ? "text-red-600" : remaining <= 3 ? "text-amber-600" : "text-gray-700"}`}>
-                            {remaining} of {event.worker_count} left
-                          </span>
-                        </div>
-                        <span className="text-gray-400">{fillPercent}% filled</span>
-                      </div>
-                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full transition-all duration-500 bg-gradient-to-r ${theme.gradient}`}
-                          style={{ width: `${fillPercent}%` }} />
-                      </div>
-                    </div>
-
-                    {/* Perks row */}
-                    {(event.food_included || event.travel_included || event.dress_code || event.skill_requirements) && (
-                      <div className="flex flex-wrap gap-1.5">
-                        {event.food_included && <span className="text-[10px] bg-green-50 text-green-700 px-2 py-0.5 rounded-full flex items-center gap-1"><UtensilsCrossed className="w-3 h-3" />Food</span>}
-                        {event.travel_included && <span className="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full flex items-center gap-1"><Car className="w-3 h-3" />Travel</span>}
-                        {event.dress_code && <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full flex items-center gap-1"><Shirt className="w-3 h-3" />{event.dress_code}</span>}
-                        {event.skill_requirements && event.skill_requirements.length > 0 && (
-                          <span className="text-[10px] bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full">{event.skill_requirements.length} skill{event.skill_requirements.length > 1 ? "s" : ""} needed</span>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Organizer trust strip */}
-                    {event.organizer && (
-                      <div className="flex items-center justify-between pt-1 border-t border-gray-100">
-                        <div className="flex items-center gap-2 min-w-0">
-                          {event.organizer.avatar_url ? (
-                            <img src={event.organizer.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover ring-1 ring-gray-200" />
-                          ) : (
-                            <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-[10px]">
-                              {event.organizer.full_name?.charAt(0) || "O"}
-                            </div>
-                          )}
-                          <span className="text-xs text-gray-600 truncate">{event.organizer.full_name}</span>
-                          {event.organizer.is_trusted_organizer && (
-                            <ShieldCheck className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-                          )}
-                        </div>
-                        {(event.organizer_rating || 0) > 0 && (
-                          <div className="flex items-center gap-1">
-                            <StarRating rating={event.organizer_rating || 0} size="xs" />
-                            <span className="text-[10px] text-gray-400">{event.organizer_rating || ""}</span>
+                    {/* === TRUST BAR === */}
+                    <div className="px-4 pt-3.5 pb-2 flex items-center justify-between">
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                        {org?.avatar_url ? (
+                          <img src={org.avatar_url} alt="" className="w-8 h-8 rounded-xl object-cover ring-1 ring-gray-100 shrink-0" />
+                        ) : (
+                          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-700 font-bold text-xs shrink-0">
+                            {org?.full_name?.charAt(0) || "O"}
                           </div>
                         )}
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs font-semibold text-gray-900 truncate">{org?.full_name || "Event Organizer"}</span>
+                            {org?.is_trusted_organizer && (
+                              <ShieldCheck className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            {orgRating > 0 && (
+                              <div className="flex items-center gap-0.5">
+                                <StarRating rating={orgRating} size="xs" />
+                                <span className="text-[10px] text-gray-500">{orgRating}</span>
+                              </div>
+                            )}
+                            {event.organizer_past_events && event.organizer_past_events > 0 && (
+                              <span className="text-[10px] text-gray-400">{event.organizer_past_events} past event{event.organizer_past_events !== 1 ? "s" : ""}</span>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                    )}
+                      <div className="flex items-center gap-1.5">
+                        {event.category && (
+                          <span className={`text-[10px] font-medium px-2 py-0.5 rounded-lg capitalize ${CATEGORY_COLORS[event.category] || "bg-gray-100 text-gray-600"}`}>
+                            {CATEGORY_LABELS[event.category] || event.category}
+                          </span>
+                        )}
+                        {isNew && (
+                          <span className="text-[10px] font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white px-2 py-0.5 rounded-lg shadow-sm">
+                            New
+                          </span>
+                        )}
+                      </div>
+                    </div>
 
-                    {/* Apply Button */}
-                    <button onClick={(e) => apply(e, event.id)}
-                      className={`w-full h-11 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-all duration-200 active:scale-[0.98] ${
-                        isUrgent
-                          ? "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-md hover:shadow-lg"
-                          : "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-sm hover:shadow-md"
-                      }`}>
-                      {isUrgent ? "Apply Now — Hurry!" : "Apply Now"}
-                      <Users className="w-4 h-4" />
-                    </button>
-                  </div>
-                </Link>
-              );
-            })}
+                    {/* === MAIN CONTENT === */}
+                    <div className="px-4 py-2">
+                      {/* Urgency badges */}
+                      <div className="flex flex-wrap gap-1.5 mb-2">
+                        {isToday && (
+                          <span className="text-[10px] font-semibold bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                            <Timer className="w-3 h-3" /> Today
+                          </span>
+                        )}
+                        {isUrgent && !isToday && (
+                          <span className="text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                            <Clock3 className="w-3 h-3" /> {daysUntil === 1 ? "Tomorrow" : `${daysUntil} days`}
+                          </span>
+                        )}
+                        {deadlineSoon && (
+                          <span className="text-[10px] font-semibold bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                            <AlertCircle className="w-3 h-3" /> Deadline soon
+                          </span>
+                        )}
+                        {isPopular && (
+                          <span className="text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                            <TrendingUp className="w-3 h-3" /> Popular
+                          </span>
+                        )}
+                        {remaining <= 3 && (
+                          <span className="text-[10px] font-semibold bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                            <Users className="w-3 h-3" /> Only {remaining} left
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Event title */}
+                      <h3 className="font-bold text-base leading-snug text-gray-900 mb-2">{event.title}</h3>
+
+                      {/* Payment — HERO */}
+                      {event.payment_info && (
+                        <div className="mb-2.5">
+                          <div className="inline-flex items-center gap-1.5 bg-emerald-50 border border-emerald-200/60 rounded-xl px-3 py-1.5">
+                            <IndianRupee className="w-4 h-4 text-emerald-600" />
+                            <span className="text-base font-bold text-emerald-700">{event.payment_info}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Date / Time / Location */}
+                      <div className="space-y-1 mb-3">
+                        <div className="flex items-center gap-2 text-xs text-gray-600">
+                          <Calendar className="w-3.5 h-3.5 shrink-0 text-gray-400" />
+                          <span className="font-medium">{event.date_display || new Date(event.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span>
+                          <span className="text-gray-300">·</span>
+                          <Clock className="w-3.5 h-3.5 shrink-0 text-gray-400" />
+                          <span>{event.time}{event.end_time ? `-${event.end_time}` : ""}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-gray-600">
+                          <MapPin className="w-3.5 h-3.5 shrink-0 text-gray-400" />
+                          <span className="truncate">{event.location}</span>
+                        </div>
+                      </div>
+
+                      {/* Seats progress */}
+                      <div className="mb-2.5">
+                        <div className="flex items-center justify-between text-xs mb-1.5">
+                          <div className="flex items-center gap-1">
+                            <Users className="w-3.5 h-3.5 text-gray-400" />
+                            <span className={`font-medium ${remaining === 0 ? "text-red-600" : remaining <= 3 ? "text-amber-600" : "text-gray-700"}`}>
+                              {remaining} of {event.worker_count} remaining
+                            </span>
+                          </div>
+                          <span className="text-gray-400">{fillPercent}% filled</span>
+                        </div>
+                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${
+                              fillPercent >= 80 ? "bg-red-500" : fillPercent >= 50 ? "bg-amber-500" : "bg-blue-500"
+                            }`}
+                            style={{ width: `${fillPercent}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Requirement chips */}
+                      <div className="flex flex-wrap gap-1.5">
+                        {event.gender_requirement && (
+                          <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-lg capitalize">{event.gender_requirement}</span>
+                        )}
+                        {(event.min_age || event.max_age) && (
+                          <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-lg">{event.min_age || 0}-{event.max_age || 99} yrs</span>
+                        )}
+                        {event.food_included && (
+                          <span className="text-[10px] bg-green-50 text-green-700 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                            <UtensilsCrossed className="w-3 h-3" /> Food
+                          </span>
+                        )}
+                        {event.travel_included && (
+                          <span className="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                            <Car className="w-3 h-3" /> Travel
+                          </span>
+                        )}
+                        {event.dress_code && (
+                          <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-lg">{event.dress_code}</span>
+                        )}
+                        {event.skill_requirements && event.skill_requirements.length > 0 && (
+                          <span className="text-[10px] bg-violet-50 text-violet-700 px-2 py-0.5 rounded-lg">
+                            {event.skill_requirements.slice(0, 2).join(", ")}{event.skill_requirements.length > 2 ? ` +${event.skill_requirements.length - 2}` : ""}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Application deadline countdown */}
+                      {event.application_deadline && (
+                        <div className="mt-2 flex items-center gap-1 text-[10px] text-gray-500">
+                          <Clock className="w-3 h-3" />
+                          Apply by {new Date(event.application_deadline).toLocaleDateString("en-IN", { day: "numeric", month: "short" })} ·
+                          <CountdownTimer targetDate={event.application_deadline} />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* === DIVIDER === */}
+                    <div className="h-px bg-gray-100 mx-4" />
+
+                    {/* === CTA SECTION === */}
+                    <div className="px-4 py-3 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2 min-w-0">
+                        {event.total_applications && event.total_applications > 0 && (
+                          <span className="text-[10px] text-gray-400 flex items-center gap-1">
+                            <Users className="w-3 h-3" />
+                            {formatCount(event.total_applications)} applicant{event.total_applications !== 1 ? "s" : ""}
+                          </span>
+                        )}
+                        {hoursUntilEvent > 0 && hoursUntilEvent < 48 && !isToday && (
+                          <span className="text-[10px] text-gray-400 flex items-center gap-1">
+                            <Clock3 className="w-3 h-3" />
+                            In {hoursUntilEvent}h
+                          </span>
+                        )}
+                      </div>
+                      <button
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); apply(event.id); }}
+                        disabled={applyingId === event.id}
+                        className={`h-10 px-5 rounded-xl font-semibold text-sm flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-60 ${
+                          isUrgent
+                            ? "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-md shadow-red-500/20 hover:shadow-lg hover:shadow-red-500/30"
+                            : "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30"
+                        }`}>
+                        {applyingId === event.id ? (
+                          <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <>
+                            Apply Now <ArrowUpRight className="w-3.5 h-3.5" />
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
           </>
         )}
 
         {/* Applied Events */}
         {tab === "applied" && appliedEvents.length === 0 && (
           <div className="text-center py-20">
-            <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
-              <Users className="w-7 h-7 text-gray-400" />
+            <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mx-auto mb-4">
+              <Send className="w-7 h-7 text-gray-300" />
             </div>
-            <p className="text-base font-medium text-gray-900">No applications yet</p>
+            <p className="text-base font-semibold text-gray-900">No applications yet</p>
             <p className="text-sm text-gray-500 mt-1">Browse events and apply to get started</p>
-            <button onClick={() => setTab("browse")} className="mt-4 h-10 px-6 rounded-xl bg-blue-600 text-white text-sm font-medium active:bg-blue-700">
+            <button onClick={() => setTab("browse")} className="mt-4 h-10 px-6 rounded-xl bg-blue-600 text-white text-sm font-medium shadow-sm">
               Browse Events
             </button>
           </div>
         )}
 
-        {tab === "applied" && appliedEvents.map(event => {
-          const theme = CATEGORY_THEMES[event.category || "other"] || DEFAULT_THEME;
-          return (
-            <Link key={event.id} href={`/worker/events/${event.id}`}
-              className="block bg-white rounded-2xl border border-gray-200/80 overflow-hidden mb-3 hover:shadow-md transition-all duration-200 active:scale-[0.98]">
-              <div className={`h-1 bg-gradient-to-r ${theme.gradient}`} />
-              <div className="p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <h3 className="font-bold text-sm text-gray-900">{event.title}</h3>
-                    <div className="flex items-center gap-2 text-xs text-gray-500 mt-1.5">
-                      <Calendar className="w-3 h-3 shrink-0 text-gray-400" />
+        {tab === "applied" && appliedEvents.length > 0 && (
+          <div className="space-y-3">
+            {appliedEvents.map(event => {
+              const app = event.application!;
+              const cfg = STATUS_CONFIG[app.status as ApplicationStatusDisplay] || STATUS_CONFIG.pending;
+              const StatusIcon = cfg.icon;
+              const org = event.organizer;
+
+              return (
+                <Link key={event.id} href={`/worker/events/${event.id}`}
+                  className={`block bg-white rounded-2xl border ${cfg.border} overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 active:scale-[0.99]`}>
+                  {/* Status color accent */}
+                  <div className={`h-1.5 ${cfg.bg}`} />
+                  <div className="p-4">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                        {org?.avatar_url ? (
+                          <img src={org.avatar_url} alt="" className="w-9 h-9 rounded-xl object-cover ring-1 ring-gray-100 shrink-0" />
+                        ) : (
+                          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-700 font-bold text-sm shrink-0">
+                            {org?.full_name?.charAt(0) || "E"}
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          <h3 className="font-semibold text-sm text-gray-900 truncate">{event.title}</h3>
+                          <div className="flex items-center gap-1.5 text-[10px] text-gray-500 mt-0.5">
+                            <span className="truncate">{event.location}</span>
+                            <span>·</span>
+                            <span>{event.date_display || event.date}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl ${cfg.bg} ${cfg.text} shrink-0`}>
+                        <StatusIcon className="w-3.5 h-3.5" />
+                        <span className="text-[10px] font-semibold">{cfg.label}</span>
+                      </div>
+                    </div>
+
+                    {event.payment_info && (
+                      <div className="flex items-center gap-1 text-emerald-700 text-sm font-semibold mb-2">
+                        <IndianRupee className="w-3.5 h-3.5" />
+                        {event.payment_info}
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-2 text-[10px] text-gray-500">
+                      <Calendar className="w-3 h-3" />
                       <span>{event.date_display || event.date}</span>
                       <span className="text-gray-300">·</span>
-                      <Clock className="w-3 h-3 shrink-0 text-gray-400" />
+                      <Clock className="w-3 h-3" />
                       <span>{event.time}</span>
+                      {event.category && (
+                        <>
+                          <span className="text-gray-300">·</span>
+                          <span className="capitalize">{CATEGORY_LABELS[event.category] || event.category}</span>
+                        </>
+                      )}
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-500 mt-0.5">
-                      <MapPin className="w-3 h-3 shrink-0 text-gray-400" />
-                      <span className="truncate">{event.location}</span>
-                    </div>
+
+                    {org && (
+                      <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-gray-100">
+                        <span className="text-[10px] text-gray-400">by</span>
+                        <span className="text-xs text-gray-600 font-medium truncate">{org.full_name}</span>
+                        {org.is_trusted_organizer && <ShieldCheck className="w-3 h-3 text-blue-500" />}
+                      </div>
+                    )}
                   </div>
-                  <StatusBadge status={event.application!.status as ApplicationStatusDisplay} />
-                </div>
-                {event.organizer && (
-                  <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-gray-100">
-                    <span className="text-[10px] text-gray-400">by</span>
-                    <span className="text-xs text-gray-600 truncate">{event.organizer.full_name}</span>
-                    {event.organizer.is_trusted_organizer && <ShieldCheck className="w-3 h-3 text-blue-500" />}
-                  </div>
-                )}
-              </div>
-            </Link>
-          );
-        })}
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </main>
     </div>
   );
