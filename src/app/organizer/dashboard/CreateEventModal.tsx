@@ -21,6 +21,7 @@ const DEFAULT_FORM = {
   category: "",
   date: "",
   time: "",
+  end_time: "",
   application_deadline: "",
   location: "",
   google_maps_link: "",
@@ -72,6 +73,7 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
       category: form.category || null,
       date: form.date,
       time: form.time,
+      end_time: form.end_time || null,
       application_deadline: form.application_deadline || null,
       location: form.location,
       google_maps_link: form.google_maps_link || null,
@@ -150,6 +152,9 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
                   className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
               </div>
               <div className="grid grid-cols-2 gap-2.5">
+                <input type="time" value={form.end_time} onChange={e => update("end_time", e.target.value)}
+                  placeholder="End time (optional)"
+                  className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
                 <input type="date" value={form.application_deadline} onChange={e => update("application_deadline", e.target.value)}
                   placeholder="Apply deadline"
                   className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />

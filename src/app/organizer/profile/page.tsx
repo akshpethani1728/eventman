@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ArrowLeft, Save, User, Phone, Mail, MapPin } from "lucide-react";
+import { ArrowLeft, Save, User, Phone, MapPin, FileText } from "lucide-react";
 import { toast } from "sonner";
 import type { Profile } from "@/lib/supabase/types";
 
@@ -17,6 +17,8 @@ export default function OrganizerProfilePage() {
     phone: "",
     city: "",
     area: "",
+    bio: "",
+    avatar_url: "",
   });
   const router = useRouter();
   const supabase = createClient();
@@ -42,6 +44,8 @@ export default function OrganizerProfilePage() {
       phone: prof.phone || "",
       city: prof.city || "",
       area: prof.area || "",
+      bio: prof.bio || "",
+      avatar_url: prof.avatar_url || "",
     });
     setLoading(false);
   };
@@ -56,6 +60,8 @@ export default function OrganizerProfilePage() {
       phone: form.phone || null,
       city: form.city || null,
       area: form.area || null,
+      bio: form.bio || null,
+      avatar_url: form.avatar_url || null,
     }).eq("user_id", user.id);
 
     setSaving(false);
@@ -129,6 +135,26 @@ export default function OrganizerProfilePage() {
             <input value={form.area} onChange={e => setForm(p => ({ ...p, area: e.target.value }))}
               placeholder="e.g., Navrangpura"
               className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
+          </div>
+        </div>
+
+        {/* About section */}
+        <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4">
+          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">About</h3>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Description / About</label>
+            <textarea value={form.bio} onChange={e => setForm(p => ({ ...p, bio: e.target.value }))}
+              placeholder="Tell workers about your organization..."
+              className="w-full h-20 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm resize-none" />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Logo URL</label>
+            <input value={form.avatar_url} onChange={e => setForm(p => ({ ...p, avatar_url: e.target.value }))}
+              placeholder="https://example.com/logo.png"
+              className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
+            {form.avatar_url && (
+              <img src={form.avatar_url} alt="Preview" className="w-16 h-16 rounded-lg object-cover mt-2 border border-gray-200" />
+            )}
           </div>
         </div>
 
