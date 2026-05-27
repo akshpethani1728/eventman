@@ -6,7 +6,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import {
   LogOut, MapPin, Calendar, Clock, Users, IndianRupee, Star, ShieldCheck,
-  UtensilsCrossed, Car, Timer, TrendingUp, Zap, CheckCircle,
+  UtensilsCrossed, Car, Timer, TrendingUp, Zap, CheckCircle, BadgeCheck,
   XCircle, Hourglass, ArrowUpRight, Clock3, Send, AlertCircle, Sparkles,
   Heart, Flame, Gauge, Bell
 } from "lucide-react";
@@ -150,18 +150,19 @@ function SkeletonCard() {
   );
 }
 
-function EventBadge({ children, variant }: { children: React.ReactNode; variant: "red" | "amber" | "blue" | "purple" | "green" | "orange" | "slate" }) {
-  const styles = {
-    red: "bg-gradient-to-r from-red-50 to-rose-50 text-red-700 border-red-200 shadow-red-200/30",
-    amber: "bg-gradient-to-r from-amber-50 to-orange-50 text-amber-700 border-amber-200 shadow-amber-200/30",
-    blue: "bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border-blue-200 shadow-blue-200/30",
-    purple: "bg-gradient-to-r from-purple-50 to-violet-50 text-purple-700 border-purple-200 shadow-purple-200/30",
-    green: "bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-700 border-emerald-200 shadow-emerald-200/30",
-    orange: "bg-gradient-to-r from-orange-50 to-amber-50 text-orange-700 border-orange-200 shadow-orange-200/30",
-    slate: "bg-gradient-to-r from-slate-50 to-gray-50 text-slate-600 border-slate-200 shadow-slate-200/30",
+function EventBadge({ children, variant, pulse }: { children: React.ReactNode; variant: "red" | "amber" | "blue" | "purple" | "green" | "orange" | "slate" | "emerald"; pulse?: boolean }) {
+  const styles: Record<string, string> = {
+    red: "bg-gradient-to-r from-red-50 to-rose-50 text-red-700 border-red-200/80 shadow-red-200/40",
+    amber: "bg-gradient-to-r from-amber-50 to-orange-50 text-amber-700 border-amber-200/80 shadow-amber-200/40",
+    blue: "bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border-blue-200/80 shadow-blue-200/40",
+    purple: "bg-gradient-to-r from-purple-50 to-violet-50 text-purple-700 border-purple-200/80 shadow-purple-200/40",
+    green: "bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-700 border-emerald-200/80 shadow-emerald-200/40",
+    orange: "bg-gradient-to-r from-orange-50 to-amber-50 text-orange-700 border-orange-200/80 shadow-orange-200/40",
+    slate: "bg-gradient-to-r from-slate-50 to-gray-50 text-slate-600 border-slate-200/80 shadow-slate-200/40",
+    emerald: "bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 border-emerald-200/80 shadow-emerald-200/40",
   };
   return (
-    <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-lg border shadow-sm ${styles[variant]}`}>
+    <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-lg border shadow-sm ${styles[variant]} ${pulse ? "animate-pulse shadow-lg" : ""}`}>
       {children}
     </span>
   );
@@ -458,8 +459,13 @@ export default function WorkerDashboard() {
                 const deadlineToday = event.application_deadline && new Date(event.application_deadline).getTime() - Date.now() < 86400000 && new Date(event.application_deadline).getTime() > Date.now();
                 const org = event.organizer;
                 const orgRating = event.organizer_rating || 0;
+                const hoursSinceCreated = (Date.now() - new Date(event.created_at).getTime()) / 3600000;
+                const isNewlyPosted = hoursSinceCreated < 6;
                 const isFillingFast = fillPercent >= 70;
                 const isNearlyFull = remaining <= 3;
+                const isTrusted = org?.is_trusted_organizer;
+                const hasHighRating = orgRating >= 4.5;
+                const isVerified = isTrusted || hasHighRating;
                 const score = computePriorityScore(event);
 
                 let cardAccent = "border-gray-200/70";
@@ -470,7 +476,7 @@ export default function WorkerDashboard() {
                 } else if (isNearlyFull || isFillingFast) {
                   cardAccent = "border-amber-200/80";
                   shadowBoost = "shadow-amber-500/5";
-                } else if (org?.is_trusted_organizer || orgRating >= 4.5) {
+                } else if (isTrusted || hasHighRating) {
                   cardAccent = "border-blue-200/80";
                   shadowBoost = "shadow-blue-500/5";
                 }
@@ -483,62 +489,91 @@ export default function WorkerDashboard() {
                     {/* === INTELLIGENCE ACCENT BAR === */}
                     <div className={`h-1.5 ${
                       isToday || hoursUntilEvent < 12
-                        ? "bg-gradient-to-r from-red-400 via-red-500 to-rose-500"
+                        ? "bg-gradient-to-r from-red-400 via-red-500 to-rose-500 shadow-sm shadow-red-500/20"
                         : isNearlyFull
-                          ? "bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500"
+                          ? "bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 shadow-sm shadow-amber-500/20"
                           : isFillingFast
                             ? "bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400"
-                            : org?.is_trusted_organizer || orgRating >= 4.5
-                              ? "bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-500"
+                            : isTrusted || hasHighRating
+                              ? "bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-500 shadow-sm shadow-blue-500/20"
                               : isNew
                                 ? "bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-400"
                                 : "bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200"
                     }`} />
 
-                    {/* === TRUST BAR === */}
-                    <div className="px-4 pt-3.5 pb-2 flex items-center justify-between">
-                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                        {org?.avatar_url ? (
-                          <img src={org.avatar_url} alt="" className={`w-8 h-8 rounded-xl object-cover ring-2 shrink-0 ${org?.is_trusted_organizer ? "ring-blue-200" : "ring-gray-100"}`} />
-                        ) : (
-                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-white font-bold text-xs shrink-0 ${
-                            org?.is_trusted_organizer
-                              ? "bg-gradient-to-br from-blue-500 to-indigo-600"
-                              : "bg-gradient-to-br from-blue-100 to-blue-200 text-blue-700"
-                          }`}>
-                            {org?.full_name?.charAt(0) || "O"}
-                          </div>
-                        )}
+                    {/* === PREMIUM TRUST STRIP === */}
+                    <div className={`px-4 pt-3.5 pb-2 flex items-center justify-between ${
+                      isVerified ? "bg-gradient-to-r from-indigo-50/60 via-blue-50/30 to-transparent" : ""
+                    }`}>
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="relative shrink-0">
+                          {org?.avatar_url ? (
+                            <img src={org.avatar_url} alt="" className={`w-10 h-10 rounded-xl object-cover ring-2 shrink-0 ${
+                              isTrusted ? "ring-emerald-200" : hasHighRating ? "ring-blue-200" : "ring-gray-100"
+                            }`} />
+                          ) : (
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0 ${
+                              isTrusted
+                                ? "bg-gradient-to-br from-emerald-500 to-teal-600"
+                                : hasHighRating
+                                  ? "bg-gradient-to-br from-blue-500 to-indigo-600"
+                                  : "bg-gradient-to-br from-blue-100 to-blue-200 text-blue-700"
+                            }`}>
+                              {org?.full_name?.charAt(0) || "O"}
+                            </div>
+                          )}
+                          {isTrusted && (
+                            <div className="absolute -bottom-1 -right-1 w-4.5 h-4.5 rounded-full bg-emerald-500 border-[2.5px] border-white flex items-center justify-center shadow-sm">
+                              <BadgeCheck className="w-2.5 h-2.5 text-white" />
+                            </div>
+                          )}
+                        </div>
                         <div className="min-w-0">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-xs font-semibold text-gray-900 truncate">{org?.full_name || "Event Organizer"}</span>
-                            {org?.is_trusted_organizer && (
-                              <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-blue-600 bg-blue-50 border border-blue-200/60 px-1.5 py-0.5 rounded-md">
-                                <ShieldCheck className="w-2.5 h-2.5" />
-                                Trusted
+                            <span className="text-sm font-bold text-gray-900 truncate">{org?.full_name || "Event Organizer"}</span>
+                            {isTrusted && (
+                              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.5 rounded-md shadow-sm">
+                                <BadgeCheck className="w-2.5 h-2.5" />
+                                Verified
+                              </span>
+                            )}
+                            {!isTrusted && hasHighRating && (
+                              <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-blue-600 bg-blue-50 border border-blue-200/60 px-1.5 py-0.5 rounded-md shadow-sm">
+                                <Star className="w-2.5 h-2.5 fill-blue-500" />
+                                Top Rated
                               </span>
                             )}
                           </div>
-                          <div className="flex items-center gap-1.5 mt-0.5">
-                            {orgRating > 0 && (
-                              <div className="flex items-center gap-0.5">
+                          <div className="flex items-center gap-2 mt-0.5">
+                            {orgRating > 0 ? (
+                              <div className="flex items-center gap-1">
                                 <StarRating rating={orgRating} size="xs" />
-                                <span className="text-[10px] text-gray-500">{orgRating}</span>
+                                <span className="text-[11px] font-bold text-gray-700">{orgRating}</span>
                               </div>
+                            ) : (
+                              <span className="text-[9px] text-gray-400">New organizer</span>
                             )}
-                            {event.organizer_past_events && event.organizer_past_events > 0 && (
-                              <span className="text-[10px] text-gray-400">{event.organizer_past_events} past</span>
+                            {(event.organizer_past_events ?? 0) > 0 && (
+                              <span className="text-[9px] text-gray-400 flex items-center gap-0.5">
+                                <CheckCircle className="w-2.5 h-2.5 text-gray-300" />
+                                {event.organizer_past_events} event{event.organizer_past_events !== 1 ? "s" : ""}
+                              </span>
                             )}
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 shrink-0">
                         {event.category && (
-                          <span className={`text-[10px] font-medium px-2 py-0.5 rounded-lg capitalize ${CATEGORY_COLORS[event.category] || "bg-gray-100 text-gray-600"}`}>
+                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-lg capitalize ${CATEGORY_COLORS[event.category] || "bg-gray-100 text-gray-600"}`}>
                             {CATEGORY_LABELS[event.category] || event.category}
                           </span>
                         )}
-                        {isNew && (
+                        {isNewlyPosted && (
+                          <span className="text-[10px] font-bold bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-2 py-0.5 rounded-lg shadow-md shadow-blue-500/30 animate-pulse">
+                            New
+                          </span>
+                        )}
+                        {!isNewlyPosted && isNew && (
                           <span className="text-[10px] font-bold bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-2 py-0.5 rounded-lg shadow-sm shadow-blue-500/20">
                             New
                           </span>
@@ -551,7 +586,7 @@ export default function WorkerDashboard() {
                       {/* Intelligence badges row */}
                       <div className="flex flex-wrap gap-1.5 mb-2">
                         {isToday && (
-                          <EventBadge variant="red"><Flame className="w-3 h-3" /> Starts Today</EventBadge>
+                          <EventBadge variant="red" pulse><Flame className="w-3 h-3" /> Starts Today</EventBadge>
                         )}
                         {daysUntil === 1 && !isToday && (
                           <EventBadge variant="amber"><Clock3 className="w-3 h-3" /> Starts Tomorrow</EventBadge>
@@ -563,10 +598,10 @@ export default function WorkerDashboard() {
                           <EventBadge variant="orange"><TrendingUp className="w-3 h-3" /> Filling Fast</EventBadge>
                         )}
                         {isNearlyFull && (
-                          <EventBadge variant="red"><Users className="w-3 h-3" /> Only {remaining} Left</EventBadge>
+                          <EventBadge variant="red" pulse><Users className="w-3 h-3" /> Only {remaining} Left</EventBadge>
                         )}
                         {deadlineToday && (
-                          <EventBadge variant="red"><AlertCircle className="w-3 h-3" /> Deadline Today</EventBadge>
+                          <EventBadge variant="red" pulse><AlertCircle className="w-3 h-3" /> Deadline Today</EventBadge>
                         )}
                         {deadlineSoon && !deadlineToday && (
                           <EventBadge variant="amber"><Clock className="w-3 h-3" /> Deadline Soon</EventBadge>
@@ -576,9 +611,6 @@ export default function WorkerDashboard() {
                         )}
                         {isPopular && !isHighDemand && (
                           <EventBadge variant="purple"><TrendingUp className="w-3 h-3" /> Popular</EventBadge>
-                        )}
-                        {org?.is_trusted_organizer && (
-                          <EventBadge variant="blue"><ShieldCheck className="w-3 h-3" /> Trusted</EventBadge>
                         )}
                       </div>
 
@@ -625,7 +657,7 @@ export default function WorkerDashboard() {
                           <div
                             className={`h-full rounded-full transition-all duration-700 ease-out ${
                               fillPercent >= 80 ? "bg-gradient-to-r from-red-400 to-red-500" : fillPercent >= 50 ? "bg-gradient-to-r from-amber-400 to-amber-500" : "bg-gradient-to-r from-blue-400 to-blue-500"
-                            }`}
+                            } ${isNearlyFull ? "animate-pulse" : ""}`}
                             style={{ width: `${fillPercent}%` }}
                           />
                         </div>
@@ -688,16 +720,16 @@ export default function WorkerDashboard() {
                           </span>
                         )}
                       </div>
-                      <button
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); apply(event.id); }}
-                        disabled={applyingId === event.id}
-                        className={`h-10 px-5 rounded-xl font-semibold text-sm flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-60 shadow-sm ${
-                          isToday || hoursUntilEvent < 12
-                            ? "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-500/20 hover:shadow-lg hover:shadow-red-500/30"
-                            : isNearlyFull
-                              ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-amber-500/20 hover:shadow-lg hover:shadow-amber-500/30"
-                              : "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30"
-                        }`}>
+                        <button
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); apply(event.id); }}
+                          disabled={applyingId === event.id}
+                          className={`h-10 px-5 rounded-xl font-semibold text-sm flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-60 shadow-sm ${
+                            isToday || hoursUntilEvent < 12
+                              ? "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-500/20 hover:shadow-lg hover:shadow-red-500/30"
+                              : isNearlyFull
+                                ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-amber-500/20 hover:shadow-lg hover:shadow-amber-500/30"
+                                : "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30"
+                          }`}>
                         {applyingId === event.id ? (
                           <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         ) : (
