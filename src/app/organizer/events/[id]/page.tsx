@@ -7,10 +7,11 @@ import { createClient } from "@/lib/supabase/client";
 import {
   ArrowLeft, Users, Edit3, Copy, XCircle, CheckCircle, Trash2, MapPin, Calendar, Clock,
   Clock3, IndianRupee, BookTemplate, AlertTriangle, Check, X as XIcon,
-  ChevronDown, ChevronUp, Phone, Mail, Award, Briefcase, Filter
+  ChevronDown, ChevronUp, Phone, Mail, Award, Briefcase, Filter, Star
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Event, Profile, Application } from "@/lib/supabase/types";
+import EditEventModal from "@/app/organizer/dashboard/EditEventModal";
 
 const STATUS_STYLES: Record<string, string> = {
   draft: "bg-gray-100 text-gray-600", published: "bg-blue-100 text-blue-700",
@@ -33,6 +34,9 @@ export default function OrganizerEventDetailPage() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [filter, setFilter] = useState<"" | "pending" | "approved" | "rejected">("");
   const [applying, setApplying] = useState<string | null>(null);
+  const [showEdit, setShowEdit] = useState(false);
+  const [ratings, setRatings] = useState<Record<string, number>>({});
+  const [ratingSaving, setRatingSaving] = useState<Record<string, boolean>>({});
 
   useEffect(() => { loadData(); }, [id]);
 
@@ -119,7 +123,7 @@ export default function OrganizerEventDetailPage() {
     if (!user) return;
     const { error } = await supabase.from("events").insert({
       organizer_id: user.id, title: event.title, category: event.category,
-      date: event.date, time: event.time, end_time: event.end_time,
+      date: event.date, date_display: event.date_display, time: event.time, end_time: event.end_time,
       application_deadline: event.application_deadline, location: event.location,
       google_maps_link: event.google_maps_link, worker_count: event.worker_count,
       gender_requirement: event.gender_requirement, min_age: event.min_age, max_age: event.max_age,
@@ -133,6 +137,21 @@ export default function OrganizerEventDetailPage() {
     });
     if (error) { toast.error(error.message); return; }
     toast.success("Event duplicated (draft)");
+  };
+
+  const rateWorker = async (workerId: string, rating: number) => {
+    setRatings(r => ({ ...r, [workerId]: rating }));
+    setRatingSaving(r => ({ ...r, [workerId]: true }));
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const existing = await supabase.from("reviews").select("id").eq("from_id", user.id).eq("to_id", workerId).eq("event_id", event!.id).maybeSingle();
+    if (existing.data) {
+      await supabase.from("reviews").update({ rating }).eq("id", existing.data.id);
+    } else {
+      await supabase.from("reviews").insert({ from_id: user.id, to_id: workerId, event_id: event!.id, rating });
+    }
+    setRatingSaving(r => ({ ...r, [workerId]: false }));
+    toast.success("Rating saved");
   };
 
   const deleteEvent = async () => {
@@ -204,7 +223,7 @@ export default function OrganizerEventDetailPage() {
         <div className="bg-white border border-gray-200 rounded-xl p-4">
           <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Event Details</h3>
           <div className="grid grid-cols-2 gap-2.5 text-sm">
-            <div className="flex items-center gap-1.5 text-gray-600"><Calendar className="w-3.5 h-3.5 text-gray-400 shrink-0" />{event.date}</div>
+            <div className="flex items-center gap-1.5 text-gray-600"><Calendar className="w-3.5 h-3.5 text-gray-400 shrink-0" />{event.date_display || event.date}</div>
             <div className="flex items-center gap-1.5 text-gray-600"><Clock className="w-3.5 h-3.5 text-gray-400 shrink-0" />{event.time}{event.end_time ? `-${event.end_time}` : ""}</div>
             <div className="col-span-2 flex items-center gap-1.5 text-gray-600"><MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" /><span className="truncate">{event.location}</span></div>
             {event.payment_info && <div className="col-span-2 flex items-center gap-1.5 text-green-700"><IndianRupee className="w-3.5 h-3.5 shrink-0" />{event.payment_info}</div>}
@@ -305,6 +324,15 @@ export default function OrganizerEventDetailPage() {
                           {app.profile.skills.map((s, i) => <span key={i} className="bg-gray-100 px-2 py-0.5 rounded-full">{s}</span>)}
                         </div>
                       )}
+                      <div className="flex items-center gap-0.5 mt-1.5">
+                        {[1,2,3,4,5].map(star => (
+                          <button key={star} onClick={() => rateWorker(app.worker_id, star)} disabled={ratingSaving[app.worker_id]}
+                            className="p-0.5 disabled:opacity-50">
+                            <Star className={`w-3.5 h-3.5 ${(ratings[app.worker_id] || 0) >= star ? "fill-amber-400 text-amber-400" : "text-gray-300 hover:text-amber-300"}`} />
+                          </button>
+                        ))}
+                        <span className="text-[10px] text-gray-400 ml-1">Rate worker</span>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -324,15 +352,23 @@ export default function OrganizerEventDetailPage() {
         )}
       </main>
 
+      {showEdit && (
+        <EditEventModal
+          event={event}
+          onClose={() => setShowEdit(false)}
+          onUpdated={() => { setShowEdit(false); loadData(); }}
+        />
+      )}
+
       {/* Sticky bottom actions */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-10">
         <div className="max-w-3xl mx-auto px-4 py-2.5 flex gap-2 overflow-x-auto">
-          <Link href={`/organizer/dashboard?edit=${event.id}`}
+          <button onClick={() => setShowEdit(true)} disabled={!canEdit}
             className={`h-9 px-3 rounded-lg text-xs font-medium flex items-center gap-1.5 shrink-0 ${
               canEdit ? "bg-gray-100 text-gray-700 active:bg-gray-200" : "bg-gray-50 text-gray-400 cursor-not-allowed"
             }`}>
             <Edit3 className="w-3.5 h-3.5" /> Edit
-          </Link>
+          </button>
           <button onClick={duplicate}
             className="h-9 px-3 rounded-lg bg-gray-100 text-gray-700 text-xs font-medium flex items-center gap-1.5 shrink-0 active:bg-gray-200">
             <Copy className="w-3.5 h-3.5" /> Duplicate

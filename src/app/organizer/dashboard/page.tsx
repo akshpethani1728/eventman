@@ -303,7 +303,8 @@ export default function OrganizerDashboard() {
                         <p className="font-medium text-sm text-gray-900 truncate">{event.title}</p>
                         <span className="text-xs font-medium text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full shrink-0">{event.pendingCount} pending</span>
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">{event.date} · {event.time}</p>
+                      <p className="text-xs text-gray-500 mt-1">{event.date_display || event.date} · {event.time}</p>
+                      <p className="text-xs text-gray-400 truncate mt-0.5">{event.location}{event.payment_info ? ` · ${event.payment_info}` : ""}</p>
                     </Link>
                   ))}
                 </div>
@@ -322,7 +323,8 @@ export default function OrganizerDashboard() {
                           <p className="font-medium text-sm text-gray-900 truncate">{event.title}</p>
                           <span className="text-xs font-medium text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full shrink-0">{rem <= 3 ? `Only ${rem} left` : "Attention"}</span>
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">{event.date} · {event.time}{event.application_deadline === todayStr ? " · Deadline today" : ""}</p>
+                        <p className="text-xs text-gray-500 mt-1">{event.date_display || event.date} · {event.time}{event.application_deadline === todayStr ? " · Deadline today" : ""}</p>
+                        <p className="text-xs text-gray-400 truncate mt-0.5">{event.location}{event.payment_info ? ` · ${event.payment_info}` : ""}</p>
                       </Link>
                     );
                   })}
@@ -340,7 +342,8 @@ export default function OrganizerDashboard() {
                         <p className="font-medium text-sm text-gray-900 truncate">{event.title}</p>
                         <span className="text-xs font-medium text-green-700 bg-green-100 px-2 py-0.5 rounded-full shrink-0">{event.worker_count - (event.approvedCount || 0)} seats</span>
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">{event.date} · {event.time}</p>
+                      <p className="text-xs text-gray-500 mt-1">{event.date_display || event.date} · {event.time}</p>
+                      <p className="text-xs text-gray-400 truncate mt-0.5">{event.location}{event.payment_info ? ` · ${event.payment_info}` : ""}</p>
                     </Link>
                   ))}
                 </div>
@@ -372,7 +375,8 @@ export default function OrganizerDashboard() {
                 <div className="flex items-center justify-between gap-2">
                   <div className="min-w-0 flex-1">
                     <p className="font-medium text-sm text-gray-900 truncate">{event.title}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{event.date} · {event.time}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{event.date_display || event.date} · {event.time}</p>
+                    <p className="text-xs text-gray-400 truncate mt-0.5">{event.location}{event.payment_info ? ` · ${event.payment_info}` : ""}</p>
                   </div>
                   <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full shrink-0 ${STATUS_STYLES[event.status]}`}>
                     {STATUS_LABELS[event.status]}

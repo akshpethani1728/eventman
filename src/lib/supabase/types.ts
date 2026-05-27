@@ -34,6 +34,7 @@ export interface Event {
   title: string;
   location: string;
   date: string;
+  date_display: string | null;
   time: string;
   end_time: string | null;
   worker_count: number;

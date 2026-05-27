@@ -20,6 +20,7 @@ const DEFAULT_FORM = {
   title: "",
   category: "",
   date: "",
+  date_display: "",
   time: "",
   end_time: "",
   application_deadline: "",
@@ -72,6 +73,7 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
       title: form.title,
       category: form.category || null,
       date: form.date,
+      date_display: form.date_display || null,
       time: form.time,
       end_time: form.end_time || null,
       application_deadline: form.application_deadline || null,
@@ -151,6 +153,9 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
                 <input required type="time" value={form.time} onChange={e => update("time", e.target.value)}
                   className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
               </div>
+              <input value={form.date_display} onChange={e => update("date_display", e.target.value)}
+                placeholder="Show dates as (e.g., 26,27,30 May or 26-31 March)"
+                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
               <div className="grid grid-cols-2 gap-2.5">
                 <input type="time" value={form.end_time} onChange={e => update("end_time", e.target.value)}
                   placeholder="End time (optional)"
