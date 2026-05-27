@@ -151,7 +151,7 @@ export default function EditEventModal({ event, onClose, onUpdated }: Props) {
 
         {/* Form body */}
         <div className="bg-gray-50 px-5 py-4 space-y-4 border-x border-gray-200/80">
-          <form onSubmit={handleSubmit} id="edit-event-form" className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
 
             {/* A. Event Basics */}
             <SectionCard emoji="📋" label="Event Basics" accentCls="bg-gradient-to-r from-blue-50/80 to-indigo-50/80">
@@ -333,19 +333,19 @@ export default function EditEventModal({ event, onClose, onUpdated }: Props) {
                   className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none transition-all" />
               </div>
             </SectionCard>
-          </form>
-        </div>
 
-        {/* Footer Actions */}
-        <div className="bg-white rounded-b-2xl px-5 py-4 border-t border-gray-200/80">
-          <button type="submit" form="edit-event-form" disabled={loading}
-            className="w-full h-12 rounded-xl bg-gradient-to-r from-violet-600 to-purple-700 text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50 hover:from-violet-700 hover:to-purple-800 active:scale-[0.98] transition-all shadow-lg shadow-violet-600/20">
-            {loading ? (
-              <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving...</>
-            ) : (
-              <><Save className="w-4 h-4" /> Save Changes</>
-            )}
-          </button>
+            {/* Footer Action inside form */}
+            <div className="pt-2">
+              <button type="submit" disabled={loading}
+                className="w-full h-12 rounded-xl bg-gradient-to-r from-violet-600 to-purple-700 text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50 hover:from-violet-700 hover:to-purple-800 active:scale-[0.98] transition-all shadow-lg shadow-violet-600/20">
+                {loading ? (
+                  <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving...</>
+                ) : (
+                  <><Save className="w-4 h-4" /> Save Changes</>
+                )}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

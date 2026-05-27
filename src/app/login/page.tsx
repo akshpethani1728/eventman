@@ -157,7 +157,7 @@ export default function LoginPage() {
       {/* Login card */}
       <div className="bg-white rounded-t-3xl px-6 pt-8 pb-10 shadow-2xl">
         {step === "auth" && (
-          <div className="space-y-5">
+          <form onSubmit={(e) => { e.preventDefault(); handleAuth(); }} className="space-y-5">
             <h2 className="text-xl font-semibold text-gray-900">
               {isSignUp ? "Create Account" : "Welcome Back"}
             </h2>
@@ -213,7 +213,7 @@ export default function LoginPage() {
 
             {/* Submit */}
             <button
-              onClick={handleAuth}
+              type="submit"
               disabled={loading}
               className="w-full h-12 rounded-xl bg-blue-600 text-white font-semibold text-base disabled:opacity-50 active:bg-blue-700 flex items-center justify-center gap-2 shadow-lg shadow-blue-200"
             >
@@ -234,17 +234,18 @@ export default function LoginPage() {
             <p className="text-center text-sm text-gray-500">
               {isSignUp ? "Already have an account? " : "Don't have an account? "}
               <button
+                type="button"
                 onClick={() => { setIsSignUp(!isSignUp); setError(""); }}
                 className="text-blue-600 font-semibold hover:underline"
               >
                 {isSignUp ? "Sign In" : "Sign Up"}
               </button>
             </p>
-          </div>
+          </form>
         )}
 
         {step === "profile" && (
-          <div className="space-y-5">
+          <form onSubmit={(e) => { e.preventDefault(); createProfile(); }} className="space-y-5">
             <h2 className="text-xl font-semibold text-gray-900">Complete Profile</h2>
             <p className="text-sm text-gray-500 -mt-3">Just a few more details</p>
 
@@ -275,6 +276,7 @@ export default function LoginPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">I want to join as</label>
               <div className="grid grid-cols-2 gap-3">
                 <button
+                  type="button"
                   onClick={() => setRole("worker")}
                   className={`h-14 rounded-xl border-2 flex flex-col items-center justify-center gap-1 transition-all ${
                     role === "worker"
@@ -286,6 +288,7 @@ export default function LoginPage() {
                   <span className="text-xs font-semibold">Worker</span>
                 </button>
                 <button
+                  type="button"
                   onClick={() => setRole("organizer")}
                   className={`h-14 rounded-xl border-2 flex flex-col items-center justify-center gap-1 transition-all ${
                     role === "organizer"
@@ -301,7 +304,7 @@ export default function LoginPage() {
 
             {/* Submit */}
             <button
-              onClick={createProfile}
+              type="submit"
               disabled={loading}
               className="w-full h-12 rounded-xl bg-blue-600 text-white font-semibold text-base disabled:opacity-50 active:bg-blue-700 flex items-center justify-center gap-2 shadow-lg shadow-blue-200"
             >
@@ -317,7 +320,7 @@ export default function LoginPage() {
                 "Continue"
               )}
             </button>
-          </div>
+          </form>
         )}
       </div>
     </div>

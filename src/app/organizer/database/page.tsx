@@ -71,24 +71,24 @@ export default function WorkerDatabasePage() {
 
       <main className="max-w-3xl mx-auto px-4 py-4">
         {/* Search */}
-        <div className="flex gap-2 mb-4">
+        <form onSubmit={e => e.preventDefault()} className="flex gap-2 mb-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input value={query} onChange={e => setQuery(e.target.value)}
               placeholder="Search by name, area, or skills..."
               className="w-full h-10 pl-9 pr-3 rounded-xl border border-gray-300 bg-white text-sm" />
           </div>
-          <button onClick={() => setShowFilters(!showFilters)}
+          <button type="button" onClick={() => setShowFilters(!showFilters)}
             className={`h-10 px-3 rounded-xl border text-sm flex items-center gap-1.5 ${
               showFilters ? "bg-blue-50 border-blue-300 text-blue-700" : "border-gray-300 text-gray-600 bg-white"
             }`}>
             <Filter className="w-4 h-4" /> Filters
           </button>
-        </div>
+        </form>
 
         {/* Filters */}
         {showFilters && (
-          <div className="bg-white border border-gray-200 rounded-xl p-3 mb-4 space-y-2">
+          <form onSubmit={e => e.preventDefault()} className="bg-white border border-gray-200 rounded-xl p-3 mb-4 space-y-2">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <select value={filters.gender} onChange={e => setFilters(f => ({ ...f, gender: e.target.value }))}
                 className="h-8 px-2 rounded-lg border border-gray-200 text-xs bg-white">
@@ -110,12 +110,12 @@ export default function WorkerDatabasePage() {
                 placeholder="Skill" className="h-8 px-2 rounded-lg border border-gray-200 text-xs bg-white" />
             </div>
             {(filters.gender || filters.availability || filters.city || filters.skills) && (
-              <button onClick={() => setFilters({ gender: "", availability: "", city: "", skills: "" })}
+              <button type="button" onClick={() => setFilters({ gender: "", availability: "", city: "", skills: "" })}
                 className="text-xs text-blue-600 flex items-center gap-1">
                 <X className="w-3 h-3" /> Clear filters
               </button>
             )}
-          </div>
+          </form>
         )}
 
         {/* Results */}

@@ -154,7 +154,7 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
 
         {/* Form body */}
         <div className="bg-gray-50 px-5 py-4 space-y-4 border-x border-gray-200/80">
-          <form onSubmit={handleSubmit} id="create-event-form" className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
 
             {/* A. Event Basics */}
             <SectionCard emoji="📋" label="Event Basics" accentCls="bg-gradient-to-r from-blue-50/80 to-indigo-50/80">
@@ -360,34 +360,24 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
                   className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none transition-all" />
               </div>
             </SectionCard>
-          </form>
-        </div>
 
-        {/* Footer Actions */}
-        <div className="bg-white rounded-b-2xl px-5 py-4 border-t border-gray-200/80 flex gap-3">
-          <button
-            type="submit"
-            form="create-event-form"
-            onClick={() => setPublishAfter(true)}
-            disabled={loading}
-            className="flex-1 h-12 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50 hover:from-blue-700 hover:to-blue-800 active:scale-[0.98] transition-all shadow-lg shadow-blue-600/20"
-          >
-            {loading ? (
-              <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Publishing...</>
-            ) : (
-              <><Sparkles className="w-4 h-4" /> Publish Event</>
-            )}
-          </button>
-          <button
-            type="submit"
-            form="create-event-form"
-            onClick={() => setPublishAfter(false)}
-            disabled={loading}
-            className="h-12 px-6 rounded-xl border-2 border-gray-200 text-gray-700 font-semibold text-sm flex items-center gap-2 disabled:opacity-50 hover:bg-gray-50 active:scale-[0.98] transition-all"
-          >
-            <ArrowRight className="w-4 h-4" />
-            Draft
-          </button>
+            {/* Footer Actions inside form */}
+            <div className="flex gap-3 pt-2">
+              <button type="submit" onClick={() => setPublishAfter(true)} disabled={loading}
+                className="flex-1 h-12 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50 hover:from-blue-700 hover:to-blue-800 active:scale-[0.98] transition-all shadow-lg shadow-blue-600/20">
+                {loading ? (
+                  <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Publishing...</>
+                ) : (
+                  <><Sparkles className="w-4 h-4" /> Publish Event</>
+                )}
+              </button>
+              <button type="submit" onClick={() => setPublishAfter(false)} disabled={loading}
+                className="h-12 px-6 rounded-xl border-2 border-gray-200 text-gray-700 font-semibold text-sm flex items-center gap-2 disabled:opacity-50 hover:bg-gray-50 active:scale-[0.98] transition-all">
+                <ArrowRight className="w-4 h-4" />
+                Draft
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

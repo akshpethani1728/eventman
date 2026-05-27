@@ -104,104 +104,106 @@ export default function OrganizerProfilePage() {
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
-        <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
-          {form.avatar_url ? (
-            <img src={form.avatar_url} alt="Logo" className="w-20 h-20 rounded-full object-cover mx-auto mb-3 border-2 border-gray-200" />
-          ) : (
-            <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
-              <User className="w-8 h-8 text-blue-600" />
+        <form onSubmit={(e) => { e.preventDefault(); saveProfile(); }}>
+          <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
+            {form.avatar_url ? (
+              <img src={form.avatar_url} alt="Logo" className="w-20 h-20 rounded-full object-cover mx-auto mb-3 border-2 border-gray-200" />
+            ) : (
+              <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
+                <User className="w-8 h-8 text-blue-600" />
+              </div>
+            )}
+            <p className="font-semibold text-lg">{profile?.full_name}</p>
+            <p className="text-sm text-gray-500 capitalize">{profile?.role}</p>
+            {profile?.is_trusted_organizer && (
+              <span className="text-xs text-blue-600 font-medium mt-1 inline-block">Trusted Organizer</span>
+            )}
+            <div className="flex items-center justify-center gap-4 mt-3">
+              <div className="text-center">
+                <p className="text-lg font-bold text-gray-900">{pastEventCount}</p>
+                <p className="text-[10px] text-gray-500">Past events</p>
+              </div>
+              <div className="text-center">
+                <p className="text-lg font-bold text-amber-500">{avgRating > 0 ? avgRating : "--"}</p>
+                <p className="text-[10px] text-gray-500">{ratingCount > 0 ? `${ratingCount} ratings` : "No ratings"}</p>
+              </div>
             </div>
-          )}
-          <p className="font-semibold text-lg">{profile?.full_name}</p>
-          <p className="text-sm text-gray-500 capitalize">{profile?.role}</p>
-          {profile?.is_trusted_organizer && (
-            <span className="text-xs text-blue-600 font-medium mt-1 inline-block">Trusted Organizer</span>
-          )}
-          <div className="flex items-center justify-center gap-4 mt-3">
-            <div className="text-center">
-              <p className="text-lg font-bold text-gray-900">{pastEventCount}</p>
-              <p className="text-[10px] text-gray-500">Past events</p>
-            </div>
-            <div className="text-center">
-              <p className="text-lg font-bold text-amber-500">{avgRating > 0 ? avgRating : "--"}</p>
-              <p className="text-[10px] text-gray-500">{ratingCount > 0 ? `${ratingCount} ratings` : "No ratings"}</p>
-            </div>
-          </div>
-          {avgRating > 0 && (
-            <div className="flex items-center justify-center gap-0.5 mt-1">
-              {[1,2,3,4,5].map(s => (
-                <Star key={s} className={`w-3.5 h-3.5 ${avgRating >= s ? "fill-amber-400 text-amber-400" : avgRating >= s - 0.5 ? "fill-amber-200 text-amber-300" : "text-gray-300"}`} />
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4">
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Full Name</label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input value={form.full_name} onChange={e => setForm(p => ({ ...p, full_name: e.target.value }))}
-                className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm" />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Phone</label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
-                placeholder="9876543210"
-                className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm" />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">City</label>
-            <div className="relative">
-              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))}
-                placeholder="Ahmedabad"
-                className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm" />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Area</label>
-            <input value={form.area} onChange={e => setForm(p => ({ ...p, area: e.target.value }))}
-              placeholder="e.g., Navrangpura"
-              className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
-          </div>
-        </div>
-
-        {/* About section */}
-        <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4">
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">About</h3>
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Description / About</label>
-            <textarea value={form.bio} onChange={e => setForm(p => ({ ...p, bio: e.target.value }))}
-              placeholder="Tell workers about your organization..."
-              className="w-full h-20 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm resize-none" />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Logo URL</label>
-            <input value={form.avatar_url} onChange={e => setForm(p => ({ ...p, avatar_url: e.target.value }))}
-              placeholder="https://example.com/logo.png"
-              className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
-            {form.avatar_url && (
-              <img src={form.avatar_url} alt="Preview" className="w-16 h-16 rounded-lg object-cover mt-2 border border-gray-200" />
+            {avgRating > 0 && (
+              <div className="flex items-center justify-center gap-0.5 mt-1">
+                {[1,2,3,4,5].map(s => (
+                  <Star key={s} className={`w-3.5 h-3.5 ${avgRating >= s ? "fill-amber-400 text-amber-400" : avgRating >= s - 0.5 ? "fill-amber-200 text-amber-300" : "text-gray-300"}`} />
+                ))}
+              </div>
             )}
           </div>
-        </div>
 
-        <button
-          onClick={saveProfile}
-          disabled={saving}
-          className="w-full h-12 rounded-xl bg-blue-600 text-white font-medium flex items-center justify-center gap-2 disabled:opacity-50 active:bg-blue-700"
-        >
-          <Save className="w-4 h-4" />
-          {saving ? "Saving..." : "Save Profile"}
-        </button>
+          <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4 mt-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Full Name</label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input value={form.full_name} onChange={e => setForm(p => ({ ...p, full_name: e.target.value }))}
+                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm" />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Phone</label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
+                  placeholder="9876543210"
+                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm" />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">City</label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))}
+                  placeholder="Ahmedabad"
+                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm" />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Area</label>
+              <input value={form.area} onChange={e => setForm(p => ({ ...p, area: e.target.value }))}
+                placeholder="e.g., Navrangpura"
+                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
+            </div>
+          </div>
+
+          {/* About section */}
+          <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4 mt-4">
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">About</h3>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Description / About</label>
+              <textarea value={form.bio} onChange={e => setForm(p => ({ ...p, bio: e.target.value }))}
+                placeholder="Tell workers about your organization..."
+                className="w-full h-20 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm resize-none" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Logo URL</label>
+              <input value={form.avatar_url} onChange={e => setForm(p => ({ ...p, avatar_url: e.target.value }))}
+                placeholder="https://example.com/logo.png"
+                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
+              {form.avatar_url && (
+                <img src={form.avatar_url} alt="Preview" className="w-16 h-16 rounded-lg object-cover mt-2 border border-gray-200" />
+              )}
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={saving}
+            className="mt-4 w-full h-12 rounded-xl bg-blue-600 text-white font-medium flex items-center justify-center gap-2 disabled:opacity-50 active:bg-blue-700"
+          >
+            <Save className="w-4 h-4" />
+            {saving ? "Saving..." : "Save Profile"}
+          </button>
+        </form>
       </main>
     </div>
   );

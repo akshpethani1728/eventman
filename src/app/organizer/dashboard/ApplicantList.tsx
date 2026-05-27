@@ -142,7 +142,7 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
 
         {/* Filters */}
         {showFilters && (
-          <div className="px-4 py-3 border-b border-gray-100 bg-gray-50 space-y-2">
+          <form onSubmit={e => e.preventDefault()} className="px-4 py-3 border-b border-gray-100 bg-gray-50 space-y-2">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               <select value={filters.gender} onChange={e => setFilters(f => ({ ...f, gender: e.target.value }))}
                 className="h-8 px-2 rounded-lg border border-gray-200 text-xs bg-white">
@@ -175,7 +175,7 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
             {filtered.length !== applicants.length && (
               <p className="text-xs text-gray-500">{filtered.length} of {applicants.length} shown</p>
             )}
-          </div>
+          </form>
         )}
 
         {/* List */}
