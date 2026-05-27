@@ -6,8 +6,9 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import {
   LogOut, MapPin, Calendar, Clock, Users, IndianRupee, Star, ShieldCheck,
-  UtensilsCrossed, Car, Shirt, Timer, TrendingUp, Zap, CheckCircle,
-  XCircle, Hourglass, ArrowUpRight, Clock3, Send, AlertCircle
+  UtensilsCrossed, Car, Timer, TrendingUp, Zap, CheckCircle,
+  XCircle, Hourglass, ArrowUpRight, Clock3, Send, AlertCircle, Sparkles,
+  Heart, Flame, Gauge
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Profile, Event, Application } from "@/lib/supabase/types";
@@ -53,6 +54,117 @@ function CountdownTimer({ targetDate }: { targetDate: string }) {
   if (days > 7) return <span>{days} days left</span>;
   if (days > 0) return <span className="text-amber-600 font-medium">{days}d {hours}h left</span>;
   return <span className="text-red-600 font-medium">{hours}h left</span>;
+}
+
+function computePriorityScore(event: any): number {
+  const now = Date.now();
+  const eventDate = new Date(event.date).getTime();
+  const hoursUntil = (eventDate - now) / 3600000;
+  const daysUntil = hoursUntil / 24;
+  const createdAt = new Date(event.created_at).getTime();
+  const hoursSinceCreated = (now - createdAt) / 3600000;
+  const remaining = event.worker_count - (event.approved_count || 0);
+  const fillPercent = event.worker_count ? ((event.approved_count || 0) / event.worker_count) * 100 : 0;
+  let score = 0;
+
+  if (hoursUntil >= 0 && hoursUntil < 96) {
+    if (hoursUntil < 12) score += 35;
+    else if (hoursUntil < 24) score += 30;
+    else if (hoursUntil < 48) score += 22;
+    else if (hoursUntil < 72) score += 12;
+    else score += 6;
+  }
+
+  if (fillPercent >= 95) score += 28;
+  else if (fillPercent >= 80) score += 22;
+  else if (fillPercent >= 60) score += 15;
+  else if (fillPercent >= 40) score += 8;
+  else if (fillPercent >= 20) score += 3;
+
+  if (event.organizer?.is_trusted_organizer) score += 18;
+  const rating = event.organizer_rating || 0;
+  if (rating >= 4.8) score += 7;
+  else if (rating >= 4.5) score += 5;
+  else if (rating >= 4.0) score += 3;
+  else if (rating >= 3.5) score += 1;
+
+  if (hoursSinceCreated < 12) score += 18;
+  else if (hoursSinceCreated < 24) score += 14;
+  else if (hoursSinceCreated < 48) score += 8;
+  else if (hoursSinceCreated < 72) score += 3;
+
+  const totalApps = event.total_applications || 0;
+  if (totalApps >= 15) score += 12;
+  else if (totalApps >= 10) score += 8;
+  else if (totalApps >= 5) score += 5;
+  else if (totalApps >= 2) score += 2;
+
+  if (event.application_deadline) {
+    const deadlineMs = new Date(event.application_deadline).getTime();
+    const hoursUntilDeadline = (deadlineMs - now) / 3600000;
+    if (hoursUntilDeadline > 0 && hoursUntilDeadline < 12) score += 14;
+    else if (hoursUntilDeadline < 24) score += 10;
+    else if (hoursUntilDeadline < 48) score += 6;
+    else if (hoursUntilDeadline < 96) score += 3;
+  }
+
+  if (remaining <= 1) score += 10;
+  else if (remaining <= 3) score += 6;
+  else if (remaining <= 5) score += 2;
+
+  return score;
+}
+
+function SkeletonCard() {
+  return (
+    <div className="bg-white rounded-2xl border border-gray-200/70 overflow-hidden shadow-sm">
+      <div className="px-4 pt-3.5 pb-2 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl bg-gray-200 animate-pulse" />
+          <div className="space-y-1.5">
+            <div className="w-28 h-3 rounded bg-gray-200 animate-pulse" />
+            <div className="w-20 h-2.5 rounded bg-gray-100 animate-pulse" />
+          </div>
+        </div>
+        <div className="w-14 h-5 rounded-lg bg-gray-200 animate-pulse" />
+      </div>
+      <div className="px-4 py-2 space-y-3">
+        <div className="flex gap-1.5">
+          <div className="w-16 h-5 rounded-lg bg-gray-100 animate-pulse" />
+          <div className="w-20 h-5 rounded-lg bg-gray-100 animate-pulse" />
+        </div>
+        <div className="w-3/4 h-5 rounded bg-gray-200 animate-pulse" />
+        <div className="w-32 h-7 rounded-xl bg-gray-100 animate-pulse" />
+        <div className="w-full h-3 rounded bg-gray-100 animate-pulse" />
+        <div className="w-full h-2 rounded-full bg-gray-100 animate-pulse" />
+        <div className="flex gap-1.5">
+          <div className="w-14 h-5 rounded-lg bg-gray-100 animate-pulse" />
+          <div className="w-16 h-5 rounded-lg bg-gray-100 animate-pulse" />
+        </div>
+      </div>
+      <div className="h-px bg-gray-100 mx-4" />
+      <div className="px-4 py-3 flex justify-end">
+        <div className="w-28 h-10 rounded-xl bg-gray-200 animate-pulse" />
+      </div>
+    </div>
+  );
+}
+
+function EventBadge({ children, variant }: { children: React.ReactNode; variant: "red" | "amber" | "blue" | "purple" | "green" | "orange" | "slate" }) {
+  const styles = {
+    red: "bg-gradient-to-r from-red-50 to-rose-50 text-red-700 border-red-200 shadow-red-200/30",
+    amber: "bg-gradient-to-r from-amber-50 to-orange-50 text-amber-700 border-amber-200 shadow-amber-200/30",
+    blue: "bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border-blue-200 shadow-blue-200/30",
+    purple: "bg-gradient-to-r from-purple-50 to-violet-50 text-purple-700 border-purple-200 shadow-purple-200/30",
+    green: "bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-700 border-emerald-200 shadow-emerald-200/30",
+    orange: "bg-gradient-to-r from-orange-50 to-amber-50 text-orange-700 border-orange-200 shadow-orange-200/30",
+    slate: "bg-gradient-to-r from-slate-50 to-gray-50 text-slate-600 border-slate-200 shadow-slate-200/30",
+  };
+  return (
+    <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-lg border shadow-sm ${styles[variant]}`}>
+      {children}
+    </span>
+  );
 }
 
 export default function WorkerDashboard() {
@@ -136,6 +248,8 @@ export default function WorkerDashboard() {
       organizer_past_events: pastCountMap[e.organizer_id] || 0,
     }));
 
+    enriched.sort((a, b) => computePriorityScore(b) - computePriorityScore(a));
+
     setEvents(enriched);
     setLoading(false);
   };
@@ -171,11 +285,7 @@ export default function WorkerDashboard() {
       body: JSON.stringify({ appId: cancelTarget.appId }),
     });
     setCancelling(false);
-    if (!res.ok) {
-      const err = await res.json();
-      toast.error(err.error || "Failed to cancel");
-      return;
-    }
+    if (!res.ok) { const err = await res.json(); toast.error(err.error || "Failed to cancel"); return; }
     toast.success("Cancelled successfully");
     loadData();
   };
@@ -192,11 +302,28 @@ export default function WorkerDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-10 h-10 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm text-gray-500">Finding events for you...</p>
-        </div>
+      <div className="min-h-screen bg-[#f5f5f7]">
+        <header className="sticky top-0 bg-white/80 backdrop-blur-2xl border-b border-gray-200/60 z-20">
+          <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center shadow-sm">
+                <Zap className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <h1 className="font-bold text-base leading-tight">EventMan</h1>
+                <p className="text-[10px] text-gray-400 -mt-0.5">Find work near you</p>
+              </div>
+            </div>
+            <div className="w-7 h-7 rounded-full bg-gray-200 animate-pulse" />
+          </div>
+        </header>
+        <main className="max-w-lg mx-auto px-4 py-4 pb-28 space-y-4">
+          <div className="w-full h-24 rounded-2xl bg-gradient-to-br from-gray-200 to-gray-100 animate-pulse" />
+          <div className="w-full h-11 rounded-2xl bg-gray-200 animate-pulse" />
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </main>
       </div>
     );
   }
@@ -256,7 +383,7 @@ export default function WorkerDashboard() {
           </button>
         </div>
 
-        {/* Browse Events */}
+        {/* ========== BROWSE TAB ========== */}
         {tab === "browse" && (
           <>
             {/* Category filter */}
@@ -264,7 +391,7 @@ export default function WorkerDashboard() {
               <div className="mb-3 overflow-x-auto -mx-4 px-4 scrollbar-none">
                 <div className="flex gap-2 min-w-max pb-1">
                   <button onClick={() => setCategoryFilter("")}
-                    className={`h-9 px-4 rounded-xl text-xs font-medium transition-all ${
+                    className={`h-9 px-4 rounded-xl text-xs font-medium transition-all whitespace-nowrap ${
                       !categoryFilter ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20" : "bg-white text-gray-600 border border-gray-200/80 hover:border-gray-300 shadow-sm"
                     }`}>All</button>
                   {allCategories.map(cat => (
@@ -279,15 +406,22 @@ export default function WorkerDashboard() {
 
             {/* Empty state */}
             {browseEvents.length === 0 && (
-              <div className="text-center py-20">
-                <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mx-auto mb-4">
-                  <TrendingUp className="w-7 h-7 text-gray-300" />
+              <div className="text-center py-16 px-4">
+                <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200/60 flex items-center justify-center mx-auto mb-5 shadow-sm">
+                  <Gauge className="w-9 h-9 text-gray-300" />
                 </div>
-                <p className="text-base font-semibold text-gray-900">No events right now</p>
-                <p className="text-sm text-gray-500 mt-1">Check back soon for new opportunities</p>
+                <p className="text-lg font-bold text-gray-900">
+                  {categoryFilter ? "No events match this category" : "No events available"}
+                </p>
+                <p className="text-sm text-gray-500 mt-1.5 leading-relaxed max-w-xs mx-auto">
+                  {categoryFilter
+                    ? "Try a different category or clear the filter to see all opportunities"
+                    : "New opportunities are added daily. Check back soon or adjust your preferences."}
+                </p>
                 {categoryFilter && (
-                  <button onClick={() => setCategoryFilter("")} className="mt-4 h-10 px-5 rounded-xl bg-blue-600 text-white text-sm font-medium shadow-sm">
-                    Clear filters
+                  <button onClick={() => setCategoryFilter("")}
+                    className="mt-5 h-11 px-6 rounded-xl bg-blue-600 text-white text-sm font-semibold shadow-md shadow-blue-600/20 hover:shadow-lg transition-all active:scale-[0.97]">
+                    Clear filter
                   </button>
                 )}
               </div>
@@ -295,41 +429,82 @@ export default function WorkerDashboard() {
 
             {/* Event Cards */}
             <div className="space-y-4">
-              {browseEvents.map(event => {
+              {browseEvents.map((event, idx) => {
                 const remaining = event.worker_count - (event.approved_count || 0);
                 const fillPercent = Math.min(100, Math.round(((event.approved_count || 0) / event.worker_count) * 100));
                 const daysUntil = Math.ceil((new Date(event.date).getTime() - Date.now()) / 86400000);
+                const hoursUntilEvent = Math.round((new Date(event.date).getTime() - Date.now()) / 3600000);
                 const isUrgent = daysUntil <= 2 && daysUntil > 0;
                 const isToday = daysUntil === 0;
-                const hoursUntilEvent = Math.round((new Date(event.date).getTime() - Date.now()) / 3600000);
                 const isNew = new Date(event.created_at).getTime() > Date.now() - 86400000 * 2;
                 const isPopular = (event.total_applications || 0) >= 5;
+                const isHighDemand = (event.total_applications || 0) >= 10;
                 const deadlineSoon = event.application_deadline && new Date(event.application_deadline).getTime() - Date.now() < 86400000 * 3 && new Date(event.application_deadline).getTime() > Date.now();
+                const deadlineToday = event.application_deadline && new Date(event.application_deadline).getTime() - Date.now() < 86400000 && new Date(event.application_deadline).getTime() > Date.now();
                 const org = event.organizer;
                 const orgRating = event.organizer_rating || 0;
+                const isFillingFast = fillPercent >= 70;
+                const isNearlyFull = remaining <= 3;
+                const score = computePriorityScore(event);
+
+                let cardAccent = "border-gray-200/70";
+                let shadowBoost = "";
+                if (isToday || hoursUntilEvent < 12) {
+                  cardAccent = "border-red-200/80";
+                  shadowBoost = "shadow-red-500/5";
+                } else if (isNearlyFull || isFillingFast) {
+                  cardAccent = "border-amber-200/80";
+                  shadowBoost = "shadow-amber-500/5";
+                } else if (org?.is_trusted_organizer || orgRating >= 4.5) {
+                  cardAccent = "border-blue-200/80";
+                  shadowBoost = "shadow-blue-500/5";
+                }
 
                 return (
                   <Link key={event.id} href={`/worker/events/${event.id}`}
-                    className="block bg-white rounded-2xl border border-gray-200/70 overflow-hidden shadow-sm hover:shadow-lg hover:border-gray-300 transition-all duration-200 active:scale-[0.99]">
+                    className={`block bg-white rounded-2xl border overflow-hidden shadow-sm hover:shadow-lg hover:border-gray-300 transition-all duration-300 active:scale-[0.99] animate-slide-up ${cardAccent} ${shadowBoost}`}
+                    style={{ animationDelay: `${idx * 60}ms`, animationFillMode: "both" }}>
+
+                    {/* === INTELLIGENCE ACCENT BAR === */}
+                    <div className={`h-1.5 ${
+                      isToday || hoursUntilEvent < 12
+                        ? "bg-gradient-to-r from-red-400 via-red-500 to-rose-500"
+                        : isNearlyFull
+                          ? "bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500"
+                          : isFillingFast
+                            ? "bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400"
+                            : org?.is_trusted_organizer || orgRating >= 4.5
+                              ? "bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-500"
+                              : isNew
+                                ? "bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-400"
+                                : "bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200"
+                    }`} />
 
                     {/* === TRUST BAR === */}
                     <div className="px-4 pt-3.5 pb-2 flex items-center justify-between">
                       <div className="flex items-center gap-2.5 min-w-0 flex-1">
                         {org?.avatar_url ? (
-                          <img src={org.avatar_url} alt="" className="w-8 h-8 rounded-xl object-cover ring-1 ring-gray-100 shrink-0" />
+                          <img src={org.avatar_url} alt="" className={`w-8 h-8 rounded-xl object-cover ring-2 shrink-0 ${org?.is_trusted_organizer ? "ring-blue-200" : "ring-gray-100"}`} />
                         ) : (
-                          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-700 font-bold text-xs shrink-0">
+                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-white font-bold text-xs shrink-0 ${
+                            org?.is_trusted_organizer
+                              ? "bg-gradient-to-br from-blue-500 to-indigo-600"
+                              : "bg-gradient-to-br from-blue-100 to-blue-200 text-blue-700"
+                          }`}>
                             {org?.full_name?.charAt(0) || "O"}
                           </div>
                         )}
                         <div className="min-w-0">
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-1.5">
                             <span className="text-xs font-semibold text-gray-900 truncate">{org?.full_name || "Event Organizer"}</span>
                             {org?.is_trusted_organizer && (
-                              <ShieldCheck className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                              <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-blue-600 bg-blue-50 border border-blue-200/60 px-1.5 py-0.5 rounded-md">
+                                <ShieldCheck className="w-2.5 h-2.5" />
+                                Trusted
+                              </span>
                             )}
                           </div>
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex items-center gap-1.5 mt-0.5">
                             {orgRating > 0 && (
                               <div className="flex items-center gap-0.5">
                                 <StarRating rating={orgRating} size="xs" />
@@ -337,7 +512,7 @@ export default function WorkerDashboard() {
                               </div>
                             )}
                             {event.organizer_past_events && event.organizer_past_events > 0 && (
-                              <span className="text-[10px] text-gray-400">{event.organizer_past_events} past event{event.organizer_past_events !== 1 ? "s" : ""}</span>
+                              <span className="text-[10px] text-gray-400">{event.organizer_past_events} past</span>
                             )}
                           </div>
                         </div>
@@ -349,7 +524,7 @@ export default function WorkerDashboard() {
                           </span>
                         )}
                         {isNew && (
-                          <span className="text-[10px] font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white px-2 py-0.5 rounded-lg shadow-sm">
+                          <span className="text-[10px] font-bold bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-2 py-0.5 rounded-lg shadow-sm shadow-blue-500/20">
                             New
                           </span>
                         )}
@@ -358,32 +533,37 @@ export default function WorkerDashboard() {
 
                     {/* === MAIN CONTENT === */}
                     <div className="px-4 py-2">
-                      {/* Urgency badges */}
+                      {/* Intelligence badges row */}
                       <div className="flex flex-wrap gap-1.5 mb-2">
                         {isToday && (
-                          <span className="text-[10px] font-semibold bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
-                            <Timer className="w-3 h-3" /> Today
-                          </span>
+                          <EventBadge variant="red"><Flame className="w-3 h-3" /> Starts Today</EventBadge>
                         )}
-                        {isUrgent && !isToday && (
-                          <span className="text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
-                            <Clock3 className="w-3 h-3" /> {daysUntil === 1 ? "Tomorrow" : `${daysUntil} days`}
-                          </span>
+                        {daysUntil === 1 && !isToday && (
+                          <EventBadge variant="amber"><Clock3 className="w-3 h-3" /> Starts Tomorrow</EventBadge>
                         )}
-                        {deadlineSoon && (
-                          <span className="text-[10px] font-semibold bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
-                            <AlertCircle className="w-3 h-3" /> Deadline soon
-                          </span>
+                        {isUrgent && !isToday && daysUntil !== 1 && (
+                          <EventBadge variant="amber"><Clock3 className="w-3 h-3" /> {daysUntil} days away</EventBadge>
                         )}
-                        {isPopular && (
-                          <span className="text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
-                            <TrendingUp className="w-3 h-3" /> Popular
-                          </span>
+                        {isFillingFast && !isNearlyFull && (
+                          <EventBadge variant="orange"><TrendingUp className="w-3 h-3" /> Filling Fast</EventBadge>
                         )}
-                        {remaining <= 3 && (
-                          <span className="text-[10px] font-semibold bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
-                            <Users className="w-3 h-3" /> Only {remaining} left
-                          </span>
+                        {isNearlyFull && (
+                          <EventBadge variant="red"><Users className="w-3 h-3" /> Only {remaining} Left</EventBadge>
+                        )}
+                        {deadlineToday && (
+                          <EventBadge variant="red"><AlertCircle className="w-3 h-3" /> Deadline Today</EventBadge>
+                        )}
+                        {deadlineSoon && !deadlineToday && (
+                          <EventBadge variant="amber"><Clock className="w-3 h-3" /> Deadline Soon</EventBadge>
+                        )}
+                        {isHighDemand && (
+                          <EventBadge variant="purple"><Flame className="w-3 h-3" /> High Demand</EventBadge>
+                        )}
+                        {isPopular && !isHighDemand && (
+                          <EventBadge variant="purple"><TrendingUp className="w-3 h-3" /> Popular</EventBadge>
+                        )}
+                        {org?.is_trusted_organizer && (
+                          <EventBadge variant="blue"><ShieldCheck className="w-3 h-3" /> Trusted</EventBadge>
                         )}
                       </div>
 
@@ -393,7 +573,7 @@ export default function WorkerDashboard() {
                       {/* Payment — HERO */}
                       {event.payment_info && (
                         <div className="mb-2.5">
-                          <div className="inline-flex items-center gap-1.5 bg-emerald-50 border border-emerald-200/60 rounded-xl px-3 py-1.5">
+                          <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200/60 rounded-xl px-3 py-1.5 shadow-sm">
                             <IndianRupee className="w-4 h-4 text-emerald-600" />
                             <span className="text-base font-bold text-emerald-700">{event.payment_info}</span>
                           </div>
@@ -428,8 +608,8 @@ export default function WorkerDashboard() {
                         </div>
                         <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                           <div
-                            className={`h-full rounded-full transition-all duration-500 ${
-                              fillPercent >= 80 ? "bg-red-500" : fillPercent >= 50 ? "bg-amber-500" : "bg-blue-500"
+                            className={`h-full rounded-full transition-all duration-700 ease-out ${
+                              fillPercent >= 80 ? "bg-gradient-to-r from-red-400 to-red-500" : fillPercent >= 50 ? "bg-gradient-to-r from-amber-400 to-amber-500" : "bg-gradient-to-r from-blue-400 to-blue-500"
                             }`}
                             style={{ width: `${fillPercent}%` }}
                           />
@@ -496,17 +676,17 @@ export default function WorkerDashboard() {
                       <button
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); apply(event.id); }}
                         disabled={applyingId === event.id}
-                        className={`h-10 px-5 rounded-xl font-semibold text-sm flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-60 ${
-                          isUrgent
-                            ? "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-md shadow-red-500/20 hover:shadow-lg hover:shadow-red-500/30"
-                            : "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30"
+                        className={`h-10 px-5 rounded-xl font-semibold text-sm flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-60 shadow-sm ${
+                          isToday || hoursUntilEvent < 12
+                            ? "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-500/20 hover:shadow-lg hover:shadow-red-500/30"
+                            : isNearlyFull
+                              ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-amber-500/20 hover:shadow-lg hover:shadow-amber-500/30"
+                              : "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30"
                         }`}>
                         {applyingId === event.id ? (
                           <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         ) : (
-                          <>
-                            {event.application?.status === "cancelled" ? "Re-apply" : "Apply Now"} <ArrowUpRight className="w-3.5 h-3.5" />
-                          </>
+                          <><ArrowUpRight className="w-3.5 h-3.5" /> {event.application?.status === "cancelled" ? "Re-apply" : "Apply"}</>
                         )}
                       </button>
                     </div>
@@ -517,15 +697,18 @@ export default function WorkerDashboard() {
           </>
         )}
 
-        {/* Applied Events */}
+        {/* ========== APPLIED TAB ========== */}
         {tab === "applied" && appliedEvents.length === 0 && (
-          <div className="text-center py-20">
-            <div className="w-16 h-16 rounded-2xl bg-white shadow-sm flex items-center justify-center mx-auto mb-4">
-              <Send className="w-7 h-7 text-gray-300" />
+          <div className="text-center py-16 px-4">
+            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200/60 flex items-center justify-center mx-auto mb-5 shadow-sm">
+              <Send className="w-9 h-9 text-gray-300" />
             </div>
-            <p className="text-base font-semibold text-gray-900">No applications yet</p>
-            <p className="text-sm text-gray-500 mt-1">Browse events and apply to get started</p>
-            <button onClick={() => setTab("browse")} className="mt-4 h-10 px-6 rounded-xl bg-blue-600 text-white text-sm font-medium shadow-sm">
+            <p className="text-lg font-bold text-gray-900">No applications yet</p>
+            <p className="text-sm text-gray-500 mt-1.5 leading-relaxed max-w-xs mx-auto">
+              Start exploring opportunities and apply to events that match your skills and availability.
+            </p>
+            <button onClick={() => setTab("browse")}
+              className="mt-5 h-11 px-6 rounded-xl bg-blue-600 text-white text-sm font-semibold shadow-md shadow-blue-600/20 hover:shadow-lg transition-all active:scale-[0.97]">
               Browse Events
             </button>
           </div>
@@ -546,11 +729,9 @@ export default function WorkerDashboard() {
                 <Link key={event.id} href={`/worker/events/${event.id}`}
                   className="block bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 active:scale-[0.99] animate-slide-up"
                   style={{ animationDelay: `${idx * 50}ms`, animationFillMode: "both" }}>
-                  {/* Premium status gradient bar */}
                   <div className={`h-2 ${app.status === "approved" ? "bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500" : "bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400"}`} />
 
                   <div className="p-4">
-                    {/* Top row: org + title + badge */}
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="flex items-center gap-2.5 min-w-0 flex-1">
                         {org?.avatar_url ? (
@@ -578,7 +759,6 @@ export default function WorkerDashboard() {
                       </div>
                     </div>
 
-                    {/* Payment & Schedule */}
                     <div className="flex items-center justify-between mb-2.5">
                       {event.payment_info && (
                         <div className="flex items-center gap-1 text-emerald-700 text-sm font-bold">
@@ -600,7 +780,6 @@ export default function WorkerDashboard() {
                       </div>
                     </div>
 
-                    {/* Info chips row */}
                     <div className="flex flex-wrap items-center gap-1.5 mb-3">
                       <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-gray-50 text-[10px] text-gray-600">
                         <Calendar className="w-3 h-3" />
@@ -616,7 +795,6 @@ export default function WorkerDashboard() {
                       )}
                     </div>
 
-                    {/* Staffing progress */}
                     {event.worker_count > 0 && (
                       <div className="mb-3">
                         <div className="flex items-center justify-between text-xs mb-1.5">
@@ -633,7 +811,6 @@ export default function WorkerDashboard() {
                       </div>
                     )}
 
-                    {/* Organizer trust strip */}
                     {org && (
                       <div className="flex items-center gap-2 p-2 rounded-xl bg-gradient-to-r from-gray-50 to-white border border-gray-100 mb-3">
                         <span className="text-[10px] text-gray-400 font-medium">by</span>
@@ -648,7 +825,6 @@ export default function WorkerDashboard() {
                       </div>
                     )}
 
-                    {/* Cancel section */}
                     {(app.status === "pending" || app.status === "approved") && (
                       <div className="pt-3 border-t border-gray-100">
                         {canCancel ? (
