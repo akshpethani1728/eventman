@@ -317,7 +317,10 @@ export default function OrganizerEventDetailPage() {
                         {app.profile.experience && <span>Exp: {app.profile.experience}</span>}
                         {app.profile.availability && <span className="capitalize">Avail: {app.profile.availability}</span>}
                         {app.profile.area && <span>Area: {app.profile.area}</span>}
-                        {app.profile.phone && <span>Phone: {app.profile.phone}</span>}
+                        {app.status === "approved" && app.profile.phone
+                          ? <span className="flex items-center gap-1 text-green-700"><Phone className="w-3 h-3" />{app.profile.phone}</span>
+                          : app.status !== "approved" && app.profile.phone && <span className="text-gray-400 italic">Contact hidden until approval</span>
+                        }
                       </div>
                       {app.profile.skills && app.profile.skills.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-1">

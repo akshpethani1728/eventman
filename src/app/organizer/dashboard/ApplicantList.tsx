@@ -255,8 +255,10 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
                       {app.profile.area && (
                         <div className="flex items-center gap-1.5"><MapPin className="w-3 h-3 text-gray-400" /><span>{app.profile.area}</span></div>
                       )}
-                      {app.profile.phone && (
-                        <div className="flex items-center gap-1.5"><Phone className="w-3 h-3 text-gray-400" /><span>{app.profile.phone}</span></div>
+                      {app.status === "approved" && app.profile.phone ? (
+                        <div className="flex items-center gap-1.5"><Phone className="w-3 h-3 text-green-600" /><span className="text-green-700">{app.profile.phone}</span></div>
+                      ) : app.profile.phone && (
+                        <div className="flex items-center gap-1.5 text-gray-400 italic"><Phone className="w-3 h-3" /><span>Contact hidden until approval</span></div>
                       )}
                       {app.profile.email && (
                         <div className="flex items-center gap-1.5"><Mail className="w-3 h-3 text-gray-400" /><span className="truncate">{app.profile.email}</span></div>

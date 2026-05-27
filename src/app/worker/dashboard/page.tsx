@@ -151,6 +151,25 @@ export default function WorkerDashboard() {
     loadData();
   };
 
+  const cancelApplication = async (eventId: string, appStatus: string) => {
+    const event = events.find(e => e.id === eventId);
+    if (!event) return;
+    const hoursUntilEvent = (new Date(event.date).getTime() - Date.now()) / 3600000;
+    if (hoursUntilEvent < 12) { toast.error("Cancellation unavailable within 12 hours of reporting time."); return; }
+    if (!confirm("Cancel your application for this event?")) return;
+    const supabase = createClient();
+    await supabase.from("applications").update({ status: "cancelled", updated_at: new Date().toISOString() }).eq("event_id", eventId);
+    await supabase.from("notifications").insert({
+      user_id: event.organizer_id, title: "Application Cancelled",
+      message: `A worker has cancelled their application for "${event.title}".`,
+    });
+    if (event.status === "full") {
+      await supabase.from("events").update({ status: "published", updated_at: new Date().toISOString() }).eq("id", event.id);
+    }
+    toast.success("Application cancelled");
+    loadData();
+  };
+
   const signOut = async () => { await supabase.auth.signOut(); router.push("/login"); };
 
   const appliedIds = new Set(events.filter(e => e.application).map(e => e.id));
@@ -568,6 +587,22 @@ export default function WorkerDashboard() {
                         {org.is_trusted_organizer && <ShieldCheck className="w-3 h-3 text-blue-500" />}
                       </div>
                     )}
+                    {(app.status === "pending" || app.status === "approved") && (() => {
+                      const hoursUntil = (new Date(event.date).getTime() - Date.now()) / 3600000;
+                      const canCancel = hoursUntil >= 12;
+                      return (
+                        <div className="mt-2 pt-2 border-t border-gray-100">
+                          <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); cancelApplication(event.id, app.status); }}
+                            disabled={!canCancel}
+                            className={`text-[10px] font-medium flex items-center gap-1 transition-colors ${
+                              canCancel ? "text-red-600 hover:text-red-700" : "text-gray-400 cursor-not-allowed"
+                            }`}>
+                            <XCircle className="w-3 h-3" />
+                            {canCancel ? "Cancel application" : "Cancellation unavailable (within 12h)"}
+                          </button>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </Link>
               );
