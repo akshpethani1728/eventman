@@ -7,10 +7,11 @@ import { createClient } from "@/lib/supabase/client";
 import {
   LogOut, Plus, Copy, Edit3, Trash2, XCircle, Users, MapPin, Calendar,
   Clock, LayoutDashboard, User, AlertTriangle, CheckCircle, Clock3,
-  BookTemplate, Bell, Search
+  BookTemplate, Bell, Search, IndianRupee, ChevronRight, ArrowUpRight,
+  Hourglass, Filter, TrendingUp, Ban, ShieldCheck, Check, X
 } from "lucide-react";
 import { toast } from "sonner";
-import type { Profile, Event } from "@/lib/supabase/types";
+import type { Profile, Event, Application } from "@/lib/supabase/types";
 import CreateEventModal from "./CreateEventModal";
 import EditEventModal from "./EditEventModal";
 import ApplicantList from "./ApplicantList";
@@ -18,7 +19,7 @@ import ApplicantList from "./ApplicantList";
 const STATUS_STYLES: Record<string, string> = {
   draft: "bg-gray-100 text-gray-600",
   published: "bg-blue-100 text-blue-700",
-  filling: "bg-green-100 text-green-700",
+  filling: "bg-emerald-100 text-emerald-700",
   full: "bg-purple-100 text-purple-700",
   closed: "bg-amber-100 text-amber-700",
   completed: "bg-gray-100 text-gray-500",
@@ -30,15 +31,25 @@ const STATUS_LABELS: Record<string, string> = {
   full: "Full", closed: "Closed", completed: "Completed", cancelled: "Cancelled",
 };
 
+const CATEGORY_LABELS: Record<string, string> = {
+  promotion: "Promotion", event_setup: "Setup", crowd_management: "Crowd Mgmt",
+  registration: "Registration", hospitality: "Hospitality", cleaning: "Cleaning",
+  security: "Security", other: "Other",
+};
+
 export default function OrganizerDashboard() {
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [events, setEvents] = useState<(Event & { applicantCount?: number; approvedCount?: number; pendingCount?: number })[]>([]);
+  const [events, setEvents] = useState<(Event & {
+    applicantCount?: number; approvedCount?: number; pendingCount?: number; rejectedCount?: number;
+    recentProfiles?: { avatar_url: string | null; full_name: string }[];
+  })[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [createFromTemplate, setCreateFromTemplate] = useState<any>(null);
   const [tab, setTab] = useState<"active" | "past" | "templates">("active");
+  const [actionMenu, setActionMenu] = useState<string | null>(null);
   const router = useRouter();
   const supabase = createClient();
 
@@ -53,20 +64,33 @@ export default function OrganizerDashboard() {
     setProfile(prof);
 
     const { data: evts } = await supabase
-      .from("events")
-      .select("*")
-      .eq("organizer_id", user.id)
-      .order("created_at", { ascending: false });
+      .from("events").select("*").eq("organizer_id", user.id).order("created_at", { ascending: false });
 
     const eventsWithCounts = await Promise.all(
       (evts || []).map(async (event) => {
-        const { count: totalCount } = await supabase
-          .from("applications").select("*", { count: "exact", head: true }).eq("event_id", event.id);
-        const { count: approvedCount } = await supabase
-          .from("applications").select("*", { count: "exact", head: true }).eq("event_id", event.id).eq("status", "approved");
-        const { count: pendingCount } = await supabase
-          .from("applications").select("*", { count: "exact", head: true }).eq("event_id", event.id).eq("status", "pending");
-        return { ...event, applicantCount: totalCount || 0, approvedCount: approvedCount || 0, pendingCount: pendingCount || 0 };
+        const { data: allApps } = await supabase
+          .from("applications").select("status, worker_id").eq("event_id", event.id);
+        const apps = allApps || [];
+        const approved = apps.filter(a => a.status === "approved");
+        const pending = apps.filter(a => a.status === "pending");
+        const rejected = apps.filter(a => a.status === "rejected");
+
+        let recentProfiles: { avatar_url: string | null; full_name: string }[] = [];
+        if (pending.length > 0) {
+          const recentPending = pending.slice(0, 3);
+          const { data: p } = await supabase
+            .from("profiles").select("avatar_url, full_name").in("user_id", recentPending.map(a => a.worker_id));
+          recentProfiles = p || [];
+        }
+
+        return {
+          ...event,
+          applicantCount: apps.length,
+          approvedCount: approved.length,
+          pendingCount: pending.length,
+          rejectedCount: rejected.length,
+          recentProfiles,
+        };
       })
     );
 
@@ -77,15 +101,14 @@ export default function OrganizerDashboard() {
   const updateEventStatus = async (eventId: string, status: string) => {
     const { error } = await supabase.from("events").update({ status, updated_at: new Date().toISOString() }).eq("id", eventId);
     if (error) { toast.error(error.message); return; }
-    toast.success(`Event marked as ${STATUS_LABELS[status]?.toLowerCase() || status}`);
+    toast.success(`Event ${STATUS_LABELS[status]?.toLowerCase() || status}`);
+    setActionMenu(null);
     loadData();
   };
 
   const duplicateEvent = async (event: Event) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-    if (!confirm("Duplicate this event?")) return;
-
     const { error } = await supabase.from("events").insert({
       organizer_id: user.id, title: event.title,
       category: event.category, application_deadline: event.application_deadline,
@@ -100,7 +123,6 @@ export default function OrganizerDashboard() {
       instructions: event.instructions, contact_person_notes: event.contact_person_notes,
       google_maps_link: event.google_maps_link, status: "draft",
     });
-
     if (error) { toast.error(error.message); return; }
     toast.success("Event duplicated (draft)");
     loadData();
@@ -111,10 +133,8 @@ export default function OrganizerDashboard() {
     if (!user) return;
     const name = prompt("Template name:", event.title);
     if (!name) return;
-
     const { error } = await supabase.from("events").insert({
-      organizer_id: user.id, title: event.title,
-      category: event.category, location: event.location,
+      organizer_id: user.id, title: event.title, category: event.category, location: event.location,
       worker_count: event.worker_count, gender_requirement: event.gender_requirement,
       min_age: event.min_age, max_age: event.max_age,
       experience_required: event.experience_required, skill_requirements: event.skill_requirements,
@@ -126,17 +146,17 @@ export default function OrganizerDashboard() {
       google_maps_link: event.google_maps_link,
       is_template: true, template_name: name, status: "draft",
     });
-
     if (error) { toast.error(error.message); return; }
     toast.success("Template saved!");
     loadData();
   };
 
   const deleteEvent = async (eventId: string) => {
-    if (!confirm("Delete this event permanently?")) return;
+    if (!confirm("Delete permanently?")) return;
     const { error } = await supabase.from("events").delete().eq("id", eventId);
     if (error) { toast.error(error.message); return; }
     toast.success("Event deleted");
+    setActionMenu(null);
     loadData();
   };
 
@@ -169,83 +189,98 @@ export default function OrganizerDashboard() {
 
   const sortedActive = [...activeEvents].sort((a, b) => getUrgencyScore(b) - getUrgencyScore(a));
 
-  // Insight groups
   const needsAttention = sortedActive.filter(e => {
     const remaining = e.worker_count - (e.approvedCount || 0);
     return (e.pendingCount || 0) > 0 || remaining <= 3 || e.date === todayStr || e.application_deadline === todayStr;
-  });
-  const startingSoon = sortedActive.filter(e => {
-    const diff = new Date(e.date).getTime() - Date.now();
-    return diff > 0 && diff < 86400000 * 3;
   });
   const seatsOpen = sortedActive.filter(e => {
     const remaining = e.worker_count - (e.approvedCount || 0);
     return remaining > 0 && !needsAttention.includes(e);
   });
-  const pendingApprovals = sortedActive.filter(e => (e.pendingCount || 0) > 0);
+
+  const formatCount = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-500">Loading...</p>
+        <div className="text-center">
+          <div className="w-10 h-10 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm text-gray-500">Loading dashboard...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-gray-50 pb-28">
       {/* Header */}
-      <header className="sticky top-0 bg-white border-b border-gray-200 z-10">
-        <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
-          <h1 className="font-bold text-lg">EventMan</h1>
-          <div className="flex items-center gap-1">
-            <Link href="/organizer/notifications" className="p-2 text-gray-500 hover:text-gray-900 relative">
+      <header className="sticky top-0 bg-white/80 backdrop-blur-lg border-b border-gray-200/80 z-20">
+        <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center shadow-sm">
+              <LayoutDashboard className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <h1 className="font-bold text-base leading-tight">EventMan</h1>
+              <p className="text-[10px] text-gray-400 -mt-0.5">Organizer</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-0.5">
+            <Link href="/organizer/notifications" className="p-2 text-gray-400 hover:text-gray-600 rounded-xl hover:bg-gray-100 transition-colors relative">
               <Bell className="w-4 h-4" />
             </Link>
-            <Link href="/organizer/database" className="p-2 text-gray-500 hover:text-gray-900">
+            <Link href="/organizer/database" className="p-2 text-gray-400 hover:text-gray-600 rounded-xl hover:bg-gray-100 transition-colors">
               <Search className="w-4 h-4" />
             </Link>
-            <Link href="/organizer/profile" className="p-2 text-gray-500 hover:text-gray-900">
-              <User className="w-4 h-4" />
+            <Link href="/organizer/profile" className="flex items-center gap-2 p-1.5 hover:bg-gray-100 rounded-xl transition-colors">
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-[11px] shadow-sm">
+                {profile?.full_name?.charAt(0) || "O"}
+              </div>
             </Link>
-            <button onClick={signOut} className="p-2 text-gray-500 hover:text-gray-900">
+            <button onClick={signOut} className="p-2 text-gray-400 hover:text-gray-600 rounded-xl hover:bg-gray-100 transition-colors">
               <LogOut className="w-4 h-4" />
             </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-4">
-        {/* Operational Overview */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
-            <p className="text-2xl font-bold text-gray-900">{activeEvents.length}</p>
-            <p className="text-xs text-gray-500 mt-0.5">Active events</p>
+      <main className="max-w-3xl mx-auto px-4 py-4">
+        {/* Welcome + Quick Stats */}
+        {profile && (
+          <div className="mb-4">
+            <p className="text-sm text-gray-500">Good to see you, <span className="font-semibold text-gray-800">{profile.full_name?.split(" ")[0] || "there"}</span></p>
           </div>
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
-            <p className="text-2xl font-bold text-amber-600">{totalWorkersNeeded > 0 ? totalWorkersNeeded : 0}</p>
-            <p className="text-xs text-gray-500 mt-0.5">Workers needed</p>
+        )}
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4">
+          <div className="bg-white border border-gray-200/80 rounded-xl p-3.5 shadow-sm">
+            <p className="text-xl font-bold text-gray-900">{activeEvents.length}</p>
+            <p className="text-[10px] text-gray-500 mt-0.5 flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Active events</p>
           </div>
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
-            <p className="text-2xl font-bold text-blue-600">{totalPendingApprovals}</p>
-            <p className="text-xs text-gray-500 mt-0.5">Pending approvals</p>
+          <div className="bg-white border border-gray-200/80 rounded-xl p-3.5 shadow-sm">
+            <p className="text-xl font-bold text-amber-600">{totalWorkersNeeded}</p>
+            <p className="text-[10px] text-gray-500 mt-0.5 flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-amber-500" /> Workers needed</p>
           </div>
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
-            <p className="text-2xl font-bold text-red-600">{needsAttention.length}</p>
-            <p className="text-xs text-gray-500 mt-0.5">Needs attention</p>
+          <div className="bg-white border border-gray-200/80 rounded-xl p-3.5 shadow-sm">
+            <p className="text-xl font-bold text-blue-600">{totalPendingApprovals}</p>
+            <p className="text-[10px] text-gray-500 mt-0.5 flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Pending approvals</p>
+          </div>
+          <div className="bg-white border border-gray-200/80 rounded-xl p-3.5 shadow-sm">
+            <p className="text-xl font-bold text-red-600">{needsAttention.length}</p>
+            <p className="text-[10px] text-gray-500 mt-0.5 flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-red-500" /> Needs attention</p>
           </div>
         </div>
 
         {/* Quick Actions */}
         <div className="flex gap-2 mb-4">
           <button onClick={() => { setCreateFromTemplate(null); setShowCreate(true); }}
-            className="flex-1 h-11 rounded-xl bg-blue-600 text-white text-sm font-medium flex items-center justify-center gap-2 active:bg-blue-700">
+            className="flex-1 h-11 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 text-white text-sm font-medium flex items-center justify-center gap-2 shadow-sm shadow-blue-600/20 active:scale-[0.98] transition-all">
             <Plus className="w-4 h-4" /> Create Event
           </button>
           {templates.length > 0 && (
             <button onClick={() => setTab("templates")}
-              className={`h-11 px-4 rounded-xl border text-sm font-medium flex items-center gap-2 ${
-                tab === "templates" ? "bg-blue-600 text-white border-blue-600" : "bg-white text-gray-700 border-gray-300"
+              className={`h-11 px-4 rounded-xl border text-sm font-medium flex items-center gap-2 transition-all ${
+                tab === "templates" ? "bg-blue-600 text-white border-blue-600 shadow-sm" : "bg-white text-gray-700 border-gray-200/80 shadow-sm active:scale-[0.98]"
               }`}>
               <BookTemplate className="w-4 h-4" />
             </button>
@@ -253,11 +288,11 @@ export default function OrganizerDashboard() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-4 border-b border-gray-200">
+        <div className="flex gap-1 mb-4 bg-white/80 backdrop-blur-xl rounded-2xl p-1 border border-gray-200/60 shadow-sm">
           {(["active", "past"] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
-              className={`h-9 px-4 text-sm font-medium transition-colors border-b-2 capitalize ${
-                tab === t ? "text-blue-600 border-blue-600" : "text-gray-500 border-transparent hover:text-gray-700"
+              className={`flex-1 h-10 rounded-xl text-sm font-medium transition-all capitalize ${
+                tab === t ? "bg-blue-600 text-white shadow-sm" : "text-gray-500 hover:text-gray-800"
               }`}>
               {t} ({t === "active" ? activeEvents.length : pastEvents.length})
             </button>
@@ -272,91 +307,289 @@ export default function OrganizerDashboard() {
               <div className="text-center py-12 text-gray-400 text-sm">No templates yet.</div>
             )}
             {templates.map(tmpl => (
-              <div key={tmpl.id} className="bg-white border border-gray-200 rounded-xl p-3.5 flex items-center justify-between gap-3">
-                <div>
-                  <p className="font-medium text-sm text-gray-900">{tmpl.template_name || tmpl.title}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{tmpl.worker_count} workers · {tmpl.category || "General"}</p>
+              <div key={tmpl.id} className="bg-white border border-gray-200 rounded-xl p-3.5 flex items-center justify-between gap-3 shadow-sm">
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-sm text-gray-900 truncate">{tmpl.template_name || tmpl.title}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{tmpl.worker_count} workers · {CATEGORY_LABELS[tmpl.category || ""] || tmpl.category || "General"}</p>
                 </div>
-                <div className="flex gap-1.5">
+                <div className="flex gap-1.5 shrink-0">
                   <button onClick={() => { setCreateFromTemplate(tmpl); setShowCreate(true); }}
-                    className="h-8 px-3 rounded-lg bg-blue-600 text-white text-xs font-medium active:bg-blue-700">Use</button>
+                    className="h-8 px-3 rounded-lg bg-blue-600 text-white text-xs font-medium active:scale-95 transition-all">Use</button>
                   <button onClick={() => deleteEvent(tmpl.id)}
-                    className="h-8 px-3 rounded-lg bg-red-50 text-red-600 text-xs active:bg-red-100"><Trash2 className="w-3.5 h-3.5" /></button>
+                    className="h-8 px-3 rounded-lg bg-red-50 text-red-600 text-xs active:scale-95 transition-all"><Trash2 className="w-3.5 h-3.5" /></button>
                 </div>
               </div>
             ))}
-            <button onClick={() => setTab("active")} className="text-xs text-blue-600 mt-1">← Back</button>
+            <button onClick={() => setTab("active")} className="text-xs text-blue-600 mt-1">← Back to active</button>
           </div>
         )}
 
         {/* Active Tab */}
         {tab === "active" && (
-          <div className="space-y-4">
-            {/* Insight sections */}
-            {pendingApprovals.length > 0 && (
-              <div>
-                <div className="flex items-center gap-1.5 mb-2"><Users className="w-3.5 h-3.5 text-blue-600" /><span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">Pending Approvals</span></div>
-                <div className="space-y-2">
-                  {pendingApprovals.map(event => (
-                    <Link key={event.id} href={`/organizer/events/${event.id}`} className="block bg-white border border-blue-200 rounded-xl p-3 active:bg-blue-50">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="font-medium text-sm text-gray-900 truncate">{event.title}</p>
-                        <span className="text-xs font-medium text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full shrink-0">{event.pendingCount} pending</span>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">{event.date_display || event.date} · {event.time}</p>
-                      <p className="text-xs text-gray-400 truncate mt-0.5">{event.location}{event.payment_info ? ` · ${event.payment_info}` : ""}</p>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {needsAttention.length > 0 && needsAttention.length !== pendingApprovals.length && (
-              <div>
-                <div className="flex items-center gap-1.5 mb-2"><AlertTriangle className="w-3.5 h-3.5 text-amber-600" /><span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">Needs Attention</span></div>
-                <div className="space-y-2">
-                  {needsAttention.filter(e => !pendingApprovals.includes(e)).map(event => {
-                    const rem = event.worker_count - (event.approvedCount || 0);
-                    return (
-                      <Link key={event.id} href={`/organizer/events/${event.id}`} className="block bg-white border border-amber-200 rounded-xl p-3 active:bg-amber-50">
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="font-medium text-sm text-gray-900 truncate">{event.title}</p>
-                          <span className="text-xs font-medium text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full shrink-0">{rem <= 3 ? `Only ${rem} left` : "Attention"}</span>
-                        </div>
-                        <p className="text-xs text-gray-500 mt-1">{event.date_display || event.date} · {event.time}{event.application_deadline === todayStr ? " · Deadline today" : ""}</p>
-                        <p className="text-xs text-gray-400 truncate mt-0.5">{event.location}{event.payment_info ? ` · ${event.payment_info}` : ""}</p>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {seatsOpen.length > 0 && (
-              <div>
-                <div className="flex items-center gap-1.5 mb-2"><Clock3 className="w-3.5 h-3.5 text-green-600" /><span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">Seats Open</span></div>
-                <div className="space-y-2">
-                  {seatsOpen.map(event => (
-                    <Link key={event.id} href={`/organizer/events/${event.id}`} className="block bg-white border border-gray-200 rounded-xl p-3 active:bg-gray-50">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="font-medium text-sm text-gray-900 truncate">{event.title}</p>
-                        <span className="text-xs font-medium text-green-700 bg-green-100 px-2 py-0.5 rounded-full shrink-0">{event.worker_count - (event.approvedCount || 0)} seats</span>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">{event.date_display || event.date} · {event.time}</p>
-                      <p className="text-xs text-gray-400 truncate mt-0.5">{event.location}{event.payment_info ? ` · ${event.payment_info}` : ""}</p>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-
+          <div className="space-y-3">
             {sortedActive.length === 0 && (
               <div className="text-center py-16 text-gray-400">
                 <LayoutDashboard className="w-10 h-10 mx-auto mb-2 text-gray-300" />
-                <p className="text-sm">No active events</p>
-                <button onClick={() => { setCreateFromTemplate(null); setShowCreate(true); }} className="mt-2 text-xs text-blue-600">Create your first event</button>
+                <p className="text-sm text-gray-500">No active events</p>
+                <button onClick={() => { setCreateFromTemplate(null); setShowCreate(true); }} className="mt-3 text-sm text-blue-600 font-medium">Create your first event</button>
               </div>
             )}
+
+            {sortedActive.map(event => {
+              const remaining = event.worker_count - (event.approvedCount || 0);
+              const fillPercent = Math.min(100, Math.round(((event.approvedCount || 0) / event.worker_count) * 100));
+              const daysUntil = Math.ceil((new Date(event.date).getTime() - Date.now()) / 86400000);
+              const isToday = event.date === todayStr;
+              const isTomorrow = daysUntil === 1;
+              const deadlineToday = event.application_deadline === todayStr;
+              const deadlineMs = event.application_deadline ? new Date(event.application_deadline).getTime() - Date.now() : null;
+              const deadlineSoon = deadlineMs !== null && deadlineMs > 0 && deadlineMs < 86400000 * 3;
+              const isUrgent = isToday || isTomorrow || (remaining <= 3 && event.status !== "full");
+              const hasDanger = isToday || deadlineToday;
+              const hasWarnings = isTomorrow || deadlineSoon || remaining <= 3;
+              const isFilling = event.status === "published" || event.status === "filling";
+              const needsApproval = (event.pendingCount || 0) > 0;
+              const isFull = event.status === "full";
+
+              return (
+                <div key={event.id}
+                  className={`bg-white rounded-2xl border overflow-hidden shadow-sm transition-all duration-200 hover:shadow-md ${
+                    hasDanger ? "border-red-200/80" : hasWarnings ? "border-amber-200/80" : isFull ? "border-purple-200/80" : "border-gray-200/80"
+                  }`}>
+
+                  {/* Header */}
+                  <div className="px-4 pt-3.5 pb-2 flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <Link href={`/organizer/events/${event.id}`} className="hover:text-blue-600 transition-colors">
+                        <h3 className="font-bold text-base leading-snug text-gray-900 truncate">{event.title}</h3>
+                      </Link>
+                      <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                        <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${STATUS_STYLES[event.status]}`}>
+                          {STATUS_LABELS[event.status]}
+                        </span>
+                        {event.category && (
+                          <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full capitalize">
+                            {CATEGORY_LABELS[event.category] || event.category}
+                          </span>
+                        )}
+                        {isToday && <span className="text-[10px] font-semibold bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-full">Today</span>}
+                        {isTomorrow && <span className="text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full">Tomorrow</span>}
+                        {deadlineToday && <span className="text-[10px] font-semibold bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-full">Deadline today</span>}
+                        {isFull && <span className="text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-200 px-2 py-0.5 rounded-full">Full</span>}
+                      </div>
+                    </div>
+                    {/* Action menu */}
+                    <div className="relative shrink-0">
+                      <button onClick={() => setActionMenu(actionMenu === event.id ? null : event.id)}
+                        className="h-8 w-8 rounded-xl hover:bg-gray-100 flex items-center justify-center text-gray-400 transition-colors">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/></svg>
+                      </button>
+                      {actionMenu === event.id && (
+                        <>
+                          <div className="fixed inset-0 z-10" onClick={() => setActionMenu(null)} />
+                          <div className="absolute right-0 top-9 w-44 bg-white rounded-xl border border-gray-200 shadow-xl z-20 py-1 overflow-hidden">
+                            {isFilling && (
+                              <button onClick={() => { setEditingEvent(event); setActionMenu(null); }}
+                                className="w-full flex items-center gap-2 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-gray-50 transition-colors">
+                                <Edit3 className="w-3.5 h-3.5" /> Edit Event
+                              </button>
+                            )}
+                            <button onClick={() => { setSelectedEvent(event); setActionMenu(null); }}
+                              className="w-full flex items-center gap-2 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-gray-50 transition-colors">
+                              <Users className="w-3.5 h-3.5" /> View Applicants
+                            </button>
+                            <Link href={`/organizer/events/${event.id}`} onClick={() => setActionMenu(null)}
+                              className="w-full flex items-center gap-2 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-gray-50 transition-colors">
+                              <ArrowUpRight className="w-3.5 h-3.5" /> Open Detail
+                            </Link>
+                            <div className="h-px bg-gray-100 my-1" />
+                            <button onClick={() => { duplicateEvent(event); setActionMenu(null); }}
+                              className="w-full flex items-center gap-2 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-gray-50 transition-colors">
+                              <Copy className="w-3.5 h-3.5" /> Duplicate
+                            </button>
+                            <button onClick={() => { saveAsTemplate(event); setActionMenu(null); }}
+                              className="w-full flex items-center gap-2 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-gray-50 transition-colors">
+                              <BookTemplate className="w-3.5 h-3.5" /> Save as Template
+                            </button>
+                            <div className="h-px bg-gray-100 my-1" />
+                            {isFilling && (
+                              <button onClick={() => { updateEventStatus(event.id, "closed"); }}
+                                className="w-full flex items-center gap-2 px-3.5 py-2.5 text-xs text-amber-700 hover:bg-amber-50 transition-colors">
+                                <XCircle className="w-3.5 h-3.5" /> Close Event
+                              </button>
+                            )}
+                            {isFilling && (
+                              <button onClick={() => { updateEventStatus(event.id, "completed"); }}
+                                className="w-full flex items-center gap-2 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-gray-50 transition-colors">
+                                <CheckCircle className="w-3.5 h-3.5" /> Mark Completed
+                              </button>
+                            )}
+                            <button onClick={() => { deleteEvent(event.id); }}
+                              className="w-full flex items-center gap-2 px-3.5 py-2.5 text-xs text-red-600 hover:bg-red-50 transition-colors">
+                              <Trash2 className="w-3.5 h-3.5" /> Delete
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Main operational section */}
+                  <div className="px-4 py-2">
+                    <div className="grid grid-cols-3 gap-3 mb-3">
+                      <div className="bg-gray-50 rounded-xl p-2.5 text-center">
+                        <p className="text-xs text-gray-500">Approved</p>
+                        <p className="text-lg font-bold text-gray-900">{event.approvedCount}</p>
+                      </div>
+                      <div className="bg-gray-50 rounded-xl p-2.5 text-center">
+                        <p className="text-xs text-gray-500">Pending</p>
+                        <p className={`text-lg font-bold ${needsApproval ? "text-amber-600" : "text-gray-900"}`}>{event.pendingCount}</p>
+                      </div>
+                      <div className="bg-gray-50 rounded-xl p-2.5 text-center">
+                        <p className="text-xs text-gray-500">Remaining</p>
+                        <p className={`text-lg font-bold ${remaining <= 3 && remaining > 0 ? "text-red-600" : remaining === 0 ? "text-gray-400" : "text-gray-900"}`}>
+                          {remaining <= 0 ? "Full" : remaining}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Progress bar */}
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between text-xs mb-1.5">
+                        <span className="text-gray-600 font-medium">{event.approvedCount} of {event.worker_count} filled</span>
+                        <span className={`font-medium ${fillPercent >= 100 ? "text-purple-600" : fillPercent >= 50 ? "text-emerald-600" : "text-gray-500"}`}>
+                          {fillPercent}%
+                        </span>
+                      </div>
+                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className={`h-full rounded-full transition-all duration-500 ${
+                          fillPercent >= 100 ? "bg-purple-500" : fillPercent >= 80 ? "bg-emerald-500" : fillPercent >= 50 ? "bg-blue-500" : "bg-amber-500"
+                        }`} style={{ width: `${Math.max(4, fillPercent)}%` }} />
+                      </div>
+                    </div>
+
+                    {/* Urgency & Operational alerts */}
+                    <div className="flex flex-wrap gap-1.5 mb-2.5">
+                      {needsApproval && (
+                        <button onClick={() => setSelectedEvent(event)}
+                          className="text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-lg flex items-center gap-1 hover:bg-blue-100 transition-colors">
+                          <Users className="w-3 h-3" /> {event.pendingCount} pending approval
+                        </button>
+                      )}
+                      {remaining <= 3 && remaining > 0 && (
+                        <span className="text-[10px] font-medium bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                          <AlertTriangle className="w-3 h-3" /> Only {remaining} seats left
+                        </span>
+                      )}
+                      {deadlineSoon && !deadlineToday && (
+                        <span className="text-[10px] font-medium bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                          <Hourglass className="w-3 h-3" /> Deadline closing
+                        </span>
+                      )}
+                      {deadlineToday && (
+                        <span className="text-[10px] font-medium bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                          <Clock3 className="w-3 h-3" /> Deadline today
+                        </span>
+                      )}
+                      {event.status === "draft" && (
+                        <button onClick={() => { setEditingEvent(event); }}
+                          className="text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-lg flex items-center gap-1 hover:bg-blue-100 transition-colors">
+                          <Edit3 className="w-3 h-3" /> Publish draft
+                        </button>
+                      )}
+                      {event.status === "published" && (
+                        <span className="text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                          <CheckCircle className="w-3 h-3" /> Published — accepting apps
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Event details row */}
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500 mb-2.5">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5 text-gray-400" />
+                        <span>{event.date_display || event.date}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5 text-gray-400" />
+                        <span>{event.time}{event.end_time ? `-${event.end_time}` : ""}</span>
+                      </div>
+                      <div className="flex items-center gap-1 truncate max-w-[180px]">
+                        <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                        <span className="truncate">{event.location}</span>
+                      </div>
+                      {event.payment_info && (
+                        <div className="flex items-center gap-1 text-emerald-600 font-medium">
+                          <IndianRupee className="w-3.5 h-3.5" />
+                          <span>{event.payment_info}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Requirement chips */}
+                    {(event.gender_requirement || event.min_age || event.max_age) && (
+                      <div className="flex flex-wrap gap-1.5 mb-2.5">
+                        {event.gender_requirement && (
+                          <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-lg capitalize">{event.gender_requirement}</span>
+                        )}
+                        {(event.min_age || event.max_age) && (
+                          <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-lg">{event.min_age || 0}-{event.max_age || 99} yrs</span>
+                        )}
+                        {event.food_included && <span className="text-[10px] bg-green-50 text-green-700 px-2 py-0.5 rounded-lg">Food</span>}
+                        {event.travel_included && <span className="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-lg">Travel</span>}
+                        {event.dress_code && <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-lg">{event.dress_code}</span>}
+                      </div>
+                    )}
+
+                    {/* Applicant preview */}
+                    {(event.recentProfiles && event.recentProfiles.length > 0) && (
+                      <div className="flex items-center gap-2 py-1.5">
+                        <div className="flex -space-x-1.5">
+                          {event.recentProfiles.map((p, i) => (
+                            <div key={i} className="w-6 h-6 rounded-full bg-blue-100 ring-2 ring-white flex items-center justify-center text-blue-700 font-bold text-[9px]">
+                              {p.avatar_url ? (
+                                <img src={p.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
+                              ) : (
+                                p.full_name?.charAt(0) || "W"
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                        <span className="text-[10px] text-gray-500">{event.pendingCount} pending applicant{event.pendingCount !== 1 ? "s" : ""}</span>
+                        <button onClick={() => { setSelectedEvent(event); }}
+                          className="text-[10px] text-blue-600 font-medium hover:underline ml-auto">
+                          Review all →
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Quick action bar */}
+                  {isFilling && (
+                    <div className="px-4 py-2.5 border-t border-gray-100 flex gap-1.5 overflow-x-auto">
+                      <button onClick={() => { setEditingEvent(event); }}
+                        className="h-8 px-3 rounded-lg bg-gray-100 text-gray-700 text-xs font-medium flex items-center gap-1.5 hover:bg-gray-200 active:scale-95 transition-all shrink-0">
+                        <Edit3 className="w-3.5 h-3.5" /> Edit
+                      </button>
+                      <button onClick={() => { setSelectedEvent(event); }}
+                        className="h-8 px-3 rounded-lg bg-gray-100 text-gray-700 text-xs font-medium flex items-center gap-1.5 hover:bg-gray-200 active:scale-95 transition-all shrink-0">
+                        <Users className="w-3.5 h-3.5" /> Applicants
+                      </button>
+                      <Link href={`/organizer/events/${event.id}`}
+                        className="h-8 px-3 rounded-lg bg-blue-600 text-white text-xs font-medium flex items-center gap-1.5 hover:bg-blue-700 active:scale-95 transition-all shrink-0">
+                        Manage <ChevronRight className="w-3 h-3" />
+                      </Link>
+                      {needsApproval && (
+                        <button onClick={() => { setSelectedEvent(event); }}
+                          className="h-8 px-3 rounded-lg bg-amber-50 text-amber-700 text-xs font-medium flex items-center gap-1.5 hover:bg-amber-100 active:scale-95 transition-all shrink-0">
+                          <Hourglass className="w-3.5 h-3.5" /> Review
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
 
@@ -366,21 +599,37 @@ export default function OrganizerDashboard() {
             {pastEvents.length === 0 && (
               <div className="text-center py-16 text-gray-400">
                 <LayoutDashboard className="w-10 h-10 mx-auto mb-2 text-gray-300" />
-                <p className="text-sm">No past events</p>
+                <p className="text-sm text-gray-500">No past events</p>
               </div>
             )}
             {pastEvents.map(event => (
               <Link key={event.id} href={`/organizer/events/${event.id}`}
-                className="block bg-white border border-gray-200 rounded-xl p-3.5 active:bg-gray-50">
-                <div className="flex items-center justify-between gap-2">
+                className="block bg-white border border-gray-200/80 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all active:scale-[0.99]">
+                <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-sm text-gray-900 truncate">{event.title}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{event.date_display || event.date} · {event.time}</p>
-                    <p className="text-xs text-gray-400 truncate mt-0.5">{event.location}{event.payment_info ? ` · ${event.payment_info}` : ""}</p>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-sm text-gray-900 truncate">{event.title}</h3>
+                      <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 ${STATUS_STYLES[event.status]}`}>
+                        {STATUS_LABELS[event.status]}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
+                      <Calendar className="w-3 h-3 shrink-0 text-gray-400" />
+                      <span>{event.date_display || event.date}</span>
+                      <span className="text-gray-300">·</span>
+                      <Clock className="w-3 h-3 shrink-0 text-gray-400" />
+                      <span>{event.time}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-gray-400 mt-0.5">
+                      <MapPin className="w-3 h-3 shrink-0 text-gray-400" />
+                      <span className="truncate">{event.location}</span>
+                      {event.payment_info && <><span className="text-gray-300">·</span><span>{event.payment_info}</span></>}
+                    </div>
                   </div>
-                  <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full shrink-0 ${STATUS_STYLES[event.status]}`}>
-                    {STATUS_LABELS[event.status]}
-                  </span>
+                  <div className="flex items-center gap-2 text-xs text-gray-500 shrink-0">
+                    <Users className="w-3 h-3" />
+                    <span>{event.applicantCount || 0}</span>
+                  </div>
                 </div>
               </Link>
             ))}
