@@ -182,8 +182,7 @@ export default function WorkerDashboard() {
   const [tab, setTab] = useState<"browse" | "applied">("browse");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [applyingId, setApplyingId] = useState<string | null>(null);
-  const [cancelTarget, setCancelTarget] = useState<{ appId: string; title: string; status: string; eventId: string } | null>(null);
-  const [cancelling, setCancelling] = useState(false);
+
   const [unreadNotifCount, setUnreadNotifCount] = useState(0);
   const router = useRouter();
   const supabase = createClient();
@@ -277,21 +276,6 @@ export default function WorkerDashboard() {
       if (error) { toast.error(error.message); return; }
       toast.success("Applied successfully!");
     }
-    loadData();
-  };
-
-  const confirmCancel = async () => {
-    if (!cancelTarget) return;
-    setCancelling(true);
-    setCancelTarget(null);
-    const res = await fetch("/api/cancel", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ appId: cancelTarget.appId }),
-    });
-    setCancelling(false);
-    if (!res.ok) { const err = await res.json(); toast.error(err.error || "Failed to cancel"); return; }
-    toast.success("Cancelled successfully");
     loadData();
   };
 
@@ -769,7 +753,6 @@ export default function WorkerDashboard() {
               const StatusIcon = cfg.icon;
               const org = event.organizer;
               const hoursUntil = (new Date(event.date).getTime() - Date.now()) / 3600000;
-              const canCancel = hoursUntil >= 12;
               const fillPercent = event.worker_count ? Math.min(100, Math.round(((event.approved_count || 0) / event.worker_count) * 100)) : 0;
 
               return (
@@ -872,26 +855,7 @@ export default function WorkerDashboard() {
                       </div>
                     )}
 
-                    {(app.status === "pending" || app.status === "approved") && (
-                      <div className="pt-3 border-t border-gray-100">
-                        {canCancel ? (
-                          <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setCancelTarget({ appId: app.id, title: event.title, status: app.status, eventId: event.id }); }}
-                            className="w-full h-10 rounded-xl bg-gradient-to-r from-red-50 to-rose-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center justify-center gap-2 hover:from-red-100 hover:to-rose-100 active:scale-[0.98] transition-all duration-200 shadow-sm">
-                            <XCircle className="w-4 h-4" />
-                            Cancel {app.status === "approved" ? "Participation" : "Application"}
-                          </button>
-                        ) : (
-                          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-50 border border-gray-100">
-                            <Clock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                            <span className="text-[10px] text-gray-500 leading-tight">
-                              {hoursUntil < 0
-                                ? "Event has already started"
-                                : "Cancellation unavailable within 12 hours of reporting time"}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    )}
+
                   </div>
                 </Link>
               );
@@ -900,37 +864,7 @@ export default function WorkerDashboard() {
         )}
       </main>
 
-      {cancelTarget && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
-          onClick={() => setCancelTarget(null)}>
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
-          <div className="relative bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl animate-slide-up"
-            onClick={(e) => e.stopPropagation()}>
-            <div className="flex flex-col items-center text-center">
-              <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mb-4">
-                <AlertCircle className="w-7 h-7 text-red-500" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-900">Cancel Application?</h3>
-              <p className="text-sm text-gray-500 mt-1.5 max-w-xs">
-                Withdraw from <span className="font-medium text-gray-700">&ldquo;{cancelTarget.title}&rdquo;</span>?
-              </p>
-              <p className="text-xs text-gray-400 mt-2">Releasing your slot for other workers.</p>
-            </div>
-            <div className="flex gap-3 mt-6">
-              <button onClick={() => setCancelTarget(null)}
-                className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                Keep application
-              </button>
-              <button onClick={confirmCancel} disabled={cancelling}
-                className="flex-1 py-2.5 rounded-xl bg-red-600 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
-                {cancelling ? (
-                  <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Cancelling</>
-                ) : "Yes, cancel"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }
