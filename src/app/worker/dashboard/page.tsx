@@ -245,16 +245,32 @@ function DashboardContent() {
     const { data: apps } = await supabase.from("applications").select("*").eq("worker_id", user.id);
     const appMap: Record<string, Application> = {};
     apps?.forEach((a: Application) => { appMap[a.event_id] = a; });
+    const appliedEventIds = Object.keys(appMap);
 
-    const { data: evts } = await supabase
+    // Load browse events: actively accepting applications
+    const { data: browseEvts } = await supabase
       .from("events").select("*").in("status", ["published", "filling"]).order("date", { ascending: true });
 
-    if (!evts || evts.length === 0) { setEvents([]); setLoading(false); return; }
+    // Load applied events: any status so applied tab tracks them even if event became full/closed
+    let appliedEvts: any[] = [];
+    if (appliedEventIds.length > 0) {
+      const { data } = await supabase.from("events").select("*").in("id", appliedEventIds);
+      appliedEvts = data || [];
+    }
 
-    const eventIds = evts.map(e => e.id);
+    // Merge: union of browse events + applied events, deduped by id
+    const seen = new Set<string>();
+    const allEvts: any[] = [];
+    for (const e of [...(browseEvts || []), ...appliedEvts]) {
+      if (!seen.has(e.id)) { seen.add(e.id); allEvts.push(e); }
+    }
+
+    if (allEvts.length === 0) { setEvents([]); setLoading(false); return; }
+
+    const allEventIds = allEvts.map(e => e.id);
 
     const { data: counts } = await supabase
-      .from("applications").select("event_id, status").in("event_id", eventIds);
+      .from("applications").select("event_id, status").in("event_id", allEventIds);
     const approvedMap: Record<string, number> = {};
     const totalMap: Record<string, number> = {};
     counts?.forEach((c: any) => {
@@ -262,7 +278,7 @@ function DashboardContent() {
       if (c.status === "approved") approvedMap[c.event_id] = (approvedMap[c.event_id] || 0) + 1;
     });
 
-    const orgIds = [...new Set(evts.map(e => e.organizer_id))];
+    const orgIds = [...new Set(allEvts.map(e => e.organizer_id))];
     const { data: orgProfiles } = await supabase.from("profiles").select("*").in("user_id", orgIds);
     const orgMap: Record<string, Profile> = {};
     orgProfiles?.forEach(p => { orgMap[p.user_id] = p; });
@@ -284,7 +300,7 @@ function DashboardContent() {
       pastCountMap[e.organizer_id] = (pastCountMap[e.organizer_id] || 0) + 1;
     });
 
-    const enriched = evts.map(e => ({
+    const enriched = allEvts.map(e => ({
       ...e,
       application: appMap[e.id] || undefined,
       approved_count: approvedMap[e.id] || 0,
@@ -305,18 +321,21 @@ function DashboardContent() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setApplyingId(null); return; }
     const existing = events.find(e => e.id === eventId)?.application;
-    if (existing && existing.status === "cancelled") {
-      const { error } = await supabase.from("applications").update({ status: "pending", updated_at: new Date().toISOString() }).eq("id", existing.id);
+    if (existing && (existing.status === "cancelled" || existing.status === "rejected")) {
+      const { error } = await supabase.from("applications").update({ status: "pending", notes: null, updated_at: new Date().toISOString() }).eq("id", existing.id);
       setApplyingId(null);
       if (error) { toast.error(error.message); return; }
       toast.success("Re-applied successfully!");
-    } else {
+    } else if (!existing) {
       const { error } = await supabase.from("applications").insert({
         event_id: eventId, worker_id: user.id, status: "pending",
       });
       setApplyingId(null);
       if (error) { toast.error(error.message); return; }
       toast.success("Applied successfully!");
+    } else {
+      setApplyingId(null);
+      toast.error("You already have an active application for this event");
     }
     loadData();
   };
@@ -345,11 +364,26 @@ function DashboardContent() {
 
   const signOut = async () => { await supabase.auth.signOut(); router.push("/login"); };
 
-  const appliedIds = new Set(events.filter(e => e.application && e.application.status !== "cancelled" && !isWaitlisted(e.application)).map(e => e.id));
   const allCategories = [...new Set(events.map(e => e.category).filter(Boolean))] as string[];
-  let browseEvents = events.filter(e => !e.application || e.application.status === "cancelled" || isWaitlisted(e.application));
+
+  // Browse: events the worker has NOT actively applied to (no app, cancelled, or waitlisted)
+  let browseEvents = events.filter(e => {
+    const app = e.application;
+    if (!app) return true;
+    if (isWaitlisted(app)) return true;
+    if (app.status === "cancelled") return true;
+    return false;
+  });
   if (categoryFilter) browseEvents = browseEvents.filter(e => e.category === categoryFilter);
-  const appliedEvents = events.filter(e => e.application && e.application.status !== "cancelled" && !isWaitlisted(e.application));
+
+  // Applied: events the worker has a non-cancelled, non-waitlisted application for
+  const appliedEvents = events.filter(e => {
+    const app = e.application;
+    if (!app) return false;
+    if (isWaitlisted(app)) return false;
+    if (app.status === "cancelled") return false;
+    return true;
+  });
 
   const formatCount = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
 
