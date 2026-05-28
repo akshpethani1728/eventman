@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import {
   LogOut, MapPin, Calendar, Clock, Users, IndianRupee, Star, ShieldCheck,
   UtensilsCrossed, Car, Timer, TrendingUp, Zap, CheckCircle, BadgeCheck,
-  XCircle, Hourglass, ArrowUpRight, Clock3, Send, AlertCircle, Sparkles,
+  XCircle, Hourglass, ArrowUpRight, Clock3, Send, AlertCircle,
   Heart, Flame, Gauge, Bell, Phone, Info, ListChecks, ListPlus, ListMinus
 } from "lucide-react";
 import { toast } from "sonner";
@@ -37,29 +37,6 @@ const CATEGORY_COLORS: Record<string, string> = {
   hospitality: "bg-amber-500/10 text-amber-600", cleaning: "bg-cyan-500/10 text-cyan-600",
   security: "bg-red-500/10 text-red-600", other: "bg-gray-500/10 text-gray-600",
 };
-
-function computeCompletion(p: Profile): { percent: number; missing: string[] } {
-  const checks: [keyof Profile, string, number][] = [
-    ["avatar_url", "Profile photo", 15],
-    ["phone", "Phone number", 15],
-    ["age", "Age", 10],
-    ["gender", "Gender", 10],
-    ["city", "City", 10],
-    ["area", "Area", 10],
-    ["skills", "Skills", 15],
-    ["experience", "Experience", 10],
-    ["bio", "Bio", 10],
-  ];
-  let percent = 0;
-  const missing: string[] = [];
-  for (const [key, label, weight] of checks) {
-    const val = p[key];
-    if (key === "skills") {
-      if (Array.isArray(val) && val.length > 0) { percent += weight; } else { missing.push(label); }
-    } else if (val !== null && val !== undefined && val !== "") { percent += weight; } else { missing.push(label); }
-  }
-  return { percent, missing };
-}
 
 const AVAIL_CONFIG: Record<string, { label: string; dot: string; badge: string }> = {
   available_today: { label: "Available Today", dot: "bg-emerald-500", badge: "bg-emerald-100 text-emerald-700 border-emerald-200" },
@@ -476,38 +453,6 @@ function DashboardContent() {
               {profile.availability === "busy" && <span className="text-[10px] opacity-75">— you&apos;re marked as unavailable</span>}
             </div>
           </div>
-        )}
-
-        {/* Profile completion card */}
-        {profile && tab === "browse" && (
-          (() => {
-            const comp = computeCompletion(profile);
-            if (comp.percent === 100) return null;
-            return (
-              <div className="mb-3 bg-white border border-amber-200/80 rounded-xl p-3.5 shadow-sm">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-medium text-gray-700">Profile Strength</span>
-                  <span className={`text-xs font-bold ${comp.percent >= 50 ? "text-amber-600" : "text-gray-500"}`}>{comp.percent}%</span>
-                </div>
-                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div className={`h-full rounded-full transition-all ${comp.percent >= 50 ? "bg-amber-500" : "bg-blue-500"}`} style={{ width: `${comp.percent}%` }} />
-                </div>
-                {comp.missing.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {comp.missing.slice(0, 3).map(m => (
-                      <span key={m} className="text-[10px] bg-amber-50 text-amber-700 border border-amber-200/60 px-2 py-0.5 rounded-lg">{m}</span>
-                    ))}
-                    {comp.missing.length > 3 && (
-                      <span className="text-[10px] text-gray-400">+{comp.missing.length - 3} more</span>
-                    )}
-                  </div>
-                )}
-                <Link href="/worker/profile" className="mt-2 inline-flex items-center gap-1 text-[10px] font-medium text-blue-600 hover:text-blue-700">
-                  <Sparkles className="w-3 h-3" /> Complete your profile
-                </Link>
-              </div>
-            );
-          })()
         )}
 
         {/* Tabs */}
