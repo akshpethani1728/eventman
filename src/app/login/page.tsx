@@ -4,12 +4,12 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
-  Mail, Lock, User, Eye, EyeOff, ArrowRight, ArrowDown,
+  Mail, User, Lock, ArrowRight, ArrowDown,
   Briefcase, HardHat, Search, Calendar, Users,
   Bell, Shield, Zap, Star, CheckCircle,
   Sparkles, MapPin, Clock, UserCheck,
   ChevronRight, TrendingUp, Building2, LayoutDashboard,
-  ListChecks, MessageSquare, RefreshCw,
+  RefreshCw, KeyRound,
 } from "lucide-react";
 
 const supabase = createClient();
@@ -466,74 +466,139 @@ function TrustSection() {
   );
 }
 
+// ─── OTP INPUT ──────────────────────────────────────────────────
+function OtpInput({ value, onChange, onComplete }: {
+  value: string[];
+  onChange: (v: string[]) => void;
+  onComplete: () => void;
+}) {
+  const refs = useRef<(HTMLInputElement | null)[]>([]);
+
+  const handleChange = (i: number, ch: string) => {
+    const digit = ch.replace(/\D/g, "").slice(-1);
+    if (!digit && !ch) return;
+    const next = [...value];
+    next[i] = digit;
+    onChange(next);
+    if (digit && i < 5) refs.current[i + 1]?.focus();
+    if (digit && i === 5) onComplete();
+  };
+
+  const handleKeyDown = (i: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !value[i] && i > 0) {
+      refs.current[i - 1]?.focus();
+    }
+    if (e.key === "Enter") onComplete();
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const paste = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    if (!paste) return;
+    e.preventDefault();
+    const next = [...value];
+    for (let i = 0; i < paste.length; i++) next[i] = paste[i];
+    onChange(next);
+    const focusIdx = Math.min(paste.length, 5);
+    refs.current[focusIdx]?.focus();
+    if (paste.length === 6) onComplete();
+  };
+
+  return (
+    <div className="flex items-center justify-center gap-2 sm:gap-3">
+      {value.map((d, i) => (
+        <input
+          key={i}
+          ref={(el) => { refs.current[i] = el; }}
+          type="text"
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          maxLength={1}
+          value={d}
+          onChange={(e) => handleChange(i, e.target.value)}
+          onKeyDown={(e) => handleKeyDown(i, e)}
+          onPaste={i === 0 ? handlePaste : undefined}
+          className={`h-12 w-10 rounded-xl border-2 text-center text-lg font-bold tracking-wider outline-none transition-all sm:h-14 sm:w-12 sm:text-xl ${
+            d ? "border-blue-500 bg-blue-50 text-blue-700" : "border-gray-200 bg-gray-50 text-gray-900"
+          } focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20`}
+        />
+      ))}
+    </div>
+  );
+}
+
 // ─── AUTH SECTION ────────────────────────────────────────────────
-function AuthForm({ step, onStepChange }: { step: "auth" | "profile"; onStepChange: (s: "auth" | "profile") => void }) {
+function AuthForm({ step, onStepChange }: { step: "email" | "otp" | "profile"; onStepChange: (s: "email" | "otp" | "profile") => void }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState<"worker" | "organizer">("worker");
   const [name, setName] = useState("");
   const [error, setError] = useState("");
+  const [resendTimer, setResendTimer] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleAuth = async () => {
+  // Resend countdown
+  useEffect(() => {
+    if (resendTimer <= 0) return;
+    const t = setInterval(() => setResendTimer((p) => p - 1), 1000);
+    return () => clearInterval(t);
+  }, [resendTimer]);
+
+  // Focus email input on mount
+  useEffect(() => { if (step === "email") inputRef.current?.focus(); }, [step]);
+
+  const handleSendOtp = async () => {
     setError("");
-    if (!email.trim()) { setError("Please enter your email"); return; }
-    if (password.length < 6) { setError("Password must be at least 6 characters"); return; }
+    const trimmed = email.trim();
+    if (!trimmed) { setError("Please enter your email"); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) { setError("Please enter a valid email"); return; }
     setLoading(true);
+    const { error: sendError } = await supabase.auth.signInWithOtp({ email: trimmed });
+    setLoading(false);
+    if (sendError) { setError(sendError.message); return; }
+    setResendTimer(30);
+    onStepChange("otp");
+  };
 
-    if (isSignUp) {
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-      });
-      setLoading(false);
-      if (signUpError) {
-        if (signUpError.message.includes("already")) {
-          setError("An account with this email already exists. Please sign in.");
-          setIsSignUp(false);
-        } else {
-          setError(signUpError.message);
-        }
-        return;
-      }
-      if (data.user?.identities?.length === 0) {
-        setError("This email is already registered. Please sign in.");
-        setIsSignUp(false);
-        return;
-      }
-      if (data.session) {
-        onStepChange("profile");
+  const handleVerifyOtp = async () => {
+    const token = otp.join("");
+    if (token.length < 6) { setError("Please enter the complete 6-digit code"); return; }
+    setError("");
+    setLoading(true);
+    const { data, error: verifyError } = await supabase.auth.verifyOtp({
+      email: email.trim(),
+      token,
+      type: "email",
+    });
+    setLoading(false);
+    if (verifyError) {
+      if (verifyError.message.includes("expired")) {
+        setError("Code expired. Request a new one.");
+      } else if (verifyError.message.includes("Invalid")) {
+        setError("Wrong code. Try again.");
       } else {
-        setError("Account created! Please check your email to confirm, then sign in.");
-        setIsSignUp(false);
+        setError(verifyError.message);
       }
-    } else {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
-      setLoading(false);
-      if (signInError) {
-        if (signInError.message.includes("Invalid login")) {
-          setError("Wrong email or password. Try again.");
-        } else if (signInError.message.includes("Email not confirmed")) {
-          setError("Please confirm your email first. Check your inbox.");
-        } else {
-          setError(signInError.message);
-        }
-        return;
-      }
-      const { data: existingProfile } = await supabase
-        .from("profiles").select("role").eq("user_id", data.user?.id).maybeSingle();
-      if (existingProfile) {
-        router.push(existingProfile.role === "admin" ? "/admin" : `/${existingProfile.role}/dashboard`);
-      } else {
-        onStepChange("profile");
-      }
+      return;
     }
+    if (!data.user) { setError("Something went wrong. Try again."); return; }
+    const { data: profile } = await supabase
+      .from("profiles").select("role").eq("user_id", data.user.id).maybeSingle();
+    if (profile) {
+      router.push(profile.role === "admin" ? "/admin" : `/${profile.role}/dashboard`);
+    } else {
+      onStepChange("profile");
+    }
+  };
+
+  const handleResend = async () => {
+    if (resendTimer > 0) return;
+    setError("");
+    const { error: sendError } = await supabase.auth.signInWithOtp({ email: email.trim() });
+    if (sendError) { setError(sendError.message); return; }
+    setResendTimer(30);
+    setOtp(["", "", "", "", "", ""]);
   };
 
   const createProfile = async () => {
@@ -544,7 +609,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "profile"; onStepChan
     if (!user) {
       setError("Session expired. Please login again.");
       setLoading(false);
-      onStepChange("auth");
+      onStepChange("email");
       return;
     }
     const { error: insertError } = await supabase.from("profiles").insert({
@@ -569,12 +634,15 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "profile"; onStepChan
     <section className="bg-gradient-to-b from-gray-50 to-white py-20 md:py-28" id="auth">
       <div className="mx-auto max-w-md px-4 sm:px-6">
         <FadeSection>
-          {step === "auth" ? (
-            <form onSubmit={(e) => { e.preventDefault(); handleAuth(); }} className="space-y-5">
+          {step === "email" && (
+            <form onSubmit={(e) => { e.preventDefault(); handleSendOtp(); }} className="space-y-5">
               <div className="text-center">
-                <h2 className="text-2xl font-bold text-gray-900">{isSignUp ? "Create Account" : "Welcome Back"}</h2>
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-200/40">
+                  <Mail className="h-7 w-7 text-white" />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900">Get Started</h2>
                 <p className="mt-1 text-sm text-gray-500">
-                  {isSignUp ? "Start your event journey" : "Sign in to continue"}
+                  Enter your email to receive a verification code
                 </p>
               </div>
 
@@ -585,10 +653,11 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "profile"; onStepChan
               )}
 
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700">Email</label>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">Email address</label>
                 <div className="relative">
                   <Mail className={inputIconClass} />
                   <input
+                    ref={inputRef}
                     type="email"
                     value={email}
                     onChange={e => { setEmail(e.target.value); setError(""); }}
@@ -596,28 +665,6 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "profile"; onStepChan
                     autoComplete="email"
                     className={inputClass}
                   />
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700">Password</label>
-                <div className="relative">
-                  <Lock className={inputIconClass} />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={e => { setPassword(e.target.value); setError(""); }}
-                    placeholder="Min 6 characters"
-                    autoComplete={isSignUp ? "new-password" : "current-password"}
-                    className="w-full h-12 pl-10 pr-10 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none transition-all focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
                 </div>
               </div>
 
@@ -629,29 +676,90 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "profile"; onStepChan
                 {loading ? (
                   <span className="flex items-center gap-2">
                     <RefreshCw className="h-4 w-4 animate-spin" />
-                    Please wait...
+                    Sending code...
                   </span>
                 ) : (
-                  <>{isSignUp ? "Create Account" : "Sign In"} <ArrowRight className="h-4 w-4" /></>
+                  <>Send Code <ArrowRight className="h-4 w-4" /></>
+                )}
+              </button>
+            </form>
+          )}
+
+          {step === "otp" && (
+            <form onSubmit={(e) => { e.preventDefault(); handleVerifyOtp(); }} className="space-y-5">
+              <div className="text-center">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-200/40">
+                  <KeyRound className="h-7 w-7 text-white" />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900">Check Your Email</h2>
+                <p className="mt-1 text-sm text-gray-500">
+                  We sent a 6-digit code to <span className="font-medium text-gray-700">{email}</span>
+                </p>
+              </div>
+
+              {error && (
+                <div className="animate-slide-down rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
+              )}
+
+              <div>
+                <label className="mb-3 block text-center text-sm font-medium text-gray-700">Verification code</label>
+                <OtpInput value={otp} onChange={setOtp} onComplete={handleVerifyOtp} />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading || otp.join("").length < 6}
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-base font-semibold text-white shadow-lg shadow-blue-200/50 transition-all active:scale-[0.98] disabled:opacity-60"
+              >
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    Verifying...
+                  </span>
+                ) : (
+                  <>Verify & Sign In <ArrowRight className="h-4 w-4" /></>
                 )}
               </button>
 
               <p className="text-center text-sm text-gray-500">
-                {isSignUp ? "Already have an account? " : "Don't have an account? "}
+                {resendTimer > 0 ? (
+                  <span className="text-gray-400">Resend code in <span className="font-semibold text-gray-600">{resendTimer}s</span></span>
+                ) : (
+                  <>
+                    Didn&apos;t receive it?{" "}
+                    <button
+                      type="button"
+                      onClick={handleResend}
+                      className="font-semibold text-blue-600 transition-colors hover:text-blue-700"
+                    >
+                      Resend code
+                    </button>
+                  </>
+                )}
+              </p>
+
+              <p className="text-center text-xs text-gray-400">
                 <button
                   type="button"
-                  onClick={() => { setIsSignUp(!isSignUp); setError(""); }}
-                  className="font-semibold text-blue-600 transition-colors hover:text-blue-700"
+                  onClick={() => { onStepChange("email"); setError(""); setOtp(["", "", "", "", "", ""]); }}
+                  className="underline hover:text-gray-600"
                 >
-                  {isSignUp ? "Sign In" : "Sign Up"}
+                  Use a different email
                 </button>
               </p>
             </form>
-          ) : (
+          )}
+
+          {step === "profile" && (
             <form onSubmit={(e) => { e.preventDefault(); createProfile(); }} className="space-y-5">
               <div className="text-center">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg shadow-emerald-200/40">
+                  <User className="h-7 w-7 text-white" />
+                </div>
                 <h2 className="text-2xl font-bold text-gray-900">Complete Profile</h2>
-                <p className="mt-1 text-sm text-gray-500">Just a few more details</p>
+                <p className="mt-1 text-sm text-gray-500">Just a few more details to get started</p>
               </div>
 
               {error && (
@@ -801,7 +909,7 @@ function HeroSection({ onCta }: { onCta: () => void }) {
 // ─── MAIN ────────────────────────────────────────────────────────
 export default function LoginPage() {
   const router = useRouter();
-  const [step, setStep] = useState<"auth" | "profile">("auth");
+  const [step, setStep] = useState<"email" | "otp" | "profile">("email");
   const previewRef = useRef<HTMLDivElement>(null);
   const authRef = useRef<HTMLDivElement>(null);
 
