@@ -537,6 +537,24 @@ function AuthForm({ step, onStepChange }: { step: "email" | "otp" | "profile"; o
   const [error, setError] = useState("");
   const [resendTimer, setResendTimer] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const signedInRef = useRef(false);
+
+  // Listen for auth state changes (magic link click or OTP verify)
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "SIGNED_IN" && session && !signedInRef.current) {
+        signedInRef.current = true;
+        const { data: profile } = await supabase
+          .from("profiles").select("role").eq("user_id", session.user.id).maybeSingle();
+        if (profile) {
+          router.push(profile.role === "admin" ? "/admin" : `/${profile.role}/dashboard`);
+        } else {
+          onStepChange("profile");
+        }
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [router, onStepChange]);
 
   // Resend countdown
   useEffect(() => {
@@ -566,7 +584,7 @@ function AuthForm({ step, onStepChange }: { step: "email" | "otp" | "profile"; o
     if (token.length < 6) { setError("Please enter the complete 6-digit code"); return; }
     setError("");
     setLoading(true);
-    const { data, error: verifyError } = await supabase.auth.verifyOtp({
+    const { error: verifyError } = await supabase.auth.verifyOtp({
       email: email.trim(),
       token,
       type: "email",
@@ -575,21 +593,14 @@ function AuthForm({ step, onStepChange }: { step: "email" | "otp" | "profile"; o
     if (verifyError) {
       if (verifyError.message.includes("expired")) {
         setError("Code expired. Request a new one.");
-      } else if (verifyError.message.includes("Invalid")) {
+      } else if (verifyError.message.includes("Invalid") || verifyError.message.includes("otp")) {
         setError("Wrong code. Try again.");
       } else {
         setError(verifyError.message);
       }
       return;
     }
-    if (!data.user) { setError("Something went wrong. Try again."); return; }
-    const { data: profile } = await supabase
-      .from("profiles").select("role").eq("user_id", data.user.id).maybeSingle();
-    if (profile) {
-      router.push(profile.role === "admin" ? "/admin" : `/${profile.role}/dashboard`);
-    } else {
-      onStepChange("profile");
-    }
+    // onAuthStateChange listener above handles the redirect / profile step
   };
 
   const handleResend = async () => {
@@ -693,7 +704,7 @@ function AuthForm({ step, onStepChange }: { step: "email" | "otp" | "profile"; o
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900">Check Your Email</h2>
                 <p className="mt-1 text-sm text-gray-500">
-                  We sent a 6-digit code to <span className="font-medium text-gray-700">{email}</span>
+                  We sent a code to <span className="font-medium text-gray-700">{email}</span>
                 </p>
               </div>
 
@@ -722,6 +733,10 @@ function AuthForm({ step, onStepChange }: { step: "email" | "otp" | "profile"; o
                   <>Verify & Sign In <ArrowRight className="h-4 w-4" /></>
                 )}
               </button>
+
+              <p className="text-center text-xs text-gray-400 leading-relaxed">
+                You can also click the sign-in link sent to your email
+              </p>
 
               <p className="text-center text-sm text-gray-500">
                 {resendTimer > 0 ? (
