@@ -4,14 +4,12 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ArrowLeft, Save, User, Phone, MapPin, FileText, Star, BadgeCheck, ShieldCheck, ShieldAlert } from "lucide-react";
+import { ArrowLeft, Save, User, Phone, MapPin, Star, BadgeCheck, ShieldCheck, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
-import AvatarUpload from "@/components/AvatarUpload";
 import type { Profile } from "@/lib/supabase/types";
 
 export default function OrganizerProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [userId, setUserId] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
@@ -20,7 +18,6 @@ export default function OrganizerProfilePage() {
     city: "",
     area: "",
     bio: "",
-    avatar_url: "",
   });
   const [pastEventCount, setPastEventCount] = useState(0);
   const [avgRating, setAvgRating] = useState(0);
@@ -29,16 +26,6 @@ export default function OrganizerProfilePage() {
   const supabase = createClient();
   const update = useCallback((key: string, value: string) => setForm(p => ({ ...p, [key]: value })), []);
 
-  const handleAvatarUpload = useCallback(async (url: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    const { error } = await supabase.from("profiles").update({ avatar_url: url }).eq("user_id", user.id);
-    if (error) { toast.error(error.message); return; }
-    setForm(p => ({ ...p, avatar_url: url }));
-    setProfile(p => p ? { ...p, avatar_url: url } : p);
-    toast.success("Logo updated");
-  }, []);
-
   useEffect(() => {
     loadProfile();
   }, []);
@@ -46,7 +33,6 @@ export default function OrganizerProfilePage() {
   const loadProfile = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.push("/login"); return; }
-    setUserId(user.id);
 
     const { data: prof } = await supabase
       .from("profiles")
@@ -62,7 +48,6 @@ export default function OrganizerProfilePage() {
       city: prof.city || "",
       area: prof.area || "",
       bio: prof.bio || "",
-      avatar_url: prof.avatar_url || "",
     });
 
     const { count: pc } = await supabase
@@ -90,7 +75,6 @@ export default function OrganizerProfilePage() {
       city: form.city || null,
       area: form.area || null,
       bio: form.bio || null,
-      avatar_url: form.avatar_url || null,
     }).eq("user_id", user.id);
 
     setSaving(false);
@@ -120,10 +104,8 @@ export default function OrganizerProfilePage() {
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
         <form onSubmit={(e) => { e.preventDefault(); saveProfile(); }}>
           <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
-            <div className="flex justify-center mb-3">
-              {userId && (
-                <AvatarUpload currentUrl={profile?.avatar_url || null} userId={userId} onUpload={handleAvatarUpload} size={80} />
-              )}
+            <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3 border-2 border-gray-200">
+              <span className="text-2xl font-bold text-blue-600">{profile?.full_name?.charAt(0)?.toUpperCase() || "O"}</span>
             </div>
             <div className="flex items-center justify-center gap-2">
               <p className="font-semibold text-lg">{profile?.full_name}</p>

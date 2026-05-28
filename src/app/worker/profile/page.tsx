@@ -10,7 +10,6 @@ import { Button } from "@/lib/design/Button";
 import { Card } from "@/lib/design/Card";
 import { Badge } from "@/lib/design/Badge";
 import { PageLoader } from "@/lib/design/Loading";
-import AvatarUpload from "@/components/AvatarUpload";
 import type { Profile } from "@/lib/supabase/types";
 
 function computeCompletion(p: Profile): { percent: number; missing: string[] } {
@@ -43,7 +42,6 @@ const AVAILABILITY_OPTIONS = [
 
 export default function WorkerProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [userId, setUserId] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [completion, setCompletion] = useState({ percent: 0, missing: [] as string[] });
@@ -59,7 +57,6 @@ export default function WorkerProfilePage() {
   const loadProfile = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.push("/login"); return; }
-    setUserId(user.id);
     const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
     if (!prof || prof.role !== "worker") { router.push("/login"); return; }
     setProfile(prof);
@@ -98,17 +95,6 @@ export default function WorkerProfilePage() {
   };
 
   const update = useCallback((key: string, value: string) => setForm(p => ({ ...p, [key]: value })), []);
-
-  const handleAvatarUpload = useCallback(async (url: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    const { error } = await supabase.from("profiles").update({ avatar_url: url }).eq("user_id", user.id);
-    if (error) { toast.error(error.message); return; }
-    const updated = { ...profile!, avatar_url: url };
-    setProfile(updated);
-    setCompletion(computeCompletion(updated));
-    toast.success("Profile photo updated");
-  }, [profile]);
 
   if (loading) return <PageLoader />;
 
@@ -152,10 +138,8 @@ export default function WorkerProfilePage() {
         <form onSubmit={(e) => { e.preventDefault(); saveProfile(); }}>
           {/* Avatar */}
           <Card padding="lg" className="text-center">
-            <div className="flex justify-center mb-3">
-              {userId && (
-                <AvatarUpload currentUrl={profile?.avatar_url || null} userId={userId} onUpload={handleAvatarUpload} />
-              )}
+            <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3 ring-2 ring-blue-200">
+              <span className="text-2xl font-bold text-blue-600">{profile?.full_name?.charAt(0)?.toUpperCase() || "W"}</span>
             </div>
             <p className="font-semibold text-lg">{profile?.full_name}</p>
             <div className="flex items-center justify-center gap-1.5 mt-1">
