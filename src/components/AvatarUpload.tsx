@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Camera, Loader2, ZoomIn, RotateCw, Check, X } from "lucide-react";
+import { Camera, Loader2, Check, X } from "lucide-react";
 import { uploadAvatar } from "@/lib/storage";
 
 const CONTAINER_SIZE = 280;
@@ -23,16 +23,15 @@ export default function AvatarUpload({ currentUrl, userId, onUpload, size = 80 }
   const [naturalH, setNaturalH] = useState(0);
   const [offsetX, setOffsetX] = useState(0);
   const [offsetY, setOffsetY] = useState(0);
-  const [zoom, setZoom] = useState(1);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [offsetStart, setOffsetStart] = useState({ x: 0, y: 0 });
 
   const fileRef = useRef<HTMLInputElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
+  const memoryImgRef = useRef<HTMLImageElement | null>(null);
 
   const coverScale = naturalW && naturalH ? Math.max(CONTAINER_SIZE / naturalW, CONTAINER_SIZE / naturalH) : 1;
-  const scale = coverScale * zoom;
 
   const handleFile = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -43,12 +42,12 @@ export default function AvatarUpload({ currentUrl, userId, onUpload, size = 80 }
     reader.onload = () => {
       const img = new Image();
       img.onload = () => {
+        memoryImgRef.current = img;
         setNaturalW(img.naturalWidth);
         setNaturalH(img.naturalHeight);
         setImageSrc(img.src);
         setOffsetX(0);
         setOffsetY(0);
-        setZoom(1);
         setShowCrop(true);
       };
       img.src = reader.result as string;
@@ -97,7 +96,8 @@ export default function AvatarUpload({ currentUrl, userId, onUpload, size = 80 }
   }, [isDragging, dragStart, offsetStart]);
 
   const handleSave = useCallback(async () => {
-    if (!imgRef.current) return;
+    const img = memoryImgRef.current || imgRef.current;
+    if (!img) return;
     setUploading(true);
     try {
       const canvas = document.createElement("canvas");
@@ -105,9 +105,9 @@ export default function AvatarUpload({ currentUrl, userId, onUpload, size = 80 }
       canvas.height = CANVAS_SIZE;
       const ctx = canvas.getContext("2d")!;
 
-      const cropSize = CONTAINER_SIZE / scale;
-      const cx = naturalW / 2 - offsetX / scale;
-      const cy = naturalH / 2 - offsetY / scale;
+      const cropSize = CONTAINER_SIZE / coverScale;
+      const cx = naturalW / 2 - offsetX / coverScale;
+      const cy = naturalH / 2 - offsetY / coverScale;
       const sx = Math.max(0, Math.min(naturalW - cropSize, cx - cropSize / 2));
       const sy = Math.max(0, Math.min(naturalH - cropSize, cy - cropSize / 2));
       const drawSize = Math.min(cropSize, naturalW - sx, naturalH - sy);
@@ -116,20 +116,23 @@ export default function AvatarUpload({ currentUrl, userId, onUpload, size = 80 }
       ctx.arc(CANVAS_SIZE / 2, CANVAS_SIZE / 2, CANVAS_SIZE / 2, 0, Math.PI * 2);
       ctx.closePath();
       ctx.clip();
-      ctx.drawImage(imgRef.current, sx, sy, drawSize, drawSize, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      ctx.drawImage(img, sx, sy, drawSize, drawSize, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
 
-      canvas.toBlob(async (blob) => {
-        if (!blob) { setUploading(false); return; }
-        const url = await uploadAvatar(blob, userId);
-        await onUpload(url);
-        setShowCrop(false);
-        setUploading(false);
-      }, "image/jpeg", 0.92);
+      const blob = await new Promise<Blob | null>((resolve) => {
+        canvas.toBlob(resolve, "image/jpeg", 0.92);
+      });
+
+      if (!blob) { setUploading(false); return; }
+
+      const url = await uploadAvatar(blob, userId);
+      await onUpload(url);
+      setShowCrop(false);
+      setUploading(false);
     } catch (err: any) {
       alert(err.message || "Upload failed");
       setUploading(false);
     }
-  }, [scale, naturalW, naturalH, offsetX, offsetY, userId, onUpload]);
+  }, [coverScale, naturalW, naturalH, offsetX, offsetY, userId, onUpload]);
 
   return (
     <>
@@ -183,28 +186,14 @@ export default function AvatarUpload({ currentUrl, userId, onUpload, size = 80 }
                     position: "absolute",
                     left: "50%",
                     top: "50%",
-                    width: naturalW * scale,
-                    height: naturalH * scale,
-                    marginLeft: -(naturalW * scale) / 2 + offsetX,
-                    marginTop: -(naturalH * scale) / 2 + offsetY,
+                    width: naturalW * coverScale,
+                    height: naturalH * coverScale,
+                    marginLeft: -(naturalW * coverScale) / 2 + offsetX,
+                    marginTop: -(naturalH * coverScale) / 2 + offsetY,
                     cursor: isDragging ? "grabbing" : "grab",
                   }}
                 />
               </div>
-            </div>
-
-            {/* Zoom slider */}
-            <div className="px-6 pb-2 flex items-center gap-3">
-              <ZoomIn className="w-4 h-4 text-gray-400 shrink-0" />
-              <input
-                type="range"
-                min={1}
-                max={300}
-                value={Math.round(zoom * 100)}
-                onChange={(e) => setZoom(Math.max(1, parseInt(e.target.value) / 100))}
-                className="flex-1 h-1 accent-blue-600"
-              />
-              <span className="text-xs text-gray-400 w-8 text-right">{Math.round(zoom * 100)}%</span>
             </div>
 
             {/* Preview */}
@@ -232,10 +221,10 @@ export default function AvatarUpload({ currentUrl, userId, onUpload, size = 80 }
                         position: "absolute",
                         left: "50%",
                         top: "50%",
-                        width: PREVIEW_SIZE * (naturalW * scale / CONTAINER_SIZE),
-                        height: PREVIEW_SIZE * (naturalH * scale / CONTAINER_SIZE),
-                        marginLeft: -(PREVIEW_SIZE * (naturalW * scale / CONTAINER_SIZE)) / 2 + offsetX * (PREVIEW_SIZE / CONTAINER_SIZE),
-                        marginTop: -(PREVIEW_SIZE * (naturalH * scale / CONTAINER_SIZE)) / 2 + offsetY * (PREVIEW_SIZE / CONTAINER_SIZE),
+                        width: PREVIEW_SIZE * (naturalW * coverScale / CONTAINER_SIZE),
+                        height: PREVIEW_SIZE * (naturalH * coverScale / CONTAINER_SIZE),
+                        marginLeft: -(PREVIEW_SIZE * (naturalW * coverScale / CONTAINER_SIZE)) / 2 + offsetX * (PREVIEW_SIZE / CONTAINER_SIZE),
+                        marginTop: -(PREVIEW_SIZE * (naturalH * coverScale / CONTAINER_SIZE)) / 2 + offsetY * (PREVIEW_SIZE / CONTAINER_SIZE),
                       }}
                     />
                   </div>
