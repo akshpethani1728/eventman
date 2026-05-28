@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -168,7 +168,7 @@ function EventBadge({ children, variant, pulse }: { children: React.ReactNode; v
   );
 }
 
-export default function WorkerDashboard() {
+function DashboardContent() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [events, setEvents] = useState<(Event & {
     application?: Application;
@@ -320,9 +320,9 @@ export default function WorkerDashboard() {
           <SkeletonCard />
           <SkeletonCard />
         </main>
-      </div>
-    );
-  }
+    </div>
+  );
+}
 
   return (
     <div className="min-h-screen bg-[#f5f5f7]">
@@ -974,5 +974,20 @@ export default function WorkerDashboard() {
 
 
     </div>
+  );
+}
+
+export default function WorkerDashboard() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse mx-auto" />
+          <div className="h-4 w-32 bg-gray-200 rounded animate-pulse mx-auto" />
+        </div>
+      </div>
+    }>
+      <DashboardContent />
+    </Suspense>
   );
 }
