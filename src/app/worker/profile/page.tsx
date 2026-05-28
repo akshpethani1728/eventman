@@ -4,29 +4,27 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ArrowLeft, Save, User, Phone, MapPin, Award, Briefcase, CheckCircle, AlertCircle, Clock, Sparkles } from "lucide-react";
+import { ArrowLeft, Save, User, Phone, MapPin, Award, Briefcase, AlertCircle, CheckCircle, Clock, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/lib/design/Button";
+import { Card } from "@/lib/design/Card";
+import { Badge } from "@/lib/design/Badge";
+import { PageLoader } from "@/lib/design/Loading";
 import type { Profile } from "@/lib/supabase/types";
 
 function computeCompletion(p: Profile): { percent: number; missing: string[] } {
   const checks: [keyof Profile, string, number][] = [
-    ["avatar_url", "Profile photo", 15],
-    ["phone", "Phone number", 15],
-    ["age", "Age", 10],
-    ["gender", "Gender", 10],
-    ["city", "City", 10],
-    ["area", "Area", 10],
-    ["skills", "Skills", 15],
-    ["experience", "Experience", 10],
-    ["bio", "Bio", 10],
+    ["avatar_url", "Profile photo", 15], ["phone", "Phone number", 15],
+    ["age", "Age", 10], ["gender", "Gender", 10],
+    ["city", "City", 10], ["area", "Area", 10],
+    ["skills", "Skills", 15], ["experience", "Experience", 10], ["bio", "Bio", 10],
   ];
   let percent = 0;
   const missing: string[] = [];
   for (const [key, label, weight] of checks) {
     const val = p[key];
-    if (key === "skills") {
-      if (Array.isArray(val) && val.length > 0) { percent += weight; } else { missing.push(label); }
-    } else if (val !== null && val !== undefined && val !== "") { percent += weight; } else { missing.push(label); }
+    if (key === "skills") { if (Array.isArray(val) && val.length > 0) percent += weight; else missing.push(label); }
+    else if (val !== null && val !== undefined && val !== "") percent += weight; else missing.push(label);
   }
   return { percent, missing };
 }
@@ -42,64 +40,33 @@ const AVAILABILITY_OPTIONS = [
   { value: "unavailable", label: "Unavailable" },
 ];
 
-const AVAILABILITY_COLORS: Record<string, string> = {
-  available_today: "bg-emerald-100 text-emerald-700",
-  available_this_week: "bg-blue-100 text-blue-700",
-  available: "bg-emerald-100 text-emerald-700",
-  weekends: "bg-amber-100 text-amber-700",
-  evenings: "bg-purple-100 text-purple-700",
-  busy: "bg-red-100 text-red-700",
-  unavailable: "bg-gray-100 text-gray-500",
-};
-
 export default function WorkerProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [completion, setCompletion] = useState({ percent: 0, missing: [] as string[] });
   const [form, setForm] = useState({
-    full_name: "",
-    phone: "",
-    age: "",
-    gender: "",
-    city: "",
-    area: "",
-    skills: "",
-    experience: "",
-    availability: "",
-    bio: "",
+    full_name: "", phone: "", age: "", gender: "", city: "", area: "",
+    skills: "", experience: "", availability: "", bio: "",
   });
   const router = useRouter();
   const supabase = createClient();
 
-  useEffect(() => {
-    loadProfile();
-  }, []);
+  useEffect(() => { loadProfile(); }, []);
 
   const loadProfile = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.push("/login"); return; }
-
-    const { data: prof } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("user_id", user.id)
-      .single();
-
+    const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
     if (!prof || prof.role !== "worker") { router.push("/login"); return; }
     setProfile(prof);
     setCompletion(computeCompletion(prof));
     setForm({
-      full_name: prof.full_name || "",
-      phone: prof.phone || "",
-      age: prof.age ? String(prof.age) : "",
-      gender: prof.gender || "",
-      city: prof.city || "",
-      area: prof.area || "",
-      skills: prof.skills?.join(", ") || "",
-      experience: prof.experience || "",
-      availability: prof.availability || "",
-      bio: prof.bio || "",
+      full_name: prof.full_name || "", phone: prof.phone || "",
+      age: prof.age ? String(prof.age) : "", gender: prof.gender || "",
+      city: prof.city || "", area: prof.area || "",
+      skills: prof.skills?.join(", ") || "", experience: prof.experience || "",
+      availability: prof.availability || "", bio: prof.bio || "",
     });
     setLoading(false);
   };
@@ -108,23 +75,15 @@ export default function WorkerProfilePage() {
     setSaving(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-
     const { error } = await supabase.from("profiles").update({
-      full_name: form.full_name,
-      phone: form.phone || null,
-      age: form.age ? parseInt(form.age) : null,
-      gender: form.gender || null,
-      city: form.city || null,
-      area: form.area || null,
+      full_name: form.full_name, phone: form.phone || null,
+      age: form.age ? parseInt(form.age) : null, gender: form.gender || null,
+      city: form.city || null, area: form.area || null,
       skills: form.skills ? form.skills.split(",").map(s => s.trim()).filter(Boolean) : null,
-      experience: form.experience || null,
-      availability: form.availability || null,
-      bio: form.bio || null,
+      experience: form.experience || null, availability: form.availability || null, bio: form.bio || null,
     }).eq("user_id", user.id);
-
     setSaving(false);
     if (error) { toast.error(error.message); return; }
-
     const updated = { ...profile, ...Object.fromEntries(Object.entries(form).map(([k, v]) => {
       if (k === "age") return [k, v ? parseInt(v) : null];
       if (k === "skills") return [k, v ? v.split(",").map(s => s.trim()).filter(Boolean) : null];
@@ -135,51 +94,34 @@ export default function WorkerProfilePage() {
     toast.success("Profile saved");
   };
 
-  const update = (key: string, value: string) =>
-    setForm(prev => ({ ...prev, [key]: value }));
+  const update = (key: string, value: string) => setForm(p => ({ ...p, [key]: value }));
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-500">Loading...</p>
-      </div>
-    );
-  }
-
-  const availColor = AVAILABILITY_COLORS[profile?.availability || ""] || "bg-gray-100 text-gray-500";
+  if (loading) return <PageLoader />;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <header className="sticky top-0 bg-white border-b border-gray-200 z-10">
+    <div className="min-h-screen bg-[#f5f5f7] pb-24">
+      <header className="sticky top-0 bg-white/80 backdrop-blur-2xl border-b border-gray-200/60 z-10">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
-          <Link href="/worker/dashboard" className="p-1 -ml-1">
-            <ArrowLeft className="w-5 h-5 text-gray-700" />
-          </Link>
-          <h1 className="font-semibold">My Profile</h1>
+          <Link href="/worker/dashboard" className="p-1 -ml-1 text-gray-500"><ArrowLeft className="w-5 h-5" /></Link>
+          <h1 className="font-semibold text-sm">My Profile</h1>
         </div>
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
         {/* Profile Completion */}
         {profile && (
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <Card padding="md">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Profile Strength</span>
-              <span className={`text-sm font-bold ${
-                completion.percent >= 80 ? "text-emerald-600" : completion.percent >= 50 ? "text-amber-600" : "text-gray-500"
-              }`}>{completion.percent}%</span>
+              <span className={`text-sm font-bold ${completion.percent >= 80 ? "text-emerald-600" : completion.percent >= 50 ? "text-amber-600" : "text-gray-500"}`}>{completion.percent}%</span>
             </div>
             <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div className={`h-full rounded-full transition-all duration-700 ${
-                completion.percent >= 80 ? "bg-emerald-500" : completion.percent >= 50 ? "bg-amber-500" : "bg-blue-500"
-              }`} style={{ width: `${completion.percent}%` }} />
+              <div className={`h-full rounded-full transition-all duration-700 ${completion.percent >= 80 ? "bg-emerald-500" : completion.percent >= 50 ? "bg-amber-500" : "bg-blue-500"}`}
+                style={{ width: `${completion.percent}%` }} />
             </div>
             {completion.missing.length > 0 && (
               <div className="mt-2.5 space-y-1">
-                <p className="text-[10px] text-gray-500 flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3 text-amber-500" />
-                  Add these to strengthen your profile:
-                </p>
+                <p className="text-[10px] text-gray-500 flex items-center gap-1"><AlertCircle className="w-3 h-3 text-amber-500" /> Add these to strengthen your profile:</p>
                 <div className="flex flex-wrap gap-1">
                   {completion.missing.map(m => (
                     <span key={m} className="text-[10px] bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-lg">{m}</span>
@@ -188,16 +130,14 @@ export default function WorkerProfilePage() {
               </div>
             )}
             {completion.percent === 100 && (
-              <p className="mt-2 text-[10px] text-emerald-600 flex items-center gap-1">
-                <CheckCircle className="w-3 h-3" /> Complete profile — you look great to organizers!
-              </p>
+              <p className="mt-2 text-[10px] text-emerald-600 flex items-center gap-1"><CheckCircle className="w-3 h-3" /> Complete profile &mdash; you look great to organizers!</p>
             )}
-          </div>
+          </Card>
         )}
 
         <form onSubmit={(e) => { e.preventDefault(); saveProfile(); }}>
-          {/* Avatar placeholder */}
-          <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
+          {/* Avatar */}
+          <Card padding="lg" className="text-center">
             <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3 ring-2 ring-blue-200">
               {profile?.avatar_url ? (
                 <img src={profile.avatar_url} alt="" className="w-20 h-20 rounded-full object-cover" />
@@ -209,15 +149,16 @@ export default function WorkerProfilePage() {
             <div className="flex items-center justify-center gap-1.5 mt-1">
               <p className="text-sm text-gray-500 capitalize">{profile?.role}</p>
               {profile?.availability && (
-                <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${availColor}`}>{AVAILABILITY_OPTIONS.find(o => o.value === profile.availability)?.label || profile.availability}</span>
+                <Badge variant={profile.availability === "unavailable" || profile.availability === "busy" ? "closed" : "published"}>
+                  {AVAILABILITY_OPTIONS.find(o => o.value === profile.availability)?.label || profile.availability}
+                </Badge>
               )}
             </div>
-          </div>
+          </Card>
 
           {/* Basic Info */}
-          <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4 mt-4">
+          <Card padding="lg" className="space-y-4 mt-4">
             <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wide">Basic Info</h3>
-
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Full Name</label>
               <div className="relative">
@@ -226,17 +167,14 @@ export default function WorkerProfilePage() {
                   className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm" />
               </div>
             </div>
-
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Phone</label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input value={form.phone} onChange={e => update("phone", e.target.value)}
-                  placeholder="9876543210"
+                <input value={form.phone} onChange={e => update("phone", e.target.value)} placeholder="9876543210"
                   className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm" />
               </div>
             </div>
-
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Age</label>
@@ -253,29 +191,24 @@ export default function WorkerProfilePage() {
                 </select>
               </div>
             </div>
-
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">City</label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input value={form.city} onChange={e => update("city", e.target.value)}
-                  placeholder="Ahmedabad"
+                <input value={form.city} onChange={e => update("city", e.target.value)} placeholder="Ahmedabad"
                   className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm" />
               </div>
             </div>
-
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Area</label>
-              <input value={form.area} onChange={e => update("area", e.target.value)}
-                placeholder="e.g., Navrangpura"
+              <input value={form.area} onChange={e => update("area", e.target.value)} placeholder="e.g., Navrangpura"
                 className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
             </div>
-          </div>
+          </Card>
 
           {/* Work Info */}
-          <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4 mt-4">
+          <Card padding="lg" className="space-y-4 mt-4">
             <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wide">Work Info</h3>
-
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Skills (comma separated)</label>
               <div className="relative">
@@ -285,7 +218,6 @@ export default function WorkerProfilePage() {
                   className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm" />
               </div>
             </div>
-
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Experience</label>
               <div className="relative">
@@ -295,37 +227,29 @@ export default function WorkerProfilePage() {
                   className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm" />
               </div>
             </div>
-
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Availability</label>
               <div className="relative">
                 <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <select value={form.availability} onChange={e => update("availability", e.target.value)}
                   className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm appearance-none">
-                  {AVAILABILITY_OPTIONS.map(o => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
-                  ))}
+                  {AVAILABILITY_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
             </div>
-
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">About / Bio</label>
               <textarea value={form.bio} onChange={e => update("bio", e.target.value)}
                 placeholder="Tell organizers about yourself..."
                 className="w-full h-24 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm resize-none" />
             </div>
-          </div>
+          </Card>
 
-          {/* Save */}
-          <button
-            type="submit"
-            disabled={saving}
-            className="mt-4 w-full h-12 rounded-xl bg-blue-600 text-white font-medium flex items-center justify-center gap-2 disabled:opacity-50 active:bg-blue-700"
-          >
-            <Save className="w-4 h-4" />
-            {saving ? "Saving..." : "Save Profile"}
-          </button>
+          <div className="mt-4">
+            <Button type="submit" size="lg" loading={saving} icon={<Save className="w-4 h-4" />} className="w-full">
+              {saving ? "Saving..." : "Save Profile"}
+            </Button>
+          </div>
         </form>
       </main>
     </div>

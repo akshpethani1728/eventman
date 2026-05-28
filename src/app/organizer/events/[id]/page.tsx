@@ -10,6 +10,10 @@ import {
   ChevronDown, ChevronUp, Phone, Mail, Award, Briefcase, Filter, Star, Sparkles
 } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/lib/design/Button";
+import { Card, CardHeader, CardTitle, CardStats, CardStat } from "@/lib/design/Card";
+import { Badge, StatusDot, Divider } from "@/lib/design/Badge";
+import { PageLoader } from "@/lib/design/Loading";
 import type { Event, Profile, Application } from "@/lib/supabase/types";
 import EditEventModal from "@/app/organizer/dashboard/EditEventModal";
 
@@ -186,9 +190,7 @@ export default function OrganizerEventDetailPage() {
     router.push("/organizer/dashboard");
   };
 
-  if (loading) {
-    return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><p className="text-gray-500">Loading...</p></div>;
-  }
+  if (loading) return <PageLoader />;
   if (!event) return null;
 
   const todayStr = new Date().toISOString().split("T")[0];
@@ -225,27 +227,27 @@ export default function OrganizerEventDetailPage() {
         </div>
 
         {/* Status & Quick Stats */}
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-3">
+        <Card>
+          <CardHeader className="mb-3">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${STATUS_STYLES[event.status]}`}>{STATUS_LABELS[event.status]}</span>
-              {event.category && <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full capitalize">{event.category.replace(/_/g, " ")}</span>}
+              <Badge variant={event.status as any || "draft"}>{STATUS_LABELS[event.status]}</Badge>
+              {event.category && <span className="text-[10px] font-medium bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full capitalize">{event.category.replace(/_/g, " ")}</span>}
             </div>
-            <span className="text-xs text-gray-400">{event.id.slice(0, 8)}</span>
-          </div>
-          <div className="grid grid-cols-3 gap-3 text-center">
-            <div><p className="text-lg font-bold text-gray-900">{remaining}</p><p className="text-xs text-gray-500">Seats open</p></div>
-            <div><p className="text-lg font-bold text-blue-600">{approvedCount}</p><p className="text-xs text-gray-500">Approved</p></div>
-            <div><p className="text-lg font-bold text-amber-600">{pendingCount}</p><p className="text-xs text-gray-500">Pending</p></div>
-          </div>
+            <span className="text-[10px] text-gray-400">{event.id.slice(0, 8)}</span>
+          </CardHeader>
+          <CardStats columns={3}>
+            <CardStat label="Seats open" value={remaining} />
+            <CardStat label="Approved" value={approvedCount} color="blue" />
+            <CardStat label="Pending" value={pendingCount} color="amber" />
+          </CardStats>
           {event.application_deadline && (
             <p className="text-xs text-gray-400 mt-2">Apply by {new Date(event.application_deadline).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</p>
           )}
-        </div>
+        </Card>
 
         {/* Event Details */}
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Event Details</h3>
+        <Card>
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Event Details</p>
           <div className="grid grid-cols-2 gap-2.5 text-sm">
             <div className="flex items-center gap-1.5 text-gray-600"><Calendar className="w-3.5 h-3.5 text-gray-400 shrink-0" />{event.date_display || event.date}</div>
             <div className="flex items-center gap-1.5 text-gray-600"><Clock className="w-3.5 h-3.5 text-gray-400 shrink-0" />{event.time}{event.end_time ? `-${event.end_time}` : ""}</div>
@@ -258,12 +260,12 @@ export default function OrganizerEventDetailPage() {
               </div>
             )}
           </div>
-        </div>
+        </Card>
 
         {/* Requirements */}
         {(event.gender_requirement || event.min_age || event.max_age || event.work_description || event.experience_required || event.skill_requirements || event.dress_code) && (
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Requirements</h3>
+          <Card>
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Requirements</p>
             <div className="flex flex-wrap gap-1.5 text-xs">
               {event.gender_requirement && <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full capitalize">{event.gender_requirement}</span>}
               {(event.min_age || event.max_age) && <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">{event.min_age || 0}-{event.max_age || 99} yrs</span>}
@@ -271,11 +273,11 @@ export default function OrganizerEventDetailPage() {
               {event.dress_code && <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">{event.dress_code}</span>}
               {event.skill_requirements?.map((s, i) => <span key={i} className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">{s}</span>)}
             </div>
-          </div>
+          </Card>
         )}
 
         {/* Applicants */}
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <Card padding="none">
           <div className="p-4 pb-3 border-b border-gray-100">
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
               Applicants ({applicants.length})
@@ -392,16 +394,16 @@ export default function OrganizerEventDetailPage() {
               </div>
             )})}
           </div>
-        </div>
+        </Card>
 
         {/* Instructions */}
         {(event.reporting_details || event.instructions || event.contact_person_notes) && (
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Reporting & Notes</h3>
+          <Card>
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Reporting & Notes</p>
             {event.reporting_details && <p className="text-sm text-gray-700 mb-2">{event.reporting_details}</p>}
             {event.instructions && <p className="text-sm text-gray-700 mb-2">{event.instructions}</p>}
             {event.contact_person_notes && <p className="text-sm text-gray-700">{event.contact_person_notes}</p>}
-          </div>
+          </Card>
         )}
       </main>
 
@@ -416,38 +418,30 @@ export default function OrganizerEventDetailPage() {
       {/* Sticky bottom actions */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-10">
         <div className="max-w-3xl mx-auto px-4 py-2.5 flex gap-2 overflow-x-auto">
-          <button onClick={() => setShowEdit(true)} disabled={!canEdit}
-            className={`h-9 px-3 rounded-lg text-xs font-medium flex items-center gap-1.5 shrink-0 ${
-              canEdit ? "bg-gray-100 text-gray-700 active:bg-gray-200" : "bg-gray-50 text-gray-400 cursor-not-allowed"
-            }`}>
+          <Button variant="secondary" size="sm" onClick={() => setShowEdit(true)} disabled={!canEdit}>
             <Edit3 className="w-3.5 h-3.5" /> Edit
-          </button>
-          <button onClick={duplicate}
-            className="h-9 px-3 rounded-lg bg-gray-100 text-gray-700 text-xs font-medium flex items-center gap-1.5 shrink-0 active:bg-gray-200">
+          </Button>
+          <Button variant="secondary" size="sm" onClick={duplicate}>
             <Copy className="w-3.5 h-3.5" /> Duplicate
-          </button>
+          </Button>
           {(event.status === "published" || event.status === "filling") && (
-            <button onClick={() => updateStatus("closed")}
-              className="h-9 px-3 rounded-lg bg-amber-50 text-amber-700 text-xs font-medium flex items-center gap-1.5 shrink-0 active:bg-amber-100">
+            <Button variant="warning" size="sm" onClick={() => updateStatus("closed")}>
               <XCircle className="w-3.5 h-3.5" /> Close
-            </button>
+            </Button>
           )}
           {event.status === "draft" && (
-            <button onClick={() => updateStatus("published")}
-              className="h-9 px-3 rounded-lg bg-green-100 text-green-700 text-xs font-medium flex items-center gap-1.5 shrink-0 active:bg-green-200">
+            <Button variant="success" size="sm" onClick={() => updateStatus("published")}>
               Publish
-            </button>
+            </Button>
           )}
           {event.status !== "completed" && event.status !== "cancelled" && event.status !== "draft" && (
-            <button onClick={() => { if (confirm("Mark as completed?")) updateStatus("completed"); }}
-              className="h-9 px-3 rounded-lg bg-gray-100 text-gray-600 text-xs font-medium flex items-center gap-1.5 shrink-0 active:bg-gray-200">
+            <Button variant="secondary" size="sm" onClick={() => { if (confirm("Mark as completed?")) updateStatus("completed"); }}>
               <CheckCircle className="w-3.5 h-3.5" /> Complete
-            </button>
+            </Button>
           )}
-          <button onClick={deleteEvent}
-            className="h-9 px-3 rounded-lg bg-red-50 text-red-600 text-xs font-medium flex items-center gap-1.5 shrink-0 active:bg-red-100">
+          <Button variant="danger" size="sm" onClick={deleteEvent}>
             <Trash2 className="w-3.5 h-3.5" /> Delete
-          </button>
+          </Button>
         </div>
       </div>
     </div>

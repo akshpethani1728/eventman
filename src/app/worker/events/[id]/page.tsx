@@ -6,6 +6,10 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { ArrowLeft, ArrowUpRight, MapPin, Calendar, Clock, Users, IndianRupee, Shirt, AlertCircle, User, Briefcase, Award, Star, ShieldCheck, CheckCircle, Hourglass, Phone, Timer, Info, ListChecks, XCircle, BadgeCheck, ListPlus, ListMinus } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/lib/design/Button";
+import { Card } from "@/lib/design/Card";
+import { Badge, StatusDot, Divider } from "@/lib/design/Badge";
+import { PageLoader } from "@/lib/design/Loading";
 import type { Event, Application, Profile } from "@/lib/supabase/types";
 
 function isWaitlisted(app: Application) { return app.status === "pending" && app.notes === "waitlisted"; }
@@ -95,23 +99,7 @@ export default function EventDetailPage() {
     loadEvent();
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <header className="sticky top-0 bg-white border-b border-gray-200 z-10">
-          <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-gray-200 animate-pulse" />
-            <div className="w-28 h-3 rounded bg-gray-200 animate-pulse" />
-          </div>
-        </header>
-        <main className="max-w-lg mx-auto px-4 py-4 space-y-3">
-          <div className="h-36 rounded-xl bg-gray-100 animate-pulse" />
-          <div className="h-48 rounded-xl bg-gray-100 animate-pulse" />
-          <div className="h-28 rounded-xl bg-gray-100 animate-pulse" />
-        </main>
-      </div>
-    );
-  }
+  if (loading) return <PageLoader />;
   if (!event) return null;
 
   const showContact = application?.status === "approved";
