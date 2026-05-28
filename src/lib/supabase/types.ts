@@ -4,7 +4,7 @@ export type UserStatus = "unverified" | "basic_verified" | "trusted";
 
 export type EventStatus = "draft" | "published" | "filling" | "full" | "closed" | "completed" | "cancelled";
 
-export type ApplicationStatus = "pending" | "approved" | "rejected" | "cancelled" | "removed";
+export type ApplicationStatus = "pending" | "approved" | "rejected" | "cancelled";
 
 export interface Profile {
   id: string;

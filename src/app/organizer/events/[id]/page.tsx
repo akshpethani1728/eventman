@@ -60,7 +60,7 @@ export default function OrganizerEventDetailPage() {
   const [applicants, setApplicants] = useState<(Application & { profile: Profile })[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [filter, setFilter] = useState<"" | "pending" | "approved" | "rejected" | "removed">("");
+  const [filter, setFilter] = useState<"" | "pending" | "approved" | "rejected">("");
   const [applying, setApplying] = useState<string | null>(null);
   const [showEdit, setShowEdit] = useState(false);
   const [ratings, setRatings] = useState<Record<string, number>>({});
@@ -140,7 +140,7 @@ export default function OrganizerEventDetailPage() {
     if (!event) return;
     setApplying(applicationId);
     const { error } = await supabase
-      .from("applications").update({ status: "removed", updated_at: new Date().toISOString() }).eq("id", applicationId);
+      .from("applications").update({ status: "cancelled", notes: "removed_by_organizer", updated_at: new Date().toISOString() }).eq("id", applicationId);
     if (error) { toast.error(error.message); setApplying(null); return; }
 
     const app = applicants.find(a => a.id === applicationId);
@@ -309,7 +309,7 @@ export default function OrganizerEventDetailPage() {
               Applicants ({applicants.length})
             </h3>
             <div className="flex gap-1.5">
-              {([["", `All (${applicants.length})`], ["pending", `Pending (${pendingCount})`], ["approved", `Approved (${approvedCount})`], ["rejected", `Rejected (${rejectedCount})`], ["removed", `Removed`]] as const).map(([key, label]) => (
+              {([["", `All (${applicants.length})`], ["pending", `Pending (${pendingCount})`], ["approved", `Approved (${approvedCount})`], ["rejected", `Rejected (${rejectedCount})`]] as const).map(([key, label]) => (
                 <button key={key} onClick={() => setFilter(key)}
                   className={`h-7 px-2.5 rounded-lg text-[10px] font-medium transition-colors ${
                     filter === key ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600"
@@ -357,9 +357,10 @@ export default function OrganizerEventDetailPage() {
                       <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
                         app.status === "pending" ? "bg-amber-100 text-amber-800" :
                         app.status === "approved" ? "bg-green-100 text-green-800" :
-                        app.status === "removed" ? "bg-red-100 text-red-800" :
-                        "bg-gray-100 text-gray-600"
-                      }`}>{app.status}</span>
+                        app.notes === "removed_by_organizer" ? "bg-red-100 text-red-800" :
+                        app.status === "rejected" ? "bg-gray-100 text-gray-600" :
+                        "bg-gray-100 text-gray-500"
+                      }`}>{app.notes === "removed_by_organizer" ? "Removed" : app.status}</span>
                       {app.status === "pending" && (
                         <>
                           <button onClick={() => handleApprove(app.id)} disabled={applying === app.id}

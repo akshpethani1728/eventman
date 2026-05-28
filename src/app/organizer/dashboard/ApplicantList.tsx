@@ -24,11 +24,10 @@ const STATUS_STYLES: Record<string, string> = {
   approved: "bg-green-100 text-green-800",
   rejected: "bg-red-100 text-red-800",
   cancelled: "bg-gray-100 text-gray-500",
-  removed: "bg-red-100 text-red-800",
 };
 
 const STATUS_LABELS: Record<string, string> = {
-  pending: "Applied", approved: "Approved", rejected: "Rejected", cancelled: "Cancelled", removed: "Removed",
+  pending: "Applied", approved: "Approved", rejected: "Rejected", cancelled: "Cancelled",
 };
 
 export default function ApplicantList({ event, onClose, onUpdate }: Props) {
@@ -102,7 +101,7 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
 
   const handleRemove = async (applicationId: string) => {
     const { error } = await supabase
-      .from("applications").update({ status: "removed", updated_at: new Date().toISOString() }).eq("id", applicationId);
+      .from("applications").update({ status: "cancelled", notes: "removed_by_organizer", updated_at: new Date().toISOString() }).eq("id", applicationId);
     if (error) { toast.error(error.message); return; }
 
     const app = applicants.find(a => a.id === applicationId);
@@ -229,8 +228,10 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${STATUS_STYLES[app.status]}`}>
-                      {STATUS_LABELS[app.status]}
+                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
+                      app.notes === "removed_by_organizer" ? "bg-red-100 text-red-800" : STATUS_STYLES[app.status]
+                    }`}>
+                      {app.notes === "removed_by_organizer" ? "Removed" : STATUS_LABELS[app.status]}
                     </span>
                     {app.status === "pending" && (
                       <button onClick={() => updateStatus(app.id, "approved")}
