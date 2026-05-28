@@ -1,24 +1,810 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Mail, Lock, User, Eye, EyeOff, ArrowRight, Briefcase, HardHat } from "lucide-react";
+import {
+  Mail, Lock, User, Eye, EyeOff, ArrowRight, ArrowDown,
+  Briefcase, HardHat, Search, Calendar, Users,
+  Bell, Shield, Zap, Star, CheckCircle,
+  Sparkles, MapPin, Clock, UserCheck,
+  ChevronRight, TrendingUp, Building2, LayoutDashboard,
+  ListChecks, MessageSquare, RefreshCw,
+} from "lucide-react";
 
-export default function LoginPage() {
+const supabase = createClient();
+
+// ─── TILT HOOK ───────────────────────────────────────────────────
+function useTilt(ref: React.RefObject<HTMLDivElement | null>) {
+  const style = useRef({ rotateX: 0, rotateY: 0, glowX: 50, glowY: 50, isHovered: false });
+  const [render, setRender] = useState(style.current);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const isTouch = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+    if (isTouch) return;
+
+    const move = (e: MouseEvent) => {
+      const rect = el.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+      style.current = {
+        rotateX: (y - 0.5) * -8,
+        rotateY: (x - 0.5) * 8,
+        glowX: x * 100,
+        glowY: y * 100,
+        isHovered: true,
+      };
+      setRender({ ...style.current });
+    };
+
+    const leave = () => {
+      style.current = { rotateX: 0, rotateY: 0, glowX: 50, glowY: 50, isHovered: false };
+      setRender({ ...style.current });
+    };
+
+    el.addEventListener("mousemove", move);
+    el.addEventListener("mouseleave", leave);
+    return () => {
+      el.removeEventListener("mousemove", move);
+      el.removeEventListener("mouseleave", leave);
+    };
+  }, [ref]);
+
+  return render;
+}
+
+// ─── TILT CARD ───────────────────────────────────────────────────
+function TiltCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { rotateX, rotateY, glowX, glowY, isHovered } = useTilt(ref);
+
+  return (
+    <div
+      ref={ref}
+      className={`relative overflow-hidden rounded-2xl bg-white shadow-xl transition-shadow duration-300 ${isHovered ? "shadow-2xl" : ""} ${className}`}
+      style={{
+        transform: `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${isHovered ? 1.02 : 1})`,
+        transition: "transform 0.15s ease-out, box-shadow 0.3s ease",
+        willChange: "transform",
+      }}
+    >
+      <div
+        className="pointer-events-none absolute inset-0 transition-opacity duration-150"
+        style={{
+          opacity: isHovered ? 1 : 0,
+          background: `radial-gradient(circle at ${glowX}% ${glowY}%, rgba(37,99,235,0.15), transparent 60%)`,
+        }}
+      />
+      {children}
+    </div>
+  );
+}
+
+// ─── COUNTER ─────────────────────────────────────────────────────
+function AnimatedCounter({ end, suffix = "" }: { end: number; suffix?: string }) {
+  const [val, setVal] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const counted = useRef(false);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !counted.current) {
+          counted.current = true;
+          const duration = 1500;
+          const step = Math.ceil(end / 60);
+          let current = 0;
+          const interval = setInterval(() => {
+            current += step;
+            if (current >= end) { current = end; clearInterval(interval); }
+            setVal(current);
+          }, duration / 60);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, [end]);
+
+  return <span ref={ref}>{val}{suffix}</span>;
+}
+
+// ─── SECTION FADE ────────────────────────────────────────────────
+function FadeSection({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { threshold: 0.08 }
+    );
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className={`transition-all duration-700 ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"} ${className}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+// ─── PREVIEW CARDS ───────────────────────────────────────────────
+const previewCards = [
+  {
+    id: "feed",
+    label: "Worker Feed",
+    icon: Search,
+    color: "from-blue-500 to-blue-600",
+    content: (
+      <div className="space-y-2.5 p-4">
+        <div className="flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-2 text-xs text-gray-400">
+          <Search className="h-3.5 w-3.5" />
+          Search events near you...
+        </div>
+        {[
+          { title: "Wedding Photography", date: "May 30", pay: "₹1,500 - 2,500", status: "filling" },
+          { title: "Corporate Gala", date: "Jun 2", pay: "₹2,000 - 3,500", status: "new" },
+          { title: "Concert Setup", date: "Jun 5", pay: "₹1,800 - 2,800", status: "filling" },
+        ].map((ev, i) => (
+          <div key={i} className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-semibold text-gray-900">{ev.title}</p>
+                <div className="mt-1 flex items-center gap-2 text-[10px] text-gray-400">
+                  <Calendar className="h-3 w-3" />
+                  {ev.date}
+                  <MapPin className="ml-1 h-3 w-3" />
+                  Ahmedabad
+                </div>
+              </div>
+              <span className={`rounded-full px-2 py-0.5 text-[9px] font-medium ${
+                ev.status === "new" ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700"
+              }`}>{ev.status === "new" ? "NEW" : "Filling"}</span>
+            </div>
+            <div className="mt-1.5 flex items-center justify-between">
+              <span className="text-[10px] font-semibold text-gray-700">{ev.pay}</span>
+              <button className="rounded-lg bg-blue-600 px-3 py-1 text-[9px] font-medium text-white">Apply</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    ),
+  },
+  {
+    id: "dashboard",
+    label: "Organizer Dashboard",
+    icon: LayoutDashboard,
+    color: "from-indigo-500 to-indigo-600",
+    content: (
+      <div className="space-y-2.5 p-4">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-semibold text-gray-900">Your Events (4)</p>
+          <span className="text-[9px] text-blue-600">View All</span>
+        </div>
+        {[
+          { title: "Wedding", filled: 12, total: 20, color: "bg-emerald-500" },
+          { title: "Conference", filled: 5, total: 15, color: "bg-amber-500" },
+          { title: "Concert", filled: 24, total: 30, color: "bg-blue-500" },
+        ].map((ev, i) => (
+          <div key={i} className="rounded-lg border border-gray-100 bg-white p-2.5 shadow-sm">
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] font-medium text-gray-700">{ev.title}</p>
+              <span className="text-[9px] text-gray-400">{ev.filled}/{ev.total} filled</span>
+            </div>
+            <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-gray-100">
+              <div className={`h-full rounded-full ${ev.color} transition-all`} style={{ width: `${(ev.filled / ev.total) * 100}%` }} />
+            </div>
+          </div>
+        ))}
+        <div className="flex items-center justify-between rounded-lg bg-blue-50 p-2">
+          <span className="text-[9px] font-medium text-blue-700">12 pending approvals</span>
+          <ChevronRight className="h-3 w-3 text-blue-500" />
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "profile",
+    label: "Worker Profile",
+    icon: UserCheck,
+    color: "from-emerald-500 to-emerald-600",
+    content: (
+      <div className="space-y-2.5 p-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white">RS</div>
+          <div>
+            <p className="text-sm font-semibold text-gray-900">Rahul Sharma</p>
+            <div className="flex items-center gap-1">
+              {[1, 2, 3, 4].map((_, i) => <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />)}
+              <Star className="h-3 w-3 text-gray-200" />
+              <span className="text-[10px] text-gray-400">4.2</span>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {["Photography", "Videography", "Editing"].map((s, i) => (
+            <span key={i} className="rounded-full bg-blue-50 px-2 py-0.5 text-[9px] font-medium text-blue-700">{s}</span>
+          ))}
+        </div>
+        <div className="flex items-center gap-3 text-[10px] text-gray-500">
+          <div className="flex items-center gap-1"><MapPin className="h-3 w-3" /> Ahmedabad</div>
+          <div className="flex items-center gap-1"><CheckCircle className="h-3 w-3 text-emerald-500" /> 12 Events</div>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "notifications",
+    label: "Live Updates",
+    icon: Bell,
+    color: "from-amber-500 to-orange-500",
+    content: (
+      <div className="space-y-2.5 p-4">
+        {[
+          { text: "You're approved for Wedding Photography", time: "2 min ago", color: "text-emerald-600", icon: CheckCircle },
+          { text: "New: Corporate Gala accepting applications", time: "15 min ago", color: "text-blue-600", icon: Sparkles },
+          { text: "Concert Setup needs more workers", time: "1 hour ago", color: "text-amber-600", icon: Users },
+        ].map((n, i) => {
+          const Icon = n.icon;
+          return (
+            <div key={i} className="flex items-start gap-2.5 rounded-lg border border-gray-100 bg-white p-2.5 shadow-sm">
+              <div className={`mt-0.5 ${n.color}`}><Icon className="h-3.5 w-3.5" /></div>
+              <div className="flex-1">
+                <p className="text-[10px] text-gray-700">{n.text}</p>
+                <p className="mt-0.5 text-[9px] text-gray-400">{n.time}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    ),
+  },
+];
+
+// ─── FEATURES ────────────────────────────────────────────────────
+const features = [
+  { icon: Shield, title: "Verified Organizers", desc: "Every event creator is verified for trust and reliability" },
+  { icon: Lock, title: "Contact Privacy", desc: "Your contact stays private until you're approved for an event" },
+  { icon: Bell, title: "Real-time Updates", desc: "Instant notifications for approvals, events, and changes" },
+  { icon: Zap, title: "Smart Matching", desc: "Find events matching your skills and location" },
+  { icon: Users, title: "Professional Network", desc: "Join Ahmedabad's growing event workforce ecosystem" },
+  { icon: TrendingUp, title: "Grow Faster", desc: "Build your profile, get rated, and earn more" },
+];
+
+// ─── DASHBOARD MOCKUP ────────────────────────────────────────────
+function EcosystemPreview() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  return (
+    <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white py-20 md:py-28">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <FadeSection>
+          <div className="text-center">
+            <span className="inline-block rounded-full bg-blue-100 px-4 py-1 text-[11px] font-semibold tracking-wide text-blue-700 uppercase">Ecosystem Preview</span>
+            <h2 className="mt-4 text-2xl font-bold tracking-tight text-gray-900 md:text-4xl">See the Platform in Action</h2>
+            <p className="mx-auto mt-3 max-w-2xl text-sm text-gray-500 md:text-base">
+              Real interfaces you will use every day — worker feed, organizer dashboard, profile, and live notifications
+            </p>
+          </div>
+        </FadeSection>
+
+        <FadeSection className="mt-12">
+          <div
+            ref={scrollRef}
+            className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-6 md:overflow-visible md:pb-0"
+          >
+            {previewCards.map((card) => {
+              const Icon = card.icon;
+              return (
+                <TiltCard key={card.id} className="w-[85vw] shrink-0 snap-center md:w-auto">
+                  <div className={`bg-gradient-to-r ${card.color} px-4 py-3`}>
+                    <div className="flex items-center gap-2">
+                      <Icon className="h-4 w-4 text-white" />
+                      <span className="text-xs font-semibold text-white">{card.label}</span>
+                    </div>
+                  </div>
+                  <div className="bg-gray-50/50 pb-1">{card.content}</div>
+                </TiltCard>
+              );
+            })}
+          </div>
+        </FadeSection>
+
+        {/* Mobile hint */}
+        <p className="mt-6 text-center text-[10px] text-gray-400 md:hidden">Swipe to explore all cards</p>
+      </div>
+    </section>
+  );
+}
+
+// ─── ROLE SELECTION ──────────────────────────────────────────────
+const roleCards = [
+  {
+    type: "worker" as const,
+    icon: HardHat,
+    title: "I'm a Worker",
+    subtitle: "Find event work & earn",
+    features: ["Browse event opportunities", "Apply in one tap", "Build a trusted profile", "Get approved faster"],
+    gradient: "from-blue-600 to-blue-700",
+    shadow: "shadow-blue-200/40",
+  },
+  {
+    type: "organizer" as const,
+    icon: Briefcase,
+    title: "I'm an Organizer",
+    subtitle: "Hire & manage staff",
+    features: ["Create & manage events", "Find workers instantly", "Track manpower live", "Approve with one click"],
+    gradient: "from-indigo-600 to-indigo-700",
+    shadow: "shadow-indigo-200/40",
+  },
+];
+
+function RoleSelection({ selected, onSelect }: { selected: string; onSelect: (r: "worker" | "organizer") => void }) {
+  return (
+    <section className="bg-white py-20 md:py-28">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <FadeSection>
+          <div className="text-center">
+            <h2 className="text-2xl font-bold tracking-tight text-gray-900 md:text-4xl">Choose Your Path</h2>
+            <p className="mx-auto mt-3 max-w-xl text-sm text-gray-500">
+              Whether you are looking for event work or need to hire staff, EventMan is built for you
+            </p>
+          </div>
+        </FadeSection>
+
+        <FadeSection className="mt-10 grid gap-5 md:grid-cols-2 md:gap-8">
+          {roleCards.map((role) => {
+            const Icon = role.icon;
+            const active = selected === role.type;
+            return (
+              <button
+                key={role.type}
+                type="button"
+                onClick={() => onSelect(role.type)}
+                className={`group relative overflow-hidden rounded-2xl border-2 p-6 text-left transition-all duration-300 ${
+                  active
+                    ? "border-blue-600 bg-blue-50 shadow-lg"
+                    : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-md"
+                }`}
+              >
+                {active && (
+                  <div className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-blue-600">
+                    <CheckCircle className="h-4 w-4 text-white" />
+                  </div>
+                )}
+                <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${role.gradient} text-white shadow-lg transition-transform duration-300 group-hover:scale-110 ${role.shadow}`}>
+                  <Icon className="h-6 w-6" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900">{role.title}</h3>
+                <p className="mt-0.5 text-sm text-gray-500">{role.subtitle}</p>
+                <ul className="mt-4 space-y-2">
+                  {role.features.map((f, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                      <CheckCircle className={`h-4 w-4 ${active ? "text-blue-600" : "text-gray-300"}`} />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+              </button>
+            );
+          })}
+        </FadeSection>
+      </div>
+    </section>
+  );
+}
+
+// ─── TRUST & FEATURES ────────────────────────────────────────────
+function TrustSection() {
+  const stats = [
+    { icon: Calendar, value: 28, label: "Active Events", suffix: "" },
+    { icon: Users, value: 380, label: "Workers Available", suffix: "+" },
+    { icon: Building2, value: 52, label: "Verified Organizers", suffix: "" },
+    { icon: TrendingUp, value: 1250, label: "Successful Placements", suffix: "+" },
+  ];
+
+  return (
+    <section className="bg-gradient-to-b from-white to-gray-50 py-20 md:py-28">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <FadeSection>
+          <div className="text-center">
+            <h2 className="text-2xl font-bold tracking-tight text-gray-900 md:text-4xl">Trusted by Ahmedabad&apos;s Event Ecosystem</h2>
+            <p className="mx-auto mt-3 max-w-2xl text-sm text-gray-500">
+              Growing community of workers and organizers using EventMan to coordinate manpower
+            </p>
+          </div>
+        </FadeSection>
+
+        {/* Live counters */}
+        <FadeSection className="mt-12">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-8">
+            {stats.map((s, i) => {
+              const Icon = s.icon;
+              return (
+                <div key={i} className="group relative rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-gray-100 transition-shadow hover:shadow-md">
+                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50">
+                    <Icon className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <p className="text-3xl font-bold tracking-tight text-gray-900 md:text-4xl">
+                    <AnimatedCounter end={s.value} suffix={s.suffix} />
+                  </p>
+                  <p className="mt-1 text-sm text-gray-500">{s.label}</p>
+                  <div className="absolute inset-x-0 bottom-0 mx-auto h-0.5 w-12 rounded-full bg-blue-100 opacity-0 transition-opacity group-hover:opacity-100" />
+                </div>
+              );
+            })}
+          </div>
+        </FadeSection>
+
+        {/* Feature cards */}
+        <FadeSection className="mt-16">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {features.map((f, i) => {
+              const Icon = f.icon;
+              return (
+                <div key={i} className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-gray-100 transition-shadow hover:shadow-md">
+                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50">
+                    <Icon className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <h3 className="text-sm font-semibold text-gray-900">{f.title}</h3>
+                  <p className="mt-1 text-xs text-gray-500 leading-relaxed">{f.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+        </FadeSection>
+      </div>
+    </section>
+  );
+}
+
+// ─── AUTH SECTION ────────────────────────────────────────────────
+function AuthForm({ step, onStepChange }: { step: "auth" | "profile"; onStepChange: (s: "auth" | "profile") => void }) {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
-  const [step, setStep] = useState<"auth" | "profile">("auth");
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState<"worker" | "organizer">("worker");
   const [name, setName] = useState("");
   const [error, setError] = useState("");
-  const router = useRouter();
-  const supabase = createClient();
 
-  // Check if user is already logged in
+  const handleAuth = async () => {
+    setError("");
+    if (!email.trim()) { setError("Please enter your email"); return; }
+    if (password.length < 6) { setError("Password must be at least 6 characters"); return; }
+    setLoading(true);
+
+    if (isSignUp) {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+      });
+      setLoading(false);
+      if (signUpError) {
+        if (signUpError.message.includes("already")) {
+          setError("An account with this email already exists. Please sign in.");
+          setIsSignUp(false);
+        } else {
+          setError(signUpError.message);
+        }
+        return;
+      }
+      if (data.user?.identities?.length === 0) {
+        setError("This email is already registered. Please sign in.");
+        setIsSignUp(false);
+        return;
+      }
+      if (data.session) {
+        onStepChange("profile");
+      } else {
+        setError("Account created! Please check your email to confirm, then sign in.");
+        setIsSignUp(false);
+      }
+    } else {
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+      setLoading(false);
+      if (signInError) {
+        if (signInError.message.includes("Invalid login")) {
+          setError("Wrong email or password. Try again.");
+        } else if (signInError.message.includes("Email not confirmed")) {
+          setError("Please confirm your email first. Check your inbox.");
+        } else {
+          setError(signInError.message);
+        }
+        return;
+      }
+      const { data: existingProfile } = await supabase
+        .from("profiles").select("role").eq("user_id", data.user?.id).maybeSingle();
+      if (existingProfile) {
+        router.push(existingProfile.role === "admin" ? "/admin" : `/${existingProfile.role}/dashboard`);
+      } else {
+        onStepChange("profile");
+      }
+    }
+  };
+
+  const createProfile = async () => {
+    setError("");
+    if (!name.trim()) { setError("Please enter your name"); return; }
+    setLoading(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setError("Session expired. Please login again.");
+      setLoading(false);
+      onStepChange("auth");
+      return;
+    }
+    const { error: insertError } = await supabase.from("profiles").insert({
+      user_id: user.id, full_name: name.trim(), role, email: user.email, status: "unverified",
+    });
+    setLoading(false);
+    if (insertError) {
+      if (insertError.message.includes("duplicate")) {
+        const { data } = await supabase.from("profiles").select("role").eq("user_id", user.id).single();
+        if (data) { router.push(data.role === "admin" ? "/admin" : `/${data.role}/dashboard`); return; }
+      }
+      setError(insertError.message);
+      return;
+    }
+    router.replace(`/${role}/dashboard`);
+  };
+
+  const inputClass = "w-full h-12 pl-10 pr-3 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none transition-all focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20";
+  const inputIconClass = "absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400";
+
+  return (
+    <section className="bg-gradient-to-b from-gray-50 to-white py-20 md:py-28" id="auth">
+      <div className="mx-auto max-w-md px-4 sm:px-6">
+        <FadeSection>
+          {step === "auth" ? (
+            <form onSubmit={(e) => { e.preventDefault(); handleAuth(); }} className="space-y-5">
+              <div className="text-center">
+                <h2 className="text-2xl font-bold text-gray-900">{isSignUp ? "Create Account" : "Welcome Back"}</h2>
+                <p className="mt-1 text-sm text-gray-500">
+                  {isSignUp ? "Start your event journey" : "Sign in to continue"}
+                </p>
+              </div>
+
+              {error && (
+                <div className="animate-slide-down rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
+              )}
+
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">Email</label>
+                <div className="relative">
+                  <Mail className={inputIconClass} />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={e => { setEmail(e.target.value); setError(""); }}
+                    placeholder="you@example.com"
+                    autoComplete="email"
+                    className={inputClass}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">Password</label>
+                <div className="relative">
+                  <Lock className={inputIconClass} />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={e => { setPassword(e.target.value); setError(""); }}
+                    placeholder="Min 6 characters"
+                    autoComplete={isSignUp ? "new-password" : "current-password"}
+                    className="w-full h-12 pl-10 pr-10 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none transition-all focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-base font-semibold text-white shadow-lg shadow-blue-200/50 transition-all active:scale-[0.98] disabled:opacity-60"
+              >
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    Please wait...
+                  </span>
+                ) : (
+                  <>{isSignUp ? "Create Account" : "Sign In"} <ArrowRight className="h-4 w-4" /></>
+                )}
+              </button>
+
+              <p className="text-center text-sm text-gray-500">
+                {isSignUp ? "Already have an account? " : "Don't have an account? "}
+                <button
+                  type="button"
+                  onClick={() => { setIsSignUp(!isSignUp); setError(""); }}
+                  className="font-semibold text-blue-600 transition-colors hover:text-blue-700"
+                >
+                  {isSignUp ? "Sign In" : "Sign Up"}
+                </button>
+              </p>
+            </form>
+          ) : (
+            <form onSubmit={(e) => { e.preventDefault(); createProfile(); }} className="space-y-5">
+              <div className="text-center">
+                <h2 className="text-2xl font-bold text-gray-900">Complete Profile</h2>
+                <p className="mt-1 text-sm text-gray-500">Just a few more details</p>
+              </div>
+
+              {error && (
+                <div className="animate-slide-down rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
+              )}
+
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">Full Name</label>
+                <div className="relative">
+                  <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={e => { setName(e.target.value); setError(""); }}
+                    placeholder="Your full name"
+                    className={inputClass}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">I want to join as</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {(["worker", "organizer"] as const).map((r) => (
+                    <button
+                      key={r}
+                      type="button"
+                      onClick={() => setRole(r)}
+                      className={`flex h-16 flex-col items-center justify-center gap-1 rounded-xl border-2 transition-all ${
+                        role === r
+                          ? "border-blue-600 bg-blue-50 text-blue-700"
+                          : "border-gray-200 bg-gray-50 text-gray-500 hover:border-gray-300"
+                      }`}
+                    >
+                      {r === "worker" ? <HardHat className="h-5 w-5" /> : <Briefcase className="h-5 w-5" />}
+                      <span className="text-xs font-semibold">{r === "worker" ? "Worker" : "Organizer"}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-base font-semibold text-white shadow-lg shadow-blue-200/50 transition-all active:scale-[0.98] disabled:opacity-60"
+              >
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    Creating...
+                  </span>
+                ) : "Continue"}
+              </button>
+            </form>
+          )}
+        </FadeSection>
+      </div>
+    </section>
+  );
+}
+
+// ─── HERO ────────────────────────────────────────────────────────
+function HeroSection({ onCta }: { onCta: () => void }) {
+  return (
+    <section className="relative flex min-h-[90dvh] flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-900">
+      {/* Animated bg orbs */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-blue-500/10 blur-3xl animate-float" />
+        <div className="absolute -bottom-32 -right-32 h-80 w-80 rounded-full bg-indigo-500/10 blur-3xl animate-float" style={{ animationDelay: "1.5s" }} />
+        <div className="absolute left-1/2 top-1/3 h-64 w-64 -translate-x-1/2 rounded-full bg-blue-400/5 blur-3xl animate-pulse-soft" />
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-4xl px-4 text-center">
+        {/* Brand */}
+        <FadeSection>
+          <div className="mb-6 inline-flex items-center gap-3 rounded-2xl bg-white/10 px-5 py-2.5 shadow-lg backdrop-blur-md">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/20">
+              <Briefcase className="h-5 w-5 text-white" />
+            </div>
+            <span className="text-sm font-bold tracking-wide text-white">EventMan</span>
+          </div>
+        </FadeSection>
+
+        {/* Headline */}
+        <FadeSection className="mt-2">
+          <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-white md:text-6xl lg:text-7xl">
+            Ahmedabad&apos;s Event<br />
+            <span className="bg-gradient-to-r from-blue-200 to-indigo-200 bg-clip-text text-transparent">Workforce Platform</span>
+          </h1>
+        </FadeSection>
+
+        {/* Subheading */}
+        <FadeSection className="mt-6">
+          <p className="mx-auto max-w-xl text-base leading-relaxed text-blue-100/80 md:text-lg">
+            Find event work or hire trusted staff — all in one place.
+            No WhatsApp groups. No confusion. Just professional manpower coordination.
+          </p>
+        </FadeSection>
+
+        {/* CTA */}
+        <FadeSection className="mt-10">
+          <button
+            onClick={onCta}
+            className="group inline-flex items-center gap-2.5 rounded-2xl bg-white px-8 py-4 text-base font-bold text-blue-700 shadow-2xl transition-all hover:scale-105 active:scale-[0.97]"
+          >
+            Get Started
+            <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
+          </button>
+        </FadeSection>
+
+        {/* Trust bump */}
+        <FadeSection className="mt-12">
+          <div className="flex items-center justify-center gap-8 text-blue-200/70">
+            <div className="flex items-center gap-2 text-xs">
+              <Shield className="h-3.5 w-3.5" />
+              Verified
+            </div>
+            <div className="flex items-center gap-2 text-xs">
+              <Users className="h-3.5 w-3.5" />
+              380+ Workers
+            </div>
+            <div className="flex items-center gap-2 text-xs">
+              <Building2 className="h-3.5 w-3.5" />
+              50+ Organizers
+            </div>
+          </div>
+        </FadeSection>
+      </div>
+
+      {/* Scroll indicator */}
+      <div className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 animate-float">
+        <div className="flex flex-col items-center gap-1">
+          <span className="text-[10px] font-medium tracking-wide text-blue-200/60 uppercase">Scroll</span>
+          <div className="flex flex-col items-center gap-0.5">
+            <div className="h-1 w-1 rounded-full bg-blue-200/40" />
+            <div className="h-1 w-1 rounded-full bg-blue-200/40" />
+            <div className="h-1 w-1 rounded-full bg-blue-200/60" />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── MAIN ────────────────────────────────────────────────────────
+export default function LoginPage() {
+  const router = useRouter();
+  const [step, setStep] = useState<"auth" | "profile">("auth");
+  const previewRef = useRef<HTMLDivElement>(null);
+  const authRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
@@ -31,298 +817,46 @@ export default function LoginPage() {
         });
       }
     });
+  }, [router]);
+
+  const scrollToAuth = useCallback(() => {
+    authRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
 
-  const handleAuth = async () => {
-    setError("");
-
-    if (!email.trim()) { setError("Please enter your email"); return; }
-    if (password.length < 6) { setError("Password must be at least 6 characters"); return; }
-
-    setLoading(true);
-
-    if (isSignUp) {
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-      });
-
-      setLoading(false);
-
-      if (signUpError) {
-        if (signUpError.message.includes("already")) {
-          setError("An account with this email already exists. Please sign in.");
-          setIsSignUp(false);
-        } else {
-          setError(signUpError.message);
-        }
-        return;
-      }
-
-      // Check if email confirmation is required
-      if (data.user?.identities?.length === 0) {
-        setError("This email is already registered. Please sign in.");
-        setIsSignUp(false);
-        return;
-      }
-
-      // If user session is available, proceed to profile setup
-      if (data.session) {
-        setStep("profile");
-      } else {
-        // Email confirmation required
-        setError("Account created! Please check your email to confirm, then sign in.");
-        setIsSignUp(false);
-      }
-    } else {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
-
-      setLoading(false);
-
-      if (signInError) {
-        if (signInError.message.includes("Invalid login")) {
-          setError("Wrong email or password. Try again.");
-        } else if (signInError.message.includes("Email not confirmed")) {
-          setError("Please confirm your email first. Check your inbox.");
-        } else {
-          setError(signInError.message);
-        }
-        return;
-      }
-
-      const { data: existingProfile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("user_id", data.user?.id)
-        .maybeSingle();
-
-      if (existingProfile) {
-        router.push(existingProfile.role === "admin" ? "/admin" : `/${existingProfile.role}/dashboard`);
-      } else {
-        setStep("profile");
-      }
-    }
-  };
-
-  const createProfile = async () => {
-    setError("");
-    if (!name.trim()) { setError("Please enter your name"); return; }
-
-    setLoading(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { setError("Session expired. Please login again."); setLoading(false); setStep("auth"); return; }
-
-    const { error: insertError } = await supabase.from("profiles").insert({
-      user_id: user.id,
-      full_name: name.trim(),
-      role,
-      email: user.email,
-      status: "unverified",
-    });
-
-    setLoading(false);
-
-    if (insertError) {
-      if (insertError.message.includes("duplicate")) {
-        // Profile already exists, try to redirect
-        const { data } = await supabase.from("profiles").select("role").eq("user_id", user.id).single();
-        if (data) {
-          router.push(data.role === "admin" ? "/admin" : `/${data.role}/dashboard`);
-          return;
-        }
-      }
-      setError(insertError.message);
-      return;
-    }
-
-    router.replace(`/${role}/dashboard`);
-  };
-
   return (
-    <div className="min-h-dvh bg-gradient-to-b from-blue-600 to-blue-800 flex flex-col">
-      {/* Top branding area */}
-      <div className="flex-1 flex items-center justify-center px-6 pt-12">
-        <div className="text-center">
-          <div className="w-20 h-20 bg-white/20 backdrop-blur-lg rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <Briefcase className="w-10 h-10 text-white" />
+    <div className="min-h-dvh bg-white">
+      {/* HERO */}
+      <HeroSection onCta={scrollToAuth} />
+
+      {/* ECOSYSTEM PREVIEW */}
+      <div ref={previewRef}>
+        <EcosystemPreview />
+      </div>
+
+      {/* ROLE SELECTION */}
+      <RoleSelection selected="worker" onSelect={() => {}} />
+
+      {/* TRUST & FEATURES */}
+      <TrustSection />
+
+      {/* AUTH */}
+      <div ref={authRef}>
+        <AuthForm step={step} onStepChange={setStep} />
+      </div>
+
+      {/* FOOTER */}
+      <footer className="border-t border-gray-100 bg-white py-8">
+        <div className="mx-auto max-w-7xl px-4 text-center">
+          <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
+            <Briefcase className="h-4 w-4" />
+            <span className="font-semibold">EventMan</span>
           </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">EventMan</h1>
-          <p className="text-blue-200 text-sm mt-1">Event Manpower Management</p>
+          <p className="mt-2 text-xs text-gray-400">
+            Ahmedabad&apos;s Event Workforce Platform &mdash; Professional manpower coordination
+          </p>
+          <p className="mt-1 text-[10px] text-gray-300">&copy; {new Date().getFullYear()} EventMan. All rights reserved.</p>
         </div>
-      </div>
-
-      {/* Login card */}
-      <div className="bg-white rounded-t-3xl px-6 pt-8 pb-10 shadow-2xl">
-        {step === "auth" && (
-          <form onSubmit={(e) => { e.preventDefault(); handleAuth(); }} className="space-y-5">
-            <h2 className="text-xl font-semibold text-gray-900">
-              {isSignUp ? "Create Account" : "Welcome Back"}
-            </h2>
-            <p className="text-sm text-gray-500 -mt-3">
-              {isSignUp ? "Sign up to get started" : "Sign in to continue"}
-            </p>
-
-            {/* Error */}
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-                <p className="text-sm text-red-700">{error}</p>
-              </div>
-            )}
-
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={e => { setEmail(e.target.value); setError(""); }}
-                  placeholder="you@example.com"
-                  autoComplete="email"
-                  className="w-full h-12 pl-10 pr-3 rounded-xl border border-gray-300 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-
-            {/* Password */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={e => { setPassword(e.target.value); setError(""); }}
-                  placeholder="Min 6 characters"
-                  autoComplete={isSignUp ? "new-password" : "current-password"}
-                  className="w-full h-12 pl-10 pr-10 rounded-xl border border-gray-300 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full h-12 rounded-xl bg-blue-600 text-white font-semibold text-base disabled:opacity-50 active:bg-blue-700 flex items-center justify-center gap-2 shadow-lg shadow-blue-200"
-            >
-              {loading ? (
-                <span className="flex items-center gap-2">
-                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  Please wait...
-                </span>
-              ) : (
-                <>{isSignUp ? "Create Account" : "Sign In"} <ArrowRight className="w-4 h-4" /></>
-              )}
-            </button>
-
-            {/* Toggle */}
-            <p className="text-center text-sm text-gray-500">
-              {isSignUp ? "Already have an account? " : "Don't have an account? "}
-              <button
-                type="button"
-                onClick={() => { setIsSignUp(!isSignUp); setError(""); }}
-                className="text-blue-600 font-semibold hover:underline"
-              >
-                {isSignUp ? "Sign In" : "Sign Up"}
-              </button>
-            </p>
-          </form>
-        )}
-
-        {step === "profile" && (
-          <form onSubmit={(e) => { e.preventDefault(); createProfile(); }} className="space-y-5">
-            <h2 className="text-xl font-semibold text-gray-900">Complete Profile</h2>
-            <p className="text-sm text-gray-500 -mt-3">Just a few more details</p>
-
-            {/* Error */}
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-                <p className="text-sm text-red-700">{error}</p>
-              </div>
-            )}
-
-            {/* Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Name</label>
-              <div className="relative">
-                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="text"
-                  value={name}
-                  onChange={e => { setName(e.target.value); setError(""); }}
-                  placeholder="Your full name"
-                  className="w-full h-12 pl-10 pr-3 rounded-xl border border-gray-300 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-
-            {/* Role selection */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">I want to join as</label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setRole("worker")}
-                  className={`h-14 rounded-xl border-2 flex flex-col items-center justify-center gap-1 transition-all ${
-                    role === "worker"
-                      ? "border-blue-600 bg-blue-50 text-blue-700"
-                      : "border-gray-200 bg-gray-50 text-gray-500"
-                  }`}
-                >
-                  <HardHat className="w-5 h-5" />
-                  <span className="text-xs font-semibold">Worker</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRole("organizer")}
-                  className={`h-14 rounded-xl border-2 flex flex-col items-center justify-center gap-1 transition-all ${
-                    role === "organizer"
-                      ? "border-blue-600 bg-blue-50 text-blue-700"
-                      : "border-gray-200 bg-gray-50 text-gray-500"
-                  }`}
-                >
-                  <Briefcase className="w-5 h-5" />
-                  <span className="text-xs font-semibold">Organizer</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full h-12 rounded-xl bg-blue-600 text-white font-semibold text-base disabled:opacity-50 active:bg-blue-700 flex items-center justify-center gap-2 shadow-lg shadow-blue-200"
-            >
-              {loading ? (
-                <span className="flex items-center gap-2">
-                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  Creating...
-                </span>
-              ) : (
-                "Continue"
-              )}
-            </button>
-          </form>
-        )}
-      </div>
+      </footer>
     </div>
   );
 }
