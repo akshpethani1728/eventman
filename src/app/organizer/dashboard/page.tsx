@@ -40,7 +40,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 export default function OrganizerDashboard() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [events, setEvents] = useState<(Event & {
-    applicantCount?: number; approvedCount?: number; pendingCount?: number; rejectedCount?: number;
+    applicantCount?: number; approvedCount?: number; pendingCount?: number; waitlistCount?: number; rejectedCount?: number;
     recentProfiles?: { avatar_url: string | null; full_name: string }[];
   })[]>([]);
   const [loading, setLoading] = useState(true);
@@ -69,10 +69,11 @@ export default function OrganizerDashboard() {
     const eventsWithCounts = await Promise.all(
       (evts || []).map(async (event) => {
         const { data: allApps } = await supabase
-          .from("applications").select("status, worker_id").eq("event_id", event.id);
+          .from("applications").select("status, notes, worker_id").eq("event_id", event.id);
         const apps = allApps || [];
         const approved = apps.filter(a => a.status === "approved");
-        const pending = apps.filter(a => a.status === "pending");
+        const pending = apps.filter(a => a.status === "pending" && a.notes !== "waitlisted");
+        const waitlisted = apps.filter(a => a.status === "pending" && a.notes === "waitlisted");
         const rejected = apps.filter(a => a.status === "rejected");
 
         let recentProfiles: { avatar_url: string | null; full_name: string }[] = [];
@@ -88,6 +89,7 @@ export default function OrganizerDashboard() {
           applicantCount: apps.length,
           approvedCount: approved.length,
           pendingCount: pending.length,
+          waitlistCount: waitlisted.length,
           rejectedCount: rejected.length,
           recentProfiles,
         };
@@ -344,12 +346,14 @@ export default function OrganizerDashboard() {
               const deadlineToday = event.application_deadline === todayStr;
               const deadlineMs = event.application_deadline ? new Date(event.application_deadline).getTime() - Date.now() : null;
               const deadlineSoon = deadlineMs !== null && deadlineMs > 0 && deadlineMs < 86400000 * 3;
+              const deadlinePassed = event.application_deadline ? new Date(event.application_deadline).getTime() <= Date.now() : false;
               const isUrgent = isToday || isTomorrow || (remaining <= 3 && event.status !== "full");
               const hasDanger = isToday || deadlineToday;
               const hasWarnings = isTomorrow || deadlineSoon || remaining <= 3;
               const isFilling = event.status === "published" || event.status === "filling";
               const needsApproval = (event.pendingCount || 0) > 0;
               const isFull = event.status === "full";
+              const hasWaitlisted = (event.waitlistCount || 0) > 0;
 
               return (
                 <div key={event.id}
@@ -500,6 +504,16 @@ export default function OrganizerDashboard() {
                       {event.status === "published" && (
                         <span className="text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
                           <CheckCircle className="w-3 h-3" /> Published — accepting apps
+                        </span>
+                      )}
+                      {deadlinePassed && (
+                        <span className="text-[10px] font-medium bg-gray-100 text-gray-500 border border-gray-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                          <Clock className="w-3 h-3" /> Deadline passed
+                        </span>
+                      )}
+                      {hasWaitlisted && (
+                        <span className="text-[10px] font-medium bg-purple-50 text-purple-700 border border-purple-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                          <Users className="w-3 h-3" /> {event.waitlistCount} waitlisted
                         </span>
                       )}
                     </div>

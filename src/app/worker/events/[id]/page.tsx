@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ArrowLeft, ArrowUpRight, MapPin, Calendar, Clock, Users, IndianRupee, Shirt, AlertCircle, User, Briefcase, Award, Star, ShieldCheck, CheckCircle, Hourglass, Phone, Timer, Info, ListChecks, XCircle, BadgeCheck } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, MapPin, Calendar, Clock, Users, IndianRupee, Shirt, AlertCircle, User, Briefcase, Award, Star, ShieldCheck, CheckCircle, Hourglass, Phone, Timer, Info, ListChecks, XCircle, BadgeCheck, ListPlus, ListMinus } from "lucide-react";
 import { toast } from "sonner";
 import type { Event, Application, Profile } from "@/lib/supabase/types";
+
+function isWaitlisted(app: Application) { return app.status === "pending" && app.notes === "waitlisted"; }
 
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -70,6 +72,29 @@ export default function EventDetailPage() {
     loadEvent();
   };
 
+  const handleJoinWaitlist = async () => {
+    setApplying(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setApplying(false); toast.error("Please login"); return; }
+    const { error } = await supabase.from("applications").insert({
+      event_id: id, worker_id: user.id, status: "pending", notes: "waitlisted",
+    });
+    setApplying(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Added to waitlist!");
+    loadEvent();
+  };
+
+  const handleLeaveWaitlist = async () => {
+    if (!application) return;
+    setApplying(true);
+    const { error } = await supabase.from("applications").delete().eq("id", application.id);
+    setApplying(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Left waitlist");
+    loadEvent();
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -94,6 +119,9 @@ export default function EventDetailPage() {
   const daysUntilEvent = Math.ceil(hoursUntilEvent / 24);
   const isEventUrgent = hoursUntilEvent > 0 && hoursUntilEvent < 24;
   const isEventToday = daysUntilEvent === 0;
+  const isFull = event ? (approvedCount >= event.worker_count) : false;
+  const deadlinePassed = event?.application_deadline ? new Date(event.application_deadline).getTime() <= timeNow : false;
+  const waitlisted = application ? isWaitlisted(application) : false;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -151,44 +179,49 @@ export default function EventDetailPage() {
         )}
 
         {/* Application status summary */}
-        {application && application.status !== "approved" && (
+        {application && application.status !== "approved" && !isWaitlisted(application) && (
           <div className={`mb-4 rounded-xl p-4 border ${
             application.status === "pending"
               ? "bg-amber-50 border-amber-100"
-              : application.status === "rejected"
-                ? "bg-gray-50 border-gray-200"
-                : "bg-gray-50 border-gray-200"
+              : "bg-gray-50 border-gray-200"
           }`}>
             <div className="flex items-center gap-2.5">
               {application.status === "pending" ? (
                 <div className="w-3 h-3 rounded-full bg-amber-400 animate-pulse shrink-0" />
-              ) : application.status === "rejected" ? (
-                <Info className="w-4 h-4 text-gray-400 shrink-0" />
               ) : (
                 <Info className="w-4 h-4 text-gray-400 shrink-0" />
               )}
               <div>
-                <p className={`text-sm font-semibold ${
-                  application.status === "pending" ? "text-amber-800" : "text-gray-600"
-                }`}>
+                <p className={`text-sm font-semibold ${application.status === "pending" ? "text-amber-800" : "text-gray-600"}`}>
                   {application.status === "pending" ? "Application Pending" : application.status === "rejected" ? "Not Selected" : "Cancelled"}
                 </p>
-                <p className={`text-xs mt-0.5 ${
-                  application.status === "pending" ? "text-amber-600" : "text-gray-500"
-                }`}>
+                <p className={`text-xs mt-0.5 ${application.status === "pending" ? "text-amber-600" : "text-gray-500"}`}>
                   {application.status === "pending"
                     ? "Waiting for organizer to review your application"
                     : application.status === "rejected"
-                      ? "The organizer chose another candidate for this position"
+                      ? "The organizer chose another candidate"
                       : "Your application has been withdrawn"}
                 </p>
               </div>
             </div>
-            {application.notes && (
+            {application.notes && !isWaitlisted(application) && (
               <div className="mt-2 pt-2 border-t border-gray-200/60 text-xs text-gray-600">
                 <span className="font-medium">Note:</span> {application.notes}
               </div>
             )}
+          </div>
+        )}
+
+        {/* Waitlisted status */}
+        {waitlisted && (
+          <div className="mb-4 rounded-xl p-4 border bg-purple-50 border-purple-100">
+            <div className="flex items-center gap-2.5">
+              <ListPlus className="w-5 h-5 text-purple-500 shrink-0" />
+              <div>
+                <p className="text-sm font-semibold text-purple-800">On Waitlist</p>
+                <p className="text-xs text-purple-600 mt-0.5">Waiting for a spot to open up &mdash; you&apos;ll be moved up if a selected worker becomes unavailable</p>
+              </div>
+            </div>
           </div>
         )}
 
@@ -200,8 +233,13 @@ export default function EventDetailPage() {
               {event.worker_count - approvedCount} of {event.worker_count} spots left
             </span>
           </div>
-          {event.application_deadline && (
+          {event.application_deadline && !deadlinePassed && (
             <p className="text-xs text-amber-700 mt-2">Apply by {new Date(event.application_deadline).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</p>
+          )}
+          {event.application_deadline && deadlinePassed && (
+            <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+              <Clock className="w-3 h-3" /> Applications closed on {new Date(event.application_deadline).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+            </p>
           )}
           {event.payment_info && (
             <p className="text-green-700 font-semibold text-sm flex items-center gap-1.5 mt-2"><IndianRupee className="w-4 h-4" />{event.payment_info}</p>
@@ -364,18 +402,12 @@ export default function EventDetailPage() {
           </div>
         )}
 
-        {/* Application Status — only when not already shown as hero */}
-        {application && application.status !== "approved" && application.status !== "pending" && (
-          <div className={`bg-white border rounded-xl p-5 mb-3 ${
-            application.status === "rejected" ? "border-gray-200" : "border-gray-200"
-          }`}>
+        {/* Application Status — only when not already shown as hero or waitlisted */}
+        {application && !isWaitlisted(application) && application.status !== "approved" && application.status !== "pending" && (
+          <div className="bg-white border rounded-xl p-5 mb-3 border-gray-200">
             <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wide mb-3">Application Status</h3>
             <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                application.status === "rejected"
-                  ? "bg-gray-100 text-gray-500"
-                  : "bg-gray-100 text-gray-500"
-              }`}>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-100 text-gray-500">
                 {application.status === "rejected" ? <XCircle className="w-5 h-5" /> : <Info className="w-5 h-5" />}
               </div>
               <div>
@@ -397,7 +429,32 @@ export default function EventDetailPage() {
       </main>
 
       {/* Bottom bar */}
-      {!application && (event.status === "published" || event.status === "filling") && (
+      {!application && deadlinePassed && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
+          <div className="max-w-lg mx-auto">
+            <div className="w-full h-14 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-500 font-medium text-sm gap-2">
+              <Clock className="w-4 h-4 text-gray-400" /> Applications Closed — deadline has passed
+            </div>
+          </div>
+        </div>
+      )}
+
+      {!application && !deadlinePassed && isFull && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
+          <div className="max-w-lg mx-auto">
+            <button onClick={handleJoinWaitlist} disabled={applying}
+              className="w-full h-12 rounded-xl bg-purple-600 text-white font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 shadow-md shadow-purple-600/20 flex items-center justify-center gap-2">
+              {applying ? (
+                <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
+              ) : (
+                <><ListPlus className="w-4 h-4" /> Join Waitlist</>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {!application && !deadlinePassed && !isFull && (event.status === "published" || event.status === "filling") && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
           <div className="max-w-lg mx-auto">
             <button onClick={handleApply} disabled={applying}
@@ -412,17 +469,7 @@ export default function EventDetailPage() {
         </div>
       )}
 
-      {!application && event.status === "full" && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
-          <div className="max-w-lg mx-auto">
-            <div className="w-full h-14 rounded-xl bg-gradient-to-r from-purple-50 to-violet-50 border border-purple-200 flex items-center justify-center text-purple-800 font-medium text-sm gap-2">
-              <Users className="w-4 h-4 text-purple-500" /> Event is full — all spots taken
-            </div>
-          </div>
-        </div>
-      )}
-
-      {!application && event.status === "closed" && (
+      {!application && !deadlinePassed && !isFull && event.status === "closed" && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
           <div className="max-w-lg mx-auto">
             <div className="w-full h-14 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-600 font-medium text-sm gap-2">
@@ -432,13 +479,28 @@ export default function EventDetailPage() {
         </div>
       )}
 
-      {application && application.status === "pending" && (
+      {application && application.status === "pending" && !isWaitlisted(application) && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
           <div className="max-w-lg mx-auto">
             <div className="w-full h-14 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-800 font-medium text-sm gap-2">
               <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
               Application submitted — waiting for organizer response
             </div>
+          </div>
+        </div>
+      )}
+
+      {waitlisted && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
+          <div className="max-w-lg mx-auto">
+            <button onClick={handleLeaveWaitlist} disabled={applying}
+              className="w-full h-12 rounded-xl border-2 border-purple-200 bg-purple-50 text-purple-700 font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+              {applying ? (
+                <span className="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin inline-block" />
+              ) : (
+                <><ListMinus className="w-4 h-4" /> Leave Waitlist</>
+              )}
+            </button>
           </div>
         </div>
       )}

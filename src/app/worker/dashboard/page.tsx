@@ -8,18 +8,21 @@ import {
   LogOut, MapPin, Calendar, Clock, Users, IndianRupee, Star, ShieldCheck,
   UtensilsCrossed, Car, Timer, TrendingUp, Zap, CheckCircle, BadgeCheck,
   XCircle, Hourglass, ArrowUpRight, Clock3, Send, AlertCircle, Sparkles,
-  Heart, Flame, Gauge, Bell, Phone, Info, ListChecks
+  Heart, Flame, Gauge, Bell, Phone, Info, ListChecks, ListPlus, ListMinus
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Profile, Event, Application } from "@/lib/supabase/types";
 
-type ApplicationStatusDisplay = "pending" | "approved" | "rejected" | "cancelled";
+function isWaitlisted(app: Application) { return app.status === "pending" && app.notes === "waitlisted"; }
+
+type ApplicationStatusDisplay = "pending" | "approved" | "rejected" | "cancelled" | "waitlisted";
 
 const STATUS_CONFIG: Record<ApplicationStatusDisplay, { label: string; badge: string; icon: any; accent: string; message: string }> = {
   pending:   { label: "Pending",   badge: "bg-amber-100 text-amber-700", icon: Hourglass,   accent: "from-amber-300 via-amber-400 to-orange-400", message: "Awaiting organizer response" },
   approved:  { label: "Selected",  badge: "bg-emerald-100 text-emerald-700", icon: CheckCircle, accent: "from-emerald-400 via-emerald-500 to-teal-500", message: "You're confirmed for this event" },
   rejected:  { label: "Not Selected", badge: "bg-gray-200 text-gray-600", icon: XCircle,    accent: "from-gray-300 via-gray-400 to-slate-400",  message: "Not selected this time" },
   cancelled: { label: "Cancelled", badge: "bg-gray-100 text-gray-400", icon: XCircle,    accent: "from-gray-200 via-gray-300 to-gray-300",  message: "Application withdrawn" },
+  waitlisted: { label: "Waitlisted", badge: "bg-purple-100 text-purple-700", icon: ListPlus, accent: "from-purple-300 via-purple-400 to-violet-400", message: "On waitlist — spot may open up" },
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -285,13 +288,35 @@ function DashboardContent() {
     loadData();
   };
 
+  const joinWaitlist = async (eventId: string) => {
+    setApplyingId(eventId);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setApplyingId(null); return; }
+    const { error } = await supabase.from("applications").insert({
+      event_id: eventId, worker_id: user.id, status: "pending", notes: "waitlisted",
+    });
+    setApplyingId(null);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Added to waitlist!");
+    loadData();
+  };
+
+  const leaveWaitlist = async (app: Application) => {
+    setApplyingId(app.event_id);
+    const { error } = await supabase.from("applications").delete().eq("id", app.id);
+    setApplyingId(null);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Removed from waitlist");
+    loadData();
+  };
+
   const signOut = async () => { await supabase.auth.signOut(); router.push("/login"); };
 
-  const appliedIds = new Set(events.filter(e => e.application && e.application.status !== "cancelled").map(e => e.id));
+  const appliedIds = new Set(events.filter(e => e.application && e.application.status !== "cancelled" && !isWaitlisted(e.application)).map(e => e.id));
   const allCategories = [...new Set(events.map(e => e.category).filter(Boolean))] as string[];
-  let browseEvents = events.filter(e => !e.application || e.application.status === "cancelled");
+  let browseEvents = events.filter(e => !e.application || e.application.status === "cancelled" || isWaitlisted(e.application));
   if (categoryFilter) browseEvents = browseEvents.filter(e => e.category === categoryFilter);
-  const appliedEvents = events.filter(e => e.application && e.application.status !== "cancelled");
+  const appliedEvents = events.filter(e => e.application && e.application.status !== "cancelled" && !isWaitlisted(e.application));
 
   const formatCount = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
 
@@ -453,6 +478,9 @@ function DashboardContent() {
                 const isNewlyPosted = hoursSinceCreated < 6;
                 const isFillingFast = fillPercent >= 70;
                 const isNearlyFull = remaining <= 3;
+                const isFull = remaining <= 0;
+                const deadlinePassed = event.application_deadline ? new Date(event.application_deadline).getTime() <= Date.now() : false;
+                const waitlisted = event.application ? isWaitlisted(event.application) : false;
                 const isTrusted = org?.is_trusted_organizer;
                 const orgStatus = org?.status;
                 const isProfileVerified = orgStatus === "trusted" || orgStatus === "basic_verified";
@@ -566,12 +594,27 @@ function DashboardContent() {
                             {CATEGORY_LABELS[event.category] || event.category}
                           </span>
                         )}
+                        {deadlinePassed && (
+                          <span className="text-[10px] font-bold bg-gray-500/10 text-gray-500 px-2 py-0.5 rounded-lg border border-gray-200/60">
+                            Deadline Passed
+                          </span>
+                        )}
+                        {!deadlinePassed && isFull && (
+                          <span className="text-[10px] font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-lg border border-purple-200/60">
+                            Full
+                          </span>
+                        )}
+                        {waitlisted && (
+                          <span className="text-[10px] font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-lg border border-purple-200/60">
+                            Waitlisted
+                          </span>
+                        )}
                         {isNewlyPosted && (
                           <span className="text-[10px] font-bold bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-2 py-0.5 rounded-lg shadow-md shadow-blue-500/30 animate-pulse">
                             New
                           </span>
                         )}
-                        {!isNewlyPosted && isNew && (
+                        {!isNewlyPosted && isNew && !deadlinePassed && (
                           <span className="text-[10px] font-bold bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-2 py-0.5 rounded-lg shadow-sm shadow-blue-500/20">
                             New
                           </span>
@@ -718,6 +761,33 @@ function DashboardContent() {
                           </span>
                         )}
                       </div>
+                      {deadlinePassed ? (
+                        <div className="h-10 px-4 rounded-xl bg-gray-100 text-gray-400 text-xs font-semibold flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5" /> Applications Closed
+                        </div>
+                      ) : waitlisted ? (
+                        <button
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); leaveWaitlist(event.application!); }}
+                          disabled={applyingId === event.id}
+                          className="h-10 px-5 rounded-xl font-semibold text-sm flex items-center gap-1.5 transition-all active:scale-95 shadow-sm bg-purple-100 text-purple-700 border border-purple-200 hover:bg-purple-200">
+                          {applyingId === event.id ? (
+                            <span className="w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <><ListMinus className="w-3.5 h-3.5" /> Leave Waitlist</>
+                          )}
+                        </button>
+                      ) : isFull ? (
+                        <button
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); joinWaitlist(event.id); }}
+                          disabled={applyingId === event.id}
+                          className="h-10 px-5 rounded-xl font-semibold text-sm flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-60 shadow-sm bg-purple-600 text-white shadow-purple-600/20 hover:shadow-lg hover:shadow-purple-600/30">
+                          {applyingId === event.id ? (
+                            <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <><ListPlus className="w-3.5 h-3.5" /> Join Waitlist</>
+                          )}
+                        </button>
+                      ) : (
                         <button
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); apply(event.id); }}
                           disabled={applyingId === event.id}
@@ -734,6 +804,7 @@ function DashboardContent() {
                           <><ArrowUpRight className="w-3.5 h-3.5" /> {event.application?.status === "cancelled" ? "Re-apply" : "Apply"}</>
                         )}
                       </button>
+                      )}
                     </div>
                   </Link>
                 );
@@ -763,7 +834,8 @@ function DashboardContent() {
           <div className="space-y-3">
             {appliedEvents.map((event, idx) => {
               const app = event.application!;
-              const cfg = STATUS_CONFIG[app.status as ApplicationStatusDisplay] || STATUS_CONFIG.pending;
+              const statusKey: ApplicationStatusDisplay = isWaitlisted(app) ? "waitlisted" : (app.status as ApplicationStatusDisplay);
+              const cfg = STATUS_CONFIG[statusKey] || STATUS_CONFIG.pending;
               const StatusIcon = cfg.icon;
               const org = event.organizer;
               const hoursUntil = (new Date(event.date).getTime() - Date.now()) / 3600000;
@@ -774,16 +846,18 @@ function DashboardContent() {
               return (
                 <Link key={event.id} href={`/worker/events/${event.id}`}
                   className={`block bg-white rounded-2xl border overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 active:scale-[0.99] animate-slide-up ${
-                    app.status === "approved"
-                      ? "border-emerald-200/80 shadow-emerald-500/5"
-                      : app.status === "rejected" || app.status === "cancelled"
-                        ? "border-gray-200/60 opacity-80"
-                        : "border-amber-200/60"
+                    isWaitlisted(app)
+                      ? "border-purple-200/80 shadow-purple-500/5"
+                      : app.status === "approved"
+                        ? "border-emerald-200/80 shadow-emerald-500/5"
+                        : app.status === "rejected" || app.status === "cancelled"
+                          ? "border-gray-200/60 opacity-80"
+                          : "border-amber-200/60"
                   }`}
                   style={{ animationDelay: `${idx * 50}ms`, animationFillMode: "both" }}>
 
                   {/* Accent bar — distinct per status */}
-                  <div className={`h-1.5 bg-gradient-to-r ${cfg.accent}`} />
+                  <div className={`h-1.5 bg-gradient-to-r ${isWaitlisted(app) ? "from-purple-300 via-purple-400 to-violet-400" : cfg.accent}`} />
 
                   <div className="p-4">
                     {/* Header: avatar, title, status badge */}
@@ -942,6 +1016,14 @@ function DashboardContent() {
                       </div>
                     )}
 
+                    {/* --- WAITLISTED: Calm purple info --- */}
+                    {isWaitlisted(app) && (
+                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-purple-50 border border-purple-100">
+                        <ListPlus className="w-4 h-4 text-purple-500 shrink-0" />
+                        <span className="text-xs text-purple-700">On waitlist — may get a spot if someone drops out</span>
+                      </div>
+                    )}
+
                     {/* --- CANCELLED: Clear neutral message --- */}
                     {app.status === "cancelled" && (
                       <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-100">
@@ -951,7 +1033,7 @@ function DashboardContent() {
                     )}
 
                     {/* Organizer info row */}
-                    {org && app.status !== "cancelled" && app.status !== "rejected" && (
+                    {org && !isWaitlisted(app) && app.status !== "cancelled" && app.status !== "rejected" && (
                       <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
                         <span className="text-[10px] text-gray-400">by</span>
                         <span className="text-xs text-gray-600 font-semibold truncate">{org.full_name}</span>
