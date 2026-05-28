@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ArrowLeft, Search, User, MapPin, Briefcase, Clock, Award, Filter, X, CheckCircle } from "lucide-react";
+import { ArrowLeft, Search, User, MapPin, Briefcase, Clock, Award, Filter, X, CheckCircle, ChevronRight, Star } from "lucide-react";
 import { Button } from "@/lib/design/Button";
 import { Card } from "@/lib/design/Card";
 import { Badge, StatusDot } from "@/lib/design/Badge";
 import { PageLoader, EmptyState } from "@/lib/design/Loading";
+import WorkerProfilePanel from "./WorkerProfilePanel";
 import type { Profile } from "@/lib/supabase/types";
 
 function computeCompletion(p: Profile): number {
@@ -47,6 +48,8 @@ export default function WorkerDatabasePage() {
   const [filters, setFilters] = useState({ gender: "", availability: "", city: "", skills: "" });
   const [availableOnly, setAvailableOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedWorker, setSelectedWorker] = useState<Profile | null>(null);
+  const [organizerId, setOrganizerId] = useState("");
   const router = useRouter();
   const supabase = createClient();
 
@@ -55,6 +58,7 @@ export default function WorkerDatabasePage() {
   const loadWorkers = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.push("/login"); return; }
+    setOrganizerId(user.id);
     const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
     if (!prof || prof.role !== "organizer") { router.push("/login"); return; }
     const { data } = await supabase.from("profiles").select("*").eq("role", "worker").order("full_name", { ascending: true });
@@ -157,20 +161,41 @@ export default function WorkerDatabasePage() {
             const completion = computeCompletion(w);
             const avail = w.availability ? AVAIL_CONFIG[w.availability] : null;
             return (
-              <Card key={w.id} padding="sm" hover>
+              <Card key={w.id} padding="sm" hover className="cursor-pointer transition-all duration-200 active:scale-[0.99] group"
+                onClick={() => setSelectedWorker(w)}>
                 <div className="flex items-start gap-3">
                   <div className="relative shrink-0">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-700 font-semibold text-sm group-hover:ring-2 group-hover:ring-blue-300 transition-all">
                       {w.full_name?.charAt(0) || "W"}
                     </div>
-                    {avail && <StatusDot className="absolute -bottom-0.5 -right-0.5 border-2 border-white" />}
+                    {avail && <StatusDot variant={
+                      w.availability === "available_today" || w.availability === "available" ? "green" :
+                      w.availability === "available_this_week" ? "blue" :
+                      w.availability === "weekends" ? "amber" :
+                      w.availability === "evenings" ? "purple" :
+                      w.availability === "busy" ? "red" : "gray"
+                    } className="absolute -bottom-0.5 -right-0.5 border-2 border-white" />}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-medium text-sm text-gray-900">{w.full_name}</p>
+                      <p className="font-medium text-sm text-gray-900 group-hover:text-blue-700 transition-colors">{w.full_name}</p>
                       {avail && (
-                        <span className={`inline-flex items-center gap-1 text-[9px] font-medium px-1.5 py-0.5 rounded-full border bg-${avail.badge}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${avail.dot}`} /> {avail.label}
+                        <span className={`inline-flex items-center gap-1 text-[9px] font-medium px-1.5 py-0.5 rounded-full border ${
+                          w.availability === "available_today" || w.availability === "available" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
+                          w.availability === "available_this_week" ? "bg-blue-50 text-blue-700 border-blue-200" :
+                          w.availability === "weekends" ? "bg-amber-50 text-amber-700 border-amber-200" :
+                          w.availability === "evenings" ? "bg-purple-50 text-purple-700 border-purple-200" :
+                          w.availability === "busy" ? "bg-red-50 text-red-700 border-red-200" :
+                          "bg-gray-50 text-gray-500 border-gray-200"
+                        }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${
+                            w.availability === "available_today" || w.availability === "available" ? "bg-emerald-500" :
+                            w.availability === "available_this_week" ? "bg-blue-500" :
+                            w.availability === "weekends" ? "bg-amber-500" :
+                            w.availability === "evenings" ? "bg-purple-500" :
+                            w.availability === "busy" ? "bg-red-500" :
+                            "bg-gray-400"
+                          }`} /> {avail.label}
                         </span>
                       )}
                     </div>
@@ -198,12 +223,21 @@ export default function WorkerDatabasePage() {
                       </Badge>
                     </div>
                   </div>
+                  <ChevronRight className="w-4 h-4 text-gray-300 mt-3 shrink-0 group-hover:text-gray-500 group-hover:translate-x-0.5 transition-all" />
                 </div>
               </Card>
             );
           })}
         </div>
       </main>
+
+      {selectedWorker && organizerId && (
+        <WorkerProfilePanel
+          worker={selectedWorker}
+          organizerId={organizerId}
+          onClose={() => setSelectedWorker(null)}
+        />
+      )}
     </div>
   );
 }
