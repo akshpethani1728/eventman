@@ -4,6 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { X, Wand2, Users, MapPin, Shirt, IndianRupee, ClipboardList, ArrowRight, Sparkles } from "lucide-react";
+import { useStableForm, useBodyScrollLock } from "@/lib/useStableForm";
 
 interface Props {
   onClose: () => void;
@@ -44,8 +45,29 @@ const DEFAULT_FORM = {
   contact_person_notes: "",
 };
 
+function SectionCard({ label, emoji, children, accentCls }: { label: string; emoji: string; children: React.ReactNode; accentCls: string }) {
+  return (
+    <div className="rounded-2xl bg-white border border-gray-200/80 overflow-hidden shadow-sm form-section">
+      <div className={`flex items-center gap-2 px-4 py-3 ${accentCls} border-b border-gray-100/50`}>
+        <span className="text-lg">{emoji}</span>
+        <span className="text-xs font-bold uppercase tracking-widest text-gray-500/80">{label}</span>
+      </div>
+      <div className="p-4 space-y-3">{children}</div>
+    </div>
+  );
+}
+
+function InputGroup({ children }: { children: React.ReactNode }) {
+  return <div className="grid grid-cols-2 gap-3">{children}</div>;
+}
+
+const inputCls = "w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all form-input scroll-mb-40";
+const dateCls = "w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all form-input scroll-mb-40";
+const selectCls = "w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all form-input scroll-mb-40";
+const textareaCls = "w-full h-36 px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 leading-relaxed resize-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none transition-all form-input scroll-mb-40";
+
 export default function CreateEventModal({ onClose, onCreated, template }: Props) {
-  const [form, setForm] = useState(template ? {
+  const { form, update } = useStableForm(template ? {
     ...DEFAULT_FORM,
     ...template,
     date: "",
@@ -58,9 +80,7 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
   const [publishAfter, setPublishAfter] = useState(true);
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
-
-  const update = (key: string, value: any) =>
-    setForm((prev: any) => ({ ...prev, [key]: value }));
+  useBodyScrollLock(true);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,23 +131,9 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
     onCreated();
   };
 
-  const SectionCard = ({ label, emoji, children, accentCls }: { label: string; emoji: string; children: React.ReactNode; accentCls: string }) => (
-    <div className="rounded-2xl bg-white border border-gray-200/80 overflow-hidden shadow-sm">
-      <div className={`flex items-center gap-2 px-4 py-3 ${accentCls} border-b border-gray-100/50`}>
-        <span className="text-lg">{emoji}</span>
-        <span className="text-xs font-bold uppercase tracking-widest text-gray-500/80">{label}</span>
-      </div>
-      <div className="p-4 space-y-3">{children}</div>
-    </div>
-  );
-
-  const InputGroup = ({ children }: { children: React.ReactNode }) => (
-    <div className="grid grid-cols-2 gap-3">{children}</div>
-  );
-
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-6 p-3 overflow-y-auto">
-      <div className="w-full max-w-xl">
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-6 p-3 overflow-y-auto modal-overlay">
+      <div className="w-full max-w-xl modal-body">
         {/* Header */}
         <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-t-2xl px-5 py-5 text-white">
           <div className="flex items-center justify-between mb-1">
@@ -163,7 +169,8 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
                 <input required value={form.title} onChange={e => update("title", e.target.value)}
                   placeholder="e.g., Wedding Staff Needed — Grand Palace"
                   maxLength={100}
-                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all" />
+                 
+                  className={inputCls} />
                 <div className="text-right mt-1">
                   <span className="text-[10px] text-gray-400">{form.title.length}/100</span>
                 </div>
@@ -172,7 +179,7 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
                 <div>
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Category</label>
                   <select value={form.category} onChange={e => update("category", e.target.value)}
-                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all">
+                    className={selectCls}>
                     <option value="">Select category</option>
                     {CATEGORIES.map(c => <option key={c} value={c}>{c.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}</option>)}
                   </select>
@@ -181,19 +188,20 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Workers Needed</label>
                   <input type="number" min={1} value={form.worker_count} onChange={e => update("worker_count", e.target.value)}
                     placeholder="Number of workers" required
-                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all" />
+                   
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all form-input" />
                 </div>
               </InputGroup>
               <InputGroup>
                 <div>
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Event Date</label>
                   <input required type="date" value={form.date} onChange={e => update("date", e.target.value)}
-                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all" />
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all form-input" />
                 </div>
                 <div>
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Start Time</label>
                   <input required type="time" value={form.time} onChange={e => update("time", e.target.value)}
-                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all" />
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all form-input" />
                 </div>
               </InputGroup>
               <InputGroup>
@@ -201,18 +209,18 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Display Date <span className="text-gray-400 normal-case font-normal">(e.g., 26,27,30 May)</span></label>
                   <input value={form.date_display} onChange={e => update("date_display", e.target.value)}
                     placeholder="e.g., 26,27,30 May"
-                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all" />
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all form-input" />
                 </div>
                 <div>
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">End Time <span className="text-gray-400 normal-case font-normal">(optional)</span></label>
                   <input type="time" value={form.end_time} onChange={e => update("end_time", e.target.value)}
-                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all" />
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all form-input" />
                 </div>
               </InputGroup>
               <div>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Application Deadline <span className="text-gray-400 normal-case font-normal">(optional)</span></label>
                 <input type="date" value={form.application_deadline} onChange={e => update("application_deadline", e.target.value)}
-                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all" />
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all form-input" />
               </div>
             </SectionCard>
 
@@ -224,14 +232,15 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
                   <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input value={form.location} onChange={e => update("location", e.target.value)}
                     placeholder="e.g., Grand Palace, SG Highway, Ahmedabad" required
-                    className="w-full h-11 pl-10 pr-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-teal-400 focus:ring-2 focus:ring-teal-100 outline-none transition-all" />
+                    className="w-full h-11 pl-10 pr-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-teal-400 focus:ring-2 focus:ring-teal-100 outline-none transition-all form-input" />
                 </div>
               </div>
               <div>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Google Maps Link <span className="text-gray-400 normal-case font-normal">(optional)</span></label>
                 <input value={form.google_maps_link} onChange={e => update("google_maps_link", e.target.value)}
                   placeholder="https://maps.google.com/..."
-                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-teal-400 focus:ring-2 focus:ring-teal-100 outline-none transition-all" />
+                 
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-teal-400 focus:ring-2 focus:ring-teal-100 outline-none transition-all form-input" />
               </div>
             </SectionCard>
 
@@ -241,7 +250,8 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
                 <div>
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Gender</label>
                   <select value={form.gender_requirement} onChange={e => update("gender_requirement", e.target.value)}
-                    className="w-full h-11 px-3 rounded-xl border border-gray-200 bg-white text-sm focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none transition-all">
+                   
+                  className="w-full h-11 px-3 rounded-xl border border-gray-200 bg-white text-sm focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none transition-all form-input">
                     <option value="">Any</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
@@ -251,13 +261,13 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Min Age</label>
                   <input type="number" min={0} value={form.min_age} onChange={e => update("min_age", e.target.value)}
                     placeholder="18"
-                    className="w-full h-11 px-3 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none transition-all" />
+                    className="w-full h-11 px-3 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none transition-all form-input" />
                 </div>
                 <div>
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Max Age</label>
                   <input type="number" min={0} value={form.max_age} onChange={e => update("max_age", e.target.value)}
                     placeholder="45"
-                    className="w-full h-11 px-3 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none transition-all" />
+                    className="w-full h-11 px-3 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none transition-all form-input" />
                 </div>
               </div>
 
@@ -265,7 +275,7 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Work Description</label>
                 <textarea value={form.work_description} onChange={e => update("work_description", e.target.value)}
                   placeholder="Describe what workers will actually do — be specific so they know what to expect.&#10;&#10;Example:&#10;• Greet guests at the entrance (4 hrs)&#10;• Guide attendees to their tables&#10;• Assist with food serving during dinner&#10;• Help with cleanup after the event"
-                  className="w-full h-36 px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 leading-relaxed resize-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none transition-all" />
+                  className="w-full h-36 px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 leading-relaxed resize-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none transition-all form-input" />
                 <p className="text-[10px] text-gray-400 mt-1.5 flex items-center gap-1">
                   <ClipboardList className="w-3 h-3" />
                   Clear description helps workers decide. Mention duration for each task.
@@ -276,7 +286,7 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Skills Required <span className="text-gray-400 normal-case font-normal">(comma separated)</span></label>
                 <input value={form.skill_requirements} onChange={e => update("skill_requirements", e.target.value)}
                   placeholder="e.g., Communication, Basic English, Hospitality"
-                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none transition-all" />
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none transition-all form-input" />
               </div>
             </SectionCard>
 
@@ -287,20 +297,20 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Dress Code</label>
                   <input value={form.dress_code} onChange={e => update("dress_code", e.target.value)}
                     placeholder="e.g., Black formal, White shirt"
-                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-green-400 focus:ring-2 focus:ring-green-100 outline-none transition-all" />
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-green-400 focus:ring-2 focus:ring-green-100 outline-none transition-all form-input" />
                 </div>
                 <div>
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Required Documents</label>
                   <input value={form.required_documents} onChange={e => update("required_documents", e.target.value)}
                     placeholder="e.g., Aadhaar, Photo"
-                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-green-400 focus:ring-2 focus:ring-green-100 outline-none transition-all" />
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-green-400 focus:ring-2 focus:ring-green-100 outline-none transition-all form-input" />
                 </div>
               </InputGroup>
               <div>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Grooming Notes <span className="text-gray-400 normal-case font-normal">(optional)</span></label>
                 <input value={form.grooming_notes} onChange={e => update("grooming_notes", e.target.value)}
                   placeholder="e.g., Clean shave, trimmed hair, no perfume"
-                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-green-400 focus:ring-2 focus:ring-green-100 outline-none transition-all" />
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-green-400 focus:ring-2 focus:ring-green-100 outline-none transition-all form-input" />
               </div>
             </SectionCard>
 
@@ -312,7 +322,7 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
                   <IndianRupee className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input value={form.payment_info} onChange={e => update("payment_info", e.target.value)}
                     placeholder="e.g., ₹500 per event, paid at venue"
-                    className="w-full h-11 pl-10 pr-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-100 outline-none transition-all" />
+                    className="w-full h-11 pl-10 pr-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-100 outline-none transition-all form-input" />
                 </div>
               </div>
               <div className="flex items-center gap-6">
@@ -335,7 +345,7 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Overtime Info <span className="text-gray-400 normal-case font-normal">(optional)</span></label>
                 <input value={form.overtime_info} onChange={e => update("overtime_info", e.target.value)}
                   placeholder="e.g., ₹100 per extra hour"
-                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-100 outline-none transition-all" />
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-amber-400 focus:ring-2 focus:ring-amber-100 outline-none transition-all form-input" />
               </div>
             </SectionCard>
 
@@ -345,19 +355,19 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Where to Report</label>
                 <textarea value={form.reporting_details} onChange={e => update("reporting_details", e.target.value)}
                   placeholder="e.g., Meet at the main entrance near the fountain. Look for the event manager in blue uniform."
-                  className="w-full h-20 px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 leading-relaxed resize-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none transition-all" />
+                  className="w-full h-20 px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 leading-relaxed resize-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none transition-all form-input" />
               </div>
               <div>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Special Instructions</label>
                 <textarea value={form.instructions} onChange={e => update("instructions", e.target.value)}
                   placeholder="e.g., Bring your own water bottle. Arrive 15 mins early for briefing."
-                  className="w-full h-20 px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 leading-relaxed resize-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none transition-all" />
+                  className="w-full h-20 px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 leading-relaxed resize-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none transition-all form-input" />
               </div>
               <div>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Contact Person <span className="text-gray-400 normal-case font-normal">(on-site)</span></label>
                 <input value={form.contact_person_notes} onChange={e => update("contact_person_notes", e.target.value)}
                   placeholder="e.g., Rajesh — 98765 43210"
-                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none transition-all" />
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none transition-all form-input" />
               </div>
             </SectionCard>
 

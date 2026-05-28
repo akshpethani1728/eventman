@@ -13,11 +13,52 @@ textarea {
   font-size: 16px;
 }
 
+input,
+textarea,
+select {
+  scroll-margin-bottom: 200px;
+}
+
 .safe-area-padding {
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
   padding-left: env(safe-area-inset-left, 0px);
   padding-right: env(safe-area-inset-right, 0px);
+}
+
+.modal-overlay {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.modal-body {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.form-input {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.form-section {
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .keyboard-safe {
+    padding-bottom: env(safe-area-inset-bottom, 16px);
+  }
 }
 
 @keyframes slide-up {

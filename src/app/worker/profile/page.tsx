@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -94,7 +94,7 @@ export default function WorkerProfilePage() {
     toast.success("Profile saved");
   };
 
-  const update = (key: string, value: string) => setForm(p => ({ ...p, [key]: value }));
+  const update = useCallback((key: string, value: string) => setForm(p => ({ ...p, [key]: value })), []);
 
   if (loading) return <PageLoader />;
 
@@ -164,7 +164,7 @@ export default function WorkerProfilePage() {
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input value={form.full_name} onChange={e => update("full_name", e.target.value)}
-                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm" />
+                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm form-input" />
               </div>
             </div>
             <div>
@@ -172,19 +172,19 @@ export default function WorkerProfilePage() {
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input value={form.phone} onChange={e => update("phone", e.target.value)} placeholder="9876543210"
-                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm" />
+                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm form-input" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Age</label>
                 <input type="number" value={form.age} onChange={e => update("age", e.target.value)}
-                  className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
+                  className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm form-input" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Gender</label>
                 <select value={form.gender} onChange={e => update("gender", e.target.value)}
-                  className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm">
+                  className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm form-input">
                   <option value="">Select</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
@@ -196,13 +196,13 @@ export default function WorkerProfilePage() {
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input value={form.city} onChange={e => update("city", e.target.value)} placeholder="Ahmedabad"
-                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm" />
+                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm form-input" />
               </div>
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Area</label>
               <input value={form.area} onChange={e => update("area", e.target.value)} placeholder="e.g., Navrangpura"
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
+                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm form-input" />
             </div>
           </Card>
 
@@ -215,7 +215,7 @@ export default function WorkerProfilePage() {
                 <Award className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input value={form.skills} onChange={e => update("skills", e.target.value)}
                   placeholder="e.g., Promotion, Event setup, Crowd management"
-                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm" />
+                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm form-input" />
               </div>
             </div>
             <div>
@@ -224,7 +224,7 @@ export default function WorkerProfilePage() {
                 <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input value={form.experience} onChange={e => update("experience", e.target.value)}
                   placeholder="e.g., 2 years in event management"
-                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm" />
+                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm form-input" />
               </div>
             </div>
             <div>
@@ -232,7 +232,7 @@ export default function WorkerProfilePage() {
               <div className="relative">
                 <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <select value={form.availability} onChange={e => update("availability", e.target.value)}
-                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm appearance-none">
+                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm appearance-none form-input">
                   {AVAILABILITY_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
@@ -241,7 +241,7 @@ export default function WorkerProfilePage() {
               <label className="block text-xs font-medium text-gray-600 mb-1">About / Bio</label>
               <textarea value={form.bio} onChange={e => update("bio", e.target.value)}
                 placeholder="Tell organizers about yourself..."
-                className="w-full h-24 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm resize-none" />
+                className="w-full h-24 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm resize-none form-input" />
             </div>
           </Card>
 

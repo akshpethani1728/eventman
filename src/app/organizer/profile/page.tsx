@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -25,6 +25,7 @@ export default function OrganizerProfilePage() {
   const [ratingCount, setRatingCount] = useState(0);
   const router = useRouter();
   const supabase = createClient();
+  const update = useCallback((key: string, value: string) => setForm(p => ({ ...p, [key]: value })), []);
 
   useEffect(() => {
     loadProfile();
@@ -159,8 +160,8 @@ export default function OrganizerProfilePage() {
               <label className="block text-xs font-medium text-gray-600 mb-1">Full Name</label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input value={form.full_name} onChange={e => setForm(p => ({ ...p, full_name: e.target.value }))}
-                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm" />
+                <input value={form.full_name} onChange={e => update("full_name", e.target.value)}
+                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm form-input" />
               </div>
             </div>
 
@@ -168,9 +169,9 @@ export default function OrganizerProfilePage() {
               <label className="block text-xs font-medium text-gray-600 mb-1">Phone</label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
+                <input value={form.phone} onChange={e => update("phone", e.target.value)}
                   placeholder="9876543210"
-                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm" />
+                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm form-input" />
               </div>
             </div>
 
@@ -178,17 +179,16 @@ export default function OrganizerProfilePage() {
               <label className="block text-xs font-medium text-gray-600 mb-1">City</label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))}
+                <input value={form.city} onChange={e => update("city", e.target.value)}
                   placeholder="Ahmedabad"
-                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm" />
+                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm form-input" />
               </div>
             </div>
-
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Area</label>
-              <input value={form.area} onChange={e => setForm(p => ({ ...p, area: e.target.value }))}
+              <input value={form.area} onChange={e => update("area", e.target.value)}
                 placeholder="e.g., Navrangpura"
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
+                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm form-input" />
             </div>
           </div>
 
@@ -197,15 +197,15 @@ export default function OrganizerProfilePage() {
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">About</h3>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Description / About</label>
-              <textarea value={form.bio} onChange={e => setForm(p => ({ ...p, bio: e.target.value }))}
+              <textarea value={form.bio} onChange={e => update("bio", e.target.value)}
                 placeholder="Tell workers about your organization..."
-                className="w-full h-20 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm resize-none" />
+                className="w-full h-20 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm resize-none form-input" />
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Logo URL</label>
-              <input value={form.avatar_url} onChange={e => setForm(p => ({ ...p, avatar_url: e.target.value }))}
+              <input value={form.avatar_url} onChange={e => update("avatar_url", e.target.value)}
                 placeholder="https://example.com/logo.png"
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm" />
+                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm form-input" />
               {form.avatar_url && (
                 <img src={form.avatar_url} alt="Preview" className="w-16 h-16 rounded-lg object-cover mt-2 border border-gray-200" />
               )}
