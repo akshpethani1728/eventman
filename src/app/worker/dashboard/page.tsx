@@ -15,7 +15,7 @@ import type { Profile, Event, Application } from "@/lib/supabase/types";
 
 function isWaitlisted(app: Application) { return app.status === "pending" && app.notes === "waitlisted"; }
 
-type ApplicationStatusDisplay = "pending" | "approved" | "rejected" | "cancelled" | "waitlisted";
+type ApplicationStatusDisplay = "pending" | "approved" | "rejected" | "cancelled" | "waitlisted" | "removed";
 
 const STATUS_CONFIG: Record<ApplicationStatusDisplay, { label: string; badge: string; icon: any; accent: string; message: string }> = {
   pending:   { label: "Pending",   badge: "bg-amber-100 text-amber-700", icon: Hourglass,   accent: "from-amber-300 via-amber-400 to-orange-400", message: "Awaiting organizer response" },
@@ -23,6 +23,7 @@ const STATUS_CONFIG: Record<ApplicationStatusDisplay, { label: string; badge: st
   rejected:  { label: "Not Selected", badge: "bg-gray-200 text-gray-600", icon: XCircle,    accent: "from-gray-300 via-gray-400 to-slate-400",  message: "Not selected this time" },
   cancelled: { label: "Cancelled", badge: "bg-gray-100 text-gray-400", icon: XCircle,    accent: "from-gray-200 via-gray-300 to-gray-300",  message: "Application withdrawn" },
   waitlisted: { label: "Waitlisted", badge: "bg-purple-100 text-purple-700", icon: ListPlus, accent: "from-purple-300 via-purple-400 to-violet-400", message: "On waitlist — spot may open up" },
+  removed: { label: "Removed", badge: "bg-red-100 text-red-700", icon: XCircle, accent: "from-red-300 via-red-400 to-rose-400", message: "Removed by organizer — you can re-apply" },
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -298,7 +299,7 @@ function DashboardContent() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setApplyingId(null); return; }
     const existing = events.find(e => e.id === eventId)?.application;
-    if (existing && (existing.status === "cancelled" || existing.status === "rejected")) {
+    if (existing && (existing.status === "cancelled" || existing.status === "rejected" || existing.status === "removed")) {
       const { error } = await supabase.from("applications").update({ status: "pending", notes: null, updated_at: new Date().toISOString() }).eq("id", existing.id);
       setApplyingId(null);
       if (error) { toast.error(error.message); return; }
@@ -343,22 +344,22 @@ function DashboardContent() {
 
   const allCategories = [...new Set(events.map(e => e.category).filter(Boolean))] as string[];
 
-  // Browse: events the worker has NOT actively applied to (no app, cancelled, or waitlisted)
+  // Browse: events the worker has not actively applied to (no app, cancelled, waitlisted, or removed)
   let browseEvents = events.filter(e => {
     const app = e.application;
     if (!app) return true;
     if (isWaitlisted(app)) return true;
-    if (app.status === "cancelled") return true;
+    if (app.status === "cancelled" || app.status === "removed") return true;
     return false;
   });
   if (categoryFilter) browseEvents = browseEvents.filter(e => e.category === categoryFilter);
 
-  // Applied: events the worker has a non-cancelled, non-waitlisted application for
+  // Applied: events the worker has a non-cancelled, non-waitlisted, non-removed application for
   const appliedEvents = events.filter(e => {
     const app = e.application;
     if (!app) return false;
     if (isWaitlisted(app)) return false;
-    if (app.status === "cancelled") return false;
+    if (app.status === "cancelled" || app.status === "removed") return false;
     return true;
   });
 
@@ -858,7 +859,7 @@ function DashboardContent() {
                         {applyingId === event.id ? (
                           <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         ) : (
-                          <><ArrowUpRight className="w-3.5 h-3.5" /> {event.application?.status === "cancelled" ? "Re-apply" : "Apply"}</>
+                          <><ArrowUpRight className="w-3.5 h-3.5" /> {event.application?.status === "cancelled" || event.application?.status === "removed" ? "Re-apply" : "Apply"}</>
                         )}
                       </button>
                       )}
@@ -907,7 +908,7 @@ function DashboardContent() {
                       ? "border-purple-200/80 shadow-purple-500/5"
                       : app.status === "approved"
                         ? "border-emerald-200/80 shadow-emerald-500/5"
-                        : app.status === "rejected" || app.status === "cancelled"
+                        : app.status === "rejected" || app.status === "cancelled" || app.status === "removed"
                           ? "border-gray-200/60 opacity-80"
                           : "border-amber-200/60"
                   }`}
@@ -1089,8 +1090,16 @@ function DashboardContent() {
                       </div>
                     )}
 
+                    {/* --- REMOVED: Organizer cancelled selection --- */}
+                    {app.status === "removed" && (
+                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-red-50 border border-red-100">
+                        <Info className="w-4 h-4 text-red-400 shrink-0" />
+                        <span className="text-xs text-red-600">{cfg.message}</span>
+                      </div>
+                    )}
+
                     {/* Organizer info row */}
-                    {org && !isWaitlisted(app) && app.status !== "cancelled" && app.status !== "rejected" && (
+                    {org && !isWaitlisted(app) && app.status !== "cancelled" && app.status !== "rejected" && app.status !== "removed" && (
                       <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
                         <span className="text-[10px] text-gray-400">by</span>
                         <span className="text-xs text-gray-600 font-semibold truncate">{org.full_name}</span>

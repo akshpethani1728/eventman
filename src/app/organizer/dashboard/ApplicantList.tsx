@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import {
   X, Check, X as XIcon, ChevronDown, ChevronUp, Phone, MapPin,
-  User, Award, Briefcase, Clock, Mail, Filter
+  User, Award, Briefcase, Clock, Mail, Filter, XCircle
 } from "lucide-react";
 import type { Event, Application, Profile } from "@/lib/supabase/types";
 
@@ -24,10 +24,11 @@ const STATUS_STYLES: Record<string, string> = {
   approved: "bg-green-100 text-green-800",
   rejected: "bg-red-100 text-red-800",
   cancelled: "bg-gray-100 text-gray-500",
+  removed: "bg-red-100 text-red-800",
 };
 
 const STATUS_LABELS: Record<string, string> = {
-  pending: "Applied", approved: "Approved", rejected: "Rejected", cancelled: "Cancelled",
+  pending: "Applied", approved: "Approved", rejected: "Rejected", cancelled: "Cancelled", removed: "Removed",
 };
 
 export default function ApplicantList({ event, onClose, onUpdate }: Props) {
@@ -95,6 +96,30 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
     }
 
     toast.success(`Worker ${status === "approved" ? "approved" : "rejected"}!`);
+    loadApplicants();
+    onUpdate();
+  };
+
+  const handleRemove = async (applicationId: string) => {
+    const { error } = await supabase
+      .from("applications").update({ status: "removed", updated_at: new Date().toISOString() }).eq("id", applicationId);
+    if (error) { toast.error(error.message); return; }
+
+    const app = applicants.find(a => a.id === applicationId);
+    if (app) {
+      await supabase.from("notifications").insert({
+        user_id: app.worker_id,
+        title: "Removed from Event",
+        message: `You have been removed from "${event.title}". The organizer cancelled your selection. You can re-apply if the event is still accepting applications.`,
+      });
+    }
+
+    // If event was full, free up a spot
+    if (event.status === "full") {
+      await supabase.from("events").update({ status: "filling", updated_at: new Date().toISOString() }).eq("id", event.id);
+    }
+
+    toast.success("Worker removed");
     loadApplicants();
     onUpdate();
   };
@@ -217,6 +242,12 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
                       <button onClick={() => updateStatus(app.id, "rejected")}
                         className="h-7 w-7 rounded-full bg-red-100 text-red-600 flex items-center justify-center hover:bg-red-200">
                         <XIcon className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                    {app.status === "approved" && (
+                      <button onClick={() => { if (confirm(`Remove ${app.profile.full_name} from this event?`)) handleRemove(app.id); }}
+                        className="h-7 px-2 rounded-full bg-red-50 text-red-600 text-[10px] font-medium flex items-center gap-1 hover:bg-red-100 border border-red-200">
+                        <XCircle className="w-3 h-3" /> Remove
                       </button>
                     )}
                   </div>
