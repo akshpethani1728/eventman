@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ArrowLeft, Save, User, Phone, MapPin, FileText, Star } from "lucide-react";
+import { ArrowLeft, Save, User, Phone, MapPin, FileText, Star, BadgeCheck, ShieldCheck, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
 import type { Profile } from "@/lib/supabase/types";
 
@@ -113,11 +113,28 @@ export default function OrganizerProfilePage() {
                 <User className="w-8 h-8 text-blue-600" />
               </div>
             )}
-            <p className="font-semibold text-lg">{profile?.full_name}</p>
+            <div className="flex items-center justify-center gap-2">
+              <p className="font-semibold text-lg">{profile?.full_name}</p>
+              {profile?.is_trusted_organizer && (
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.5 rounded-md">
+                  <BadgeCheck className="w-3 h-3" />
+                  Trusted
+                </span>
+              )}
+              {!profile?.is_trusted_organizer && profile?.status === "trusted" && (
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-blue-700 bg-blue-50 border border-blue-200/60 px-1.5 py-0.5 rounded-md">
+                  <ShieldCheck className="w-3 h-3" />
+                  Verified
+                </span>
+              )}
+              {!profile?.is_trusted_organizer && profile?.status === "basic_verified" && (
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-sky-700 bg-sky-50 border border-sky-200/60 px-1.5 py-0.5 rounded-md">
+                  <ShieldAlert className="w-3 h-3" />
+                  Basic Verified
+                </span>
+              )}
+            </div>
             <p className="text-sm text-gray-500 capitalize">{profile?.role}</p>
-            {profile?.is_trusted_organizer && (
-              <span className="text-xs text-blue-600 font-medium mt-1 inline-block">Trusted Organizer</span>
-            )}
             <div className="flex items-center justify-center gap-4 mt-3">
               <div className="text-center">
                 <p className="text-lg font-bold text-gray-900">{pastEventCount}</p>

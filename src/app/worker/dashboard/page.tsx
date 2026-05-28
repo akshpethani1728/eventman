@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -185,7 +185,13 @@ export default function WorkerDashboard() {
 
   const [unreadNotifCount, setUnreadNotifCount] = useState(0);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
+
+  useEffect(() => {
+    const tabParam = searchParams.get("tab");
+    if (tabParam === "applied") setTab("applied");
+  }, [searchParams]);
 
   useEffect(() => { loadData(); }, []);
 
@@ -448,8 +454,10 @@ export default function WorkerDashboard() {
                 const isFillingFast = fillPercent >= 70;
                 const isNearlyFull = remaining <= 3;
                 const isTrusted = org?.is_trusted_organizer;
+                const orgStatus = org?.status;
+                const isProfileVerified = orgStatus === "trusted" || orgStatus === "basic_verified";
                 const hasHighRating = orgRating >= 4.5;
-                const isVerified = isTrusted || hasHighRating;
+                const isVerified = isTrusted || isProfileVerified || hasHighRating;
                 const score = computePriorityScore(event);
 
                 let cardAccent = "border-gray-200/70";
@@ -518,12 +526,18 @@ export default function WorkerDashboard() {
                             {isTrusted && (
                               <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.5 rounded-md shadow-sm">
                                 <BadgeCheck className="w-2.5 h-2.5" />
+                                Trusted
+                              </span>
+                            )}
+                            {!isTrusted && isProfileVerified && (
+                              <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-blue-700 bg-blue-50 border border-blue-200/60 px-1.5 py-0.5 rounded-md shadow-sm">
+                                <ShieldCheck className="w-2.5 h-2.5" />
                                 Verified
                               </span>
                             )}
-                            {!isTrusted && hasHighRating && (
-                              <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-blue-600 bg-blue-50 border border-blue-200/60 px-1.5 py-0.5 rounded-md shadow-sm">
-                                <Star className="w-2.5 h-2.5 fill-blue-500" />
+                            {!isTrusted && !isProfileVerified && hasHighRating && (
+                              <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-indigo-600 bg-indigo-50 border border-indigo-200/60 px-1.5 py-0.5 rounded-md shadow-sm">
+                                <Star className="w-2.5 h-2.5 fill-indigo-500" />
                                 Top Rated
                               </span>
                             )}
@@ -534,7 +548,7 @@ export default function WorkerDashboard() {
                                 <StarRating rating={orgRating} size="xs" />
                                 <span className="text-[11px] font-bold text-gray-700">{orgRating}</span>
                               </div>
-                            ) : (
+                            ) : isTrusted || isProfileVerified ? null : (
                               <span className="text-[9px] text-gray-400">New organizer</span>
                             )}
                             {(event.organizer_past_events ?? 0) > 0 && (

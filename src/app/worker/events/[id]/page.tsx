@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ArrowLeft, ArrowUpRight, MapPin, Calendar, Clock, Users, IndianRupee, Shirt, AlertCircle, User, Briefcase, Award, Star, ShieldCheck, CheckCircle, Hourglass, Phone, Timer, Info, ListChecks, XCircle } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, MapPin, Calendar, Clock, Users, IndianRupee, Shirt, AlertCircle, User, Briefcase, Award, Star, ShieldCheck, CheckCircle, Hourglass, Phone, Timer, Info, ListChecks, XCircle, BadgeCheck } from "lucide-react";
 import { toast } from "sonner";
 import type { Event, Application, Profile } from "@/lib/supabase/types";
 
@@ -301,21 +301,36 @@ export default function EventDetailPage() {
             <div className="flex items-center gap-3">
               {organizer.avatar_url ? (
                 <img src={organizer.avatar_url} alt="" className={`w-11 h-11 rounded-full object-cover ring-2 shrink-0 ${
-                  showContact ? "ring-emerald-200" : "ring-gray-100"
+                  showContact ? "ring-emerald-200" : organizer.is_trusted_organizer ? "ring-emerald-200" : organizer.status === "trusted" || organizer.status === "basic_verified" ? "ring-blue-200" : "ring-gray-100"
                 }`} />
               ) : (
                 <div className={`w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-base shrink-0 ${
                   showContact
                     ? "bg-gradient-to-br from-emerald-500 to-teal-600"
-                    : "bg-gradient-to-br from-blue-500 to-blue-600"
+                    : organizer.is_trusted_organizer
+                      ? "bg-gradient-to-br from-emerald-500 to-teal-600"
+                      : organizer.status === "trusted" || organizer.status === "basic_verified"
+                        ? "bg-gradient-to-br from-blue-500 to-indigo-600"
+                        : "bg-gradient-to-br from-blue-500 to-blue-600"
                 }`}>
                   {organizer.full_name?.charAt(0) || "O"}
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 flex-wrap">
                   <p className="font-semibold text-sm truncate">{organizer.full_name}</p>
-                  {organizer.is_trusted_organizer && <ShieldCheck className="w-4 h-4 text-blue-500 shrink-0" />}
+                  {organizer.is_trusted_organizer && (
+                    <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.5 rounded-md">
+                      <BadgeCheck className="w-3 h-3" />
+                      Trusted
+                    </span>
+                  )}
+                  {!organizer.is_trusted_organizer && (organizer.status === "trusted" || organizer.status === "basic_verified") && (
+                    <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-blue-700 bg-blue-50 border border-blue-200/60 px-1.5 py-0.5 rounded-md">
+                      <ShieldCheck className="w-3 h-3" />
+                      Verified
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-2 mt-0.5">
                   {organizerRating > 0 && (

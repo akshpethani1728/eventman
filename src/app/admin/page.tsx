@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
-import { LogOut, Shield, Check, X, Ban, Users, Calendar } from "lucide-react";
+import { LogOut, Shield, Check, X, Ban, Users, Calendar, BadgeCheck, ShieldCheck, ShieldAlert, Crown } from "lucide-react";
 import type { Profile, Event } from "@/lib/supabase/types";
 
 type AdminTab = "users" | "events";
@@ -136,16 +136,25 @@ export default function AdminDashboard() {
               <div key={u.id} className="bg-white border border-gray-200 rounded-lg p-3">
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-sm truncate">{u.full_name}</p>
+                    <div className="flex items-center gap-1.5">
+                      <p className="font-medium text-sm truncate">{u.full_name}</p>
+                      {u.role === "organizer" && u.is_trusted_organizer && (
+                        <Crown className="w-3 h-3 text-emerald-500 shrink-0" />
+                      )}
+                    </div>
                     <p className="text-xs text-gray-500 truncate">
                       {u.role} · {u.email || u.phone || "—"}
                     </p>
                   </div>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full capitalize shrink-0 ${
+                  <span className={`inline-flex items-center gap-0.5 text-xs font-medium px-2 py-0.5 rounded-full capitalize shrink-0 ${
                     u.status === "trusted" ? "bg-green-100 text-green-700" :
-                    u.status === "basic_verified" ? "bg-blue-100 text-blue-700" :
+                    u.status === "basic_verified" ? "bg-sky-100 text-sky-700" :
                     "bg-gray-100 text-gray-600"
                   }`}>
+                    {u.is_trusted_organizer && <Crown className="w-3 h-3" />}
+                    {!u.is_trusted_organizer && u.status === "trusted" && <ShieldCheck className="w-3 h-3" />}
+                    {!u.is_trusted_organizer && u.status === "basic_verified" && <ShieldAlert className="w-3 h-3" />}
+                    {u.status === "unverified" && <Shield className="w-3 h-3" />}
                     {u.status.replace("_", " ")}
                   </span>
                 </div>
@@ -156,24 +165,26 @@ export default function AdminDashboard() {
                     className="h-8 px-2 rounded-lg border border-gray-200 bg-white text-xs flex-1 min-w-0"
                   >
                     <option value="unverified">Unverified</option>
-                    <option value="basic_verified">Verify Basic</option>
+                    <option value="basic_verified">Basic Verify</option>
                     <option value="trusted">Trusted</option>
                   </select>
                   {u.role === "organizer" && (
                     <button
                       onClick={() => toggleOrganizerTrust(u.user_id, u.is_trusted_organizer)}
-                      className={`h-8 px-3 rounded-lg text-xs font-medium shrink-0 ${
+                      className={`h-8 px-3 rounded-lg text-xs font-medium shrink-0 inline-flex items-center gap-1 ${
                         u.is_trusted_organizer
-                          ? "bg-amber-100 text-amber-700"
+                          ? "bg-emerald-100 text-emerald-700"
                           : "bg-gray-100 text-gray-600"
                       }`}
                     >
+                      <Crown className="w-3 h-3" />
                       {u.is_trusted_organizer ? "Trusted" : "Mark Trust"}
                     </button>
                   )}
                   <button
                     onClick={() => deleteUser(u.user_id)}
                     className="h-8 w-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center shrink-0"
+                    title="Delete user"
                   >
                     <Ban className="w-3.5 h-3.5" />
                   </button>
