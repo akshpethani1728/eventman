@@ -4,10 +4,10 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
-  Mail, User, Lock, ArrowRight, ArrowDown,
+  Mail, User, Lock, Eye, EyeOff, ArrowRight, ArrowDown,
   Briefcase, HardHat, Search, Calendar, Users,
   Bell, Shield, Zap, Star, CheckCircle,
-  Sparkles, MapPin, Clock, UserCheck,
+  Sparkles, MapPin, UserCheck,
   ChevronRight, TrendingUp, Building2, LayoutDashboard,
   RefreshCw, KeyRound,
 } from "lucide-react";
@@ -470,37 +470,47 @@ function TrustSection() {
 function OtpInput({ value, onChange, onComplete }: {
   value: string[];
   onChange: (v: string[]) => void;
-  onComplete: () => void;
+  onComplete: (code: string) => void;
 }) {
   const refs = useRef<(HTMLInputElement | null)[]>([]);
+  const valRef = useRef(value);
+  valRef.current = value;
 
   const handleChange = (i: number, ch: string) => {
     const digit = ch.replace(/\D/g, "").slice(-1);
     if (!digit && !ch) return;
-    const next = [...value];
+    const next = [...valRef.current];
     next[i] = digit;
+    valRef.current = next;
     onChange(next);
     if (digit && i < 5) refs.current[i + 1]?.focus();
-    if (digit && i === 5) onComplete();
+    if (digit && i === 5) onComplete(next.join(""));
   };
 
   const handleKeyDown = (i: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && !value[i] && i > 0) {
+    if (e.key === "Backspace" && !valRef.current[i] && i > 0) {
+      const next = [...valRef.current];
+      next[i - 1] = "";
+      valRef.current = next;
+      onChange(next);
       refs.current[i - 1]?.focus();
     }
-    if (e.key === "Enter") onComplete();
+    if (e.key === "Enter" && valRef.current.join("").length === 6) {
+      onComplete(valRef.current.join(""));
+    }
   };
 
   const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     const paste = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
     if (!paste) return;
     e.preventDefault();
-    const next = [...value];
+    const next = [...valRef.current];
     for (let i = 0; i < paste.length; i++) next[i] = paste[i];
+    valRef.current = next;
     onChange(next);
     const focusIdx = Math.min(paste.length, 5);
     refs.current[focusIdx]?.focus();
-    if (paste.length === 6) onComplete();
+    if (paste.length === 6) onComplete(next.join(""));
   };
 
   return (
@@ -526,10 +536,11 @@ function OtpInput({ value, onChange, onComplete }: {
   );
 }
 
-// ─── AUTH SECTION ────────────────────────────────────────────────
-function AuthForm({ step, onStepChange }: { step: "email" | "otp" | "profile"; onStepChange: (s: "email" | "otp" | "profile") => void }) {
+function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; onStepChange: (s: "auth" | "otp" | "profile") => void }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState<"worker" | "organizer">("worker");
@@ -539,7 +550,6 @@ function AuthForm({ step, onStepChange }: { step: "email" | "otp" | "profile"; o
   const inputRef = useRef<HTMLInputElement>(null);
   const signedInRef = useRef(false);
 
-  // Listen for auth state changes (magic link click or OTP verify)
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN" && session && !signedInRef.current) {
@@ -556,31 +566,66 @@ function AuthForm({ step, onStepChange }: { step: "email" | "otp" | "profile"; o
     return () => subscription.unsubscribe();
   }, [router, onStepChange]);
 
-  // Resend countdown
   useEffect(() => {
     if (resendTimer <= 0) return;
     const t = setInterval(() => setResendTimer((p) => p - 1), 1000);
     return () => clearInterval(t);
   }, [resendTimer]);
 
-  // Focus email input on mount
-  useEffect(() => { if (step === "email") inputRef.current?.focus(); }, [step]);
+  useEffect(() => { if (step === "auth") inputRef.current?.focus(); }, [step]);
 
-  const handleSendOtp = async () => {
+  const handleSignIn = async () => {
     setError("");
     const trimmed = email.trim();
     if (!trimmed) { setError("Please enter your email"); return; }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) { setError("Please enter a valid email"); return; }
+    if (!password) { setError("Please enter your password"); return; }
     setLoading(true);
-    const { error: sendError } = await supabase.auth.signInWithOtp({ email: trimmed });
+    const { data, error: signInError } = await supabase.auth.signInWithPassword({ email: trimmed, password });
     setLoading(false);
-    if (sendError) { setError(sendError.message); return; }
+    if (signInError) {
+      if (signInError.message.includes("Invalid login")) {
+        setError("Wrong email or password. Try again, or use Create Account.");
+      } else {
+        setError(signInError.message);
+      }
+      return;
+    }
+    const { data: profile } = await supabase
+      .from("profiles").select("role").eq("user_id", data.user?.id).maybeSingle();
+    if (profile) {
+      router.push(profile.role === "admin" ? "/admin" : `/${profile.role}/dashboard`);
+    } else {
+      onStepChange("profile");
+    }
+  };
+
+  const handleCreateAccount = async () => {
+    setError("");
+    const trimmed = email.trim();
+    if (!trimmed) { setError("Please enter your email"); return; }
+    if (!password || password.length < 6) { setError("Password must be at least 6 characters"); return; }
+    setLoading(true);
+    // Create user with password
+    const { error: signUpError } = await supabase.auth.signUp({ email: trimmed, password });
+    if (signUpError) {
+      setLoading(false);
+      if (signUpError.message.includes("already")) {
+        setError("An account with this email already exists. Please sign in.");
+      } else {
+        setError(signUpError.message);
+      }
+      return;
+    }
+    // Send OTP
+    const { error: otpError } = await supabase.auth.signInWithOtp({ email: trimmed });
+    setLoading(false);
+    if (otpError) { setError(otpError.message); return; }
     setResendTimer(30);
     onStepChange("otp");
   };
 
-  const handleVerifyOtp = async () => {
-    const token = otp.join("");
+  const handleVerifyOtp = async (prefilledCode?: string) => {
+    const token = prefilledCode || otp.join("");
     if (token.length < 6) { setError("Please enter the complete 6-digit code"); return; }
     setError("");
     setLoading(true);
@@ -600,7 +645,7 @@ function AuthForm({ step, onStepChange }: { step: "email" | "otp" | "profile"; o
       }
       return;
     }
-    // onAuthStateChange listener above handles the redirect / profile step
+    // onAuthStateChange listener handles redirect / profile step
   };
 
   const handleResend = async () => {
@@ -620,7 +665,7 @@ function AuthForm({ step, onStepChange }: { step: "email" | "otp" | "profile"; o
     if (!user) {
       setError("Session expired. Please login again.");
       setLoading(false);
-      onStepChange("email");
+      onStepChange("auth");
       return;
     }
     const { error: insertError } = await supabase.from("profiles").insert({
@@ -645,15 +690,15 @@ function AuthForm({ step, onStepChange }: { step: "email" | "otp" | "profile"; o
     <section className="bg-gradient-to-b from-gray-50 to-white py-20 md:py-28" id="auth">
       <div className="mx-auto max-w-md px-4 sm:px-6">
         <FadeSection>
-          {step === "email" && (
-            <form onSubmit={(e) => { e.preventDefault(); handleSendOtp(); }} className="space-y-5">
+          {step === "auth" && (
+            <form onSubmit={(e) => { e.preventDefault(); }} className="space-y-5">
               <div className="text-center">
                 <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-200/40">
                   <Mail className="h-7 w-7 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900">Get Started</h2>
+                <h2 className="text-2xl font-bold text-gray-900">Welcome to EventMan</h2>
                 <p className="mt-1 text-sm text-gray-500">
-                  Enter your email to receive a verification code
+                  Sign in or create your account
                 </p>
               </div>
 
@@ -679,20 +724,67 @@ function AuthForm({ step, onStepChange }: { step: "email" | "otp" | "profile"; o
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-base font-semibold text-white shadow-lg shadow-blue-200/50 transition-all active:scale-[0.98] disabled:opacity-60"
-              >
-                {loading ? (
-                  <span className="flex items-center gap-2">
-                    <RefreshCw className="h-4 w-4 animate-spin" />
-                    Sending code...
-                  </span>
-                ) : (
-                  <>Send Code <ArrowRight className="h-4 w-4" /></>
-                )}
-              </button>
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">Password</label>
+                <div className="relative">
+                  <Lock className={inputIconClass} />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={e => { setPassword(e.target.value); setError(""); }}
+                    placeholder="Your password"
+                    autoComplete="current-password"
+                    className="w-full h-12 pl-10 pr-10 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none transition-all focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <button
+                  type="button"
+                  disabled={loading}
+                  onClick={handleSignIn}
+                  className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-base font-semibold text-white shadow-lg shadow-blue-200/50 transition-all active:scale-[0.98] disabled:opacity-60"
+                >
+                  {loading ? (
+                    <span className="flex items-center gap-2">
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                      Signing in...
+                    </span>
+                  ) : (
+                    <>Sign In <ArrowRight className="h-4 w-4" /></>
+                  )}
+                </button>
+
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 border-t border-gray-200" />
+                  <span className="text-xs text-gray-400">or</span>
+                  <div className="flex-1 border-t border-gray-200" />
+                </div>
+
+                <button
+                  type="button"
+                  disabled={loading}
+                  onClick={handleCreateAccount}
+                  className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border-2 border-blue-600 bg-white text-base font-semibold text-blue-600 transition-all active:scale-[0.98] hover:bg-blue-50 disabled:opacity-60"
+                >
+                  {loading ? (
+                    <span className="flex items-center gap-2">
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                      Creating account...
+                    </span>
+                  ) : (
+                    <>Create Account <ArrowRight className="h-4 w-4" /></>
+                  )}
+                </button>
+              </div>
             </form>
           )}
 
@@ -758,7 +850,7 @@ function AuthForm({ step, onStepChange }: { step: "email" | "otp" | "profile"; o
               <p className="text-center text-xs text-gray-400">
                 <button
                   type="button"
-                  onClick={() => { onStepChange("email"); setError(""); setOtp(["", "", "", "", "", ""]); }}
+                  onClick={() => { onStepChange("auth"); setError(""); setOtp(["", "", "", "", "", ""]); }}
                   className="underline hover:text-gray-600"
                 >
                   Use a different email
@@ -924,7 +1016,7 @@ function HeroSection({ onCta }: { onCta: () => void }) {
 // ─── MAIN ────────────────────────────────────────────────────────
 export default function LoginPage() {
   const router = useRouter();
-  const [step, setStep] = useState<"email" | "otp" | "profile">("email");
+  const [step, setStep] = useState<"auth" | "otp" | "profile">("auth");
   const previewRef = useRef<HTMLDivElement>(null);
   const authRef = useRef<HTMLDivElement>(null);
 
