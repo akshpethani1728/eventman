@@ -38,6 +38,39 @@ const CATEGORY_COLORS: Record<string, string> = {
   security: "bg-red-500/10 text-red-600", other: "bg-gray-500/10 text-gray-600",
 };
 
+function computeCompletion(p: Profile): { percent: number; missing: string[] } {
+  const checks: [keyof Profile, string, number][] = [
+    ["avatar_url", "Profile photo", 15],
+    ["phone", "Phone number", 15],
+    ["age", "Age", 10],
+    ["gender", "Gender", 10],
+    ["city", "City", 10],
+    ["area", "Area", 10],
+    ["skills", "Skills", 15],
+    ["experience", "Experience", 10],
+    ["bio", "Bio", 10],
+  ];
+  let percent = 0;
+  const missing: string[] = [];
+  for (const [key, label, weight] of checks) {
+    const val = p[key];
+    if (key === "skills") {
+      if (Array.isArray(val) && val.length > 0) { percent += weight; } else { missing.push(label); }
+    } else if (val !== null && val !== undefined && val !== "") { percent += weight; } else { missing.push(label); }
+  }
+  return { percent, missing };
+}
+
+const AVAIL_CONFIG: Record<string, { label: string; dot: string; badge: string }> = {
+  available_today: { label: "Available Today", dot: "bg-emerald-500", badge: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  available_this_week: { label: "Available This Week", dot: "bg-blue-500", badge: "bg-blue-100 text-blue-700 border-blue-200" },
+  available: { label: "Available", dot: "bg-emerald-500", badge: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  weekends: { label: "Weekends", dot: "bg-amber-500", badge: "bg-amber-100 text-amber-700 border-amber-200" },
+  evenings: { label: "Evenings", dot: "bg-purple-500", badge: "bg-purple-100 text-purple-700 border-purple-200" },
+  busy: { label: "Busy", dot: "bg-red-500", badge: "bg-red-100 text-red-700 border-red-200" },
+  unavailable: { label: "Unavailable", dot: "bg-gray-400", badge: "bg-gray-100 text-gray-500 border-gray-200" },
+};
+
 function StarRating({ rating, size = "sm" }: { rating: number; size?: "sm" | "xs" }) {
   const cls = size === "sm" ? "w-3.5 h-3.5" : "w-3 h-3";
   return (
@@ -374,10 +407,13 @@ function DashboardContent() {
                     </span>
                   )}
                 </Link>
-                <Link href="/worker/profile" className="flex items-center gap-2 p-1.5 hover:bg-gray-100 rounded-xl transition-colors">
+                <Link href="/worker/profile" className="relative flex items-center gap-2 p-1.5 hover:bg-gray-100 rounded-xl transition-colors">
                   <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-[11px] shadow-sm">
                     {profile.full_name?.charAt(0) || "W"}
                   </div>
+                  {profile.availability && AVAIL_CONFIG[profile.availability] && (
+                    <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-[1.5px] border-white ${AVAIL_CONFIG[profile.availability].dot}`} />
+                  )}
                 </Link>
               </>
             )}
@@ -391,11 +427,53 @@ function DashboardContent() {
       <main className="max-w-lg mx-auto px-4 py-4 pb-28">
         {/* Welcome banner */}
         {profile && tab === "browse" && browseEvents.length > 0 && (
-          <div className="mb-4 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-4 text-white shadow-lg shadow-blue-600/20">
+          <div className="mb-3 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-4 text-white shadow-lg shadow-blue-600/20">
             <p className="text-sm opacity-90">Hey <span className="font-semibold">{profile.full_name?.split(" ")[0] || "there"}</span></p>
             <p className="text-lg font-bold mt-0.5">{browseEvents.length} event{browseEvents.length !== 1 ? "s" : ""} available</p>
-            <p className="text-xs opacity-75 mt-0.5">Find the perfect opportunity today</p>
+            <div className="flex items-center gap-2 mt-1.5">
+              {profile.availability && AVAIL_CONFIG[profile.availability] ? (
+                <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-lg bg-white/20 text-white`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${AVAIL_CONFIG[profile.availability].dot}`} />
+                  {AVAIL_CONFIG[profile.availability].label}
+                </span>
+              ) : (
+                <Link href="/worker/profile" className="text-[10px] opacity-75 underline">Set your availability</Link>
+              )}
+              {profile.availability === "busy" && <span className="text-[10px] opacity-75">— you&apos;re marked as unavailable</span>}
+            </div>
           </div>
+        )}
+
+        {/* Profile completion card */}
+        {profile && tab === "browse" && (
+          (() => {
+            const comp = computeCompletion(profile);
+            if (comp.percent === 100) return null;
+            return (
+              <div className="mb-3 bg-white border border-amber-200/80 rounded-xl p-3.5 shadow-sm">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs font-medium text-gray-700">Profile Strength</span>
+                  <span className={`text-xs font-bold ${comp.percent >= 50 ? "text-amber-600" : "text-gray-500"}`}>{comp.percent}%</span>
+                </div>
+                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className={`h-full rounded-full transition-all ${comp.percent >= 50 ? "bg-amber-500" : "bg-blue-500"}`} style={{ width: `${comp.percent}%` }} />
+                </div>
+                {comp.missing.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {comp.missing.slice(0, 3).map(m => (
+                      <span key={m} className="text-[10px] bg-amber-50 text-amber-700 border border-amber-200/60 px-2 py-0.5 rounded-lg">{m}</span>
+                    ))}
+                    {comp.missing.length > 3 && (
+                      <span className="text-[10px] text-gray-400">+{comp.missing.length - 3} more</span>
+                    )}
+                  </div>
+                )}
+                <Link href="/worker/profile" className="mt-2 inline-flex items-center gap-1 text-[10px] font-medium text-blue-600 hover:text-blue-700">
+                  <Sparkles className="w-3 h-3" /> Complete your profile
+                </Link>
+              </div>
+            );
+          })()
         )}
 
         {/* Tabs */}

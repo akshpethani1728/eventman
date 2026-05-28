@@ -7,11 +7,35 @@ import { createClient } from "@/lib/supabase/client";
 import {
   ArrowLeft, Users, Edit3, Copy, XCircle, CheckCircle, Trash2, MapPin, Calendar, Clock,
   Clock3, IndianRupee, BookTemplate, AlertTriangle, Check, X as XIcon,
-  ChevronDown, ChevronUp, Phone, Mail, Award, Briefcase, Filter, Star
+  ChevronDown, ChevronUp, Phone, Mail, Award, Briefcase, Filter, Star, Sparkles
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Event, Profile, Application } from "@/lib/supabase/types";
 import EditEventModal from "@/app/organizer/dashboard/EditEventModal";
+
+function computeCompletion(p: Profile): number {
+  const checks: [keyof Profile, number][] = [
+    ["avatar_url", 15], ["phone", 15], ["age", 10], ["gender", 10],
+    ["city", 10], ["area", 10], ["skills", 15], ["experience", 10], ["bio", 10],
+  ];
+  let percent = 0;
+  for (const [key, weight] of checks) {
+    const val = p[key];
+    if (key === "skills") { if (Array.isArray(val) && val.length > 0) percent += weight; }
+    else if (val !== null && val !== undefined && val !== "") percent += weight;
+  }
+  return percent;
+}
+
+const AVAIL_CONFIG: Record<string, { label: string; dot: string; badge: string }> = {
+  available_today: { label: "Available Today", dot: "bg-emerald-500", badge: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  available_this_week: { label: "Available This Week", dot: "bg-blue-500", badge: "bg-blue-100 text-blue-700 border-blue-200" },
+  available: { label: "Available", dot: "bg-emerald-500", badge: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  weekends: { label: "Weekends", dot: "bg-amber-500", badge: "bg-amber-100 text-amber-700 border-amber-200" },
+  evenings: { label: "Evenings", dot: "bg-purple-500", badge: "bg-purple-100 text-purple-700 border-purple-200" },
+  busy: { label: "Busy", dot: "bg-red-500", badge: "bg-red-100 text-red-700 border-red-200" },
+  unavailable: { label: "Unavailable", dot: "bg-gray-400", badge: "bg-gray-100 text-gray-500 border-gray-200" },
+};
 
 const STATUS_STYLES: Record<string, string> = {
   draft: "bg-gray-100 text-gray-600", published: "bg-blue-100 text-blue-700",
@@ -270,16 +294,32 @@ export default function OrganizerEventDetailPage() {
             {filteredApplicants.length === 0 && (
               <p className="text-center text-gray-400 text-sm py-6">No applicants</p>
             )}
-            {filteredApplicants.map(app => (
+            {filteredApplicants.map(app => {
+              const avail = app.profile.availability ? AVAIL_CONFIG[app.profile.availability] : null;
+              const completion = computeCompletion(app.profile);
+              return (
               <div key={app.id} className="border border-gray-200 rounded-xl overflow-hidden">
                 <div className="p-3">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                      <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm shrink-0">
-                        {app.profile.full_name?.charAt(0) || "W"}
+                      <div className="relative shrink-0">
+                        <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm">
+                          {app.profile.full_name?.charAt(0) || "W"}
+                        </div>
+                        {avail && (
+                          <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-[1.5px] border-white ${avail.dot}`} />
+                        )}
                       </div>
                       <div className="min-w-0">
-                        <p className="font-medium text-sm text-gray-900 truncate">{app.profile.full_name}</p>
+                        <div className="flex items-center gap-1.5">
+                          <p className="font-medium text-sm text-gray-900 truncate">{app.profile.full_name}</p>
+                          {avail && (
+                            <span className={`inline-flex items-center gap-0.5 text-[8px] font-medium px-1 py-0.5 rounded-full border ${avail.badge}`}>
+                              <span className={`w-1 h-1 rounded-full ${avail.dot}`} />
+                              {avail.label}
+                            </span>
+                          )}
+                        </div>
                         <p className="text-xs text-gray-500 truncate">
                           {app.profile.age && `${app.profile.age} yrs`}{app.profile.gender && ` · ${app.profile.gender}`}{app.profile.city && ` · ${app.profile.city}`}
                         </p>
@@ -315,12 +355,22 @@ export default function OrganizerEventDetailPage() {
                       {app.profile.bio && <p className="italic">{app.profile.bio}</p>}
                       <div className="grid grid-cols-2 gap-1">
                         {app.profile.experience && <span>Exp: {app.profile.experience}</span>}
-                        {app.profile.availability && <span className="capitalize">Avail: {app.profile.availability}</span>}
                         {app.profile.area && <span>Area: {app.profile.area}</span>}
                         {app.status === "approved" && app.profile.phone
                           ? <span className="flex items-center gap-1 text-green-700"><Phone className="w-3 h-3" />{app.profile.phone}</span>
                           : app.status !== "approved" && app.profile.phone && <span className="text-gray-400 italic">Contact hidden until approval</span>
                         }
+                      </div>
+                      {/* Profile strength */}
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <div className="flex-1 max-w-[80px] h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div className={`h-full rounded-full ${
+                            completion >= 80 ? "bg-emerald-500" : completion >= 50 ? "bg-amber-500" : "bg-blue-500"
+                          }`} style={{ width: `${completion}%` }} />
+                        </div>
+                        <span className={`text-[10px] font-medium ${
+                          completion >= 80 ? "text-emerald-600" : completion >= 50 ? "text-amber-600" : "text-gray-400"
+                        }`}>{completion}% profile</span>
                       </div>
                       {app.profile.skills && app.profile.skills.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-1">
@@ -340,7 +390,7 @@ export default function OrganizerEventDetailPage() {
                   )}
                 </div>
               </div>
-            ))}
+            )})}
           </div>
         </div>
 

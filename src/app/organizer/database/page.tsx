@@ -4,8 +4,37 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ArrowLeft, Search, User, MapPin, Phone, Mail, Briefcase, Clock, Award, Filter, X } from "lucide-react";
+import { ArrowLeft, Search, User, MapPin, Phone, Briefcase, Clock, Award, Filter, X, CheckCircle, AlertCircle, Sparkles } from "lucide-react";
 import type { Profile } from "@/lib/supabase/types";
+
+function computeCompletion(p: Profile): number {
+  const checks: [keyof Profile, number][] = [
+    ["avatar_url", 15], ["phone", 15], ["age", 10], ["gender", 10],
+    ["city", 10], ["area", 10], ["skills", 15], ["experience", 10], ["bio", 10],
+  ];
+  let percent = 0;
+  for (const [key, weight] of checks) {
+    const val = p[key];
+    if (key === "skills") { if (Array.isArray(val) && val.length > 0) percent += weight; }
+    else if (val !== null && val !== undefined && val !== "") percent += weight;
+  }
+  return percent;
+}
+
+const AVAIL_CONFIG: Record<string, { label: string; dot: string; badge: string }> = {
+  available_today: { label: "Available Today", dot: "bg-emerald-500", badge: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  available_this_week: { label: "Available This Week", dot: "bg-blue-500", badge: "bg-blue-100 text-blue-700 border-blue-200" },
+  available: { label: "Available", dot: "bg-emerald-500", badge: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  weekends: { label: "Weekends", dot: "bg-amber-500", badge: "bg-amber-100 text-amber-700 border-amber-200" },
+  evenings: { label: "Evenings", dot: "bg-purple-500", badge: "bg-purple-100 text-purple-700 border-purple-200" },
+  busy: { label: "Busy", dot: "bg-red-500", badge: "bg-red-100 text-red-700 border-red-200" },
+  unavailable: { label: "Unavailable", dot: "bg-gray-400", badge: "bg-gray-100 text-gray-500 border-gray-200" },
+};
+
+const AVAIL_SORT_KEY: Record<string, number> = {
+  available_today: 0, available_this_week: 1, available: 2,
+  weekends: 3, evenings: 4, busy: 5, unavailable: 6,
+};
 
 export default function WorkerDatabasePage() {
   const [workers, setWorkers] = useState<Profile[]>([]);
@@ -17,6 +46,7 @@ export default function WorkerDatabasePage() {
     city: "",
     skills: "",
   });
+  const [availableOnly, setAvailableOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const router = useRouter();
   const supabase = createClient();
@@ -50,7 +80,15 @@ export default function WorkerDatabasePage() {
     if (filters.availability && w.availability !== filters.availability) return false;
     if (filters.city && !w.city?.toLowerCase().includes(filters.city.toLowerCase())) return false;
     if (filters.skills && !w.skills?.some(s => s.toLowerCase().includes(filters.skills.toLowerCase()))) return false;
+    if (availableOnly) {
+      const avail = w.availability || "";
+      if (avail !== "available_today" && avail !== "available_this_week" && avail !== "available") return false;
+    }
     return true;
+  }).sort((a, b) => {
+    const aKey = AVAIL_SORT_KEY[a.availability || ""] ?? 99;
+    const bKey = AVAIL_SORT_KEY[b.availability || ""] ?? 99;
+    return aKey - bKey;
   });
 
   if (loading) {
@@ -71,7 +109,7 @@ export default function WorkerDatabasePage() {
 
       <main className="max-w-3xl mx-auto px-4 py-4">
         {/* Search */}
-        <form onSubmit={e => e.preventDefault()} className="flex gap-2 mb-4">
+        <form onSubmit={e => e.preventDefault()} className="flex gap-2 mb-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input value={query} onChange={e => setQuery(e.target.value)}
@@ -86,9 +124,25 @@ export default function WorkerDatabasePage() {
           </button>
         </form>
 
+        {/* Available only toggle */}
+        <div className="flex items-center gap-2 mb-3">
+          <button onClick={() => setAvailableOnly(!availableOnly)}
+            className={`h-7 px-3 rounded-lg text-[10px] font-medium transition-all flex items-center gap-1.5 ${
+              availableOnly
+                ? "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                : "bg-white text-gray-500 border border-gray-200"
+            }`}>
+            {availableOnly && <CheckCircle className="w-3 h-3" />}
+            Available only
+          </button>
+          {filtered.length < workers.length && (
+            <span className="text-[10px] text-gray-400">{filtered.length} match{filtered.length !== 1 ? "es" : ""}</span>
+          )}
+        </div>
+
         {/* Filters */}
         {showFilters && (
-          <form onSubmit={e => e.preventDefault()} className="bg-white border border-gray-200 rounded-xl p-3 mb-4 space-y-2">
+          <form onSubmit={e => e.preventDefault()} className="bg-white border border-gray-200 rounded-xl p-3 mb-3 space-y-2">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <select value={filters.gender} onChange={e => setFilters(f => ({ ...f, gender: e.target.value }))}
                 className="h-8 px-2 rounded-lg border border-gray-200 text-xs bg-white">
@@ -99,9 +153,12 @@ export default function WorkerDatabasePage() {
               <select value={filters.availability} onChange={e => setFilters(f => ({ ...f, availability: e.target.value }))}
                 className="h-8 px-2 rounded-lg border border-gray-200 text-xs bg-white">
                 <option value="">Any availability</option>
-                <option value="available">Available</option>
+                <option value="available_today">Available Today</option>
+                <option value="available_this_week">Available This Week</option>
+                <option value="available">Available (general)</option>
                 <option value="weekends">Weekends</option>
                 <option value="evenings">Evenings</option>
+                <option value="busy">Busy</option>
                 <option value="unavailable">Unavailable</option>
               </select>
               <input value={filters.city} onChange={e => setFilters(f => ({ ...f, city: e.target.value }))}
@@ -124,41 +181,72 @@ export default function WorkerDatabasePage() {
         )}
 
         <div className="space-y-2">
-          {filtered.map(w => (
-            <div key={w.id} className="bg-white border border-gray-200 rounded-xl p-3.5">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm shrink-0">
-                  {w.full_name?.charAt(0) || "W"}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium text-sm text-gray-900">{w.full_name}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    {w.age && `${w.age} yrs`}{w.gender && ` · ${w.gender}`}{w.city && ` · ${w.city}`}
-                  </p>
-                  <div className="flex flex-wrap gap-1 mt-1.5">
-                    {w.skills?.slice(0, 3).map((s, i) => (
-                      <span key={i} className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{s}</span>
-                    ))}
-                    {(w.skills?.length || 0) > 3 && (
-                      <span className="text-[10px] text-gray-400">+{w.skills!.length - 3}</span>
+          {filtered.map(w => {
+            const completion = computeCompletion(w);
+            const avail = w.availability ? AVAIL_CONFIG[w.availability] : null;
+            return (
+              <div key={w.id} className="bg-white border border-gray-200 rounded-xl p-3.5">
+                <div className="flex items-start gap-3">
+                  {/* Avatar with availability dot */}
+                  <div className="relative shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm">
+                      {w.full_name?.charAt(0) || "W"}
+                    </div>
+                    {avail && (
+                      <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-[2px] border-white ${avail.dot}`} />
                     )}
                   </div>
-                  <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1.5 text-xs text-gray-500">
-                    {w.experience && <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" />{w.experience}</span>}
-                    {w.availability && <span className="flex items-center gap-1 capitalize"><Clock className="w-3 h-3" />{w.availability}</span>}
-                    {w.area && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{w.area}</span>}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="font-medium text-sm text-gray-900">{w.full_name}</p>
+                      {/* Availability badge */}
+                      {avail && (
+                        <span className={`inline-flex items-center gap-1 text-[9px] font-medium px-1.5 py-0.5 rounded-full border ${avail.badge}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${avail.dot}`} />
+                          {avail.label}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {w.age && `${w.age} yrs`}{w.gender && ` · ${w.gender}`}{w.city && ` · ${w.city}`}
+                    </p>
+                    <div className="flex flex-wrap gap-1 mt-1.5">
+                      {w.skills?.slice(0, 3).map((s, i) => (
+                        <span key={i} className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{s}</span>
+                      ))}
+                      {(w.skills?.length || 0) > 3 && (
+                        <span className="text-[10px] text-gray-400">+{w.skills!.length - 3}</span>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1.5 text-xs text-gray-500">
+                      {w.experience && <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" />{w.experience}</span>}
+                      {w.area && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{w.area}</span>}
+                    </div>
+                    {/* Profile strength */}
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <div className="flex items-center gap-1.5 flex-1">
+                        <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden max-w-[100px]">
+                          <div className={`h-full rounded-full ${
+                            completion >= 80 ? "bg-emerald-500" : completion >= 50 ? "bg-amber-500" : "bg-blue-500"
+                          }`} style={{ width: `${completion}%` }} />
+                        </div>
+                        <span className={`text-[10px] font-medium ${
+                          completion >= 80 ? "text-emerald-600" : completion >= 50 ? "text-amber-600" : "text-gray-400"
+                        }`}>{completion}%</span>
+                      </div>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full shrink-0 ${
+                        w.status === "trusted" ? "bg-green-100 text-green-700" :
+                        w.status === "basic_verified" ? "bg-blue-100 text-blue-700" :
+                        "bg-gray-100 text-gray-500"
+                      }`}>
+                        {w.status.replace(/_/g, " ")}
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full shrink-0 ${
-                  w.status === "trusted" ? "bg-green-100 text-green-700" :
-                  w.status === "basic_verified" ? "bg-blue-100 text-blue-700" :
-                  "bg-gray-100 text-gray-500"
-                }`}>
-                  {w.status.replace(/_/g, " ")}
-                </span>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </main>
     </div>

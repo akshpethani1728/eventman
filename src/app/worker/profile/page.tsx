@@ -4,14 +4,59 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ArrowLeft, Save, User, Phone, Mail, MapPin, Calendar, Briefcase, Award } from "lucide-react";
+import { ArrowLeft, Save, User, Phone, MapPin, Award, Briefcase, CheckCircle, AlertCircle, Clock, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import type { Profile } from "@/lib/supabase/types";
+
+function computeCompletion(p: Profile): { percent: number; missing: string[] } {
+  const checks: [keyof Profile, string, number][] = [
+    ["avatar_url", "Profile photo", 15],
+    ["phone", "Phone number", 15],
+    ["age", "Age", 10],
+    ["gender", "Gender", 10],
+    ["city", "City", 10],
+    ["area", "Area", 10],
+    ["skills", "Skills", 15],
+    ["experience", "Experience", 10],
+    ["bio", "Bio", 10],
+  ];
+  let percent = 0;
+  const missing: string[] = [];
+  for (const [key, label, weight] of checks) {
+    const val = p[key];
+    if (key === "skills") {
+      if (Array.isArray(val) && val.length > 0) { percent += weight; } else { missing.push(label); }
+    } else if (val !== null && val !== undefined && val !== "") { percent += weight; } else { missing.push(label); }
+  }
+  return { percent, missing };
+}
+
+const AVAILABILITY_OPTIONS = [
+  { value: "", label: "Set your availability" },
+  { value: "available_today", label: "Available Today" },
+  { value: "available_this_week", label: "Available This Week" },
+  { value: "available", label: "Available (general)" },
+  { value: "weekends", label: "Weekends only" },
+  { value: "evenings", label: "Evenings only" },
+  { value: "busy", label: "Busy / Unavailable" },
+  { value: "unavailable", label: "Unavailable" },
+];
+
+const AVAILABILITY_COLORS: Record<string, string> = {
+  available_today: "bg-emerald-100 text-emerald-700",
+  available_this_week: "bg-blue-100 text-blue-700",
+  available: "bg-emerald-100 text-emerald-700",
+  weekends: "bg-amber-100 text-amber-700",
+  evenings: "bg-purple-100 text-purple-700",
+  busy: "bg-red-100 text-red-700",
+  unavailable: "bg-gray-100 text-gray-500",
+};
 
 export default function WorkerProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [completion, setCompletion] = useState({ percent: 0, missing: [] as string[] });
   const [form, setForm] = useState({
     full_name: "",
     phone: "",
@@ -43,6 +88,7 @@ export default function WorkerProfilePage() {
 
     if (!prof || prof.role !== "worker") { router.push("/login"); return; }
     setProfile(prof);
+    setCompletion(computeCompletion(prof));
     setForm({
       full_name: prof.full_name || "",
       phone: prof.phone || "",
@@ -78,6 +124,14 @@ export default function WorkerProfilePage() {
 
     setSaving(false);
     if (error) { toast.error(error.message); return; }
+
+    const updated = { ...profile, ...Object.fromEntries(Object.entries(form).map(([k, v]) => {
+      if (k === "age") return [k, v ? parseInt(v) : null];
+      if (k === "skills") return [k, v ? v.split(",").map(s => s.trim()).filter(Boolean) : null];
+      return [k, v || null];
+    })) } as Profile;
+    setProfile(updated);
+    setCompletion(computeCompletion(updated));
     toast.success("Profile saved");
   };
 
@@ -92,6 +146,8 @@ export default function WorkerProfilePage() {
     );
   }
 
+  const availColor = AVAILABILITY_COLORS[profile?.availability || ""] || "bg-gray-100 text-gray-500";
+
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       <header className="sticky top-0 bg-white border-b border-gray-200 z-10">
@@ -104,14 +160,58 @@ export default function WorkerProfilePage() {
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
+        {/* Profile Completion */}
+        {profile && (
+          <div className="bg-white border border-gray-200 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Profile Strength</span>
+              <span className={`text-sm font-bold ${
+                completion.percent >= 80 ? "text-emerald-600" : completion.percent >= 50 ? "text-amber-600" : "text-gray-500"
+              }`}>{completion.percent}%</span>
+            </div>
+            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div className={`h-full rounded-full transition-all duration-700 ${
+                completion.percent >= 80 ? "bg-emerald-500" : completion.percent >= 50 ? "bg-amber-500" : "bg-blue-500"
+              }`} style={{ width: `${completion.percent}%` }} />
+            </div>
+            {completion.missing.length > 0 && (
+              <div className="mt-2.5 space-y-1">
+                <p className="text-[10px] text-gray-500 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3 text-amber-500" />
+                  Add these to strengthen your profile:
+                </p>
+                <div className="flex flex-wrap gap-1">
+                  {completion.missing.map(m => (
+                    <span key={m} className="text-[10px] bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-lg">{m}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {completion.percent === 100 && (
+              <p className="mt-2 text-[10px] text-emerald-600 flex items-center gap-1">
+                <CheckCircle className="w-3 h-3" /> Complete profile — you look great to organizers!
+              </p>
+            )}
+          </div>
+        )}
+
         <form onSubmit={(e) => { e.preventDefault(); saveProfile(); }}>
           {/* Avatar placeholder */}
           <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
-            <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
-              <User className="w-8 h-8 text-blue-600" />
+            <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3 ring-2 ring-blue-200">
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt="" className="w-20 h-20 rounded-full object-cover" />
+              ) : (
+                <User className="w-8 h-8 text-blue-600" />
+              )}
             </div>
             <p className="font-semibold text-lg">{profile?.full_name}</p>
-            <p className="text-sm text-gray-500 capitalize">{profile?.role}</p>
+            <div className="flex items-center justify-center gap-1.5 mt-1">
+              <p className="text-sm text-gray-500 capitalize">{profile?.role}</p>
+              {profile?.availability && (
+                <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${availColor}`}>{AVAILABILITY_OPTIONS.find(o => o.value === profile.availability)?.label || profile.availability}</span>
+              )}
+            </div>
           </div>
 
           {/* Basic Info */}
@@ -198,14 +298,15 @@ export default function WorkerProfilePage() {
 
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Availability</label>
-              <select value={form.availability} onChange={e => update("availability", e.target.value)}
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm">
-                <option value="">Select availability</option>
-                <option value="available">Available</option>
-                <option value="weekends">Weekends only</option>
-                <option value="evenings">Evenings only</option>
-                <option value="unavailable">Not available</option>
-              </select>
+              <div className="relative">
+                <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <select value={form.availability} onChange={e => update("availability", e.target.value)}
+                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm appearance-none">
+                  {AVAILABILITY_OPTIONS.map(o => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <div>
