@@ -8,18 +8,18 @@ import {
   LogOut, MapPin, Calendar, Clock, Users, IndianRupee, Star, ShieldCheck,
   UtensilsCrossed, Car, Timer, TrendingUp, Zap, CheckCircle, BadgeCheck,
   XCircle, Hourglass, ArrowUpRight, Clock3, Send, AlertCircle, Sparkles,
-  Heart, Flame, Gauge, Bell
+  Heart, Flame, Gauge, Bell, Phone, Info, ListChecks
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Profile, Event, Application } from "@/lib/supabase/types";
 
 type ApplicationStatusDisplay = "pending" | "approved" | "rejected" | "cancelled";
 
-const STATUS_CONFIG: Record<ApplicationStatusDisplay, { label: string; bg: string; text: string; icon: any; border: string }> = {
-  pending:   { label: "Pending",   bg: "bg-amber-50", text: "text-amber-700", icon: Hourglass,  border: "border-amber-200" },
-  approved:  { label: "Approved",  bg: "bg-emerald-50", text: "text-emerald-700", icon: CheckCircle, border: "border-emerald-200" },
-  rejected:  { label: "Rejected",  bg: "bg-red-50", text: "text-red-700", icon: XCircle,  border: "border-red-200" },
-  cancelled: { label: "Cancelled", bg: "bg-gray-50", text: "text-gray-500", icon: XCircle, border: "border-gray-200" },
+const STATUS_CONFIG: Record<ApplicationStatusDisplay, { label: string; badge: string; icon: any; accent: string; message: string }> = {
+  pending:   { label: "Pending",   badge: "bg-amber-100 text-amber-700", icon: Hourglass,   accent: "from-amber-300 via-amber-400 to-orange-400", message: "Awaiting organizer response" },
+  approved:  { label: "Selected",  badge: "bg-emerald-100 text-emerald-700", icon: CheckCircle, accent: "from-emerald-400 via-emerald-500 to-teal-500", message: "You're confirmed for this event" },
+  rejected:  { label: "Not Selected", badge: "bg-gray-200 text-gray-600", icon: XCircle,    accent: "from-gray-300 via-gray-400 to-slate-400",  message: "Not selected this time" },
+  cancelled: { label: "Cancelled", badge: "bg-gray-100 text-gray-400", icon: XCircle,    accent: "from-gray-200 via-gray-300 to-gray-300",  message: "Application withdrawn" },
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -735,11 +735,11 @@ export default function WorkerDashboard() {
               <Send className="w-9 h-9 text-gray-300" />
             </div>
             <p className="text-lg font-bold text-gray-900">No applications yet</p>
-            <p className="text-sm text-gray-500 mt-1.5 leading-relaxed max-w-xs mx-auto">
-              Start exploring opportunities and apply to events that match your skills and availability.
+            <p className="text-sm text-gray-500 mt-2 leading-relaxed max-w-xs mx-auto">
+            You haven&apos;t applied to any events yet. Browse available opportunities and send your first application to get started.
             </p>
             <button onClick={() => setTab("browse")}
-              className="mt-5 h-11 px-6 rounded-xl bg-blue-600 text-white text-sm font-semibold shadow-md shadow-blue-600/20 hover:shadow-lg transition-all active:scale-[0.97]">
+              className="mt-6 h-11 px-6 rounded-xl bg-blue-600 text-white text-sm font-semibold shadow-md shadow-blue-600/20 hover:shadow-lg transition-all active:scale-[0.97]">
               Browse Events
             </button>
           </div>
@@ -754,20 +754,37 @@ export default function WorkerDashboard() {
               const org = event.organizer;
               const hoursUntil = (new Date(event.date).getTime() - Date.now()) / 3600000;
               const fillPercent = event.worker_count ? Math.min(100, Math.round(((event.approved_count || 0) / event.worker_count) * 100)) : 0;
+              const daysUntil = Math.ceil(hoursUntil / 24);
+              const isUrgent = hoursUntil > 0 && hoursUntil < 24;
 
               return (
                 <Link key={event.id} href={`/worker/events/${event.id}`}
-                  className="block bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 active:scale-[0.99] animate-slide-up"
+                  className={`block bg-white rounded-2xl border overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 active:scale-[0.99] animate-slide-up ${
+                    app.status === "approved"
+                      ? "border-emerald-200/80 shadow-emerald-500/5"
+                      : app.status === "rejected" || app.status === "cancelled"
+                        ? "border-gray-200/60 opacity-80"
+                        : "border-amber-200/60"
+                  }`}
                   style={{ animationDelay: `${idx * 50}ms`, animationFillMode: "both" }}>
-                  <div className={`h-2 ${app.status === "approved" ? "bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-500" : "bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400"}`} />
+
+                  {/* Accent bar — distinct per status */}
+                  <div className={`h-1.5 bg-gradient-to-r ${cfg.accent}`} />
 
                   <div className="p-4">
+                    {/* Header: avatar, title, status badge */}
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="flex items-center gap-2.5 min-w-0 flex-1">
                         {org?.avatar_url ? (
-                          <img src={org.avatar_url} alt="" className="w-10 h-10 rounded-xl object-cover ring-2 ring-gray-100 shrink-0" />
+                          <img src={org.avatar_url} alt="" className={`w-10 h-10 rounded-xl object-cover ring-2 shrink-0 ${
+                            app.status === "approved" ? "ring-emerald-200" : "ring-gray-100"
+                          }`} />
                         ) : (
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-700 font-bold text-sm shrink-0">
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm shrink-0 ${
+                            app.status === "approved"
+                              ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white"
+                              : "bg-gradient-to-br from-blue-100 to-blue-200 text-blue-700"
+                          }`}>
                             {org?.full_name?.charAt(0) || "E"}
                           </div>
                         )}
@@ -779,38 +796,14 @@ export default function WorkerDashboard() {
                           </div>
                         </div>
                       </div>
-                      <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold shadow-sm shrink-0 ${
-                        app.status === "approved"
-                          ? "bg-gradient-to-br from-emerald-50 to-green-50 text-emerald-700 border border-emerald-200"
-                          : "bg-gradient-to-br from-amber-50 to-orange-50 text-amber-700 border border-amber-200"
-                      }`}>
+                      <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold shadow-sm shrink-0 ${cfg.badge}`}>
                         <StatusIcon className="w-3.5 h-3.5" />
                         {cfg.label}
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between mb-2.5">
-                      {event.payment_info && (
-                        <div className="flex items-center gap-1 text-emerald-700 text-sm font-bold">
-                          <IndianRupee className="w-3.5 h-3.5" />
-                          {event.payment_info}
-                        </div>
-                      )}
-                      <div className={`flex items-center gap-1 text-xs font-medium ${hoursUntil > 24 ? "text-gray-600" : "text-red-600"}`}>
-                        <Clock className="w-3.5 h-3.5" />
-                        <span>
-                          {hoursUntil > 72
-                            ? `${Math.floor(hoursUntil / 24)} days away`
-                            : hoursUntil > 24
-                              ? `${Math.floor(hoursUntil / 24)}d ${Math.floor(hoursUntil % 24)}h away`
-                              : hoursUntil > 12
-                                ? `${Math.floor(hoursUntil)}h away`
-                                : "< 12 hours"}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-1.5 mb-3">
+                    {/* Date/time chips */}
+                    <div className="flex flex-wrap items-center gap-1.5 mb-2.5">
                       <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-gray-50 text-[10px] text-gray-600">
                         <Calendar className="w-3 h-3" />
                         {event.date_display || event.date}
@@ -825,15 +818,45 @@ export default function WorkerDashboard() {
                       )}
                     </div>
 
-                    {event.worker_count > 0 && (
+                    {/* Payment & countdown */}
+                    <div className="flex items-center justify-between mb-3">
+                      {event.payment_info && (
+                        <div className="flex items-center gap-1 text-emerald-700 text-sm font-bold">
+                          <IndianRupee className="w-3.5 h-3.5" />
+                          {event.payment_info}
+                        </div>
+                      )}
+                      {!event.payment_info && <div />}
+                      {app.status !== "cancelled" && app.status !== "rejected" && (
+                        <div className={`flex items-center gap-1 text-xs font-medium ${isUrgent ? "text-red-600" : "text-gray-500"}`}>
+                          <Clock className="w-3.5 h-3.5" />
+                          <span>
+                            {hoursUntil <= 0
+                              ? "Event started"
+                              : hoursUntil > 72
+                                ? `${Math.floor(hoursUntil / 24)} days away`
+                                : hoursUntil > 24
+                                  ? `${Math.floor(hoursUntil / 24)}d ${Math.floor(hoursUntil % 24)}h away`
+                                  : hoursUntil > 12
+                                    ? `${Math.floor(hoursUntil)}h away`
+                                    : hoursUntil > 0
+                                      ? "< 12 hours"
+                                      : "Event started"}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Progress bar */}
+                    {event.worker_count > 0 && (app.status === "pending" || app.status === "approved") && (
                       <div className="mb-3">
-                        <div className="flex items-center justify-between text-xs mb-1.5">
-                          <span className="text-gray-500">Staffing progress</span>
-                          <span className="font-medium text-gray-700">{event.approved_count || 0}/{event.worker_count}</span>
+                        <div className="flex items-center justify-between text-xs mb-1">
+                          <span className="text-gray-400">Staffing</span>
+                          <span className="font-medium text-gray-500">{event.approved_count || 0}/{event.worker_count}</span>
                         </div>
                         <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                           <div className={`h-full rounded-full transition-all duration-500 ${
-                            app.status === "approved"
+                            app.status === "approved" && fillPercent >= 80
                               ? "bg-gradient-to-r from-emerald-400 to-teal-500"
                               : "bg-gradient-to-r from-amber-400 to-orange-400"
                           }`} style={{ width: `${fillPercent}%` }} />
@@ -841,21 +864,92 @@ export default function WorkerDashboard() {
                       </div>
                     )}
 
-                    {org && (
-                      <div className="flex items-center gap-2 p-2 rounded-xl bg-gradient-to-r from-gray-50 to-white border border-gray-100 mb-3">
-                        <span className="text-[10px] text-gray-400 font-medium">by</span>
-                        <span className="text-xs text-gray-700 font-semibold truncate">{org.full_name}</span>
-                        {(event.organizer_rating ?? 0) > 0 && (
-                          <div className="flex items-center gap-0.5 ml-auto">
-                            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                            <span className="text-[10px] font-medium text-gray-600">{event.organizer_rating}</span>
+                    {/* Status-specific sections */}
+
+                    {/* --- APPROVED: Readiness section --- */}
+                    {app.status === "approved" && (
+                      <div className="space-y-2">
+                        {/* Countdown banner */}
+                        {hoursUntil > 0 && (
+                          <div className={`flex items-center gap-2 px-3 py-2 rounded-xl ${
+                            isUrgent
+                              ? "bg-red-50 text-red-700 border border-red-100"
+                              : "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                          }`}>
+                            <Timer className={`w-4 h-4 ${isUrgent ? "animate-pulse" : ""}`} />
+                            <span className="text-xs font-semibold">
+                              {isUrgent
+                                ? hoursUntil < 12
+                                  ? "Starting in less than 12 hours — be prepared!"
+                                  : `Starting in ${Math.floor(hoursUntil)}h`
+                                : `Event in ${Math.floor(hoursUntil / 24)} days`}
+                            </span>
                           </div>
                         )}
-                        {org.is_trusted_organizer && <ShieldCheck className="w-3.5 h-3.5 text-blue-500 shrink-0" />}
+
+                        {/* Contact information */}
+                        {org?.phone && (
+                          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white border border-emerald-100">
+                            <Phone className="w-4 h-4 text-emerald-500 shrink-0" />
+                            <span className="text-xs font-medium text-gray-700">Contact:</span>
+                            <span className="text-xs font-semibold text-gray-900">{org.phone}</span>
+                          </div>
+                        )}
+
+                        {/* Reporting info */}
+                        {event.reporting_details && (
+                          <div className="flex items-start gap-2 px-3 py-2 rounded-xl bg-gray-50 border border-gray-100">
+                            <Info className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                            <div className="text-xs text-gray-600 leading-relaxed">{event.reporting_details}</div>
+                          </div>
+                        )}
                       </div>
                     )}
 
+                    {/* --- PENDING: Status message --- */}
+                    {app.status === "pending" && (
+                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-amber-50 border border-amber-100">
+                        <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0" />
+                        <span className="text-xs text-amber-700 font-medium">{cfg.message}</span>
+                      </div>
+                    )}
 
+                    {/* --- REJECTED: Respectful message + reapply option --- */}
+                    {app.status === "rejected" && (
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-100">
+                          <Info className="w-4 h-4 text-gray-400 shrink-0" />
+                          <span className="text-xs text-gray-600">{cfg.message}</span>
+                        </div>
+                        <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-blue-50 border border-blue-100">
+                          <ArrowUpRight className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                          <span className="text-xs text-blue-700 font-medium">Browse other opportunities</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* --- CANCELLED: Clear neutral message --- */}
+                    {app.status === "cancelled" && (
+                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-100">
+                        <Info className="w-4 h-4 text-gray-400 shrink-0" />
+                        <span className="text-xs text-gray-500">{cfg.message}</span>
+                      </div>
+                    )}
+
+                    {/* Organizer info row */}
+                    {org && app.status !== "cancelled" && app.status !== "rejected" && (
+                      <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+                        <span className="text-[10px] text-gray-400">by</span>
+                        <span className="text-xs text-gray-600 font-semibold truncate">{org.full_name}</span>
+                        {(event.organizer_rating ?? 0) > 0 && (
+                          <div className="flex items-center gap-0.5 ml-auto">
+                            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                            <span className="text-[10px] font-medium text-gray-500">{event.organizer_rating}</span>
+                          </div>
+                        )}
+                        {org.is_trusted_organizer && <ShieldCheck className="w-3 h-3 text-blue-500 shrink-0" />}
+                      </div>
+                    )}
                   </div>
                 </Link>
               );

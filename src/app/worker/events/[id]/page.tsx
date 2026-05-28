@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ArrowLeft, MapPin, Calendar, Clock, Users, IndianRupee, Shirt, AlertCircle, User, Briefcase, Award, Star, ShieldCheck, CheckCircle, Hourglass, Phone } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, MapPin, Calendar, Clock, Users, IndianRupee, Shirt, AlertCircle, User, Briefcase, Award, Star, ShieldCheck, CheckCircle, Hourglass, Phone, Timer, Info, ListChecks, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import type { Event, Application, Profile } from "@/lib/supabase/types";
 
@@ -21,8 +21,16 @@ export default function EventDetailPage() {
 
   const [organizerRating, setOrganizerRating] = useState(0);
   const [organizerPastEvents, setOrganizerPastEvents] = useState(0);
+  const [timeNow, setTimeNow] = useState(Date.now());
 
   useEffect(() => { loadEvent(); }, [id]);
+
+  useEffect(() => {
+    if (application?.status === "approved") {
+      const interval = setInterval(() => setTimeNow(Date.now()), 60000);
+      return () => clearInterval(interval);
+    }
+  }, [application?.status]);
 
   const loadEvent = async () => {
     const { data: evt } = await supabase.from("events").select("*").eq("id", id).single();
@@ -64,17 +72,28 @@ export default function EventDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="w-10 h-10 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm text-gray-500">Loading event...</p>
-        </div>
+      <div className="min-h-screen bg-gray-50">
+        <header className="sticky top-0 bg-white border-b border-gray-200 z-10">
+          <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-gray-200 animate-pulse" />
+            <div className="w-28 h-3 rounded bg-gray-200 animate-pulse" />
+          </div>
+        </header>
+        <main className="max-w-lg mx-auto px-4 py-4 space-y-3">
+          <div className="h-36 rounded-xl bg-gray-100 animate-pulse" />
+          <div className="h-48 rounded-xl bg-gray-100 animate-pulse" />
+          <div className="h-28 rounded-xl bg-gray-100 animate-pulse" />
+        </main>
       </div>
     );
   }
   if (!event) return null;
 
   const showContact = application?.status === "approved";
+  const hoursUntilEvent = event ? (new Date(event.date).getTime() - timeNow) / 3600000 : 0;
+  const daysUntilEvent = Math.ceil(hoursUntilEvent / 24);
+  const isEventUrgent = hoursUntilEvent > 0 && hoursUntilEvent < 24;
+  const isEventToday = daysUntilEvent === 0;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -86,6 +105,93 @@ export default function EventDetailPage() {
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-4 pb-28">
+
+        {/* Approval Hero */}
+        {application?.status === "approved" && (
+          <div className="mb-4 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl p-5 text-white shadow-lg shadow-emerald-600/20 overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+            <div className="relative">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
+                  <CheckCircle className="w-6 h-6" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-emerald-100">Confirmation</p>
+                  <p className="text-xl font-bold">You&apos;re Selected!</p>
+                </div>
+              </div>
+              <p className="text-sm text-emerald-100 leading-relaxed">
+                You&apos;ve been approved for <span className="font-semibold text-white">{event.title}</span>
+              </p>
+              <div className="mt-3 flex flex-wrap gap-3">
+                <div className="flex items-center gap-1.5 text-xs text-emerald-100 bg-white/10 rounded-lg px-3 py-1.5">
+                  <Calendar className="w-3.5 h-3.5" />
+                  {event.date_display || new Date(event.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                </div>
+                <div className="flex items-center gap-1.5 text-xs text-emerald-100 bg-white/10 rounded-lg px-3 py-1.5">
+                  <Clock className="w-3.5 h-3.5" />
+                  {event.time}
+                </div>
+              </div>
+              {hoursUntilEvent > 0 && (
+                <div className={`mt-3 flex items-center gap-2 text-xs font-semibold ${
+                  isEventUrgent ? "text-amber-200" : "text-emerald-100"
+                } bg-white/10 rounded-xl px-3 py-2`}>
+                  <Timer className={`w-4 h-4 ${isEventUrgent ? "animate-pulse" : ""}`} />
+                  {isEventToday
+                    ? "Event starts today — get ready!"
+                    : isEventUrgent
+                      ? `Starting in ${Math.floor(hoursUntilEvent)}h — be prepared!`
+                      : `Event in ${daysUntilEvent} days`}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Application status summary */}
+        {application && application.status !== "approved" && (
+          <div className={`mb-4 rounded-xl p-4 border ${
+            application.status === "pending"
+              ? "bg-amber-50 border-amber-100"
+              : application.status === "rejected"
+                ? "bg-gray-50 border-gray-200"
+                : "bg-gray-50 border-gray-200"
+          }`}>
+            <div className="flex items-center gap-2.5">
+              {application.status === "pending" ? (
+                <div className="w-3 h-3 rounded-full bg-amber-400 animate-pulse shrink-0" />
+              ) : application.status === "rejected" ? (
+                <Info className="w-4 h-4 text-gray-400 shrink-0" />
+              ) : (
+                <Info className="w-4 h-4 text-gray-400 shrink-0" />
+              )}
+              <div>
+                <p className={`text-sm font-semibold ${
+                  application.status === "pending" ? "text-amber-800" : "text-gray-600"
+                }`}>
+                  {application.status === "pending" ? "Application Pending" : application.status === "rejected" ? "Not Selected" : "Cancelled"}
+                </p>
+                <p className={`text-xs mt-0.5 ${
+                  application.status === "pending" ? "text-amber-600" : "text-gray-500"
+                }`}>
+                  {application.status === "pending"
+                    ? "Waiting for organizer to review your application"
+                    : application.status === "rejected"
+                      ? "The organizer chose another candidate for this position"
+                      : "Your application has been withdrawn"}
+                </p>
+              </div>
+            </div>
+            {application.notes && (
+              <div className="mt-2 pt-2 border-t border-gray-200/60 text-xs text-gray-600">
+                <span className="font-medium">Note:</span> {application.notes}
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="bg-white border border-gray-200 rounded-xl p-5 mb-3">
           <h2 className="text-lg font-bold mb-1">{event.title}</h2>
           <div className="flex flex-wrap gap-2 mt-2">
@@ -183,13 +289,26 @@ export default function EventDetailPage() {
 
         {/* Organizer Info — contact hidden until approved */}
         {organizer && (
-          <div className="bg-white border border-gray-200 rounded-xl p-5 mb-3 space-y-3">
-            <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wide">Organized by</h3>
+          <div className={`bg-white border rounded-xl p-5 mb-3 space-y-3 ${
+            showContact ? "border-emerald-200 bg-gradient-to-br from-white to-emerald-50/30" : "border-gray-200"
+          }`}>
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wide">Organized by</h3>
+              {showContact && (
+                <span className="text-[10px] font-medium text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-lg">Contact Available</span>
+              )}
+            </div>
             <div className="flex items-center gap-3">
               {organizer.avatar_url ? (
-                <img src={organizer.avatar_url} alt="" className="w-11 h-11 rounded-full object-cover ring-2 ring-gray-100" />
+                <img src={organizer.avatar_url} alt="" className={`w-11 h-11 rounded-full object-cover ring-2 shrink-0 ${
+                  showContact ? "ring-emerald-200" : "ring-gray-100"
+                }`} />
               ) : (
-                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-base">
+                <div className={`w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-base shrink-0 ${
+                  showContact
+                    ? "bg-gradient-to-br from-emerald-500 to-teal-600"
+                    : "bg-gradient-to-br from-blue-500 to-blue-600"
+                }`}>
                   {organizer.full_name?.charAt(0) || "O"}
                 </div>
               )}
@@ -209,31 +328,53 @@ export default function EventDetailPage() {
                 </div>
                 {/* Contact — only visible after approval */}
                 {showContact && organizer.phone && (
-                  <div className="flex items-center gap-1.5 mt-1.5 text-xs text-gray-600 bg-green-50 px-2 py-1 rounded-lg">
-                    <Phone className="w-3 h-3 text-green-600" />
-                    <span className="font-medium">{organizer.phone}</span>
+                  <div className="flex items-center gap-2 mt-2 px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-100">
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shrink-0">
+                      <Phone className="w-3.5 h-3.5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-emerald-600 font-medium">Organizer Contact</p>
+                      <p className="text-sm font-semibold text-gray-900">{organizer.phone}</p>
+                    </div>
                   </div>
                 )}
                 {!showContact && (
-                  <p className="text-[10px] text-gray-400 mt-1.5">Contact revealed after approval</p>
+                  <div className="flex items-center gap-1.5 mt-2 px-3 py-1.5 rounded-lg bg-gray-50 border border-gray-100">
+                    <Info className="w-3 h-3 text-gray-400" />
+                    <p className="text-[10px] text-gray-400">Contact revealed after approval</p>
+                  </div>
                 )}
               </div>
             </div>
           </div>
         )}
 
-        {/* Application Status */}
-        {application && (
-          <div className="bg-white border border-gray-200 rounded-xl p-5 mb-3">
-            <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wide mb-2">Your Application</h3>
-            <div className="flex items-center gap-2 mb-2">
-              <span className={`inline-block w-2 h-2 rounded-full ${application.status === "approved" ? "bg-green-500" : application.status === "rejected" || application.status === "cancelled" ? "bg-red-500" : "bg-amber-500"}`} />
-              <span className="font-medium capitalize text-sm">{application.status}</span>
+        {/* Application Status — only when not already shown as hero */}
+        {application && application.status !== "approved" && application.status !== "pending" && (
+          <div className={`bg-white border rounded-xl p-5 mb-3 ${
+            application.status === "rejected" ? "border-gray-200" : "border-gray-200"
+          }`}>
+            <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wide mb-3">Application Status</h3>
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                application.status === "rejected"
+                  ? "bg-gray-100 text-gray-500"
+                  : "bg-gray-100 text-gray-500"
+              }`}>
+                {application.status === "rejected" ? <XCircle className="w-5 h-5" /> : <Info className="w-5 h-5" />}
+              </div>
+              <div>
+                <p className="font-semibold text-sm text-gray-900 capitalize">{application.status === "rejected" ? "Not Selected" : application.status}</p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {application.status === "rejected"
+                    ? "The organizer selected another candidate"
+                    : "Application has been withdrawn"}
+                </p>
+              </div>
             </div>
-            {application.notes && <p className="text-sm text-gray-600 mt-2">{application.notes}</p>}
-            {application.status === "approved" && (
-              <div className="mt-2 text-xs text-emerald-700 bg-emerald-50 px-3 py-2 rounded-lg flex items-center gap-1.5">
-                <CheckCircle className="w-3.5 h-3.5" /> You have been approved for this event
+            {application.notes && (
+              <div className="mt-3 pt-3 border-t border-gray-100 text-sm text-gray-600">
+                <span className="font-medium">Feedback:</span> {application.notes}
               </div>
             )}
           </div>
@@ -242,44 +383,90 @@ export default function EventDetailPage() {
 
       {/* Bottom bar */}
       {!application && (event.status === "published" || event.status === "filling") && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
           <div className="max-w-lg mx-auto">
             <button onClick={handleApply} disabled={applying}
-              className="w-full h-12 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 shadow-md shadow-blue-600/20">
-              {applying ? <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" /> : "Apply for this Event"}
+              className="w-full h-12 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 shadow-md shadow-blue-600/20 flex items-center justify-center gap-2">
+              {applying ? (
+                <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
+              ) : (
+                <><Briefcase className="w-4 h-4" /> Apply for this Event</>
+              )}
             </button>
           </div>
         </div>
       )}
 
       {!application && event.status === "full" && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
           <div className="max-w-lg mx-auto">
-            <div className="w-full h-12 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-700 font-medium text-sm">Event is full — no more applications accepted</div>
+            <div className="w-full h-14 rounded-xl bg-gradient-to-r from-purple-50 to-violet-50 border border-purple-200 flex items-center justify-center text-purple-800 font-medium text-sm gap-2">
+              <Users className="w-4 h-4 text-purple-500" /> Event is full — all spots taken
+            </div>
+          </div>
+        </div>
+      )}
+
+      {!application && event.status === "closed" && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
+          <div className="max-w-lg mx-auto">
+            <div className="w-full h-14 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-600 font-medium text-sm gap-2">
+              <Info className="w-4 h-4 text-gray-400" /> This event is no longer accepting applications
+            </div>
           </div>
         </div>
       )}
 
       {application && application.status === "pending" && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
           <div className="max-w-lg mx-auto">
-            <div className="w-full h-12 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-800 font-medium text-sm">
-              <Hourglass className="w-4 h-4 mr-1.5" /> Application pending — waiting for organizer response
+            <div className="w-full h-14 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-800 font-medium text-sm gap-2">
+              <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+              Application submitted — waiting for organizer response
             </div>
           </div>
         </div>
       )}
 
       {application && application.status === "approved" && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
           <div className="max-w-lg mx-auto">
-            <div className="w-full h-12 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-800 font-medium text-sm">
-              <CheckCircle className="w-4 h-4 mr-1.5" /> You are approved for this event
+            <div className={`w-full rounded-xl flex items-center justify-between px-5 py-3 ${
+              isEventUrgent
+                ? "bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200"
+                : "bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200"
+            }`}>
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-sm">
+                  <CheckCircle className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-emerald-800">You&apos;re Confirmed</p>
+                  <p className="text-[10px] text-emerald-600">{event.date_display || new Date(event.date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })} at {event.time}</p>
+                </div>
+              </div>
+              {hoursUntilEvent > 0 && (
+                <div className={`text-xs font-bold px-3 py-1.5 rounded-lg ${
+                  isEventUrgent ? "bg-red-100 text-red-700" : "bg-emerald-100 text-emerald-700"
+                }`}>
+                  {isEventToday ? "Today!" : isEventUrgent ? `${Math.floor(hoursUntilEvent)}h` : `${daysUntilEvent}d`}
+                </div>
+              )}
             </div>
           </div>
         </div>
       )}
 
+      {application && (application.status === "rejected" || application.status === "cancelled") && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
+          <div className="max-w-lg mx-auto">
+            <Link href="/worker/dashboard"
+              className="w-full h-12 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium text-base flex items-center justify-center gap-2 shadow-md shadow-blue-600/20">
+              <ArrowUpRight className="w-4 h-4" /> Browse More Events
+            </Link>
+          </div>
+        </div>
+      )}
 
     </div>
   );
