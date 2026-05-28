@@ -6,10 +6,12 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { ArrowLeft, Save, User, Phone, MapPin, FileText, Star, BadgeCheck, ShieldCheck, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
+import AvatarUpload from "@/components/AvatarUpload";
 import type { Profile } from "@/lib/supabase/types";
 
 export default function OrganizerProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [userId, setUserId] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
@@ -27,6 +29,16 @@ export default function OrganizerProfilePage() {
   const supabase = createClient();
   const update = useCallback((key: string, value: string) => setForm(p => ({ ...p, [key]: value })), []);
 
+  const handleAvatarUpload = useCallback(async (url: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { error } = await supabase.from("profiles").update({ avatar_url: url }).eq("user_id", user.id);
+    if (error) { toast.error(error.message); return; }
+    setForm(p => ({ ...p, avatar_url: url }));
+    setProfile(p => p ? { ...p, avatar_url: url } : p);
+    toast.success("Logo updated");
+  }, []);
+
   useEffect(() => {
     loadProfile();
   }, []);
@@ -34,6 +46,7 @@ export default function OrganizerProfilePage() {
   const loadProfile = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.push("/login"); return; }
+    setUserId(user.id);
 
     const { data: prof } = await supabase
       .from("profiles")
@@ -107,13 +120,11 @@ export default function OrganizerProfilePage() {
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
         <form onSubmit={(e) => { e.preventDefault(); saveProfile(); }}>
           <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
-            {form.avatar_url ? (
-              <img src={form.avatar_url} alt="Logo" className="w-20 h-20 rounded-full object-cover mx-auto mb-3 border-2 border-gray-200" />
-            ) : (
-              <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
-                <User className="w-8 h-8 text-blue-600" />
-              </div>
-            )}
+            <div className="flex justify-center mb-3">
+              {userId && (
+                <AvatarUpload currentUrl={profile?.avatar_url || null} userId={userId} onUpload={handleAvatarUpload} size={80} />
+              )}
+            </div>
             <div className="flex items-center justify-center gap-2">
               <p className="font-semibold text-lg">{profile?.full_name}</p>
               {profile?.is_trusted_organizer && (
@@ -200,15 +211,6 @@ export default function OrganizerProfilePage() {
               <textarea value={form.bio} onChange={e => update("bio", e.target.value)}
                 placeholder="Tell workers about your organization..."
                 className="w-full h-20 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm resize-none form-input" />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Logo URL</label>
-              <input value={form.avatar_url} onChange={e => update("avatar_url", e.target.value)}
-                placeholder="https://example.com/logo.png"
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm form-input" />
-              {form.avatar_url && (
-                <img src={form.avatar_url} alt="Preview" className="w-16 h-16 rounded-lg object-cover mt-2 border border-gray-200" />
-              )}
             </div>
           </div>
 
