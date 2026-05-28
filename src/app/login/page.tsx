@@ -549,11 +549,15 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
   const [resendTimer, setResendTimer] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const signedInRef = useRef(false);
+  const otpFlowRef = useRef(false);
+  const pendingPasswordRef = useRef("");
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "SIGNED_IN" && session && !signedInRef.current) {
         signedInRef.current = true;
+        // OTP verification flow handles password + redirect itself
+        if (otpFlowRef.current) return;
         const { data: profile } = await supabase
           .from("profiles").select("role").eq("user_id", session.user.id).maybeSingle();
         if (profile) {
@@ -604,22 +608,19 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
     const trimmed = email.trim();
     if (!trimmed) { setError("Please enter your email"); return; }
     if (!password || password.length < 6) { setError("Password must be at least 6 characters"); return; }
+    pendingPasswordRef.current = password;
     setLoading(true);
-    // Create user with password
-    const { error: signUpError } = await supabase.auth.signUp({ email: trimmed, password });
-    if (signUpError) {
-      setLoading(false);
-      if (signUpError.message.includes("already")) {
+    // signInWithOtp creates user if not exists + sends OTP in one call
+    const { error: otpError } = await supabase.auth.signInWithOtp({ email: trimmed });
+    setLoading(false);
+    if (otpError) {
+      if (otpError.message.includes("already")) {
         setError("An account with this email already exists. Please sign in.");
       } else {
-        setError(signUpError.message);
+        setError(otpError.message);
       }
       return;
     }
-    // Send OTP
-    const { error: otpError } = await supabase.auth.signInWithOtp({ email: trimmed });
-    setLoading(false);
-    if (otpError) { setError(otpError.message); return; }
     setResendTimer(30);
     onStepChange("otp");
   };
@@ -629,13 +630,15 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
     if (token.length < 6) { setError("Please enter the complete 6-digit code"); return; }
     setError("");
     setLoading(true);
+    otpFlowRef.current = true;
     const { error: verifyError } = await supabase.auth.verifyOtp({
       email: email.trim(),
       token,
       type: "email",
     });
-    setLoading(false);
     if (verifyError) {
+      otpFlowRef.current = false;
+      setLoading(false);
       if (verifyError.message.includes("expired")) {
         setError("Code expired. Request a new one.");
       } else if (verifyError.message.includes("Invalid") || verifyError.message.includes("otp")) {
@@ -645,7 +648,23 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
       }
       return;
     }
-    // onAuthStateChange listener handles redirect / profile step
+    // Set the password the user chose during registration
+    if (pendingPasswordRef.current) {
+      await supabase.auth.updateUser({ password: pendingPasswordRef.current });
+      pendingPasswordRef.current = "";
+    }
+    setLoading(false);
+    // Check profile and redirect
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: profile } = await supabase
+        .from("profiles").select("role").eq("user_id", user.id).maybeSingle();
+      if (profile) {
+        router.push(profile.role === "admin" ? "/admin" : `/${profile.role}/dashboard`);
+        return;
+      }
+    }
+    onStepChange("profile");
   };
 
   const handleResend = async () => {
@@ -1020,7 +1039,8 @@ export default function LoginPage() {
   const previewRef = useRef<HTMLDivElement>(null);
   const authRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  // Scroll to top on mount
+  useEffect(() => { window.scrollTo(0, 0); }, []);  useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         supabase.from("profiles").select("role").eq("user_id", session.user.id).maybeSingle().then(({ data }) => {
