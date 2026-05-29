@@ -3,13 +3,14 @@
 import { Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, Bell, User, Send } from "lucide-react";
+import { LayoutDashboard, Bell, User, Send, CreditCard } from "lucide-react";
 
 const NAV = [
   { href: "/worker/dashboard", label: "Home", icon: LayoutDashboard },
   { href: "/worker/dashboard?tab=applied", label: "Applied", icon: Send },
   { href: "/worker/notifications", label: "Alerts", icon: Bell },
   { href: "/worker/profile", label: "Profile", icon: User },
+  { href: "/worker/plans", label: "Plans", icon: CreditCard },
 ];
 
 function BottomNav() {

@@ -8,11 +8,12 @@ import {
   LogOut, MapPin, Calendar, Clock, Users, IndianRupee, ShieldCheck,
   UtensilsCrossed, Car, Timer, TrendingUp, Zap, CheckCircle, BadgeCheck,
   XCircle, Hourglass, ArrowUpRight, Clock3, Send, AlertCircle,
-  Heart, Flame, Gauge, Bell, Phone, Info, ListChecks, ListPlus, ListMinus
+  Heart, Flame, Gauge, Bell, Phone, Info, ListChecks, ListPlus, ListMinus, CreditCard
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Profile, Event, Application } from "@/lib/supabase/types";
 import { Logo } from "@/components/Logo";
+import { checkPlanStatus } from "@/lib/subscription";
 
 function isWaitlisted(app: Application) { return app.status === "pending" && app.notes === "waitlisted"; }
 function isRemovedByOrganizer(app: Application) { return app.status === "cancelled" && app.notes === "removed_by_organizer"; }
@@ -200,6 +201,15 @@ function DashboardContent() {
     const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
     if (!prof || prof.role !== "worker") { router.push("/login"); return; }
     setProfile(prof);
+
+    // Auto-expire trial/subscription if past end date
+    if (prof.plan_status === "trial" && prof.trial_end_date && new Date(prof.trial_end_date) <= new Date()) {
+      await supabase.from("profiles").update({ plan_status: "expired" }).eq("user_id", user.id);
+      prof.plan_status = "expired";
+    } else if (prof.plan_status === "active" && prof.subscription_end_date && new Date(prof.subscription_end_date) <= new Date()) {
+      await supabase.from("profiles").update({ plan_status: "expired" }).eq("user_id", user.id);
+      prof.plan_status = "expired";
+    }
 
     const { count } = await supabase.from("notifications").select("*", { count: "exact", head: true }).eq("user_id", user.id).eq("read", false);
     setUnreadNotifCount(count || 0);
@@ -410,6 +420,53 @@ function DashboardContent() {
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-4 pb-28">
+        {/* Subscription status banner */}
+        {profile && profile.plan_status && (
+          <div className={`mb-3 rounded-xl px-4 py-3 flex items-center justify-between ${
+            profile.plan_status === "active"
+              ? "bg-emerald-50 border border-emerald-200"
+              : profile.plan_status === "trial"
+                ? "bg-blue-50 border border-blue-200"
+                : "bg-amber-50 border border-amber-200"
+          }`}>
+            <div className="flex items-center gap-2">
+              {profile.plan_status === "active" ? (
+                <CreditCard className="w-4 h-4 text-emerald-600" />
+              ) : profile.plan_status === "trial" ? (
+                <Clock className="w-4 h-4 text-blue-600" />
+              ) : (
+                <AlertCircle className="w-4 h-4 text-amber-600" />
+              )}
+              <div>
+                <p className={`text-xs font-semibold ${
+                  profile.plan_status === "active" ? "text-emerald-800" : profile.plan_status === "trial" ? "text-blue-800" : "text-amber-800"
+                }`}>
+                  {profile.plan_status === "active" ? "Subscription Active" : profile.plan_status === "trial" ? "Free Trial" : "Plan Expired"}
+                </p>
+                {profile.plan_status === "trial" && profile.trial_end_date && (
+                  <p className={`text-[10px] ${profile.plan_status === "trial" ? "text-blue-600" : ""}`}>
+                    {Math.ceil((new Date(profile.trial_end_date).getTime() - Date.now()) / 86400000)} days remaining
+                  </p>
+                )}
+                {profile.plan_status === "active" && profile.subscription_end_date && (
+                  <p className="text-[10px] text-emerald-600">
+                    Expires {new Date(profile.subscription_end_date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                  </p>
+                )}
+              </div>
+            </div>
+            {profile.plan_status === "expired" && (
+              <Link href="/worker/plans" className="text-[10px] font-semibold text-amber-700 bg-amber-100 px-3 py-1 rounded-lg hover:bg-amber-200 transition-colors">
+                Renew
+              </Link>
+            )}
+            {(profile.plan_status === "trial" || profile.plan_status === "active") && (
+              <Link href="/worker/plans" className="text-[10px] font-medium text-gray-500 hover:text-gray-700 transition-colors">
+                Details
+              </Link>
+            )}
+          </div>
+        )}
         {/* Welcome banner */}
         {profile && tab === "browse" && browseEvents.length > 0 && (
           <div className="mb-3 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-4 text-white shadow-lg shadow-blue-600/20">

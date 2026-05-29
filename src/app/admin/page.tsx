@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
-import { LogOut, Shield, Ban, Users, Calendar, BadgeCheck, ShieldCheck, ShieldAlert, Crown, Trash2 } from "lucide-react";
+import { LogOut, Shield, Ban, Users, Calendar, BadgeCheck, ShieldCheck, ShieldAlert, Crown, Trash2, CreditCard, Clock } from "lucide-react";
 import { Button } from "@/lib/design/Button";
 import { Card, CardHeader } from "@/lib/design/Card";
 import { Badge, StatusDot } from "@/lib/design/Badge";
@@ -105,8 +105,18 @@ export default function AdminDashboard() {
                     <div className="flex items-center gap-1.5">
                       <p className="font-medium text-sm truncate">{u.full_name}</p>
                       {u.role === "organizer" && u.is_trusted_organizer && <Crown className="w-3 h-3 text-emerald-500 shrink-0" />}
+                      {u.role === "worker" && u.plan_status === "active" && <CreditCard className="w-3 h-3 text-blue-500 shrink-0" />}
+                      {u.role === "worker" && u.plan_status === "expired" && <Clock className="w-3 h-3 text-red-400 shrink-0" />}
                     </div>
                     <p className="text-xs text-gray-500 truncate">{u.role} · {u.email || u.phone || "—"}</p>
+                    {u.role === "worker" && u.plan_status && (
+                      <p className="text-[10px] text-gray-400 mt-0.5">
+                        Plan: {u.plan_status}
+                        {u.subscription_start_date && ` · Since ${new Date(u.subscription_start_date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`}
+                        {u.subscription_end_date && ` · Till ${new Date(u.subscription_end_date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`}
+                        {u.trial_end_date && u.plan_status === "trial" && ` · Trial ends ${new Date(u.trial_end_date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`}
+                      </p>
+                    )}
                   </div>
                   <Badge variant={u.status === "trusted" ? "trusted" : u.status === "basic_verified" ? "basicVerified" : "unverified"}>
                     {u.is_trusted_organizer && <Crown className="w-3 h-3" />}

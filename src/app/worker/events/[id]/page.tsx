@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ArrowLeft, ArrowUpRight, MapPin, Calendar, Clock, Users, IndianRupee, Shirt, AlertCircle, User, Briefcase, Award, ShieldCheck, CheckCircle, Hourglass, Phone, Timer, Info, ListChecks, XCircle, BadgeCheck, ListPlus, ListMinus } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, MapPin, Calendar, Clock, Users, IndianRupee, Shirt, AlertCircle, User, Briefcase, Award, ShieldCheck, CheckCircle, Hourglass, Phone, Timer, Info, ListChecks, XCircle, BadgeCheck, ListPlus, ListMinus, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/lib/design/Button";
 import { Card } from "@/lib/design/Card";
 import { Badge, StatusDot, Divider } from "@/lib/design/Badge";
 import { PageLoader } from "@/lib/design/Loading";
 import type { Event, Application, Profile } from "@/lib/supabase/types";
+import { checkPlanStatus } from "@/lib/subscription";
 
 function isWaitlisted(app: Application) { return app.status === "pending" && app.notes === "waitlisted"; }
 
@@ -26,6 +27,7 @@ export default function EventDetailPage() {
   const [applying, setApplying] = useState(false);
 
   const [organizerPastEvents, setOrganizerPastEvents] = useState(0);
+  const [workerProfile, setWorkerProfile] = useState<Profile | null>(null);
   const [timeNow, setTimeNow] = useState(Date.now());
 
   useEffect(() => { loadEvent(); }, [id]);
@@ -54,6 +56,8 @@ export default function EventDetailPage() {
 
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
+      const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
+      if (prof) setWorkerProfile(prof);
       const { data: app } = await supabase.from("applications").select("*").eq("event_id", id).eq("worker_id", user.id).maybeSingle();
       if (app) setApplication(app);
     }
@@ -61,6 +65,14 @@ export default function EventDetailPage() {
   };
 
   const handleApply = async () => {
+    if (workerProfile) {
+      const status = checkPlanStatus(workerProfile);
+      if (!status.canApply) {
+        toast.error("Your trial or subscription has expired. Purchase a plan to continue applying for events.");
+        router.push("/worker/plans");
+        return;
+      }
+    }
     setApplying(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { toast.error("Please login"); setApplying(false); return; }
@@ -74,6 +86,14 @@ export default function EventDetailPage() {
   };
 
   const handleJoinWaitlist = async () => {
+    if (workerProfile) {
+      const status = checkPlanStatus(workerProfile);
+      if (!status.canApply) {
+        toast.error("Your trial or subscription has expired. Purchase a plan to continue applying for events.");
+        router.push("/worker/plans");
+        return;
+      }
+    }
     setApplying(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setApplying(false); toast.error("Please login"); return; }
@@ -100,6 +120,8 @@ export default function EventDetailPage() {
   if (!event) return null;
 
   const showContact = application?.status === "approved";
+  const planCheck = workerProfile ? checkPlanStatus(workerProfile) : null;
+  const canApply = planCheck?.canApply ?? true;
   const hoursUntilEvent = event ? (new Date(event.date).getTime() - timeNow) / 3600000 : 0;
   const daysUntilEvent = Math.ceil(hoursUntilEvent / 24);
   const isEventUrgent = hoursUntilEvent > 0 && hoursUntilEvent < 24;
@@ -418,7 +440,7 @@ export default function EventDetailPage() {
         </div>
       )}
 
-      {!application && !deadlinePassed && isFull && (
+      {!application && !deadlinePassed && isFull && canApply && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
           <div className="max-w-lg mx-auto">
             <button onClick={handleJoinWaitlist} disabled={applying}
@@ -433,7 +455,17 @@ export default function EventDetailPage() {
         </div>
       )}
 
-      {!application && !deadlinePassed && !isFull && (event.status === "published" || event.status === "filling") && (
+      {!application && !deadlinePassed && isFull && !canApply && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
+          <div className="max-w-lg mx-auto">
+            <Link href="/worker/plans" className="w-full h-12 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-medium text-base active:scale-[0.98] transition-all shadow-md shadow-amber-600/20 flex items-center justify-center gap-2">
+              <CreditCard className="w-4 h-4" /> Subscribe to Join Waitlist
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {!application && !deadlinePassed && !isFull && (event.status === "published" || event.status === "filling") && canApply && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
           <div className="max-w-lg mx-auto">
             <button onClick={handleApply} disabled={applying}
@@ -444,6 +476,16 @@ export default function EventDetailPage() {
                 <><Briefcase className="w-4 h-4" /> Apply for this Event</>
               )}
             </button>
+          </div>
+        </div>
+      )}
+
+      {!application && !deadlinePassed && !isFull && (event.status === "published" || event.status === "filling") && !canApply && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
+          <div className="max-w-lg mx-auto">
+            <Link href="/worker/plans" className="w-full h-12 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-medium text-base active:scale-[0.98] transition-all shadow-md shadow-amber-600/20 flex items-center justify-center gap-2">
+              <CreditCard className="w-4 h-4" /> Subscribe to Apply
+            </Link>
           </div>
         </div>
       )}

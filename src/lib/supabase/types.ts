@@ -2,6 +2,8 @@ export type Role = "worker" | "organizer" | "admin";
 
 export type UserStatus = "unverified" | "basic_verified" | "trusted";
 
+export type PlanStatus = "trial" | "active" | "expired";
+
 export type EventStatus = "draft" | "published" | "filling" | "full" | "closed" | "completed" | "cancelled";
 
 export type ApplicationStatus = "pending" | "approved" | "rejected" | "cancelled";
@@ -24,6 +26,15 @@ export interface Profile {
   bio: string | null;
   status: UserStatus;
   is_trusted_organizer: boolean;
+  trial_start_date: string | null;
+  trial_end_date: string | null;
+  plan_status: PlanStatus | null;
+  subscription_start_date: string | null;
+  subscription_end_date: string | null;
+  razorpay_payment_id: string | null;
+  razorpay_order_id: string | null;
+  razorpay_signature: string | null;
+  last_payment_date: string | null;
   created_at: string;
   updated_at: string;
 }
