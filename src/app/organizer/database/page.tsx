@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ArrowLeft, Search, User, MapPin, Briefcase, Clock, Award, Filter, X, CheckCircle, ChevronRight, Star } from "lucide-react";
+import { ArrowLeft, Search, User, MapPin, Briefcase, Clock, Award, Filter, X, CheckCircle, ChevronRight } from "lucide-react";
 import { Button } from "@/lib/design/Button";
 import { Card } from "@/lib/design/Card";
 import { Badge, StatusDot } from "@/lib/design/Badge";

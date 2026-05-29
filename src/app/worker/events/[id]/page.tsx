@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ArrowLeft, ArrowUpRight, MapPin, Calendar, Clock, Users, IndianRupee, Shirt, AlertCircle, User, Briefcase, Award, Star, ShieldCheck, CheckCircle, Hourglass, Phone, Timer, Info, ListChecks, XCircle, BadgeCheck, ListPlus, ListMinus } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, MapPin, Calendar, Clock, Users, IndianRupee, Shirt, AlertCircle, User, Briefcase, Award, ShieldCheck, CheckCircle, Hourglass, Phone, Timer, Info, ListChecks, XCircle, BadgeCheck, ListPlus, ListMinus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/lib/design/Button";
 import { Card } from "@/lib/design/Card";
@@ -25,7 +25,6 @@ export default function EventDetailPage() {
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState(false);
 
-  const [organizerRating, setOrganizerRating] = useState(0);
   const [organizerPastEvents, setOrganizerPastEvents] = useState(0);
   const [timeNow, setTimeNow] = useState(Date.now());
 
@@ -49,8 +48,6 @@ export default function EventDetailPage() {
     const { data: org } = await supabase.from("profiles").select("*").eq("user_id", evt.organizer_id).single();
     if (org) {
       setOrganizer(org);
-      const { data: revs } = await supabase.from("reviews").select("rating").eq("to_id", org.user_id);
-      if (revs && revs.length > 0) setOrganizerRating(Math.round(revs.reduce((s, r) => s + r.rating, 0) / revs.length * 10) / 10);
       const { count: pc } = await supabase.from("events").select("*", { count: "exact", head: true }).eq("organizer_id", org.user_id).in("status", ["completed", "cancelled"]);
       setOrganizerPastEvents(pc || 0);
     }
@@ -359,12 +356,6 @@ export default function EventDetailPage() {
                   )}
                 </div>
                 <div className="flex items-center gap-2 mt-0.5">
-                  {organizerRating > 0 && (
-                    <div className="flex items-center gap-1">
-                      <div className="flex items-center gap-0.5">{[1,2,3,4,5].map(s => <Star key={s} className={`w-3 h-3 ${organizerRating >= s ? "fill-amber-400 text-amber-400" : "text-gray-300"}`} />)}</div>
-                      <span className="text-xs text-gray-500">{organizerRating}</span>
-                    </div>
-                  )}
                   <span className="text-xs text-gray-400">{organizerPastEvents} past event{organizerPastEvents !== 1 ? "s" : ""}</span>
                 </div>
                 {/* Contact — only visible after approval */}

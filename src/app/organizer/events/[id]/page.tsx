@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import {
   ArrowLeft, Users, Edit3, Copy, XCircle, CheckCircle, Trash2, MapPin, Calendar, Clock,
   Clock3, IndianRupee, BookTemplate, AlertTriangle, Check, X as XIcon,
-  ChevronDown, ChevronUp, Phone, Mail, Award, Briefcase, Filter, Star, Sparkles
+  ChevronDown, ChevronUp, Phone, Mail, Award, Briefcase, Filter, Sparkles
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/lib/design/Button";
@@ -63,8 +63,6 @@ export default function OrganizerEventDetailPage() {
   const [filter, setFilter] = useState<"" | "pending" | "approved" | "rejected">("");
   const [applying, setApplying] = useState<string | null>(null);
   const [showEdit, setShowEdit] = useState(false);
-  const [ratings, setRatings] = useState<Record<string, number>>({});
-  const [ratingSaving, setRatingSaving] = useState<Record<string, boolean>>({});
 
   useEffect(() => { loadData(); }, [id]);
 
@@ -191,21 +189,6 @@ export default function OrganizerEventDetailPage() {
     });
     if (error) { toast.error(error.message); return; }
     toast.success("Event duplicated (draft)");
-  };
-
-  const rateWorker = async (workerId: string, rating: number) => {
-    setRatings(r => ({ ...r, [workerId]: rating }));
-    setRatingSaving(r => ({ ...r, [workerId]: true }));
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    const existing = await supabase.from("reviews").select("id").eq("from_id", user.id).eq("to_id", workerId).eq("event_id", event!.id).maybeSingle();
-    if (existing.data) {
-      await supabase.from("reviews").update({ rating }).eq("id", existing.data.id);
-    } else {
-      await supabase.from("reviews").insert({ from_id: user.id, to_id: workerId, event_id: event!.id, rating });
-    }
-    setRatingSaving(r => ({ ...r, [workerId]: false }));
-    toast.success("Rating saved");
   };
 
   const deleteEvent = async () => {
@@ -413,15 +396,7 @@ export default function OrganizerEventDetailPage() {
                           {app.profile.skills.map((s, i) => <span key={i} className="bg-gray-100 px-2 py-0.5 rounded-full">{s}</span>)}
                         </div>
                       )}
-                      <div className="flex items-center gap-0.5 mt-1.5">
-                        {[1,2,3,4,5].map(star => (
-                          <button key={star} onClick={() => rateWorker(app.worker_id, star)} disabled={ratingSaving[app.worker_id]}
-                            className="p-0.5 disabled:opacity-50">
-                            <Star className={`w-3.5 h-3.5 ${(ratings[app.worker_id] || 0) >= star ? "fill-amber-400 text-amber-400" : "text-gray-300 hover:text-amber-300"}`} />
-                          </button>
-                        ))}
-                        <span className="text-[10px] text-gray-400 ml-1">Rate worker</span>
-                      </div>
+
                     </div>
                   )}
                 </div>

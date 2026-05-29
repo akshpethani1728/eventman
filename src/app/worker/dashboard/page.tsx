@@ -5,13 +5,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import {
-  LogOut, MapPin, Calendar, Clock, Users, IndianRupee, Star, ShieldCheck,
+  LogOut, MapPin, Calendar, Clock, Users, IndianRupee, ShieldCheck,
   UtensilsCrossed, Car, Timer, TrendingUp, Zap, CheckCircle, BadgeCheck,
   XCircle, Hourglass, ArrowUpRight, Clock3, Send, AlertCircle,
   Heart, Flame, Gauge, Bell, Phone, Info, ListChecks, ListPlus, ListMinus
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Profile, Event, Application } from "@/lib/supabase/types";
+import { Logo } from "@/components/Logo";
 
 function isWaitlisted(app: Application) { return app.status === "pending" && app.notes === "waitlisted"; }
 function isRemovedByOrganizer(app: Application) { return app.status === "cancelled" && app.notes === "removed_by_organizer"; }
@@ -49,17 +50,6 @@ const AVAIL_CONFIG: Record<string, { label: string; dot: string; badge: string }
   unavailable: { label: "Unavailable", dot: "bg-gray-400", badge: "bg-gray-100 text-gray-500 border-gray-200" },
 };
 
-function StarRating({ rating, size = "sm" }: { rating: number; size?: "sm" | "xs" }) {
-  const cls = size === "sm" ? "w-3.5 h-3.5" : "w-3 h-3";
-  return (
-    <div className="flex items-center gap-0.5">
-      {[1,2,3,4,5].map(s => (
-        <Star key={s} className={`${cls} ${rating >= s ? "fill-amber-400 text-amber-400" : rating >= s - 0.5 ? "fill-amber-200 text-amber-300" : "text-gray-200"}`} />
-      ))}
-    </div>
-  );
-}
-
 function CountdownTimer({ targetDate }: { targetDate: string }) {
   const diff = new Date(targetDate).getTime() - Date.now();
   if (diff <= 0) return <span className="text-red-600 font-medium">Deadline passed</span>;
@@ -96,11 +86,6 @@ function computePriorityScore(event: any): number {
   else if (fillPercent >= 20) score += 3;
 
   if (event.organizer?.is_trusted_organizer) score += 18;
-  const rating = event.organizer_rating || 0;
-  if (rating >= 4.8) score += 7;
-  else if (rating >= 4.5) score += 5;
-  else if (rating >= 4.0) score += 3;
-  else if (rating >= 3.5) score += 1;
 
   if (hoursSinceCreated < 12) score += 18;
   else if (hoursSinceCreated < 24) score += 14;
@@ -189,7 +174,6 @@ function DashboardContent() {
     approved_count?: number;
     total_applications?: number;
     organizer?: Profile;
-    organizer_rating?: number;
     organizer_past_events?: number;
   })[]>([]);
   const [loading, setLoading] = useState(true);
@@ -261,16 +245,6 @@ function DashboardContent() {
     const orgMap: Record<string, Profile> = {};
     orgProfiles?.forEach(p => { orgMap[p.user_id] = p; });
 
-    const { data: reviews } = await supabase.from("reviews").select("to_id, rating").in("to_id", orgIds);
-    const ratingSums: Record<string, { sum: number; count: number }> = {};
-    reviews?.forEach(r => {
-      if (!ratingSums[r.to_id]) ratingSums[r.to_id] = { sum: 0, count: 0 };
-      ratingSums[r.to_id].sum += r.rating;
-      ratingSums[r.to_id].count++;
-    });
-    const ratingMap: Record<string, number> = {};
-    Object.entries(ratingSums).forEach(([id, v]) => { ratingMap[id] = Math.round((v.sum / v.count) * 10) / 10; });
-
     const { data: pastCounts } = await supabase
       .from("events").select("organizer_id").in("organizer_id", orgIds).in("status", ["completed", "cancelled"]);
     const pastCountMap: Record<string, number> = {};
@@ -284,7 +258,6 @@ function DashboardContent() {
       approved_count: approvedMap[e.id] || 0,
       total_applications: totalMap[e.id] || 0,
       organizer: orgMap[e.organizer_id],
-      organizer_rating: ratingMap[e.organizer_id] || 0,
       organizer_past_events: pastCountMap[e.organizer_id] || 0,
     }));
 
@@ -375,7 +348,7 @@ function DashboardContent() {
                 <Zap className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h1 className="font-bold text-base leading-tight">EventMan</h1>
+                <Logo size="sm" />
                 <p className="text-[10px] text-gray-400 -mt-0.5">Find work near you</p>
               </div>
             </div>
@@ -404,7 +377,7 @@ function DashboardContent() {
               <Zap className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h1 className="font-bold text-base leading-tight">EventMan</h1>
+              <Logo size="sm" />
               <p className="text-[10px] text-gray-400 -mt-0.5">Find work near you</p>
             </div>
           </div>
@@ -531,7 +504,6 @@ function DashboardContent() {
                 const deadlineSoon = event.application_deadline && new Date(event.application_deadline).getTime() - Date.now() < 86400000 * 3 && new Date(event.application_deadline).getTime() > Date.now();
                 const deadlineToday = event.application_deadline && new Date(event.application_deadline).getTime() - Date.now() < 86400000 && new Date(event.application_deadline).getTime() > Date.now();
                 const org = event.organizer;
-                const orgRating = event.organizer_rating || 0;
                 const hoursSinceCreated = (Date.now() - new Date(event.created_at).getTime()) / 3600000;
                 const isNewlyPosted = hoursSinceCreated < 6;
                 const isFillingFast = fillPercent >= 70;
@@ -542,8 +514,7 @@ function DashboardContent() {
                 const isTrusted = org?.is_trusted_organizer;
                 const orgStatus = org?.status;
                 const isProfileVerified = orgStatus === "trusted" || orgStatus === "basic_verified";
-                const hasHighRating = orgRating >= 4.5;
-                const isVerified = isTrusted || isProfileVerified || hasHighRating;
+                const isVerified = isTrusted || isProfileVerified;
                 const score = computePriorityScore(event);
 
                 let cardAccent = "border-gray-200/70";
@@ -554,7 +525,7 @@ function DashboardContent() {
                 } else if (isNearlyFull || isFillingFast) {
                   cardAccent = "border-amber-200/80";
                   shadowBoost = "shadow-amber-500/5";
-                } else if (isTrusted || hasHighRating) {
+                } else if (isTrusted) {
                   cardAccent = "border-blue-200/80";
                   shadowBoost = "shadow-blue-500/5";
                 }
@@ -572,7 +543,7 @@ function DashboardContent() {
                           ? "bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 shadow-sm shadow-amber-500/20"
                           : isFillingFast
                             ? "bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400"
-                            : isTrusted || hasHighRating
+                            : isTrusted
                               ? "bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-500 shadow-sm shadow-blue-500/20"
                               : isNew
                                 ? "bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-400"
@@ -584,21 +555,19 @@ function DashboardContent() {
                       isVerified ? "bg-gradient-to-r from-indigo-50/60 via-blue-50/30 to-transparent" : ""
                     }`}>
                       <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div className="relative shrink-0">
-                          {org?.avatar_url ? (
-                            <img src={org.avatar_url} alt="" className={`w-10 h-10 rounded-xl object-cover ring-2 shrink-0 ${
-                              isTrusted ? "ring-emerald-200" : hasHighRating ? "ring-blue-200" : "ring-gray-100"
-                            }`} />
-                          ) : (
-                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0 ${
-                              isTrusted
-                                ? "bg-gradient-to-br from-emerald-500 to-teal-600"
-                                : hasHighRating
-                                  ? "bg-gradient-to-br from-blue-500 to-indigo-600"
+                          <div className="relative shrink-0">
+                            {org?.avatar_url ? (
+                              <img src={org.avatar_url} alt="" className={`w-10 h-10 rounded-xl object-cover ring-2 shrink-0 ${
+                                isTrusted ? "ring-emerald-200" : "ring-gray-100"
+                              }`} />
+                            ) : (
+                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0 ${
+                                isTrusted
+                                  ? "bg-gradient-to-br from-emerald-500 to-teal-600"
                                   : "bg-gradient-to-br from-blue-100 to-blue-200 text-blue-700"
-                            }`}>
-                              {org?.full_name?.charAt(0) || "O"}
-                            </div>
+                              }`}>
+                                {org?.full_name?.charAt(0) || "O"}
+                              </div>
                           )}
                           {isTrusted && (
                             <div className="absolute -bottom-1 -right-1 w-4.5 h-4.5 rounded-full bg-emerald-500 border-[2.5px] border-white flex items-center justify-center shadow-sm">
@@ -606,7 +575,7 @@ function DashboardContent() {
                             </div>
                           )}
                         </div>
-                        <div className="min-w-0">
+                          <div className="min-w-0">
                           <div className="flex items-center gap-1.5">
                             <span className="text-sm font-bold text-gray-900 truncate">{org?.full_name || "Event Organizer"}</span>
                             {isTrusted && (
@@ -621,29 +590,13 @@ function DashboardContent() {
                                 Verified
                               </span>
                             )}
-                            {!isTrusted && !isProfileVerified && hasHighRating && (
-                              <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-indigo-600 bg-indigo-50 border border-indigo-200/60 px-1.5 py-0.5 rounded-md shadow-sm">
-                                <Star className="w-2.5 h-2.5 fill-indigo-500" />
-                                Top Rated
-                              </span>
-                            )}
                           </div>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            {orgRating > 0 ? (
-                              <div className="flex items-center gap-1">
-                                <StarRating rating={orgRating} size="xs" />
-                                <span className="text-[11px] font-bold text-gray-700">{orgRating}</span>
-                              </div>
-                            ) : isTrusted || isProfileVerified ? null : (
-                              <span className="text-[9px] text-gray-400">New organizer</span>
-                            )}
-                            {(event.organizer_past_events ?? 0) > 0 && (
+                          {(event.organizer_past_events ?? 0) > 0 && (
                               <span className="text-[9px] text-gray-400 flex items-center gap-0.5">
                                 <CheckCircle className="w-2.5 h-2.5 text-gray-300" />
                                 {event.organizer_past_events} event{event.organizer_past_events !== 1 ? "s" : ""}
                               </span>
                             )}
-                          </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
@@ -1103,12 +1056,6 @@ function DashboardContent() {
                       <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
                         <span className="text-[10px] text-gray-400">by</span>
                         <span className="text-xs text-gray-600 font-semibold truncate">{org.full_name}</span>
-                        {(event.organizer_rating ?? 0) > 0 && (
-                          <div className="flex items-center gap-0.5 ml-auto">
-                            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                            <span className="text-[10px] font-medium text-gray-500">{event.organizer_rating}</span>
-                          </div>
-                        )}
                         {org.is_trusted_organizer && <ShieldCheck className="w-3 h-3 text-blue-500 shrink-0" />}
                       </div>
                     )}

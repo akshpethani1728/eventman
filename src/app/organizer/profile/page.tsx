@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ArrowLeft, Save, User, Phone, MapPin, Star, BadgeCheck, ShieldCheck, ShieldAlert } from "lucide-react";
+import { ArrowLeft, Save, User, Phone, MapPin, BadgeCheck, ShieldCheck, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
 import type { Profile } from "@/lib/supabase/types";
 
@@ -20,8 +20,6 @@ export default function OrganizerProfilePage() {
     bio: "",
   });
   const [pastEventCount, setPastEventCount] = useState(0);
-  const [avgRating, setAvgRating] = useState(0);
-  const [ratingCount, setRatingCount] = useState(0);
   const router = useRouter();
   const supabase = createClient();
   const update = useCallback((key: string, value: string) => setForm(p => ({ ...p, [key]: value })), []);
@@ -53,13 +51,6 @@ export default function OrganizerProfilePage() {
     const { count: pc } = await supabase
       .from("events").select("*", { count: "exact", head: true }).eq("organizer_id", user.id).in("status", ["completed", "cancelled"]);
     setPastEventCount(pc || 0);
-
-    const { data: revs } = await supabase
-      .from("reviews").select("rating").eq("to_id", user.id);
-    if (revs && revs.length > 0) {
-      setAvgRating(Math.round(revs.reduce((s, r) => s + r.rating, 0) / revs.length * 10) / 10);
-      setRatingCount(revs.length);
-    }
 
     setLoading(false);
   };
@@ -134,18 +125,7 @@ export default function OrganizerProfilePage() {
                 <p className="text-lg font-bold text-gray-900">{pastEventCount}</p>
                 <p className="text-[10px] text-gray-500">Past events</p>
               </div>
-              <div className="text-center">
-                <p className="text-lg font-bold text-amber-500">{avgRating > 0 ? avgRating : "--"}</p>
-                <p className="text-[10px] text-gray-500">{ratingCount > 0 ? `${ratingCount} ratings` : "No ratings"}</p>
-              </div>
             </div>
-            {avgRating > 0 && (
-              <div className="flex items-center justify-center gap-0.5 mt-1">
-                {[1,2,3,4,5].map(s => (
-                  <Star key={s} className={`w-3.5 h-3.5 ${avgRating >= s ? "fill-amber-400 text-amber-400" : avgRating >= s - 0.5 ? "fill-amber-200 text-amber-300" : "text-gray-300"}`} />
-                ))}
-              </div>
-            )}
           </div>
 
           <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4 mt-4">

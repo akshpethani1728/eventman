@@ -6,11 +6,12 @@ import { createClient } from "@/lib/supabase/client";
 import {
   Mail, User, Lock, Eye, EyeOff, ArrowRight, ArrowDown,
   Briefcase, HardHat, Search, Calendar, Users,
-  Bell, Shield, Zap, Star, CheckCircle,
+  Bell, Shield, Zap, CheckCircle,
   Sparkles, MapPin, UserCheck,
   ChevronRight, TrendingUp, Building2, LayoutDashboard,
   RefreshCw, KeyRound,
 } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 const supabase = createClient();
 
@@ -218,17 +219,15 @@ const previewCards = [
     color: "from-emerald-500 to-emerald-600",
     content: (
       <div className="space-y-2.5 p-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white">RS</div>
-          <div>
-            <p className="text-sm font-semibold text-gray-900">Rahul Sharma</p>
-            <div className="flex items-center gap-1">
-              {[1, 2, 3, 4].map((_, i) => <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />)}
-              <Star className="h-3 w-3 text-gray-200" />
-              <span className="text-[10px] text-gray-400">4.2</span>
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white">RS</div>
+            <div>
+              <p className="text-sm font-semibold text-gray-900">Rahul Sharma</p>
+              <div className="flex items-center gap-1 text-[10px] text-gray-500">
+                <CheckCircle className="h-3 w-3 text-emerald-500" /> 12 Events
+              </div>
             </div>
           </div>
-        </div>
         <div className="flex flex-wrap gap-1.5">
           {["Photography", "Videography", "Editing"].map((s, i) => (
             <span key={i} className="rounded-full bg-blue-50 px-2 py-0.5 text-[9px] font-medium text-blue-700">{s}</span>
@@ -371,16 +370,16 @@ function RoleSelection({ selected, onSelect }: { selected: string; onSelect: (r:
                 onClick={() => onSelect(role.type)}
                 className={`group relative overflow-hidden rounded-2xl border-2 p-6 text-left transition-all duration-300 ${
                   active
-                    ? "border-blue-600 bg-blue-50 shadow-lg"
-                    : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-md"
+                    ? "border-blue-600 bg-blue-50 shadow-lg shadow-blue-200/40 scale-[1.02]"
+                    : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-md hover:scale-[1.01]"
                 }`}
               >
                 {active && (
-                  <div className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-blue-600">
+                  <div className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 animate-scale-in">
                     <CheckCircle className="h-4 w-4 text-white" />
                   </div>
                 )}
-                <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${role.gradient} text-white shadow-lg transition-transform duration-300 group-hover:scale-110 ${role.shadow}`}>
+                <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${role.gradient} text-white shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 ${active ? "scale-110 rotate-3" : ""} ${role.shadow}`}>
                   <Icon className="h-6 w-6" />
                 </div>
                 <h3 className="text-lg font-bold text-gray-900">{role.title}</h3>
@@ -964,9 +963,7 @@ function HeroSection({ onCta }: { onCta: () => void }) {
         {/* Brand */}
         <FadeSection>
           <div className="mb-6 inline-flex items-center gap-3 rounded-2xl bg-white/10 px-5 py-2.5 shadow-lg backdrop-blur-md">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/20">
-              <Briefcase className="h-5 w-5 text-white" />
-            </div>
+            <Logo showText={false} />
             <span className="text-sm font-bold tracking-wide text-white">EventMan</span>
           </div>
         </FadeSection>
@@ -1040,7 +1037,9 @@ export default function LoginPage() {
   const authRef = useRef<HTMLDivElement>(null);
 
   // Scroll to top on mount
-  useEffect(() => { window.scrollTo(0, 0); }, []);  useEffect(() => {
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+  const [selectedRole, setSelectedRole] = useState<"worker" | "organizer">("worker");
+  useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         supabase.from("profiles").select("role").eq("user_id", session.user.id).maybeSingle().then(({ data }) => {
@@ -1069,7 +1068,7 @@ export default function LoginPage() {
       </div>
 
       {/* ROLE SELECTION */}
-      <RoleSelection selected="worker" onSelect={() => {}} />
+      <RoleSelection selected={selectedRole} onSelect={setSelectedRole} />
 
       {/* TRUST & FEATURES */}
       <TrustSection />
@@ -1082,10 +1081,7 @@ export default function LoginPage() {
       {/* FOOTER */}
       <footer className="border-t border-gray-100 bg-white py-8">
         <div className="mx-auto max-w-7xl px-4 text-center">
-          <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
-            <Briefcase className="h-4 w-4" />
-            <span className="font-semibold">EventMan</span>
-          </div>
+          <Logo muted />
           <p className="mt-2 text-xs text-gray-400">
             Ahmedabad&apos;s Event Workforce Platform &mdash; Professional manpower coordination
           </p>
