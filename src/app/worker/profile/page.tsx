@@ -14,10 +14,9 @@ import type { Profile } from "@/lib/supabase/types";
 
 function computeCompletion(p: Profile): { percent: number; missing: string[] } {
   const checks: [keyof Profile, string, number][] = [
-    ["avatar_url", "Profile photo", 15], ["phone", "Phone number", 15],
-    ["age", "Age", 10], ["gender", "Gender", 10],
+    ["phone", "Phone number", 20], ["age", "Age", 10], ["gender", "Gender", 10],
     ["city", "City", 10], ["area", "Area", 10],
-    ["skills", "Skills", 15], ["experience", "Experience", 10], ["bio", "Bio", 10],
+    ["skills", "Skills", 20], ["experience", "Experience", 10], ["bio", "Bio", 10],
   ];
   let percent = 0;
   const missing: string[] = [];
