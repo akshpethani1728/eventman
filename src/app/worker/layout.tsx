@@ -9,8 +9,8 @@ const NAV = [
   { href: "/worker/dashboard", label: "Home", icon: LayoutDashboard },
   { href: "/worker/dashboard?tab=applied", label: "Applied", icon: Send },
   { href: "/worker/notifications", label: "Alerts", icon: Bell },
-  { href: "/worker/profile", label: "Profile", icon: User },
   { href: "/worker/plans", label: "Plans", icon: CreditCard },
+  { href: "/worker/profile", label: "Profile", icon: User },
 ];
 
 function BottomNav() {

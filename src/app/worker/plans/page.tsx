@@ -7,14 +7,33 @@ import { checkPlanStatus } from "@/lib/subscription";
 import type { Profile } from "@/lib/supabase/types";
 import {
   ArrowLeft, Crown, Sparkles, Shield, CheckCircle, Clock,
-  Zap, Calendar, CreditCard, Loader2, AlertCircle, XCircle,
+  Zap, CreditCard, Loader2, AlertCircle, XCircle, BadgeCheck,
+  TrendingUp, Users, Calendar,
 } from "lucide-react";
 import Link from "next/link";
 
+const MONTHLY_PRICE = 149;
+const PER_DAY = (MONTHLY_PRICE / 30).toFixed(0);
+
 declare global {
-  interface Window {
-    Razorpay: any;
-  }
+  interface Window { Razorpay: any; }
+}
+
+function ProgressBar({ value, max, color }: { value: number; max: number; color: string }) {
+  const pct = Math.min((value / max) * 100, 100);
+  return (
+    <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
+      <div className={`h-full rounded-full transition-all duration-700 ease-out ${color}`} style={{ width: `${pct}%` }} />
+    </div>
+  );
+}
+
+function StatusBadge({ label, color }: { label: string; color: string }) {
+  return (
+    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${color}`}>
+      {label}
+    </span>
+  );
 }
 
 export default function WorkerPlansPage() {
@@ -36,34 +55,26 @@ export default function WorkerPlansPage() {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.onload = () => setRazorpayLoaded(true);
-    script.onerror = () => console.error("Failed to load Razorpay SDK");
+    script.onerror = () => {};
     document.body.appendChild(script);
   }, []);
 
   const loadProfile = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.push("/login"); return; }
-
-    let { data: prof } = await supabase
-      .from("profiles").select("*").eq("user_id", user.id).single();
-
+    let { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
     if (!prof || prof.role !== "worker") { router.push("/login"); return; }
-
-    // Auto-initialize trial if subscription data is missing
     if (!prof.plan_status) {
       const now = new Date();
       const trialEnd = new Date(now);
       trialEnd.setDate(trialEnd.getDate() + 10);
       await supabase.from("profiles").update({
-        plan_status: "trial",
-        trial_start_date: now.toISOString(),
-        trial_end_date: trialEnd.toISOString(),
+        plan_status: "trial", trial_start_date: now.toISOString(), trial_end_date: trialEnd.toISOString(),
       }).eq("user_id", user.id);
       prof.plan_status = "trial";
       prof.trial_start_date = now.toISOString();
       prof.trial_end_date = trialEnd.toISOString();
     }
-
     setProfile(prof);
     setPaymentStatus("idle");
     setPurchasing(false);
@@ -73,34 +84,27 @@ export default function WorkerPlansPage() {
   const planStatus = profile ? checkPlanStatus(profile) : null;
 
   const handlePurchase = async () => {
-    if (!razorpayLoaded) { return; }
+    if (!razorpayLoaded) return;
     setPurchasing(true);
     setPaymentStatus("idle");
-
     try {
       const orderRes = await fetch("/api/razorpay/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: 299, currency: "INR", receipt: `worker_${Date.now()}` }),
+        body: JSON.stringify({ amount: MONTHLY_PRICE, currency: "INR", receipt: `worker_${Date.now()}` }),
       });
-
       const orderData = await orderRes.json();
-      if (!orderRes.ok) { throw new Error(orderData.error || "Order creation failed"); }
-
+      if (!orderRes.ok) throw new Error(orderData.error || "Order creation failed");
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: orderData.amount,
         currency: orderData.currency,
         name: "EventMan",
-        description: "Monthly Worker Subscription",
+        description: "Monthly Worker Plan",
         order_id: orderData.orderId,
-        prefill: {
-          name: profile?.full_name || "",
-          email: profile?.email || "",
-          contact: profile?.phone || "",
-        },
+        prefill: { name: profile?.full_name || "", email: profile?.email || "", contact: profile?.phone || "" },
         theme: { color: "#2563eb" },
-        handler: async function (response: any) {
+        handler: async (response: any) => {
           const verifyRes = await fetch("/api/razorpay/verify-payment", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -110,28 +114,19 @@ export default function WorkerPlansPage() {
               signature: response.razorpay_signature,
             }),
           });
-
           const verifyData = await verifyRes.json();
           if (verifyRes.ok && verifyData.success) {
             setPaymentStatus("success");
             loadProfile();
           } else {
             setPaymentStatus("failed");
+            setPurchasing(false);
           }
         },
-        modal: {
-          ondismiss: function () {
-            setPaymentStatus("cancelled");
-            setPurchasing(false);
-          },
-        },
+        modal: { ondismiss: () => { setPaymentStatus("cancelled"); setPurchasing(false); } },
       };
-
       const razorpay = new window.Razorpay(options);
-      razorpay.on("payment.failed", function () {
-        setPaymentStatus("failed");
-        setPurchasing(false);
-      });
+      razorpay.on("payment.failed", () => { setPaymentStatus("failed"); setPurchasing(false); });
       razorpay.open();
     } catch {
       setPaymentStatus("failed");
@@ -141,19 +136,25 @@ export default function WorkerPlansPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f5f5f7] flex items-center justify-center">
-        <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
+      <div className="min-h-dvh bg-white flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
+          <p className="text-xs text-gray-400">Loading...</p>
+        </div>
       </div>
     );
   }
 
-  const isActive = planStatus?.isActive;
-  const isTrialing = planStatus?.isTrialing;
-  const isExpired = planStatus?.isExpired;
+  const isActive = planStatus?.isActive ?? false;
+  const isTrialing = planStatus?.isTrialing ?? false;
+  const isExpired = planStatus?.isExpired ?? true;
   const daysRemaining = planStatus?.daysRemaining ?? 0;
+  const endDate = isActive ? profile?.subscription_end_date : profile?.trial_end_date;
+  const barrier = isExpired;
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7] pb-24">
+    <div className="min-h-dvh bg-[#f5f5f7] pb-28">
+      {/* HEADER */}
       <header className="sticky top-0 bg-white/80 backdrop-blur-2xl border-b border-gray-200/60 z-10">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
           <Link href="/worker/dashboard" className="p-1 -ml-1 text-gray-500">
@@ -163,184 +164,234 @@ export default function WorkerPlansPage() {
         </div>
       </header>
 
-      <main className="max-w-lg mx-auto px-4 py-6 space-y-6">
-        {/* PAYMENT STATUS MESSAGES */}
+      <main className="max-w-lg mx-auto px-4 py-6 space-y-5">
+        {/* ─── PAYMENT STATUS ─── */}
         {paymentStatus === "success" && (
-          <div className="rounded-2xl bg-emerald-50 border border-emerald-200 p-5 flex items-start gap-3 animate-slide-down">
+          <div className="rounded-2xl bg-emerald-50 border border-emerald-200 p-4 flex items-start gap-3 animate-slide-down shadow-sm">
             <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
               <CheckCircle className="w-5 h-5 text-emerald-600" />
             </div>
-            <div>
-              <p className="font-semibold text-emerald-900">Payment Successful!</p>
-              <p className="text-sm text-emerald-700 mt-0.5">Your subscription is now active. You can apply to events seamlessly.</p>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-emerald-900 text-sm">Payment Successful!</p>
+              <p className="text-xs text-emerald-700 mt-0.5">Your plan is now active — start applying to events.</p>
             </div>
           </div>
         )}
-
         {paymentStatus === "failed" && (
-          <div className="rounded-2xl bg-red-50 border border-red-200 p-5 flex items-start gap-3 animate-slide-down">
+          <div className="rounded-2xl bg-red-50 border border-red-200 p-4 flex items-start gap-3 animate-slide-down shadow-sm">
             <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
               <XCircle className="w-5 h-5 text-red-600" />
             </div>
-            <div>
-              <p className="font-semibold text-red-900">Payment Failed</p>
-              <p className="text-sm text-red-700 mt-0.5">The transaction did not complete. Please try again.</p>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-red-900 text-sm">Payment Failed</p>
+              <p className="text-xs text-red-700 mt-0.5">Transaction did not complete. Please try again.</p>
             </div>
           </div>
         )}
-
         {paymentStatus === "cancelled" && (
-          <div className="rounded-2xl bg-amber-50 border border-amber-200 p-5 flex items-start gap-3 animate-slide-down">
+          <div className="rounded-2xl bg-amber-50 border border-amber-200 p-4 flex items-start gap-3 animate-slide-down shadow-sm">
             <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
               <AlertCircle className="w-5 h-5 text-amber-600" />
             </div>
-            <div>
-              <p className="font-semibold text-amber-900">Payment Cancelled</p>
-              <p className="text-sm text-amber-700 mt-0.5">No charges were made. Your subscription remains unchanged.</p>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-amber-900 text-sm">Payment Cancelled</p>
+              <p className="text-xs text-amber-700 mt-0.5">No charges made. Your current plan is unchanged.</p>
             </div>
           </div>
         )}
 
-        {/* CURRENT STATUS CARD */}
+        {/* ─── STATUS CARD ─── */}
         <div className="bg-white rounded-2xl border border-gray-200/80 overflow-hidden shadow-sm">
-          <div className={`px-5 py-4 ${isActive ? "bg-gradient-to-r from-emerald-500 to-emerald-600" : isTrialing ? "bg-gradient-to-r from-blue-500 to-indigo-600" : "bg-gradient-to-r from-gray-500 to-gray-600"}`}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                {isActive ? (
-                  <Crown className="w-5 h-5 text-white" />
-                ) : isTrialing ? (
-                  <Sparkles className="w-5 h-5 text-white" />
-                ) : (
-                  <Clock className="w-5 h-5 text-white" />
-                )}
-                <span className="text-sm font-bold text-white">
-                  {isActive ? "Subscription Active" : isTrialing ? "Trial Active" : "Plan Expired"}
-                </span>
+          {/* Gradient header */}
+          <div className={`relative px-5 py-4 ${
+            isActive ? "bg-gradient-to-r from-emerald-500 to-emerald-600" :
+            isTrialing ? "bg-gradient-to-r from-blue-500 to-indigo-600" :
+            "bg-gradient-to-r from-slate-500 to-slate-600"
+          }`}>
+            <div className="flex items-center justify-between relative z-10">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                  {isActive ? <Crown className="w-4 h-4 text-white" /> :
+                   isTrialing ? <Sparkles className="w-4 h-4 text-white" /> :
+                   <Clock className="w-4 h-4 text-white" />}
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-white">
+                    {isActive ? "Plan Active" : isTrialing ? "Free Trial" : "Plan Expired"}
+                  </p>
+                  {!isExpired && (
+                    <p className="text-[10px] text-white/70">{daysRemaining} day{daysRemaining !== 1 ? "s" : ""} remaining</p>
+                  )}
+                </div>
               </div>
-              <span className="text-[10px] font-semibold text-white/80 bg-white/15 px-2.5 py-1 rounded-full">
-                {isActive ? "ACTIVE" : isTrialing ? "TRIAL" : "EXPIRED"}
-              </span>
+              <StatusBadge
+                label={isActive ? "ACTIVE" : isTrialing ? "TRIAL" : "EXPIRED"}
+                color={isActive ? "bg-emerald-600/30 text-emerald-100" : isTrialing ? "bg-blue-600/30 text-blue-100" : "bg-slate-600/30 text-slate-100"}
+              />
             </div>
+            {/* Decorative circles */}
+            <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/5" />
+            <div className="absolute -bottom-4 -left-4 w-16 h-16 rounded-full bg-white/5" />
           </div>
-          <div className="p-5 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">Days Remaining</span>
-              <span className={`font-bold text-lg ${isExpired ? "text-red-500" : "text-gray-900"}`}>
-                {isExpired ? "0" : daysRemaining}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500">Status</span>
-              <span className={`text-sm font-semibold ${isActive ? "text-emerald-600" : isTrialing ? "text-blue-600" : "text-red-500"}`}>
-                {isActive ? "Active" : isTrialing ? "In Trial" : "Expired"}
-              </span>
-            </div>
-            {isActive && profile?.subscription_end_date && (
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500">Expires On</span>
-                <span className="text-sm font-medium text-gray-900">
-                  {new Date(profile.subscription_end_date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-                </span>
+
+          {/* Progress + details */}
+          <div className="p-5 space-y-4">
+            {!isExpired && (
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-500">Plan progress</span>
+                  <span className={`font-medium ${isActive ? "text-emerald-600" : "text-blue-600"}`}>
+                    {daysRemaining} day{daysRemaining !== 1 ? "s" : ""} left
+                  </span>
+                </div>
+                <ProgressBar
+                  value={daysRemaining}
+                  max={isActive ? 30 : 10}
+                  color={isActive ? "bg-emerald-400" : "bg-blue-400"}
+                />
               </div>
             )}
-            {isTrialing && profile?.trial_end_date && (
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-500">Trial Ends On</span>
-                <span className="text-sm font-medium text-gray-900">
-                  {new Date(profile.trial_end_date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-                </span>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-gray-50 rounded-xl p-3 text-center">
+                <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Status</p>
+                <p className={`text-sm font-bold mt-0.5 ${
+                  isActive ? "text-emerald-600" : isTrialing ? "text-blue-600" : "text-red-500"
+                }`}>
+                  {isActive ? "Active" : isTrialing ? "In Trial" : "Expired"}
+                </p>
+              </div>
+              <div className="bg-gray-50 rounded-xl p-3 text-center">
+                <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Expires</p>
+                <p className="text-sm font-bold text-gray-900 mt-0.5">
+                  {endDate
+                    ? new Date(endDate).toLocaleDateString("en-IN", { day: "numeric", month: "short" })
+                    : "—"}
+                </p>
+              </div>
+            </div>
+
+            {isExpired && (
+              <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 rounded-xl px-3 py-2.5">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                Renew your plan to continue applying for events.
               </div>
             )}
           </div>
         </div>
 
-        {/* PLAN CARD */}
-        <div className="bg-white rounded-2xl border-2 border-blue-200/80 overflow-hidden shadow-lg shadow-blue-200/20 relative">
-          <div className="absolute top-0 right-0 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-[9px] font-bold px-3 py-1 rounded-bl-xl uppercase tracking-wider">
-            Recommended
+        {/* ─── PLAN CARD ─── */}
+        <div className="relative">
+          {/* Premium corner badge */}
+          <div className="absolute -top-[1px] -right-[1px] z-10">
+            <div className="bg-gradient-to-l from-blue-600 to-blue-500 text-white text-[9px] font-bold px-4 py-1.5 rounded-bl-2xl rounded-tr-2xl tracking-wider shadow-sm flex items-center gap-1">
+              <BadgeCheck className="w-2.5 h-2.5" /> BEST VALUE
+            </div>
           </div>
 
-          <div className="p-6 space-y-5">
-            <div className="text-center">
-              <div className="mx-auto w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-200/40 mb-3">
-                <Crown className="w-6 h-6 text-white" />
+          <div className="bg-white rounded-2xl border-2 border-blue-200/70 overflow-hidden shadow-lg shadow-blue-200/20">
+            {/* Plan header */}
+            <div className="px-6 pt-7 pb-2 text-center">
+              <div className="mx-auto mb-3 w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-200/40 ring-4 ring-blue-50">
+                <Crown className="w-7 h-7 text-white" />
               </div>
-              <h2 className="text-xl font-extrabold text-gray-900">Monthly Access Plan</h2>
-              <p className="text-sm text-gray-500 mt-1">Unlock full platform access</p>
+              <h2 className="text-xl font-extrabold text-gray-900 tracking-tight">Monthly Access</h2>
+              <p className="text-xs text-gray-500 mt-1">Everything you need to find event work</p>
             </div>
 
-            <div className="text-center py-4">
-              <span className="text-4xl font-black text-gray-900">₹299</span>
-              <span className="text-sm text-gray-500 ml-1">/ month</span>
+            {/* Pricing */}
+            <div className="px-6 py-5 text-center border-b border-gray-100">
+              <div className="flex items-baseline justify-center gap-0.5">
+                <span className="text-3xl font-bold text-gray-900">₹</span>
+                <span className="text-5xl font-black text-gray-900 tracking-tight">{MONTHLY_PRICE}</span>
+                <span className="text-sm text-gray-400 ml-1 font-medium">/month</span>
+              </div>
+              <p className="text-xs text-gray-400 mt-2 flex items-center justify-center gap-1">
+                <Zap className="w-3 h-3 text-blue-400" />
+                Just <span className="font-semibold text-gray-600">₹{PER_DAY}/day</span> — less than a cup of chai
+              </p>
             </div>
 
-            <div className="space-y-3">
+            {/* Benefits */}
+            <div className="px-6 pt-5 pb-2 space-y-3">
               {[
-                "Unlimited event applications",
-                "Access to all event opportunities",
-                "Continue receiving approvals",
-                "Full platform access",
-                "Priority support",
-              ].map((benefit, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                    <CheckCircle className="w-3.5 h-3.5 text-blue-600" />
+                { icon: Zap, text: "Unlimited event applications", sub: "Apply to as many events as you want" },
+                { icon: TrendingUp, text: "Stay ahead of the crowd", sub: "Get priority visibility to organizers" },
+                { icon: Users, text: "Keep growing your profile", sub: "Build reputation with every approval" },
+                { icon: Calendar, text: "Full 30-day access", sub: "No restrictions, cancel anytime" },
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center shrink-0 mt-0.5">
+                    <item.icon className="w-3.5 h-3.5 text-blue-600" />
                   </div>
-                  <span className="text-sm text-gray-700">{benefit}</span>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">{item.text}</p>
+                    <p className="text-[11px] text-gray-400">{item.sub}</p>
+                  </div>
                 </div>
               ))}
             </div>
 
-            {isActive ? (
-              <div className="w-full h-12 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 font-semibold text-sm gap-2">
-                <CheckCircle className="w-4 h-4" /> Already Active
-              </div>
-            ) : (
-              <button
-                onClick={handlePurchase}
-                disabled={purchasing || !razorpayLoaded}
-                className="w-full h-12 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2"
-              >
-                {purchasing ? (
-                  <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
-                ) : !razorpayLoaded ? (
-                  <><Loader2 className="w-4 h-4 animate-spin" /> Loading...</>
-                ) : (
-                  <><CreditCard className="w-4 h-4" /> {isExpired ? "Renew Plan" : "Purchase Plan"}</>
-                )}
-              </button>
-            )}
+            {/* CTA */}
+            <div className="px-6 pt-4 pb-6">
+              {isActive ? (
+                <div className="w-full h-12 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 font-semibold text-sm gap-2">
+                  <CheckCircle className="w-4 h-4" /> Currently Active
+                </div>
+              ) : barrier ? (
+                <button
+                  onClick={handlePurchase}
+                  disabled={purchasing || !razorpayLoaded}
+                  className="w-full h-13 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 shadow-lg shadow-blue-600/25 hover:shadow-xl hover:shadow-blue-600/30 flex items-center justify-center gap-2"
+                >
+                  {purchasing ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
+                  ) : !razorpayLoaded ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Loading...</>
+                  ) : (
+                    <><CreditCard className="w-4 h-4" /> Renew — ₹{MONTHLY_PRICE}/mo</>
+                  )}
+                </button>
+              ) : (
+                <button
+                  onClick={handlePurchase}
+                  disabled={purchasing || !razorpayLoaded}
+                  className="w-full h-13 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 shadow-lg shadow-blue-600/25 hover:shadow-xl hover:shadow-blue-600/30 flex items-center justify-center gap-2"
+                >
+                  {purchasing ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
+                  ) : !razorpayLoaded ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Loading...</>
+                  ) : (
+                    <><CreditCard className="w-4 h-4" /> Subscribe — ₹{MONTHLY_PRICE}/mo</>
+                  )}
+                </button>
+              )}
 
-            <p className="text-[10px] text-gray-400 text-center">
-              Secure payment via Razorpay. You can cancel anytime.
-            </p>
+              {!barrier && !isActive && (
+                <p className="text-[10px] text-gray-400 text-center mt-3">
+                  Your free trial continues. Subscribe before it ends to keep applying.
+                </p>
+              )}
+
+              {isExpired && (
+                <p className="text-[10px] text-gray-400 text-center mt-3">
+                  Your plan has expired. Renew to start applying again.
+                </p>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* WHY SUBSCRIBE */}
-        <div className="bg-white rounded-2xl border border-gray-200/80 p-5">
-          <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-            <Zap className="w-4 h-4 text-blue-600" /> Why Subscribe?
-          </h3>
-          <div className="space-y-2.5">
-            {[
-              "Keep applying to new events throughout the month",
-              "No per-application fees — one flat rate",
-              "Your profile stays visible to organizers",
-              "Cancel anytime, no lock-in",
-            ].map((item, i) => (
-              <div key={i} className="flex items-start gap-2.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
-                <span className="text-xs text-gray-600">{item}</span>
-              </div>
-            ))}
+        {/* ─── TRUST STRIP ─── */}
+        <div className="bg-white rounded-2xl border border-gray-200/80 p-4">
+          <div className="flex items-center justify-center gap-4 text-[10px] text-gray-400 flex-wrap">
+            <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> 256-bit SSL</span>
+            <span className="w-1 h-1 rounded-full bg-gray-300" />
+            <span className="flex items-center gap-1"><CreditCard className="w-3 h-3" /> Razorpay</span>
+            <span className="w-1 h-1 rounded-full bg-gray-300" />
+            <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3" /> Cancel anytime</span>
           </div>
-        </div>
-
-        {/* PAYMENT SECURITY */}
-        <div className="flex items-center justify-center gap-2 text-[10px] text-gray-400 pb-4">
-          <Shield className="w-3 h-3" />
-          Powered by Razorpay · 256-bit SSL encrypted
         </div>
       </main>
     </div>
