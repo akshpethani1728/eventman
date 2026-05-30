@@ -96,7 +96,7 @@ export default function WorkerPlansPage() {
         body: JSON.stringify({ amount: MONTHLY_PRICE, currency: "INR", receipt: `worker_${Date.now()}` }),
       });
       const orderData = await orderRes.json();
-      if (!orderRes.ok) { setPaymentError(orderData.error || "Order creation failed"); throw new Error(orderData.error || "Order creation failed"); }
+      if (!orderRes.ok) { setPaymentError(`${orderData.code ? orderData.code + ": " : ""}${orderData.error || "Order creation failed"}`); throw new Error(orderData.error || "Order creation failed"); }
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: orderData.amount,
