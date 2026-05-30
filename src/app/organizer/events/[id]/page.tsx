@@ -376,7 +376,12 @@ export default function OrganizerEventDetailPage() {
                         {app.profile.experience && <span>Exp: {app.profile.experience}</span>}
                         {app.profile.area && <span>Area: {app.profile.area}</span>}
                         {app.status === "approved" && app.profile.phone
-                          ? <span className="flex items-center gap-1 text-green-700"><Phone className="w-3 h-3" />{app.profile.phone}</span>
+                          ? <span className="flex items-center gap-1 text-green-700"><Phone className="w-3 h-3" />{app.profile.phone}
+                              <button onClick={() => { navigator.clipboard.writeText(app.profile.phone!); toast.success("Phone copied"); }}
+                                className="p-0.5 rounded hover:bg-green-100 text-green-500 hover:text-green-700 transition-colors">
+                                <Copy className="w-3 h-3" />
+                              </button>
+                            </span>
                           : app.status !== "approved" && app.profile.phone && <span className="text-gray-400 italic">Contact hidden until approval</span>
                         }
                       </div>

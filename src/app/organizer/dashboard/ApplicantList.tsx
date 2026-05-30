@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import {
   X, Check, X as XIcon, ChevronDown, ChevronUp, Phone, MapPin,
-  User, Award, Briefcase, Clock, Mail, Filter, XCircle
+  User, Award, Briefcase, Clock, Mail, Filter, XCircle, Copy,
 } from "lucide-react";
 import type { Event, Application, Profile } from "@/lib/supabase/types";
 
@@ -290,7 +290,14 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
                       {app.status === "approved" && (app.profile.phone || app.profile.email) ? (
                         <>
                           {app.profile.phone && (
-                            <div className="flex items-center gap-1.5"><Phone className="w-3 h-3 text-green-600" /><span className="text-green-700">{app.profile.phone}</span></div>
+                            <div className="flex items-center gap-1.5">
+                              <Phone className="w-3 h-3 text-green-600" />
+                              <span className="text-green-700">{app.profile.phone}</span>
+                              <button onClick={() => { navigator.clipboard.writeText(app.profile.phone!); toast.success("Phone copied"); }}
+                                className="p-0.5 rounded hover:bg-green-100 text-green-500 hover:text-green-700 transition-colors">
+                                <Copy className="w-3 h-3" />
+                              </button>
+                            </div>
                           )}
                           {app.profile.email && (
                             <div className="flex items-center gap-1.5"><Mail className="w-3 h-3 text-green-600" /><span className="text-green-700 truncate">{app.profile.email}</span></div>
