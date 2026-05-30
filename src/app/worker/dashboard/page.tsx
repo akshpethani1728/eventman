@@ -302,6 +302,11 @@ function DashboardContent() {
   };
 
   const apply = async (eventId: string) => {
+    if (profile && !checkPlanStatus(profile).canApply) {
+      toast.error("Your plan has expired. Subscribe to continue applying.");
+      router.push("/worker/plans");
+      return;
+    }
     setApplyingId(eventId);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setApplyingId(null); return; }
@@ -326,6 +331,11 @@ function DashboardContent() {
   };
 
   const joinWaitlist = async (eventId: string) => {
+    if (profile && !checkPlanStatus(profile).canApply) {
+      toast.error("Your plan has expired. Subscribe to continue applying.");
+      router.push("/worker/plans");
+      return;
+    }
     setApplyingId(eventId);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setApplyingId(null); return; }
@@ -369,6 +379,9 @@ function DashboardContent() {
     if (app.status === "cancelled") return false;
     return true;
   });
+
+  const planCheck = profile ? checkPlanStatus(profile) : null;
+  const canApply = planCheck?.canApply ?? true;
 
   const formatCount = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
 
@@ -868,6 +881,12 @@ function DashboardContent() {
                             <><ListMinus className="w-3.5 h-3.5" /> Leave Waitlist</>
                           )}
                         </button>
+                      ) : !canApply ? (
+                        <Link href="/worker/plans"
+                          onClick={(e) => { e.stopPropagation(); }}
+                          className="h-10 px-5 rounded-xl font-semibold text-sm flex items-center gap-1.5 shadow-sm bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:shadow-lg transition-all active:scale-95">
+                          <CreditCard className="w-3.5 h-3.5" /> Subscribe to Apply
+                        </Link>
                       ) : isFull ? (
                         <button
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); joinWaitlist(event.id); }}
