@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ArrowLeft, ArrowUpRight, MapPin, Calendar, Clock, Users, IndianRupee, Shirt, AlertCircle, User, Briefcase, Award, ShieldCheck, CheckCircle, Hourglass, Phone, Timer, Info, ListChecks, XCircle, BadgeCheck, ListPlus, ListMinus, CreditCard } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, MapPin, Calendar, Clock, Users, IndianRupee, Shirt, AlertCircle, User, Briefcase, Award, ShieldCheck, CheckCircle, Hourglass, Phone, Timer, Info, ListChecks, XCircle, BadgeCheck, ListPlus, ListMinus, CreditCard, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/lib/design/Button";
 import { Card } from "@/lib/design/Card";
@@ -14,6 +14,7 @@ import type { Event, Application, Profile } from "@/lib/supabase/types";
 import { checkPlanStatus } from "@/lib/subscription";
 
 function isWaitlisted(app: Application) { return app.status === "pending" && app.notes === "waitlisted"; }
+function isRemovedByOrganizer(app: Application) { return app.status === "cancelled" && app.notes === "removed_by_organizer"; }
 
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -113,6 +114,28 @@ export default function EventDetailPage() {
     setApplying(false);
     if (error) { toast.error(error.message); return; }
     toast.success("Left waitlist");
+    loadEvent();
+  };
+
+  const handleReApply = async () => {
+    if (workerProfile) {
+      const status = checkPlanStatus(workerProfile);
+      if (!status.canApply) {
+        toast.error("Your trial or subscription has expired. Purchase a plan to continue applying for events.");
+        router.push("/worker/plans");
+        return;
+      }
+    }
+    if (!application) return;
+    setApplying(true);
+    const { error: delError } = await supabase.from("applications").delete().eq("id", application.id);
+    if (delError) { toast.error(delError.message); setApplying(false); return; }
+    const { error: insError } = await supabase.from("applications").insert({
+      event_id: id, worker_id: application.worker_id, status: "pending",
+    });
+    setApplying(false);
+    if (insError) { toast.error(insError.message); return; }
+    toast.success("Re-applied successfully!");
     loadEvent();
   };
 
@@ -404,7 +427,7 @@ export default function EventDetailPage() {
         )}
 
         {/* Application Status — only when not already shown as hero or waitlisted */}
-        {application && !isWaitlisted(application) && application.status !== "approved" && application.status !== "pending" && (
+        {application && !isWaitlisted(application) && application.status !== "approved" && application.status !== "pending" && !isRemovedByOrganizer(application) && (
           <div className="bg-white border rounded-xl p-5 mb-3 border-gray-200">
             <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wide mb-3">Application Status</h3>
             <div className="flex items-center gap-3">
@@ -425,6 +448,24 @@ export default function EventDetailPage() {
                 <span className="font-medium">Feedback:</span> {application.notes}
               </div>
             )}
+          </div>
+        )}
+
+        {/* Removed by organizer — show re-apply option */}
+        {application && isRemovedByOrganizer(application) && (
+          <div className="bg-white border rounded-xl p-5 mb-3 border-amber-200 bg-amber-50/30">
+            <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wide mb-3">Application Status</h3>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-amber-100 text-amber-600">
+                <AlertCircle className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="font-semibold text-sm text-amber-900">Removed by Organizer</p>
+                <p className="text-xs text-amber-700 mt-0.5">
+                  The organizer removed you from this event. You can re-apply if you&apos;re still interested.
+                </p>
+              </div>
+            </div>
           </div>
         )}
       </main>
@@ -555,7 +596,22 @@ export default function EventDetailPage() {
         </div>
       )}
 
-      {application && (application.status === "rejected" || application.status === "cancelled") && (
+      {application && isRemovedByOrganizer(application) && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
+          <div className="max-w-lg mx-auto">
+            <button onClick={handleReApply} disabled={applying}
+              className="w-full h-12 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 shadow-md shadow-blue-600/20 flex items-center justify-center gap-2">
+              {applying ? (
+                <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
+              ) : (
+                <><RefreshCw className="w-4 h-4" /> Re-Apply for this Event</>
+              )}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {application && (application.status === "rejected" || (application.status === "cancelled" && !isRemovedByOrganizer(application))) && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
           <div className="max-w-lg mx-auto">
             <Link href="/worker/dashboard"
