@@ -198,19 +198,41 @@ function DashboardContent() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.push("/login"); return; }
 
-    const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
-    if (!prof || prof.role !== "worker") { router.push("/login"); return; }
-    setProfile(prof);
+    const { data: profRaw } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
+    if (!profRaw || profRaw.role !== "worker") { router.push("/login"); return; }
 
-    // Auto-expire trial/subscription if past end date
-    if (prof.plan_status === "trial" && prof.trial_end_date && new Date(prof.trial_end_date) <= new Date()) {
-      await supabase.from("profiles").update({ plan_status: "expired" }).eq("user_id", user.id);
-      prof.plan_status = "expired";
-    } else if (prof.plan_status === "active" && prof.subscription_end_date && new Date(prof.subscription_end_date) <= new Date()) {
-      await supabase.from("profiles").update({ plan_status: "expired" }).eq("user_id", user.id);
-      prof.plan_status = "expired";
+    const prof = profRaw;
+
+    // Subscription auto-heal: ensure every worker always has valid subscription data
+    if (prof.role === "worker") {
+      const now = new Date();
+
+      // Case 1: No subscription record at all → auto-initialize trial
+      if (!prof.plan_status) {
+        const trialEnd = new Date(now);
+        trialEnd.setDate(trialEnd.getDate() + 10);
+        await supabase.from("profiles").update({
+          plan_status: "trial",
+          trial_start_date: now.toISOString(),
+          trial_end_date: trialEnd.toISOString(),
+        }).eq("user_id", user.id);
+        prof.plan_status = "trial";
+        prof.trial_start_date = now.toISOString();
+        prof.trial_end_date = trialEnd.toISOString();
+      }
+      // Case 2: Trial expired → mark expired
+      else if (prof.plan_status === "trial" && prof.trial_end_date && new Date(prof.trial_end_date) <= now) {
+        await supabase.from("profiles").update({ plan_status: "expired" }).eq("user_id", user.id);
+        prof.plan_status = "expired";
+      }
+      // Case 3: Subscription expired → mark expired
+      else if (prof.plan_status === "active" && prof.subscription_end_date && new Date(prof.subscription_end_date) <= now) {
+        await supabase.from("profiles").update({ plan_status: "expired" }).eq("user_id", user.id);
+        prof.plan_status = "expired";
+      }
     }
 
+    setProfile(prof);
     const { count } = await supabase.from("notifications").select("*", { count: "exact", head: true }).eq("user_id", user.id).eq("read", false);
     setUnreadNotifCount(count || 0);
 

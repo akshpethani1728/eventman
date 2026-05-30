@@ -44,11 +44,29 @@ export default function WorkerPlansPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.push("/login"); return; }
 
-    const { data: prof } = await supabase
+    let { data: prof } = await supabase
       .from("profiles").select("*").eq("user_id", user.id).single();
 
     if (!prof || prof.role !== "worker") { router.push("/login"); return; }
+
+    // Auto-initialize trial if subscription data is missing
+    if (!prof.plan_status) {
+      const now = new Date();
+      const trialEnd = new Date(now);
+      trialEnd.setDate(trialEnd.getDate() + 10);
+      await supabase.from("profiles").update({
+        plan_status: "trial",
+        trial_start_date: now.toISOString(),
+        trial_end_date: trialEnd.toISOString(),
+      }).eq("user_id", user.id);
+      prof.plan_status = "trial";
+      prof.trial_start_date = now.toISOString();
+      prof.trial_end_date = trialEnd.toISOString();
+    }
+
     setProfile(prof);
+    setPaymentStatus("idle");
+    setPurchasing(false);
     setLoading(false);
   };
 
