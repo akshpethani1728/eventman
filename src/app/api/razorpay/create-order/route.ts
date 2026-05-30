@@ -6,7 +6,6 @@ export async function POST(request: NextRequest) {
 
     const keyId = process.env.RAZORPAY_KEY_ID!;
     const keySecret = process.env.RAZORPAY_KEY_SECRET!;
-
     const auth = Buffer.from(`${keyId}:${keySecret}`).toString("base64");
 
     const res = await fetch("https://api.razorpay.com/v1/orders", {

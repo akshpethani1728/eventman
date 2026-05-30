@@ -41,6 +41,7 @@ export default function WorkerPlansPage() {
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<"idle" | "success" | "failed" | "cancelled">("idle");
+  const [paymentError, setPaymentError] = useState("");
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
   const router = useRouter();
   const supabase = createClient();
@@ -87,6 +88,7 @@ export default function WorkerPlansPage() {
     if (!razorpayLoaded) return;
     setPurchasing(true);
     setPaymentStatus("idle");
+    setPaymentError("");
     try {
       const orderRes = await fetch("/api/razorpay/create-order", {
         method: "POST",
@@ -94,7 +96,7 @@ export default function WorkerPlansPage() {
         body: JSON.stringify({ amount: MONTHLY_PRICE, currency: "INR", receipt: `worker_${Date.now()}` }),
       });
       const orderData = await orderRes.json();
-      if (!orderRes.ok) throw new Error(orderData.error || "Order creation failed");
+      if (!orderRes.ok) { setPaymentError(orderData.error || "Order creation failed"); throw new Error(orderData.error || "Order creation failed"); }
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: orderData.amount,
@@ -119,6 +121,7 @@ export default function WorkerPlansPage() {
             setPaymentStatus("success");
             loadProfile();
           } else {
+            setPaymentError(verifyData.error || "Verification failed");
             setPaymentStatus("failed");
             setPurchasing(false);
           }
@@ -126,9 +129,10 @@ export default function WorkerPlansPage() {
         modal: { ondismiss: () => { setPaymentStatus("cancelled"); setPurchasing(false); } },
       };
       const razorpay = new window.Razorpay(options);
-      razorpay.on("payment.failed", () => { setPaymentStatus("failed"); setPurchasing(false); });
+      razorpay.on("payment.failed", (resp: any) => { setPaymentError(resp?.error?.description || "Payment declined"); setPaymentStatus("failed"); setPurchasing(false); });
       razorpay.open();
-    } catch {
+    } catch (e: any) {
+      setPaymentError(e?.message || "Something went wrong");
       setPaymentStatus("failed");
       setPurchasing(false);
     }
@@ -184,7 +188,7 @@ export default function WorkerPlansPage() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-red-900 text-sm">Payment Failed</p>
-              <p className="text-xs text-red-700 mt-0.5">Transaction did not complete. Please try again.</p>
+              <p className="text-xs text-red-700 mt-0.5">{paymentError || "Transaction did not complete. Please try again."}</p>
             </div>
           </div>
         )}

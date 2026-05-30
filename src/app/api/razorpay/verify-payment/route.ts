@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerSupabase } from "@/lib/supabase/server";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
+import crypto from "crypto";
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,7 +10,6 @@ export async function POST(request: NextRequest) {
     const keySecret = process.env.RAZORPAY_KEY_SECRET!;
 
     const body = orderId + "|" + paymentId;
-    const crypto = await import("crypto");
     const expectedSignature = crypto
       .createHmac("sha256", keySecret)
       .update(body)
@@ -18,17 +19,34 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
     }
 
-    const supabase = await createServerSupabase();
-    const { data: { user } } = await supabase.auth.getUser();
+    const cookieStore = await cookies();
+    const authClient = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() { return cookieStore.getAll(); },
+          setAll() {},
+        },
+      }
+    );
+
+    const { data: { user } } = await authClient.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const adminClient = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { cookies: { getAll() { return []; }, setAll() {} } }
+    );
 
     const now = new Date();
     const subscriptionEnd = new Date(now);
     subscriptionEnd.setDate(subscriptionEnd.getDate() + 30);
 
-    const { error: updateError } = await supabase
+    const { error: updateError } = await adminClient
       .from("profiles")
       .update({
         plan_status: "active",

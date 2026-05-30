@@ -165,14 +165,16 @@ export default function OrganizerDashboard() {
   const signOut = async () => { await supabase.auth.signOut(); router.push("/login"); };
 
   const activeEvents = events.filter(e =>
-    !["completed", "cancelled"].includes(e.status) && !e.is_template
+    !["completed", "cancelled"].includes(e.status) && !e.is_template && e.date >= pastCutoffStr
   );
   const pastEvents = events.filter(e =>
-    ["completed", "cancelled"].includes(e.status) && !e.is_template
+    (["completed", "cancelled"].includes(e.status) || e.date < pastCutoffStr) && !e.is_template
   );
   const templates = events.filter(e => e.is_template);
 
   const todayStr = new Date().toISOString().split("T")[0];
+  const pastCutoff = new Date(); pastCutoff.setDate(pastCutoff.getDate() - 1);
+  const pastCutoffStr = pastCutoff.toISOString().split("T")[0];
   const totalWorkersNeeded = activeEvents.reduce((s, e) => s + Math.max(0, e.worker_count - (e.approvedCount || 0)), 0);
   const totalPendingApprovals = activeEvents.reduce((s, e) => s + (e.pendingCount || 0), 0);
 
@@ -609,7 +611,7 @@ export default function OrganizerDashboard() {
 
         {/* Past Tab */}
         {tab === "past" && (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {pastEvents.length === 0 && (
               <div className="text-center py-16 text-gray-400">
                 <LayoutDashboard className="w-10 h-10 mx-auto mb-2 text-gray-300" />
@@ -617,35 +619,76 @@ export default function OrganizerDashboard() {
               </div>
             )}
             {pastEvents.map(event => (
-              <Link key={event.id} href={`/organizer/events/${event.id}`}
-                className="block bg-white border border-gray-200/80 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all active:scale-[0.99]">
-                <div className="flex items-start justify-between gap-3">
+              <div key={event.id}
+                className="bg-white border border-gray-200/80 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
+                <div className="px-4 pt-3.5 pb-2 flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
+                    <Link href={`/organizer/events/${event.id}`} className="hover:text-blue-600 transition-colors">
                       <h3 className="font-semibold text-sm text-gray-900 truncate">{event.title}</h3>
-                      <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 ${STATUS_STYLES[event.status]}`}>
+                    </Link>
+                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                      <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${STATUS_STYLES[event.status]}`}>
                         {STATUS_LABELS[event.status]}
                       </span>
+                      {event.category && (
+                        <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full capitalize">
+                          {CATEGORY_LABELS[event.category] || event.category}
+                        </span>
+                      )}
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
-                      <Calendar className="w-3 h-3 shrink-0 text-gray-400" />
-                      <span>{event.date_display || event.date}</span>
-                      <span className="text-gray-300">·</span>
-                      <Clock className="w-3 h-3 shrink-0 text-gray-400" />
-                      <span>{event.time}</span>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500 mt-1.5">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3 text-gray-400" />
+                        <span>{event.date_display || event.date}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-3 h-3 text-gray-400" />
+                        <span>{event.time}{event.end_time ? `-${event.end_time}` : ""}</span>
+                      </div>
+                      <div className="flex items-center gap-1 truncate max-w-[160px]">
+                        <MapPin className="w-3 h-3 text-gray-400 shrink-0" />
+                        <span className="truncate">{event.location}</span>
+                      </div>
+                      {event.payment_info && (
+                        <div className="flex items-center gap-1 text-emerald-600 font-medium">
+                          <IndianRupee className="w-3 h-3" />
+                          <span>{event.payment_info}</span>
+                        </div>
+                      )}
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-400 mt-0.5">
-                      <MapPin className="w-3 h-3 shrink-0 text-gray-400" />
-                      <span className="truncate">{event.location}</span>
-                      {event.payment_info && <><span className="text-gray-300">·</span><span>{event.payment_info}</span></>}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-gray-500 shrink-0">
-                    <Users className="w-3 h-3" />
-                    <span>{event.applicantCount || 0}</span>
                   </div>
                 </div>
-              </Link>
+                <div className="px-4 pb-2">
+                  <div className="grid grid-cols-3 gap-2 mb-2">
+                    <div className="bg-gray-50 rounded-xl p-2 text-center">
+                      <p className="text-[10px] text-gray-500">Applicants</p>
+                      <p className="text-sm font-bold text-gray-900">{event.applicantCount || 0}</p>
+                    </div>
+                    <div className="bg-gray-50 rounded-xl p-2 text-center">
+                      <p className="text-[10px] text-gray-500">Approved</p>
+                      <p className="text-sm font-bold text-emerald-600">{event.approvedCount || 0}</p>
+                    </div>
+                    <div className="bg-gray-50 rounded-xl p-2 text-center">
+                      <p className="text-[10px] text-gray-500">Pending</p>
+                      <p className="text-sm font-bold text-amber-600">{event.pendingCount || 0}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="px-4 py-2.5 border-t border-gray-100 flex gap-1.5 overflow-x-auto">
+                  <button onClick={() => { setSelectedEvent(event); }}
+                    className="h-8 px-3 rounded-lg bg-gray-100 text-gray-700 text-xs font-medium flex items-center gap-1.5 hover:bg-gray-200 active:scale-95 transition-all shrink-0">
+                    <Users className="w-3.5 h-3.5" /> View Applicants
+                  </button>
+                  <Link href={`/organizer/events/${event.id}`}
+                    className="h-8 px-3 rounded-lg bg-blue-600 text-white text-xs font-medium flex items-center gap-1.5 hover:bg-blue-700 active:scale-95 transition-all shrink-0">
+                    Details <ChevronRight className="w-3 h-3" />
+                  </Link>
+                  <button onClick={() => { duplicateEvent(event); }}
+                    className="h-8 px-3 rounded-lg bg-gray-100 text-gray-700 text-xs font-medium flex items-center gap-1.5 hover:bg-gray-200 active:scale-95 transition-all shrink-0">
+                    <Copy className="w-3.5 h-3.5" /> Duplicate
+                  </button>
+                </div>
+              </div>
             ))}
           </div>
         )}

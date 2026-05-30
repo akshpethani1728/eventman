@@ -241,9 +241,11 @@ function DashboardContent() {
     apps?.forEach((a: Application) => { appMap[a.event_id] = a; });
     const appliedEventIds = Object.keys(appMap);
 
-    // Load browse events: actively accepting applications
+    // Load browse events: actively accepting applications, exclude events >1 day past event date
+    const browseCutoff = new Date(); browseCutoff.setDate(browseCutoff.getDate() - 1);
+    const browseCutoffStr = browseCutoff.toISOString().split("T")[0];
     const { data: browseEvts } = await supabase
-      .from("events").select("*").in("status", ["published", "filling"]).order("date", { ascending: true });
+      .from("events").select("*").in("status", ["published", "filling"]).gte("date", browseCutoffStr).order("date", { ascending: true });
 
     // Load applied events: any status so applied tab tracks them even if event became full/closed
     let appliedEvts: any[] = [];
