@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import {
   Mail, User, Lock, Eye, EyeOff, ArrowRight, ArrowDown,
@@ -545,6 +546,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
   const [role, setRole] = useState<"worker" | "organizer">("worker");
   const [name, setName] = useState("");
   const [error, setError] = useState("");
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const signedInRef = useRef(false);
@@ -678,6 +680,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
   const createProfile = async () => {
     setError("");
     if (!name.trim()) { setError("Please enter your name"); return; }
+    if (!agreeToTerms) { setError("Please agree to the Terms & Conditions and Privacy Policy"); return; }
     setLoading(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -797,9 +800,24 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                   <div className="flex-1 border-t border-gray-200" />
                   <span className="text-xs text-gray-400">or</span>
                   <div className="flex-1 border-t border-gray-200" />
-                </div>
+              </div>
 
-                <button
+              <label className="flex items-start gap-2.5 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={agreeToTerms}
+                  onChange={e => setAgreeToTerms(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500/30 focus:ring-offset-0"
+                />
+                <span className="text-xs text-gray-500 leading-relaxed group-hover:text-gray-700 transition-colors">
+                  I agree to the{" "}
+                  <Link href="/terms" target="_blank" className="text-blue-600 hover:text-blue-700 underline font-medium">Terms &amp; Conditions</Link>
+                  {" "}and{" "}
+                  <Link href="/privacy" target="_blank" className="text-blue-600 hover:text-blue-700 underline font-medium">Privacy Policy</Link>
+                </span>
+              </label>
+
+              <button
                   type="button"
                   disabled={loading}
                   onClick={handleCreateAccount}
@@ -1097,7 +1115,14 @@ export default function LoginPage() {
           <p className="mt-2 text-xs text-gray-400">
             Ahmedabad&apos;s Event Workforce Platform &mdash; Professional manpower coordination
           </p>
-          <p className="mt-1 text-[10px] text-gray-300">&copy; {new Date().getFullYear()} EventMan. All rights reserved.</p>
+          <div className="mt-4 flex items-center justify-center gap-4 text-[11px]">
+            <Link href="/terms" className="text-gray-400 hover:text-gray-600 transition-colors">Terms</Link>
+            <span className="text-gray-200">|</span>
+            <Link href="/privacy" className="text-gray-400 hover:text-gray-600 transition-colors">Privacy</Link>
+            <span className="text-gray-200">|</span>
+            <Link href="/refund-policy" className="text-gray-400 hover:text-gray-600 transition-colors">Refunds</Link>
+          </div>
+          <p className="mt-3 text-[10px] text-gray-300">&copy; {new Date().getFullYear()} EventMan. All rights reserved.</p>
         </div>
       </footer>
     </div>
