@@ -12,11 +12,11 @@ interface CardProps {
 }
 
 const ACCENT_BORDERS: Record<string, string> = {
-  red: "border-red-200/80",
-  amber: "border-amber-200/80",
-  blue: "border-blue-200/80",
-  purple: "border-purple-200/80",
-  emerald: "border-emerald-200/80",
+  red: "border-red-200/70",
+  amber: "border-amber-200/70",
+  blue: "border-blue-200/70",
+  purple: "border-purple-200/70",
+  emerald: "border-emerald-200/70",
 };
 
 const PADDING: Record<string, string> = {
@@ -53,7 +53,7 @@ const GRID_COLS: Record<number, string> = { 2: "grid-cols-2", 3: "grid-cols-3", 
 
 export function CardStats({ children, columns = 3 }: { children: React.ReactNode; columns?: number }) {
   return (
-    <div className={`grid ${GRID_COLS[columns] || "grid-cols-3"} gap-3`}>
+    <div className={`grid ${GRID_COLS[columns] || "grid-cols-3"} gap-2.5`}>
       {children}
     </div>
   );
@@ -69,9 +69,9 @@ export function CardStat({ label, value, color = "gray" }: { label: string; valu
     purple: "text-purple-600",
   };
   return (
-    <div className="bg-gray-50 rounded-xl p-2.5 text-center">
-      <p className="text-xs text-gray-500">{label}</p>
-      <p className={`text-lg font-bold ${colors[color] || colors.gray}`}>{value}</p>
+    <div className="bg-gray-50/80 rounded-xl p-3 text-center ring-1 ring-gray-100/50">
+      <p className="text-[11px] font-medium text-gray-500">{label}</p>
+      <p className={`text-xl font-bold mt-0.5 ${colors[color] || colors.gray}`}>{value}</p>
     </div>
   );
 }

@@ -216,10 +216,10 @@ export default function OrganizerDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 pb-28">
       {/* Header */}
-      <header className="sticky top-0 bg-white/80 backdrop-blur-lg border-b border-gray-200/80 z-20">
+      <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-gray-200/60 z-20">
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center shadow-sm">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center shadow-sm">
               <LayoutDashboard className="w-4 h-4 text-white" />
             </div>
             <div>
@@ -228,18 +228,18 @@ export default function OrganizerDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-0.5">
-            <Link href="/organizer/notifications" className="p-2 text-gray-400 hover:text-gray-600 rounded-xl hover:bg-gray-100 transition-colors relative">
+            <Link href="/organizer/notifications" className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors relative">
               <Bell className="w-4 h-4" />
             </Link>
-            <Link href="/organizer/database" className="p-2 text-gray-400 hover:text-gray-600 rounded-xl hover:bg-gray-100 transition-colors">
+            <Link href="/organizer/database" className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
               <Search className="w-4 h-4" />
             </Link>
-            <Link href="/organizer/profile" className="flex items-center gap-2 p-1.5 hover:bg-gray-100 rounded-xl transition-colors">
+            <Link href="/organizer/profile" className="flex items-center gap-2 p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
               <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-[11px] shadow-sm">
                 {profile?.full_name?.charAt(0) || "O"}
               </div>
             </Link>
-            <button onClick={signOut} className="p-2 text-gray-400 hover:text-gray-600 rounded-xl hover:bg-gray-100 transition-colors">
+            <button onClick={signOut} className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
               <LogOut className="w-4 h-4" />
             </button>
           </div>
@@ -255,28 +255,28 @@ export default function OrganizerDashboard() {
         )}
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4">
-          <div className="bg-white border border-gray-200/80 rounded-xl p-3.5 shadow-sm">
-            <p className="text-xl font-bold text-gray-900">{activeEvents.length}</p>
-            <p className="text-[10px] text-gray-500 mt-0.5 flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Active events</p>
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200/70 shadow-black/[0.02]">
+            <p className="text-2xl font-bold text-gray-900">{activeEvents.length}</p>
+            <p className="text-[11px] text-gray-500 mt-1 flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Active events</p>
           </div>
-          <div className="bg-white border border-gray-200/80 rounded-xl p-3.5 shadow-sm">
-            <p className="text-xl font-bold text-amber-600">{totalWorkersNeeded}</p>
-            <p className="text-[10px] text-gray-500 mt-0.5 flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-amber-500" /> Workers needed</p>
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200/70 shadow-black/[0.02]">
+            <p className="text-2xl font-bold text-amber-600">{totalWorkersNeeded}</p>
+            <p className="text-[11px] text-gray-500 mt-1 flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> Workers needed</p>
           </div>
-          <div className="bg-white border border-gray-200/80 rounded-xl p-3.5 shadow-sm">
-            <p className="text-xl font-bold text-blue-600">{totalPendingApprovals}</p>
-            <p className="text-[10px] text-gray-500 mt-0.5 flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Pending approvals</p>
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200/70 shadow-black/[0.02]">
+            <p className="text-2xl font-bold text-blue-600">{totalPendingApprovals}</p>
+            <p className="text-[11px] text-gray-500 mt-1 flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-blue-500" /> Pending approvals</p>
           </div>
-          <div className="bg-white border border-gray-200/80 rounded-xl p-3.5 shadow-sm">
-            <p className="text-xl font-bold text-red-600">{needsAttention.length}</p>
-            <p className="text-[10px] text-gray-500 mt-0.5 flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-red-500" /> Needs attention</p>
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200/70 shadow-black/[0.02]">
+            <p className="text-2xl font-bold text-red-600">{needsAttention.length}</p>
+            <p className="text-[11px] text-gray-500 mt-1 flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Needs attention</p>
           </div>
         </div>
 
         {/* Quick Actions */}
         <div className="flex gap-2 mb-4">
           <button onClick={() => { setCreateFromTemplate(null); setShowCreate(true); }}
-            className="flex-1 h-11 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 text-white text-sm font-medium flex items-center justify-center gap-2 shadow-sm shadow-blue-600/20 active:scale-[0.98] transition-all">
+            className="flex-1 h-11 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white text-sm font-semibold flex items-center justify-center gap-2 shadow-sm shadow-blue-600/20 hover:shadow-md hover:shadow-blue-600/30 active:scale-[0.97] transition-all duration-150">
             <Plus className="w-4 h-4" /> Create Event
           </button>
           {templates.length > 0 && (
@@ -290,10 +290,10 @@ export default function OrganizerDashboard() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-4 bg-white/80 backdrop-blur-xl rounded-2xl p-1 border border-gray-200/60 shadow-sm">
+        <div className="flex gap-1 mb-4 bg-white/80 backdrop-blur-xl rounded-xl p-1 border border-gray-200/60 shadow-sm shadow-black/[0.02]">
           {(["active", "past"] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
-              className={`flex-1 h-10 rounded-xl text-sm font-medium transition-all capitalize ${
+              className={`flex-1 h-9 rounded-lg text-sm font-medium transition-all capitalize ${
                 tab === t ? "bg-blue-600 text-white shadow-sm" : "text-gray-500 hover:text-gray-800"
               }`}>
               {t} ({t === "active" ? activeEvents.length : pastEvents.length})

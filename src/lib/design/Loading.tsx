@@ -7,21 +7,24 @@ export function Spinner({ size = "md", className = "" }: { size?: "sm" | "md" | 
 
 export function PageLoader() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <Spinner size="lg" />
+    <div className="min-h-screen bg-[#f5f5f7] flex items-center justify-center">
+      <div className="text-center">
+        <Spinner size="lg" />
+        <p className="mt-3 text-sm text-gray-400">Loading...</p>
+      </div>
     </div>
   );
 }
 
 export function SkeletonBlock({ className = "" }: { className?: string }) {
-  return <div className={`bg-gray-200 animate-pulse rounded-xl ${className}`} />;
+  return <div className={`bg-gray-200/70 animate-pulse rounded-lg ${className}`} />;
 }
 
 export function SkeletonCard() {
   return (
     <div className="bg-white rounded-2xl border border-gray-200/70 overflow-hidden shadow-sm">
       <div className="px-4 pt-3.5 pb-2 flex items-center gap-2.5">
-        <SkeletonBlock className="w-8 h-8 rounded-xl" />
+        <SkeletonBlock className="w-8 h-8 rounded-lg" />
         <div className="space-y-1.5 flex-1">
           <SkeletonBlock className="w-28 h-3" />
           <SkeletonBlock className="w-20 h-2.5" />
@@ -47,17 +50,19 @@ export function SkeletonCard() {
 }
 
 export function EmptyState({ icon, title, description, action }: {
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   title: string;
   description: string;
   action?: React.ReactNode;
 }) {
   return (
-    <div className="text-center py-16 px-4">
-      <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200/60 flex items-center justify-center mx-auto mb-5 shadow-sm">
-        {icon}
-      </div>
-      <p className="text-lg font-bold text-gray-900">{title}</p>
+    <div className="text-center py-16 px-6">
+      {icon && (
+        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200/60 flex items-center justify-center mx-auto mb-4 shadow-sm">
+          {icon}
+        </div>
+      )}
+      <p className="text-base font-semibold text-gray-900">{title}</p>
       <p className="text-sm text-gray-500 mt-1.5 leading-relaxed max-w-xs mx-auto">{description}</p>
       {action && <div className="mt-5">{action}</div>}
     </div>

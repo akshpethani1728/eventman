@@ -390,10 +390,10 @@ function DashboardContent() {
   return (
     <div className="min-h-screen bg-[#f5f5f7]">
       {/* Header */}
-      <header className="sticky top-0 bg-white/80 backdrop-blur-2xl border-b border-gray-200/60 z-20">
+      <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-gray-200/60 z-20">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center shadow-sm">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center shadow-sm">
               <Zap className="w-4 h-4 text-white" />
             </div>
             <div>
@@ -404,15 +404,15 @@ function DashboardContent() {
           <div className="flex items-center gap-0.5">
             {profile && (
               <>
-                <Link href="/worker/notifications" className="relative p-2 text-gray-400 hover:text-gray-600 rounded-xl hover:bg-gray-100 transition-colors">
+                <Link href="/worker/notifications" className="relative p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
                   <Bell className="w-4 h-4" />
                   {unreadNotifCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center shadow-sm shadow-red-500/30">
+                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center shadow-sm">
                       {unreadNotifCount > 9 ? "9+" : unreadNotifCount}
                     </span>
                   )}
                 </Link>
-                <Link href="/worker/profile" className="relative flex items-center gap-2 p-1.5 hover:bg-gray-100 rounded-xl transition-colors">
+                <Link href="/worker/profile" className="relative flex items-center gap-2 p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
                   <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-[11px] shadow-sm">
                     {profile.full_name?.charAt(0) || "W"}
                   </div>
@@ -422,7 +422,7 @@ function DashboardContent() {
                 </Link>
               </>
             )}
-            <button onClick={signOut} className="p-2 text-gray-400 hover:text-gray-600 rounded-xl hover:bg-gray-100 transition-colors">
+            <button onClick={signOut} className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
               <LogOut className="w-4 h-4" />
             </button>
           </div>
@@ -497,16 +497,16 @@ function DashboardContent() {
         )}
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-4 bg-white/80 backdrop-blur-xl rounded-2xl p-1 border border-gray-200/60 shadow-sm">
+        <div className="flex gap-2 mb-4 bg-white/80 backdrop-blur-xl rounded-lg p-1 border border-gray-200/60 shadow-sm shadow-black/[0.02]">
           <button onClick={() => setTab("browse")}
-            className={`flex-1 h-11 rounded-xl text-sm font-medium transition-all ${
-              tab === "browse" ? "bg-blue-600 text-white shadow-md shadow-blue-600/20" : "text-gray-500 hover:text-gray-800"
+            className={`flex-1 h-10 rounded-lg text-sm font-medium transition-all ${
+              tab === "browse" ? "bg-blue-600 text-white shadow-sm" : "text-gray-500 hover:text-gray-800"
             }`}>
             Browse {browseEvents.length > 0 && `(${browseEvents.length})`}
           </button>
           <button onClick={() => setTab("applied")}
-            className={`flex-1 h-11 rounded-xl text-sm font-medium transition-all ${
-              tab === "applied" ? "bg-blue-600 text-white shadow-md shadow-blue-600/20" : "text-gray-500 hover:text-gray-800"
+            className={`flex-1 h-10 rounded-lg text-sm font-medium transition-all ${
+              tab === "applied" ? "bg-blue-600 text-white shadow-sm" : "text-gray-500 hover:text-gray-800"
             }`}>
             Applied {appliedEvents.length > 0 && `(${appliedEvents.length})`}
           </button>
@@ -520,13 +520,13 @@ function DashboardContent() {
               <div className="mb-3 overflow-x-auto -mx-4 px-4 scrollbar-none">
                 <div className="flex gap-2 min-w-max pb-1">
                   <button onClick={() => setCategoryFilter("")}
-                    className={`h-9 px-4 rounded-xl text-xs font-medium transition-all whitespace-nowrap ${
-                      !categoryFilter ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20" : "bg-white text-gray-600 border border-gray-200/80 hover:border-gray-300 shadow-sm"
+                    className={`h-9 px-4 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
+                      !categoryFilter ? "bg-blue-600 text-white shadow-sm" : "bg-white text-gray-600 border border-gray-200/80 hover:border-gray-300 shadow-sm"
                     }`}>All</button>
                   {allCategories.map(cat => (
                     <button key={cat} onClick={() => setCategoryFilter(cat)}
-                      className={`h-9 px-4 rounded-xl text-xs font-medium capitalize transition-all whitespace-nowrap ${
-                        categoryFilter === cat ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20" : "bg-white text-gray-600 border border-gray-200/80 hover:border-gray-300 shadow-sm"
+                      className={`h-9 px-4 rounded-lg text-xs font-medium capitalize transition-all whitespace-nowrap ${
+                        categoryFilter === cat ? "bg-blue-600 text-white shadow-sm" : "bg-white text-gray-600 border border-gray-200/80 hover:border-gray-300 shadow-sm"
                       }`}>{CATEGORY_LABELS[cat] || cat.replace(/_/g, " ")}</button>
                   ))}
                 </div>
@@ -603,18 +603,18 @@ function DashboardContent() {
                     style={{ animationDelay: `${idx * 60}ms`, animationFillMode: "both" }}>
 
                     {/* === INTELLIGENCE ACCENT BAR === */}
-                    <div className={`h-1.5 ${
+                    <div className={`h-1 ${
                       isToday || hoursUntilEvent < 12
-                        ? "bg-gradient-to-r from-red-400 via-red-500 to-rose-500 shadow-sm shadow-red-500/20"
+                        ? "bg-gradient-to-r from-red-400 to-rose-500"
                         : isNearlyFull
-                          ? "bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 shadow-sm shadow-amber-500/20"
+                          ? "bg-gradient-to-r from-amber-400 to-orange-500"
                           : isFillingFast
-                            ? "bg-gradient-to-r from-amber-300 via-amber-400 to-orange-400"
+                            ? "bg-gradient-to-r from-amber-300 to-orange-400"
                             : isTrusted
-                              ? "bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-500 shadow-sm shadow-blue-500/20"
+                              ? "bg-gradient-to-r from-blue-400 to-indigo-500"
                               : isNew
-                                ? "bg-gradient-to-r from-blue-300 via-blue-400 to-indigo-400"
-                                : "bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200"
+                                ? "bg-gradient-to-r from-blue-300 to-indigo-400"
+                                : "bg-gradient-to-r from-gray-200 to-gray-300"
                     }`} />
 
                     {/* === PREMIUM TRUST STRIP === */}
@@ -668,32 +668,32 @@ function DashboardContent() {
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
                         {event.category && (
-                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-lg capitalize ${CATEGORY_COLORS[event.category] || "bg-gray-100 text-gray-600"}`}>
+                          <span className={`text-[10px] font-semibold px-2.5 py-0.5 rounded-lg capitalize ${CATEGORY_COLORS[event.category] || "bg-gray-50 text-gray-600 border border-gray-200/60"}`}>
                             {CATEGORY_LABELS[event.category] || event.category}
                           </span>
                         )}
                         {deadlinePassed && (
-                          <span className="text-[10px] font-bold bg-gray-500/10 text-gray-500 px-2 py-0.5 rounded-lg border border-gray-200/60">
+                          <span className="text-[10px] font-semibold bg-gray-100/50 text-gray-500 px-2.5 py-0.5 rounded-lg border border-gray-200/60">
                             Deadline Passed
                           </span>
                         )}
                         {!deadlinePassed && isFull && (
-                          <span className="text-[10px] font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-lg border border-purple-200/60">
+                          <span className="text-[10px] font-semibold bg-purple-50 text-purple-700 px-2.5 py-0.5 rounded-lg border border-purple-200/60">
                             Full
                           </span>
                         )}
                         {waitlisted && (
-                          <span className="text-[10px] font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-lg border border-purple-200/60">
+                          <span className="text-[10px] font-semibold bg-purple-50 text-purple-700 px-2.5 py-0.5 rounded-lg border border-purple-200/60">
                             Waitlisted
                           </span>
                         )}
                         {isNewlyPosted && (
-                          <span className="text-[10px] font-bold bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-2 py-0.5 rounded-lg shadow-md shadow-blue-500/30 animate-pulse">
+                          <span className="text-[10px] font-semibold bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-2.5 py-0.5 rounded-lg shadow-sm animate-pulse">
                             New
                           </span>
                         )}
                         {!isNewlyPosted && isNew && !deadlinePassed && (
-                          <span className="text-[10px] font-bold bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-2 py-0.5 rounded-lg shadow-sm shadow-blue-500/20">
+                          <span className="text-[10px] font-semibold bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-2.5 py-0.5 rounded-lg shadow-sm">
                             New
                           </span>
                         )}
@@ -739,7 +739,7 @@ function DashboardContent() {
                       {/* Payment — HERO */}
                       {event.payment_info && (
                         <div className="mb-2.5">
-                          <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200/60 rounded-xl px-3 py-1.5 shadow-sm">
+                          <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200/60 rounded-lg px-3 py-1.5 shadow-sm">
                             <IndianRupee className="w-4 h-4 text-emerald-600" />
                             <span className="text-base font-bold text-emerald-700">{event.payment_info}</span>
                           </div>
@@ -747,15 +747,16 @@ function DashboardContent() {
                       )}
 
                       {/* Date / Time / Location */}
-                      <div className="space-y-1 mb-3">
-                        <div className="flex items-center gap-2 text-xs text-gray-600">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-600 mb-3">
+                        <div className="flex items-center gap-1.5">
                           <Calendar className="w-3.5 h-3.5 shrink-0 text-gray-400" />
-                          <span className="font-medium">{event.date_display || new Date(event.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span>
-                          <span className="text-gray-300">·</span>
+                          <span>{event.date_display || new Date(event.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
                           <Clock className="w-3.5 h-3.5 shrink-0 text-gray-400" />
                           <span>{event.time}{event.end_time ? `-${event.end_time}` : ""}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-gray-600">
+                        <div className="flex items-center gap-1.5 truncate max-w-[200px]">
                           <MapPin className="w-3.5 h-3.5 shrink-0 text-gray-400" />
                           <span className="truncate">{event.location}</span>
                         </div>
@@ -764,7 +765,7 @@ function DashboardContent() {
                       {/* Seats progress */}
                       <div className="mb-2.5">
                         <div className="flex items-center justify-between text-xs mb-1.5">
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-1.5">
                             <Users className="w-3.5 h-3.5 text-gray-400" />
                             <span className={`font-medium ${remaining === 0 ? "text-red-600" : remaining <= 3 ? "text-amber-600" : "text-gray-700"}`}>
                               {remaining} of {event.worker_count} remaining
@@ -772,12 +773,12 @@ function DashboardContent() {
                           </div>
                           <span className="text-gray-400">{fillPercent}% filled</span>
                         </div>
-                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                           <div
                             className={`h-full rounded-full transition-all duration-700 ease-out ${
                               fillPercent >= 80 ? "bg-gradient-to-r from-red-400 to-red-500" : fillPercent >= 50 ? "bg-gradient-to-r from-amber-400 to-amber-500" : "bg-gradient-to-r from-blue-400 to-blue-500"
                             } ${isNearlyFull ? "animate-pulse" : ""}`}
-                            style={{ width: `${fillPercent}%` }}
+                            style={{ width: `${Math.max(2, fillPercent)}%` }}
                           />
                         </div>
                       </div>
@@ -785,26 +786,26 @@ function DashboardContent() {
                       {/* Requirement chips */}
                       <div className="flex flex-wrap gap-1.5">
                         {event.gender_requirement && (
-                          <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-lg capitalize">{event.gender_requirement}</span>
+                          <span className="text-[10px] font-medium bg-gray-50 text-gray-600 px-2.5 py-0.5 rounded-lg border border-gray-200/60 capitalize">{event.gender_requirement}</span>
                         )}
                         {(event.min_age || event.max_age) && (
-                          <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-lg">{event.min_age || 0}-{event.max_age || 99} yrs</span>
+                          <span className="text-[10px] font-medium bg-gray-50 text-gray-600 px-2.5 py-0.5 rounded-lg border border-gray-200/60">{event.min_age || 0}-{event.max_age || 99} yrs</span>
                         )}
                         {event.food_included && (
-                          <span className="text-[10px] bg-green-50 text-green-700 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                          <span className="text-[10px] font-medium bg-green-50 text-green-700 px-2.5 py-0.5 rounded-lg border border-green-200/60 flex items-center gap-1">
                             <UtensilsCrossed className="w-3 h-3" /> Food
                           </span>
                         )}
                         {event.travel_included && (
-                          <span className="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                          <span className="text-[10px] font-medium bg-blue-50 text-blue-700 px-2.5 py-0.5 rounded-lg border border-blue-200/60 flex items-center gap-1">
                             <Car className="w-3 h-3" /> Travel
                           </span>
                         )}
                         {event.dress_code && (
-                          <span className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-lg">{event.dress_code}</span>
+                          <span className="text-[10px] font-medium bg-gray-50 text-gray-600 px-2.5 py-0.5 rounded-lg border border-gray-200/60">{event.dress_code}</span>
                         )}
                         {event.skill_requirements && event.skill_requirements.length > 0 && (
-                          <span className="text-[10px] bg-violet-50 text-violet-700 px-2 py-0.5 rounded-lg">
+                          <span className="text-[10px] font-medium bg-violet-50 text-violet-700 px-2.5 py-0.5 rounded-lg border border-violet-200/60">
                             {event.skill_requirements.slice(0, 2).join(", ")}{event.skill_requirements.length > 2 ? ` +${event.skill_requirements.length - 2}` : ""}
                           </span>
                         )}
@@ -840,16 +841,16 @@ function DashboardContent() {
                         )}
                       </div>
                       {deadlinePassed ? (
-                        <div className="h-10 px-4 rounded-xl bg-gray-100 text-gray-400 text-xs font-semibold flex items-center gap-1.5">
+                        <div className="h-9 px-4 rounded-lg bg-gray-100 text-gray-400 text-xs font-semibold flex items-center gap-1.5">
                           <Clock className="w-3.5 h-3.5" /> Applications Closed
                         </div>
                       ) : waitlisted ? (
                         <button
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); leaveWaitlist(event.application!); }}
                           disabled={applyingId === event.id}
-                          className="h-10 px-5 rounded-xl font-semibold text-sm flex items-center gap-1.5 transition-all active:scale-95 shadow-sm bg-purple-100 text-purple-700 border border-purple-200 hover:bg-purple-200">
+                          className="h-9 px-4 rounded-lg font-semibold text-xs flex items-center gap-1.5 transition-all active:scale-[0.97] shadow-sm bg-purple-50 text-purple-700 border border-purple-200/60 hover:bg-purple-100">
                           {applyingId === event.id ? (
-                            <span className="w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
+                            <span className="w-3.5 h-3.5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
                           ) : (
                             <><ListMinus className="w-3.5 h-3.5" /> Leave Waitlist</>
                           )}
@@ -857,16 +858,16 @@ function DashboardContent() {
                       ) : !canApply ? (
                         <Link href="/worker/plans"
                           onClick={(e) => { e.stopPropagation(); }}
-                          className="h-10 px-5 rounded-xl font-semibold text-sm flex items-center gap-1.5 shadow-sm bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:shadow-lg transition-all active:scale-95">
-                          <CreditCard className="w-3.5 h-3.5" /> Subscribe to Apply
+                          className="h-9 px-4 rounded-lg font-semibold text-xs flex items-center gap-1.5 shadow-sm bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:shadow-lg transition-all active:scale-[0.97]">
+                          <CreditCard className="w-3.5 h-3.5" /> Subscribe
                         </Link>
                       ) : isFull ? (
                         <button
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); joinWaitlist(event.id); }}
                           disabled={applyingId === event.id}
-                          className="h-10 px-5 rounded-xl font-semibold text-sm flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-60 shadow-sm bg-purple-600 text-white shadow-purple-600/20 hover:shadow-lg hover:shadow-purple-600/30">
+                          className="h-9 px-4 rounded-lg font-semibold text-xs flex items-center gap-1.5 transition-all active:scale-[0.97] disabled:opacity-60 shadow-sm bg-purple-600 text-white shadow-purple-600/20 hover:shadow-lg">
                           {applyingId === event.id ? (
-                            <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                           ) : (
                             <><ListPlus className="w-3.5 h-3.5" /> Join Waitlist</>
                           )}
@@ -875,15 +876,15 @@ function DashboardContent() {
                         <button
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); apply(event.id); }}
                           disabled={applyingId === event.id}
-                          className={`h-10 px-5 rounded-xl font-semibold text-sm flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-60 shadow-sm ${
+                          className={`h-9 px-4 rounded-lg font-semibold text-xs flex items-center gap-1.5 transition-all active:scale-[0.97] disabled:opacity-60 shadow-sm ${
                             isToday || hoursUntilEvent < 12
-                              ? "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-500/20 hover:shadow-lg hover:shadow-red-500/30"
+                              ? "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-500/20 hover:shadow-lg"
                               : isNearlyFull
-                                ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-amber-500/20 hover:shadow-lg hover:shadow-amber-500/30"
-                                : "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30"
+                                ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-amber-500/20 hover:shadow-lg"
+                                : "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-blue-600/20 hover:shadow-lg"
                           }`}>
                         {applyingId === event.id ? (
-                          <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         ) : (
                           <><ArrowUpRight className="w-3.5 h-3.5" /> {(event.application && (event.application.status === "cancelled" || event.application.status === "rejected")) ? "Re-apply" : "Apply"}</>
                         )}
