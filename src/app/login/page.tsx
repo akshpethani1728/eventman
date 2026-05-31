@@ -795,6 +795,21 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                     </div>
                   </div>
 
+                  <label className="flex items-start gap-2.5 cursor-pointer group mb-1">
+                    <input
+                      type="checkbox"
+                      checked={agreeToTerms}
+                      onChange={e => setAgreeToTerms(e.target.checked)}
+                      className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500/30 focus:ring-offset-0"
+                    />
+                    <span className="text-xs text-gray-500 leading-relaxed group-hover:text-gray-700 transition-colors">
+                      I agree to the{" "}
+                      <Link href="/terms" target="_blank" className="text-blue-600 hover:text-blue-700 underline font-medium">Terms &amp; Conditions</Link>
+                      {" "}and{" "}
+                      <Link href="/privacy" target="_blank" className="text-blue-600 hover:text-blue-700 underline font-medium">Privacy Policy</Link>
+                    </span>
+                  </label>
+
                   <button
                     type="button"
                     disabled={loading}
@@ -830,21 +845,6 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                   <p className="text-xs text-gray-400 text-center -mt-1">
                     New here? Set up your account in seconds
                   </p>
-
-                  <label className="flex items-start gap-2.5 cursor-pointer group">
-                    <input
-                      type="checkbox"
-                      checked={agreeToTerms}
-                      onChange={e => setAgreeToTerms(e.target.checked)}
-                      className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500/30 focus:ring-offset-0"
-                    />
-                    <span className="text-xs text-gray-500 leading-relaxed group-hover:text-gray-700 transition-colors">
-                      I agree to the{" "}
-                      <Link href="/terms" target="_blank" className="text-blue-600 hover:text-blue-700 underline font-medium">Terms &amp; Conditions</Link>
-                      {" "}and{" "}
-                      <Link href="/privacy" target="_blank" className="text-blue-600 hover:text-blue-700 underline font-medium">Privacy Policy</Link>
-                    </span>
-                  </label>
 
                   <button
                     type="button"
