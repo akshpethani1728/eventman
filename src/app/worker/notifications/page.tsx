@@ -77,13 +77,13 @@ export default function WorkerNotificationsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <header className="sticky top-0 bg-white border-b border-gray-200 z-10">
+    <div className="min-h-screen bg-gray-50/50 pb-24">
+      <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-gray-200/60 z-10">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
           <Link href="/worker/dashboard" className="p-1 -ml-1 text-gray-500"><ArrowLeft className="w-5 h-5" /></Link>
-          <h1 className="font-semibold">Notifications</h1>
+          <h1 className="font-semibold text-sm">Notifications</h1>
           {unreadCount > 0 && (
-            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full ml-auto">{unreadCount} new</span>
+            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full ml-auto font-semibold">{unreadCount} new</span>
           )}
         </div>
       </header>
@@ -91,16 +91,18 @@ export default function WorkerNotificationsPage() {
       <main className="max-w-lg mx-auto px-4 py-4">
         {unreadCount > 0 && (
           <button onClick={markAllRead}
-            className="w-full h-9 mb-4 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium flex items-center justify-center gap-2 active:bg-gray-200">
+            className="w-full h-9 mb-4 rounded-lg bg-white text-gray-600 text-sm font-medium flex items-center justify-center gap-2 border border-gray-200/70 shadow-sm hover:bg-gray-50 active:scale-[0.98] transition-all">
             <CheckCheck className="w-4 h-4" /> Mark all as read
           </button>
         )}
 
         {notifications.length === 0 && (
-          <div className="text-center py-16 text-gray-400">
-            <Bell className="w-10 h-10 mx-auto mb-2 text-gray-300" />
-            <p className="text-sm">No notifications yet</p>
-            <p className="text-xs text-gray-300 mt-1">Updates about your applications will appear here</p>
+          <div className="text-center py-20">
+            <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mx-auto mb-3 ring-1 ring-blue-100">
+              <Bell className="w-5 h-5 text-blue-500" />
+            </div>
+            <p className="text-sm font-medium text-gray-500">No notifications yet</p>
+            <p className="text-xs text-gray-400 mt-1">Updates about your applications will appear here</p>
           </div>
         )}
 
@@ -111,14 +113,14 @@ export default function WorkerNotificationsPage() {
                 <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider truncate">
                   {eventName}
                 </span>
-                <span className="text-[10px] text-gray-400 ml-auto">{notifs.length}</span>
+                <span className="text-[10px] text-gray-400 ml-auto bg-gray-100 px-1.5 py-0.5 rounded-md font-medium">{notifs.length}</span>
               </div>
               <div className="space-y-1.5">
                 {notifs.map(n => (
-                  <div key={n.id} className={`border rounded-xl p-3 flex items-start gap-2.5 ${
-                    n.read ? "border-gray-200 bg-white" : "border-blue-200 bg-blue-50"
+                  <div key={n.id} className={`rounded-lg p-3 flex items-start gap-2.5 border shadow-sm shadow-black/[0.02] transition-all ${
+                    n.read ? "border-gray-200/70 bg-white" : "border-blue-200 bg-blue-50"
                   }`}>
-                    <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center shrink-0">
+                    <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center shrink-0 shadow-sm">
                       {ICONS[n.title] || <Bell className="w-3.5 h-3.5 text-gray-400" />}
                     </div>
                     <div className="min-w-0 flex-1">

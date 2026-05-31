@@ -6,6 +6,8 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { ArrowLeft, Save, User, Phone, MapPin, BadgeCheck, ShieldCheck, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/lib/design/Button";
+import { PageLoader } from "@/lib/design/Loading";
 import type { Profile } from "@/lib/supabase/types";
 
 export default function OrganizerProfilePage() {
@@ -71,53 +73,45 @@ export default function OrganizerProfilePage() {
     toast.success("Profile saved");
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-500">Loading...</p>
-      </div>
-    );
-  }
+  if (loading) return <PageLoader />;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <header className="sticky top-0 bg-white border-b border-gray-200 z-10">
+    <div className="min-h-screen bg-gray-50/50 pb-24">
+      <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-gray-200/60 z-10">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
-          <Link href="/organizer/dashboard" className="p-1 -ml-1">
-            <ArrowLeft className="w-5 h-5 text-gray-700" />
-          </Link>
-          <h1 className="font-semibold">My Profile</h1>
+          <Link href="/organizer/dashboard" className="p-1 -ml-1 text-gray-500"><ArrowLeft className="w-5 h-5" /></Link>
+          <h1 className="font-semibold text-sm">My Profile</h1>
         </div>
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
         <form onSubmit={(e) => { e.preventDefault(); saveProfile(); }}>
-          <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
-            <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3 border-2 border-gray-200">
+          <div className="bg-white rounded-xl p-6 text-center shadow-sm shadow-black/[0.02] border border-gray-200/70">
+            <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3 ring-1 ring-blue-200">
               <span className="text-2xl font-bold text-blue-600">{profile?.full_name?.charAt(0)?.toUpperCase() || "O"}</span>
             </div>
             <div className="flex items-center justify-center gap-2">
               <p className="font-semibold text-lg">{profile?.full_name}</p>
               {profile?.is_trusted_organizer && (
-                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.5 rounded-md">
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.5 rounded-lg">
                   <BadgeCheck className="w-3 h-3" />
                   Trusted
                 </span>
               )}
               {!profile?.is_trusted_organizer && profile?.status === "trusted" && (
-                <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-blue-700 bg-blue-50 border border-blue-200/60 px-1.5 py-0.5 rounded-md">
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-blue-700 bg-blue-50 border border-blue-200/60 px-1.5 py-0.5 rounded-lg">
                   <ShieldCheck className="w-3 h-3" />
                   Verified
                 </span>
               )}
               {!profile?.is_trusted_organizer && profile?.status === "basic_verified" && (
-                <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-sky-700 bg-sky-50 border border-sky-200/60 px-1.5 py-0.5 rounded-md">
+                <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-sky-700 bg-sky-50 border border-sky-200/60 px-1.5 py-0.5 rounded-lg">
                   <ShieldAlert className="w-3 h-3" />
                   Basic Verified
                 </span>
               )}
             </div>
-            <p className="text-sm text-gray-500 capitalize">{profile?.role}</p>
+            <p className="text-sm text-gray-500 capitalize mt-0.5">{profile?.role}</p>
             <div className="flex items-center justify-center gap-4 mt-3">
               <div className="text-center">
                 <p className="text-lg font-bold text-gray-900">{pastEventCount}</p>
@@ -126,13 +120,13 @@ export default function OrganizerProfilePage() {
             </div>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4 mt-4">
+          <div className="bg-white rounded-xl p-5 space-y-4 shadow-sm shadow-black/[0.02] border border-gray-200/70">
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Full Name</label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input value={form.full_name} onChange={e => update("full_name", e.target.value)}
-                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm form-input" />
+                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all" />
               </div>
             </div>
 
@@ -142,7 +136,7 @@ export default function OrganizerProfilePage() {
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input value={form.phone} onChange={e => update("phone", e.target.value)}
                   placeholder="9876543210"
-                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm form-input" />
+                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all" />
               </div>
             </div>
 
@@ -152,36 +146,33 @@ export default function OrganizerProfilePage() {
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input value={form.city} onChange={e => update("city", e.target.value)}
                   placeholder="Ahmedabad"
-                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm form-input" />
+                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all" />
               </div>
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Area</label>
               <input value={form.area} onChange={e => update("area", e.target.value)}
                 placeholder="e.g., Navrangpura"
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm form-input" />
+                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all" />
             </div>
           </div>
 
           {/* About section */}
-          <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4 mt-4">
+          <div className="bg-white rounded-xl p-5 space-y-4 shadow-sm shadow-black/[0.02] border border-gray-200/70">
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">About</h3>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Description / About</label>
               <textarea value={form.bio} onChange={e => update("bio", e.target.value)}
                 placeholder="Tell workers about your organization..."
-                className="w-full h-20 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm resize-none form-input" />
+                className="w-full h-20 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm resize-none outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all" />
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={saving}
-            className="mt-4 w-full h-12 rounded-xl bg-blue-600 text-white font-medium flex items-center justify-center gap-2 disabled:opacity-50 active:bg-blue-700"
-          >
-            <Save className="w-4 h-4" />
-            {saving ? "Saving..." : "Save Profile"}
-          </button>
+          <div className="mt-4">
+            <Button type="submit" size="lg" loading={saving} icon={<Save className="w-4 h-4" />} className="w-full">
+              {saving ? "Saving..." : "Save Profile"}
+            </Button>
+          </div>
         </form>
       </main>
     </div>
