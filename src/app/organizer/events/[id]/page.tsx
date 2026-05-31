@@ -213,87 +213,101 @@ export default function OrganizerEventDetailPage() {
   const filteredApplicants = filter ? applicants.filter(a => a.status === filter) : applicants;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white pb-20">
       {/* Header */}
-      <header className="sticky top-0 bg-white border-b border-gray-200 z-10">
+      <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-gray-200/60 z-10">
+        <div className="h-0.5 bg-gradient-to-r from-indigo-200 via-indigo-500 to-indigo-200" />
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center gap-3">
-          <Link href="/organizer/dashboard" className="p-1 -ml-1 text-gray-500"><ArrowLeft className="w-5 h-5" /></Link>
+          <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-indigo-700 hover:bg-indigo-50 rounded-xl transition-all"><ArrowLeft className="w-5 h-5" /></Link>
           <h1 className="font-semibold text-sm truncate">{event.title}</h1>
+          <Badge variant={event.status as any || "draft"} className="ml-auto">{STATUS_LABELS[event.status]}</Badge>
         </div>
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-4 space-y-4">
         {/* Operational Alerts */}
-        <div className="space-y-1.5">
-          {isToday && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-lg px-3 py-2 flex items-center gap-2"><Clock3 className="w-3.5 h-3.5" />Starts today</div>}
-          {isTomorrow && <div className="text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-lg px-3 py-2 flex items-center gap-2"><Clock3 className="w-3.5 h-3.5" />Starts tomorrow</div>}
-          {remaining <= 3 && remaining > 0 && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-lg px-3 py-2 flex items-center gap-2"><AlertTriangle className="w-3.5 h-3.5" />Only {remaining} seat{remaining !== 1 ? "s" : ""} left</div>}
-          {deadlineToday && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-lg px-3 py-2 flex items-center gap-2"><AlertTriangle className="w-3.5 h-3.5" />Application deadline is today</div>}
-          {deadlineSoon && !deadlineToday && <div className="text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-lg px-3 py-2 flex items-center gap-2"><Clock3 className="w-3.5 h-3.5" />Deadline closing soon</div>}
-          {pendingCount > 0 && <div className="text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-lg px-3 py-2 flex items-center gap-2"><Users className="w-3.5 h-3.5" />{pendingCount} pending approval{pendingCount !== 1 ? "s" : ""}</div>}
+        <div className="space-y-1.5 animate-fade-in">
+          {isToday && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-xl px-3.5 py-2.5 flex items-center gap-2 shadow-sm"><Clock3 className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Starts today</span></div>}
+          {isTomorrow && <div className="text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-xl px-3.5 py-2.5 flex items-center gap-2 shadow-sm"><Clock3 className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Starts tomorrow</span></div>}
+          {remaining <= 3 && remaining > 0 && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-xl px-3.5 py-2.5 flex items-center gap-2 shadow-sm"><AlertTriangle className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Only {remaining} seat{remaining !== 1 ? "s" : ""} left</span></div>}
+          {deadlineToday && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-xl px-3.5 py-2.5 flex items-center gap-2 shadow-sm"><AlertTriangle className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Application deadline is today</span></div>}
+          {deadlineSoon && !deadlineToday && <div className="text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-xl px-3.5 py-2.5 flex items-center gap-2 shadow-sm"><Clock3 className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Deadline closing soon</span></div>}
+          {pendingCount > 0 && <div className="text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-xl px-3.5 py-2.5 flex items-center gap-2 shadow-sm"><Users className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">{pendingCount} pending approval{pendingCount !== 1 ? "s" : ""}</span></div>}
         </div>
 
         {/* Status & Quick Stats */}
         <Card>
           <CardHeader className="mb-3">
             <div className="flex items-center gap-2 flex-wrap">
-              <Badge variant={event.status as any || "draft"}>{STATUS_LABELS[event.status]}</Badge>
-              {event.category && <span className="text-[10px] font-medium bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full capitalize">{event.category.replace(/_/g, " ")}</span>}
+              {event.category && <span className="text-[10px] font-medium bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-lg capitalize">{event.category.replace(/_/g, " ")}</span>}
             </div>
-            <span className="text-[10px] text-gray-400">{event.id.slice(0, 8)}</span>
+            <span className="text-[10px] text-gray-400 font-mono">{event.id.slice(0, 8)}</span>
           </CardHeader>
           <CardStats columns={3}>
             <CardStat label="Seats open" value={remaining} />
             <CardStat label="Approved" value={approvedCount} color="blue" />
             <CardStat label="Pending" value={pendingCount} color="amber" />
           </CardStats>
-          {event.application_deadline && (
-            <p className="text-xs text-gray-400 mt-2">Apply by {new Date(event.application_deadline).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</p>
-          )}
-        </Card>
-
-        {/* Event Details */}
-        <Card>
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Event Details</p>
-          <div className="grid grid-cols-2 gap-2.5 text-sm">
-            <div className="flex items-center gap-1.5 text-gray-600"><Calendar className="w-3.5 h-3.5 text-gray-400 shrink-0" />{event.date_display || event.date}</div>
-            <div className="flex items-center gap-1.5 text-gray-600"><Clock className="w-3.5 h-3.5 text-gray-400 shrink-0" />{event.time}{event.end_time ? `-${event.end_time}` : ""}</div>
-            <div className="col-span-2 flex items-center gap-1.5 text-gray-600"><MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" /><span className="truncate">{event.location}</span></div>
-            {event.payment_info && <div className="col-span-2 flex items-center gap-1.5 text-green-700"><IndianRupee className="w-3.5 h-3.5 shrink-0" />{event.payment_info}</div>}
-            {(event.food_included || event.travel_included) && (
-              <div className="col-span-2 flex gap-3 text-xs text-gray-500">
-                {event.food_included && <span>âœ“ Food included</span>}
-                {event.travel_included && <span>âœ“ Travel included</span>}
-              </div>
+          <div className="mt-3 flex items-center justify-between">
+            {(event.application_deadline) && (
+              <p className="text-[11px] text-gray-400 flex items-center gap-1"><Clock className="w-3 h-3" />Apply by {new Date(event.application_deadline).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</p>
             )}
+            <div className="flex-1 ml-4">
+              <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div className={`h-full rounded-full transition-all duration-500 ${
+                  approvedCount >= event.worker_count ? "bg-purple-500" : approvedCount >= Math.ceil(event.worker_count * 0.8) ? "bg-emerald-500" : "bg-indigo-600"
+                }`} style={{ width: `${Math.min(100, Math.round((approvedCount / event.worker_count) * 100))}%`}} />
+              </div>
+              <p className="text-[10px] text-gray-400 mt-0.5 text-right">{approvedCount}/{event.worker_count} filled</p>
+            </div>
           </div>
         </Card>
 
+        {/* Event Details */}
+        <div className="bg-white rounded-2xl border border-gray-200/70 p-4 shadow-sm shadow-black/[0.02] space-y-3">
+          <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Event Details</p>
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="flex items-center gap-2 text-gray-600 bg-gray-50/80 rounded-xl px-3 py-2.5"><Calendar className="w-4 h-4 text-gray-400 shrink-0" /><span className="font-medium">{event.date_display || event.date}</span></div>
+            <div className="flex items-center gap-2 text-gray-600 bg-gray-50/80 rounded-xl px-3 py-2.5"><Clock className="w-4 h-4 text-gray-400 shrink-0" /><span className="font-medium">{event.time}{event.end_time ? `-${event.end_time}` : ""}</span></div>
+            <div className="col-span-2 flex items-center gap-2 text-gray-600 bg-gray-50/80 rounded-xl px-3 py-2.5"><MapPin className="w-4 h-4 text-gray-400 shrink-0" /><span className="font-medium truncate">{event.location}</span></div>
+            {event.payment_info && <div className="col-span-2 flex items-center gap-2 text-emerald-700 bg-emerald-50/80 rounded-xl px-3 py-2.5"><IndianRupee className="w-4 h-4 shrink-0" /><span className="font-medium">{event.payment_info}</span></div>}
+            {(event.food_included || event.travel_included) && (
+              <div className="col-span-2 flex gap-3 text-xs">
+                {event.food_included && <span className="bg-green-50 text-green-700 px-2.5 py-1 rounded-lg font-medium">✓ Food included</span>}
+                {event.travel_included && <span className="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-lg font-medium">✓ Travel included</span>}
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Requirements */}
         {(event.gender_requirement || event.min_age || event.max_age || event.work_description || event.experience_required || event.skill_requirements || event.dress_code) && (
-          <Card>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Requirements</p>
+          <div className="bg-white rounded-2xl border border-gray-200/70 p-4 shadow-sm shadow-black/[0.02] space-y-3">
+            <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Requirements</p>
+            {event.work_description && <p className="text-sm text-gray-700 leading-relaxed">{event.work_description}</p>}
             <div className="flex flex-wrap gap-1.5 text-xs">
-              {event.gender_requirement && <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full capitalize">{event.gender_requirement}</span>}
-              {(event.min_age || event.max_age) && <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">{event.min_age || 0}-{event.max_age || 99} yrs</span>}
-              {(event.work_description || event.experience_required) && <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">{event.work_description || event.experience_required}</span>}
-              {event.dress_code && <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">{event.dress_code}</span>}
-              {event.skill_requirements?.map((s, i) => <span key={i} className="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full">{s}</span>)}
+              {event.gender_requirement && <span className="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-lg capitalize font-medium">{event.gender_requirement}</span>}
+              {(event.min_age || event.max_age) && <span className="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-lg font-medium">{event.min_age || 0}-{event.max_age || 99} yrs</span>}
+              {event.dress_code && <span className="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-lg font-medium">{event.dress_code}</span>}
+              {event.skill_requirements?.map((s, i) => <span key={i} className="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-lg font-medium">{s}</span>)}
             </div>
-          </Card>
+          </div>
         )}
 
         {/* Applicants */}
         <Card padding="none">
-          <div className="p-4 pb-3 border-b border-gray-100">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-              Applicants ({applicants.length})
-            </h3>
+          <div className="px-4 pt-4 pb-3 border-b border-gray-100">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+                Applicants ({applicants.length})
+              </h3>
+              <span className="text-[10px] text-gray-400">{approvedCount} approved · {pendingCount} pending</span>
+            </div>
             <div className="flex gap-1.5">
               {([["", `All (${applicants.length})`], ["pending", `Pending (${pendingCount})`], ["approved", `Approved (${approvedCount})`], ["rejected", `Rejected (${rejectedCount})`]] as const).map(([key, label]) => (
                 <button key={key} onClick={() => setFilter(key)}
-                  className={`h-7 px-2.5 rounded-lg text-[10px] font-medium transition-colors ${
-                    filter === key ? "bg-indigo-700 text-white" : "bg-gray-100 text-gray-600"
+                  className={`h-7 px-2.5 rounded-lg text-[10px] font-medium transition-all ${
+                    filter === key ? "bg-indigo-700 text-white shadow-sm shadow-indigo-200" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}>{label}</button>
               ))}
             </div>
@@ -301,18 +315,21 @@ export default function OrganizerEventDetailPage() {
 
           <div className="p-3 space-y-2 max-h-96 overflow-y-auto">
             {filteredApplicants.length === 0 && (
-              <p className="text-center text-gray-400 text-sm py-6">No applicants</p>
+              <div className="text-center py-8">
+                <Users className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                <p className="text-sm text-gray-400">No applicants</p>
+              </div>
             )}
             {filteredApplicants.map(app => {
               const avail = app.profile.availability ? AVAIL_CONFIG[app.profile.availability] : null;
               const completion = computeCompletion(app.profile);
               return (
-              <div key={app.id} className="border border-gray-200 rounded-xl overflow-hidden">
-                <div className="p-3">
+              <div key={app.id} className="border border-gray-200/80 rounded-2xl overflow-hidden hover:shadow-sm transition-all">
+                <div className="p-3.5">
                   <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
                       <div className="relative shrink-0">
-                        <div className="w-9 h-9 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-700 font-semibold text-sm">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-50 to-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-sm shadow-sm">
                           {app.profile.full_name?.charAt(0) || "W"}
                         </div>
                         {avail && (
@@ -321,71 +338,71 @@ export default function OrganizerEventDetailPage() {
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <p className="font-medium text-sm text-gray-900 truncate">{app.profile.full_name}</p>
+                          <p className="font-semibold text-sm text-gray-900 truncate">{app.profile.full_name}</p>
                           {avail && (
-                            <span className={`inline-flex items-center gap-0.5 text-[8px] font-medium px-1 py-0.5 rounded-full border ${avail.badge}`}>
+                            <span className={`inline-flex items-center gap-0.5 text-[8px] font-medium px-1 py-0.5 rounded-lg border ${avail.badge}`}>
                               <span className={`w-1 h-1 rounded-full ${avail.dot}`} />
                               {avail.label}
                             </span>
                           )}
                         </div>
                         <p className="text-xs text-gray-500 truncate">
-                          {app.profile.age && `${app.profile.age} yrs`}{app.profile.gender && ` Â· ${app.profile.gender}`}{app.profile.city && ` Â· ${app.profile.city}`}
+                          {app.profile.age && `${app.profile.age} yrs`}{app.profile.gender && ` · ${app.profile.gender}`}{app.profile.city && ` · ${app.profile.city}`}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
-                        app.status === "pending" ? "bg-amber-100 text-amber-800" :
-                        app.status === "approved" ? "bg-green-100 text-green-800" :
-                        app.notes === "removed_by_organizer" ? "bg-red-100 text-red-800" :
-                        app.status === "rejected" ? "bg-gray-100 text-gray-600" :
-                        "bg-gray-100 text-gray-500"
+                      <span className={`text-[10px] font-semibold px-2.5 py-0.5 rounded-lg ${
+                        app.status === "pending" ? "bg-amber-50 text-amber-700 border border-amber-200" :
+                        app.status === "approved" ? "bg-emerald-50 text-emerald-700 border border-emerald-200" :
+                        app.notes === "removed_by_organizer" ? "bg-red-50 text-red-700 border border-red-200" :
+                        app.status === "rejected" ? "bg-gray-50 text-gray-500 border border-gray-200" :
+                        "bg-gray-50 text-gray-500 border border-gray-200"
                       }`}>{app.notes === "removed_by_organizer" ? "Removed" : app.status}</span>
                       {app.status === "pending" && (
                         <>
                           <button onClick={() => handleApprove(app.id)} disabled={applying === app.id}
-                            className="h-7 w-7 rounded-full bg-green-100 text-green-700 flex items-center justify-center hover:bg-green-200 disabled:opacity-50">
-                            <Check className="w-3.5 h-3.5" />
+                            className="h-8 w-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-100 hover:text-emerald-700 disabled:opacity-50 transition-all active:scale-90">
+                            <Check className="w-4 h-4" />
                           </button>
                           <button onClick={() => handleReject(app.id)} disabled={applying === app.id}
-                            className="h-7 w-7 rounded-full bg-red-100 text-red-600 flex items-center justify-center hover:bg-red-200 disabled:opacity-50">
-                            <XIcon className="w-3.5 h-3.5" />
+                            className="h-8 w-8 rounded-xl bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 hover:text-red-600 disabled:opacity-50 transition-all active:scale-90">
+                            <XIcon className="w-4 h-4" />
                           </button>
                         </>
                       )}
                       {app.status === "approved" && (
                         <button onClick={() => { if (confirm(`Remove ${app.profile.full_name} from this event?`)) handleRemove(app.id); }} disabled={applying === app.id}
-                          className="h-7 px-2 rounded-full bg-red-50 text-red-600 text-[10px] font-medium flex items-center gap-1 hover:bg-red-100 disabled:opacity-50 border border-red-200">
+                          className="h-7 px-2.5 rounded-xl bg-red-50 text-red-600 text-[10px] font-medium flex items-center gap-1 hover:bg-red-100 disabled:opacity-50 border border-red-200 transition-all active:scale-95">
                           <XCircle className="w-3 h-3" /> Remove
                         </button>
                       )}
                     </div>
                   </div>
                   <button onClick={() => setExpanded(expanded === app.id ? null : app.id)}
-                    className="mt-1.5 text-xs text-gray-400 flex items-center gap-1 hover:text-gray-600">
+                    className="mt-2 text-[11px] text-gray-400 flex items-center gap-1 hover:text-indigo-600 transition-colors">
                     {expanded === app.id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                    {expanded === app.id ? "Hide" : "Profile"}
+                    {expanded === app.id ? "Hide profile" : "View full profile"}
                   </button>
                   {expanded === app.id && (
-                    <div className="mt-2 pt-2 border-t border-gray-100 text-xs text-gray-600 space-y-1">
-                      {app.profile.bio && <p className="italic">{app.profile.bio}</p>}
-                      <div className="grid grid-cols-2 gap-1">
-                        {app.profile.experience && <span>Exp: {app.profile.experience}</span>}
-                        {app.profile.area && <span>Area: {app.profile.area}</span>}
+                    <div className="mt-3 pt-3 border-t border-gray-100 text-xs text-gray-600 space-y-2.5">
+                      {app.profile.bio && <p className="text-gray-700 leading-relaxed italic border-l-2 border-indigo-200 pl-3 py-0.5">{app.profile.bio}</p>}
+                      <div className="grid grid-cols-2 gap-2">
+                        {app.profile.experience && <span className="flex items-center gap-1.5 text-gray-600"><Briefcase className="w-3 h-3 text-gray-400" />{app.profile.experience}</span>}
+                        {app.profile.area && <span className="flex items-center gap-1.5 text-gray-600"><MapPin className="w-3 h-3 text-gray-400" />{app.profile.area}</span>}
                         {app.status === "approved" && app.profile.phone
-                          ? <span className="flex items-center gap-1 text-green-700"><Phone className="w-3 h-3" />{app.profile.phone}
+                          ? <span className="flex items-center gap-1.5 text-emerald-700 col-span-2"><Phone className="w-3 h-3" />{app.profile.phone}
                               <button onClick={() => { navigator.clipboard.writeText(app.profile.phone!); toast.success("Phone copied"); }}
-                                className="p-0.5 rounded hover:bg-green-100 text-green-500 hover:text-green-700 transition-colors">
+                                className="p-0.5 rounded hover:bg-emerald-100 text-emerald-500 hover:text-emerald-700 transition-colors">
                                 <Copy className="w-3 h-3" />
                               </button>
                             </span>
-                          : app.status !== "approved" && app.profile.phone && <span className="text-gray-400 italic">Contact hidden until approval</span>
+                          : app.status !== "approved" && app.profile.phone && <span className="text-gray-400 italic flex items-center gap-1.5 col-span-2"><Phone className="w-3 h-3" />Contact hidden until approval</span>
                         }
                       </div>
                       {/* Profile strength */}
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <div className="flex-1 max-w-[80px] h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="flex items-center gap-2 pt-1">
+                        <div className="flex-1 max-w-[100px] h-1.5 bg-gray-100 rounded-full overflow-hidden">
                           <div className={`h-full rounded-full ${
                             completion >= 80 ? "bg-emerald-500" : completion >= 50 ? "bg-amber-500" : "bg-indigo-600"
                           }`} style={{ width: `${completion}%` }} />
@@ -395,11 +412,12 @@ export default function OrganizerEventDetailPage() {
                         }`}>{completion}% profile</span>
                       </div>
                       {app.profile.skills && app.profile.skills.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {app.profile.skills.map((s, i) => <span key={i} className="bg-gray-100 px-2 py-0.5 rounded-full">{s}</span>)}
+                        <div className="flex flex-wrap gap-1">
+                          {app.profile.skills.map((s, i) => (
+                            <span key={i} className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-lg">{s}</span>
+                          ))}
                         </div>
                       )}
-
                     </div>
                   )}
                 </div>
@@ -428,7 +446,7 @@ export default function OrganizerEventDetailPage() {
       )}
 
       {/* Sticky bottom actions */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-10">
+      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-gray-200/80 z-10 pb-[env(safe-area-inset-bottom,0px)]">
         <div className="max-w-3xl mx-auto px-4 py-2.5 flex gap-2 overflow-x-auto">
           <Button variant="secondary" size="sm" onClick={() => setShowEdit(true)} disabled={!canEdit}>
             <Edit3 className="w-3.5 h-3.5" /> Edit

@@ -28,7 +28,7 @@ export const BUTTON = {
 
 export const VARIANTS = {
   primary:
-    "bg-slate-800 text-white hover:bg-slate-900 active:scale-[0.97] disabled:opacity-50 transition-all duration-150",
+    "bg-indigo-700 text-white hover:bg-indigo-800 active:scale-[0.97] disabled:opacity-50 transition-all duration-150",
   secondary:
     "bg-white text-gray-700 border border-gray-200 hover:border-gray-300 hover:bg-gray-50 active:scale-[0.97] disabled:opacity-50 shadow-sm transition-all duration-150",
   success:
@@ -55,7 +55,7 @@ export const BADGE = {
   cancelled: "bg-gray-50 text-gray-400 border-gray-200/60",
   waitlisted: "bg-purple-50 text-purple-700 border-purple-200/60",
   draft: "bg-gray-50 text-gray-600 border-gray-200/60",
-  published: "bg-slate-100 text-slate-700 border-slate-200/60",
+  published: "bg-indigo-50 text-indigo-700 border-indigo-200/60",
   filling: "bg-green-50 text-green-700 border-green-200/60",
   full: "bg-purple-50 text-purple-700 border-purple-200/60",
   closed: "bg-amber-50 text-amber-700 border-amber-200/60",
@@ -63,7 +63,7 @@ export const BADGE = {
   urgent: "bg-red-50 text-red-700 border-red-200/60",
   soon: "bg-amber-50 text-amber-700 border-amber-200/60",
   trusted: "bg-emerald-50 text-emerald-700 border-emerald-200/60",
-  verified: "bg-slate-100 text-slate-700 border-slate-200/60",
+  verified: "bg-indigo-50 text-indigo-700 border-indigo-200/60",
   basicVerified: "bg-sky-50 text-sky-700 border-sky-200/60",
   unverified: "bg-gray-50 text-gray-500 border-gray-200/60",
   new: "bg-slate-700 text-white border-slate-600/30",

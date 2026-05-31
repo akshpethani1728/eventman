@@ -62,7 +62,7 @@ export function CardStats({ children, columns = 3 }: { children: React.ReactNode
 export function CardStat({ label, value, color = "gray" }: { label: string; value: React.ReactNode; color?: string }) {
   const colors: Record<string, string> = {
     gray: "text-gray-900",
-    blue: "text-slate-800",
+    blue: "text-indigo-700",
     amber: "text-amber-600",
     red: "text-red-600",
     emerald: "text-emerald-600",
