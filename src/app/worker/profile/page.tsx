@@ -120,7 +120,7 @@ export default function WorkerProfilePage() {
               <span className={`text-sm font-bold ${completion.percent >= 80 ? "text-emerald-600" : completion.percent >= 50 ? "text-amber-600" : "text-gray-500"}`}>{completion.percent}%</span>
             </div>
             <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-              <div className={`h-full rounded-full transition-all duration-700 ${completion.percent >= 80 ? "bg-emerald-500" : completion.percent >= 50 ? "bg-amber-500" : "bg-slate-600"}`}
+              <div className={`h-full rounded-full transition-all duration-700 ${completion.percent >= 80 ? "bg-emerald-500" : completion.percent >= 50 ? "bg-amber-500" : "bg-indigo-600"}`}
                 style={{ width: `${completion.percent}%` }} />
             </div>
             {completion.missing.length > 0 && (
@@ -142,8 +142,8 @@ export default function WorkerProfilePage() {
         <form onSubmit={(e) => { e.preventDefault(); saveProfile(); }}>
           {/* Avatar */}
           <Card padding="lg" className="text-center shadow-sm shadow-black/[0.02]">
-            <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3 ring-1 ring-slate-200">
-              <span className="text-2xl font-bold text-slate-700">{profile?.full_name?.charAt(0)?.toUpperCase() || "W"}</span>
+            <div className="w-20 h-20 rounded-full bg-indigo-50 flex items-center justify-center mx-auto mb-3 ring-1 ring-indigo-200">
+              <span className="text-2xl font-bold text-indigo-700">{profile?.full_name?.charAt(0)?.toUpperCase() || "W"}</span>
             </div>
             <p className="font-semibold text-lg">{profile?.full_name}</p>
             <div className="flex items-center justify-center gap-1.5 mt-1">
@@ -164,7 +164,7 @@ export default function WorkerProfilePage() {
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input value={form.full_name} onChange={e => update("full_name", e.target.value)}
-                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500/20 transition-all" />
+                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all" />
               </div>
             </div>
             <div>
@@ -172,19 +172,19 @@ export default function WorkerProfilePage() {
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input value={form.phone} onChange={e => update("phone", e.target.value)} placeholder="9876543210"
-                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500/20 transition-all" />
+                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Age</label>
                 <input type="number" value={form.age} onChange={e => update("age", e.target.value)}
-                  className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500/20 transition-all" />
+                  className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Gender</label>
                 <select value={form.gender} onChange={e => update("gender", e.target.value)}
-                  className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500/20 transition-all">
+                  className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all">
                   <option value="">Select</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
@@ -196,13 +196,13 @@ export default function WorkerProfilePage() {
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input value={form.city} onChange={e => update("city", e.target.value)} placeholder="Ahmedabad"
-                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500/20 transition-all" />
+                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all" />
               </div>
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Area</label>
               <input value={form.area} onChange={e => update("area", e.target.value)} placeholder="e.g., Navrangpura"
-                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500/20 transition-all" />
+                className="w-full h-10 px-3 rounded-lg border border-gray-300 bg-white text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all" />
             </div>
           </Card>
 
@@ -215,7 +215,7 @@ export default function WorkerProfilePage() {
                 <Award className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input value={form.skills} onChange={e => update("skills", e.target.value)}
                   placeholder="e.g., Promotion, Event setup, Crowd management"
-                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500/20 transition-all" />
+                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all" />
               </div>
             </div>
             <div>
@@ -224,7 +224,7 @@ export default function WorkerProfilePage() {
                 <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input value={form.experience} onChange={e => update("experience", e.target.value)}
                   placeholder="e.g., 2 years in event management"
-                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500/20 transition-all" />
+                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all" />
               </div>
             </div>
             <div>
@@ -232,7 +232,7 @@ export default function WorkerProfilePage() {
               <div className="relative">
                 <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <select value={form.availability} onChange={e => update("availability", e.target.value)}
-                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm appearance-none outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500/20 transition-all">
+                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm appearance-none outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all">
                   {AVAILABILITY_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
@@ -241,7 +241,7 @@ export default function WorkerProfilePage() {
               <label className="block text-xs font-medium text-gray-600 mb-1">About / Bio</label>
               <textarea value={form.bio} onChange={e => update("bio", e.target.value)}
                 placeholder="Tell organizers about yourself..."
-                className="w-full h-24 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm resize-none outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500/20 transition-all" />
+                className="w-full h-24 px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm resize-none outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all" />
             </div>
           </Card>
 

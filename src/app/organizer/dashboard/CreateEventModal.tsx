@@ -61,9 +61,9 @@ function InputGroup({ children }: { children: React.ReactNode }) {
   return <div className="grid grid-cols-2 gap-3">{children}</div>;
 }
 
-const inputCls = "w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-100 outline-none transition-all form-input scroll-mb-40";
-const dateCls = "w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-slate-400 focus:ring-2 focus:ring-slate-100 outline-none transition-all form-input scroll-mb-40";
-const selectCls = "w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-slate-400 focus:ring-2 focus:ring-slate-100 outline-none transition-all form-input scroll-mb-40";
+const inputCls = "w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-50 outline-none transition-all form-input scroll-mb-40";
+const dateCls = "w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-indigo-400 focus:ring-2 focus:ring-indigo-50 outline-none transition-all form-input scroll-mb-40";
+const selectCls = "w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-indigo-400 focus:ring-2 focus:ring-indigo-50 outline-none transition-all form-input scroll-mb-40";
 const textareaCls = "w-full h-36 px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 leading-relaxed resize-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 outline-none transition-all form-input scroll-mb-40";
 
 export default function CreateEventModal({ onClose, onCreated, template }: Props) {
@@ -135,7 +135,7 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
     <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-6 p-3 overflow-y-auto modal-overlay">
       <div className="w-full max-w-xl modal-body">
         {/* Header */}
-        <div className="bg-gradient-to-br from-slate-800 via-slate-800 to-slate-900 rounded-t-2xl px-5 py-5 text-white">
+        <div className="bg-gradient-to-br from-indigo-700 via-indigo-800 to-indigo-950 rounded-t-2xl px-5 py-5 text-white">
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center backdrop-blur-sm">
@@ -143,7 +143,7 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
               </div>
               <div>
                 <h2 className="font-bold text-lg">{template ? "Create from Template" : "New Event"}</h2>
-                <p className="text-xs text-slate-200/80 mt-0.5">Fill in the details below</p>
+                <p className="text-xs text-indigo-100/80 mt-0.5">Fill in the details below</p>
               </div>
             </div>
             <button onClick={onClose} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors">
@@ -163,7 +163,7 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
           <form onSubmit={handleSubmit} className="space-y-4">
 
             {/* A. Event Basics */}
-            <SectionCard emoji="📋" label="Event Basics" accentCls="bg-gradient-to-r from-slate-100/80 to-slate-200/80">
+            <SectionCard emoji="📋" label="Event Basics" accentCls="bg-gradient-to-r from-indigo-50/80 to-indigo-100/80">
               <div>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Event Title</label>
                 <input required value={form.title} onChange={e => update("title", e.target.value)}
@@ -189,19 +189,19 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
                   <input type="number" min={1} value={form.worker_count} onChange={e => update("worker_count", e.target.value)}
                     placeholder="Number of workers" required
                    
-                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-100 outline-none transition-all form-input" />
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-50 outline-none transition-all form-input" />
                 </div>
               </InputGroup>
               <InputGroup>
                 <div>
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Event Date</label>
                   <input required type="date" value={form.date} onChange={e => update("date", e.target.value)}
-                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-slate-400 focus:ring-2 focus:ring-slate-100 outline-none transition-all form-input" />
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-indigo-400 focus:ring-2 focus:ring-indigo-50 outline-none transition-all form-input" />
                 </div>
                 <div>
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Start Time</label>
                   <input required type="time" value={form.time} onChange={e => update("time", e.target.value)}
-                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-slate-400 focus:ring-2 focus:ring-slate-100 outline-none transition-all form-input" />
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-indigo-400 focus:ring-2 focus:ring-indigo-50 outline-none transition-all form-input" />
                 </div>
               </InputGroup>
               <InputGroup>
@@ -209,18 +209,18 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Display Date <span className="text-gray-400 normal-case font-normal">(e.g., 26,27,30 May)</span></label>
                   <input value={form.date_display} onChange={e => update("date_display", e.target.value)}
                     placeholder="e.g., 26,27,30 May"
-                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-100 outline-none transition-all form-input" />
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-50 outline-none transition-all form-input" />
                 </div>
                 <div>
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">End Time <span className="text-gray-400 normal-case font-normal">(optional)</span></label>
                   <input type="time" value={form.end_time} onChange={e => update("end_time", e.target.value)}
-                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-slate-400 focus:ring-2 focus:ring-slate-100 outline-none transition-all form-input" />
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-indigo-400 focus:ring-2 focus:ring-indigo-50 outline-none transition-all form-input" />
                 </div>
               </InputGroup>
               <div>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Application Deadline <span className="text-gray-400 normal-case font-normal">(optional)</span></label>
                 <input type="date" value={form.application_deadline} onChange={e => update("application_deadline", e.target.value)}
-                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-slate-400 focus:ring-2 focus:ring-slate-100 outline-none transition-all form-input" />
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-indigo-400 focus:ring-2 focus:ring-indigo-50 outline-none transition-all form-input" />
               </div>
             </SectionCard>
 
@@ -374,7 +374,7 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
             {/* Footer Actions inside form */}
             <div className="flex gap-3 pt-2">
               <button type="submit" onClick={() => setPublishAfter(true)} disabled={loading}
-                className="flex-1 h-12 rounded-lg bg-slate-800 text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50 hover:bg-slate-900 active:scale-[0.98] transition-all">
+                className="flex-1 h-12 rounded-lg bg-indigo-700 text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50 hover:bg-indigo-800 active:scale-[0.98] transition-all">
                 {loading ? (
                   <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Publishing...</>
                 ) : (

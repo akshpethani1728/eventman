@@ -38,7 +38,7 @@ function BottomNav() {
               href={href}
               className={`flex flex-col items-center justify-center gap-0.5 min-w-0 px-2 py-1 rounded-xl transition-all duration-200 ${
                 active
-                  ? "text-slate-800"
+                  ? "text-indigo-700"
                   : "text-gray-400 hover:text-gray-600 active:scale-95"
               }`}
             >
@@ -53,7 +53,7 @@ function BottomNav() {
                 {label}
               </span>
               {active && (
-                <div className="absolute -top-0.5 w-5 h-0.5 rounded-full bg-slate-800" />
+                <div className="absolute -top-0.5 w-5 h-0.5 rounded-full bg-indigo-700" />
               )}
             </Link>
           );

@@ -136,7 +136,7 @@ export default function WorkerPlansPage() {
     return (
       <div className="min-h-dvh bg-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="w-6 h-6 text-slate-800 animate-spin" />
+          <Loader2 className="w-6 h-6 text-indigo-700 animate-spin" />
           <p className="text-xs text-gray-400">Loading...</p>
         </div>
       </div>
@@ -203,8 +203,8 @@ export default function WorkerPlansPage() {
           {/* Gradient header */}
           <div className={`relative px-5 py-4 ${
             isActive ? "bg-gradient-to-r from-emerald-500 to-emerald-600" :
-            isTrialing ? "bg-gradient-to-r from-slate-700 to-slate-800" :
-            "bg-gradient-to-r from-slate-500 to-slate-600"
+            isTrialing ? "bg-gradient-to-r from-indigo-600 to-indigo-700" :
+            "bg-gradient-to-r from-indigo-500 to-indigo-600"
           }`}>
             <div className="flex items-center justify-between relative z-10">
               <div className="flex items-center gap-2.5">
@@ -224,7 +224,7 @@ export default function WorkerPlansPage() {
               </div>
               <StatusBadge
                 label={isActive ? "ACTIVE" : isTrialing ? "TRIAL" : "EXPIRED"}
-                color={isActive ? "bg-emerald-600/30 text-emerald-100" : isTrialing ? "bg-slate-700/30 text-slate-100" : "bg-slate-600/30 text-slate-100"}
+                color={isActive ? "bg-emerald-600/30 text-emerald-100" : isTrialing ? "bg-indigo-700/30 text-indigo-100" : "bg-indigo-600/30 text-indigo-100"}
               />
             </div>
             {/* Decorative circles */}
@@ -238,14 +238,14 @@ export default function WorkerPlansPage() {
               <div className="space-y-1.5">
                 <div className="flex justify-between text-xs">
                   <span className="text-gray-500">Plan progress</span>
-                  <span className={`font-medium ${isActive ? "text-emerald-600" : "text-slate-800"}`}>
+                  <span className={`font-medium ${isActive ? "text-emerald-600" : "text-indigo-700"}`}>
                     {daysRemaining} day{daysRemaining !== 1 ? "s" : ""} left
                   </span>
                 </div>
                 <ProgressBar
                   value={daysRemaining}
                   max={isActive ? 30 : 10}
-                  color={isActive ? "bg-emerald-400" : "bg-slate-600"}
+                  color={isActive ? "bg-emerald-400" : "bg-indigo-600"}
                 />
               </div>
             )}
@@ -254,7 +254,7 @@ export default function WorkerPlansPage() {
               <div className="bg-gray-50 rounded-xl p-3 text-center">
                 <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Status</p>
                 <p className={`text-sm font-bold mt-0.5 ${
-                  isActive ? "text-emerald-600" : isTrialing ? "text-slate-800" : "text-red-500"
+                  isActive ? "text-emerald-600" : isTrialing ? "text-indigo-700" : "text-red-500"
                 }`}>
                   {isActive ? "Active" : isTrialing ? "In Trial" : "Expired"}
                 </p>
@@ -282,15 +282,15 @@ export default function WorkerPlansPage() {
         <div className="relative">
           {/* Premium corner badge */}
           <div className="absolute -top-[1px] -right-[1px] z-10">
-            <div className="bg-gradient-to-l from-slate-800 to-slate-700 text-white text-[9px] font-bold px-4 py-1.5 rounded-bl-2xl rounded-tr-2xl tracking-wider shadow-sm flex items-center gap-1">
+            <div className="bg-gradient-to-l from-indigo-700 to-indigo-600 text-white text-[9px] font-bold px-4 py-1.5 rounded-bl-2xl rounded-tr-2xl tracking-wider shadow-sm flex items-center gap-1">
               <BadgeCheck className="w-2.5 h-2.5" /> BEST VALUE
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl border-2 border-slate-200/70 overflow-hidden shadow-sm shadow-slate-200/20">
+          <div className="bg-white rounded-2xl border-2 border-indigo-200/70 overflow-hidden shadow-sm shadow-indigo-200/20">
             {/* Plan header */}
             <div className="px-6 pt-7 pb-2 text-center">
-              <div className="mx-auto mb-3 w-14 h-14 rounded-2xl bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center shadow-sm ring-4 ring-slate-100">
+              <div className="mx-auto mb-3 w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center shadow-sm ring-4 ring-indigo-50">
                 <Crown className="w-7 h-7 text-white" />
               </div>
               <h2 className="text-xl font-extrabold text-gray-900 tracking-tight">Monthly Access</h2>
@@ -319,8 +319,8 @@ export default function WorkerPlansPage() {
                 { icon: Calendar, text: "Full 30-day access", sub: "No restrictions, cancel anytime" },
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-3">
-                  <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center shrink-0 mt-0.5">
-                    <item.icon className="w-3.5 h-3.5 text-slate-700" />
+                  <div className="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0 mt-0.5">
+                    <item.icon className="w-3.5 h-3.5 text-indigo-700" />
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-gray-900">{item.text}</p>
@@ -340,7 +340,7 @@ export default function WorkerPlansPage() {
                 <button
                   onClick={handlePurchase}
                   disabled={purchasing || !razorpayLoaded}
-                  className="w-full h-13 rounded-lg bg-slate-800 text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-slate-900 flex items-center justify-center gap-2"
+                  className="w-full h-13 rounded-lg bg-indigo-700 text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-indigo-800 flex items-center justify-center gap-2"
                 >
                   {purchasing ? (
                     <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
@@ -354,7 +354,7 @@ export default function WorkerPlansPage() {
                 <button
                   onClick={handlePurchase}
                   disabled={purchasing || !razorpayLoaded}
-                  className="w-full h-13 rounded-lg bg-slate-800 text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-slate-900 flex items-center justify-center gap-2"
+                  className="w-full h-13 rounded-lg bg-indigo-700 text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-indigo-800 flex items-center justify-center gap-2"
                 >
                   {purchasing ? (
                     <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>

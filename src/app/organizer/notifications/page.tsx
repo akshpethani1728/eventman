@@ -10,7 +10,7 @@ import type { Notification } from "@/lib/supabase/types";
 const ICONS: Record<string, any> = {
   "Application Approved": <CheckCircle className="w-4 h-4 text-green-600" />,
   "Application Rejected": <XCircle className="w-4 h-4 text-red-600" />,
-  "New Applicant": <Users className="w-4 h-4 text-slate-700" />,
+  "New Applicant": <Users className="w-4 h-4 text-indigo-700" />,
 };
 
 function extractEventTitle(message: string): string | null {
@@ -73,7 +73,7 @@ export default function NotificationsPage() {
           <Link href="/organizer/dashboard" className="p-1 -ml-1 text-gray-500"><ArrowLeft className="w-5 h-5" /></Link>
           <h1 className="font-semibold text-sm">Notifications</h1>
           {unreadCount > 0 && (
-            <span className="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full ml-auto font-semibold">{unreadCount} new</span>
+            <span className="text-xs bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full ml-auto font-semibold">{unreadCount} new</span>
           )}
         </div>
       </header>
@@ -88,8 +88,8 @@ export default function NotificationsPage() {
 
         {notifications.length === 0 && (
           <div className="text-center py-20">
-            <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center mx-auto mb-3 ring-1 ring-slate-200">
-              <Bell className="w-5 h-5 text-slate-600" />
+            <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center mx-auto mb-3 ring-1 ring-indigo-200">
+              <Bell className="w-5 h-5 text-indigo-600" />
             </div>
             <p className="text-sm font-medium text-gray-500">No notifications yet</p>
             <p className="text-xs text-gray-400 mt-1">Updates about new applicants will appear here</p>
@@ -108,7 +108,7 @@ export default function NotificationsPage() {
               <div className="space-y-1.5">
                 {notifs.map(n => (
                   <div key={n.id} className={`rounded-lg p-3 flex items-start gap-2.5 border shadow-sm shadow-black/[0.02] transition-all ${
-                    n.read ? "border-gray-200/70 bg-white" : "border-slate-200 bg-slate-50"
+                    n.read ? "border-gray-200/70 bg-white" : "border-indigo-200 bg-indigo-50"
                   }`}>
                     <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center shrink-0 shadow-sm">
                       {ICONS[n.title] || <Bell className="w-3.5 h-3.5 text-gray-400" />}

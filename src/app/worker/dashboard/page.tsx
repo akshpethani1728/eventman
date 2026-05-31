@@ -43,7 +43,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 const AVAIL_CONFIG: Record<string, { label: string; dot: string; badge: string }> = {
   available_today: { label: "Available Today", dot: "bg-emerald-500", badge: "bg-emerald-100 text-emerald-700 border-emerald-200" },
-  available_this_week: { label: "Available This Week", dot: "bg-slate-600", badge: "bg-slate-100 text-slate-700 border-slate-200" },
+  available_this_week: { label: "Available This Week", dot: "bg-indigo-600", badge: "bg-indigo-50 text-indigo-700 border-indigo-200" },
   available: { label: "Available", dot: "bg-emerald-500", badge: "bg-emerald-100 text-emerald-700 border-emerald-200" },
   weekends: { label: "Weekends", dot: "bg-amber-500", badge: "bg-amber-100 text-amber-700 border-amber-200" },
   evenings: { label: "Evenings", dot: "bg-purple-500", badge: "bg-purple-100 text-purple-700 border-purple-200" },
@@ -154,7 +154,7 @@ function EventBadge({ children, variant, pulse }: { children: React.ReactNode; v
   const styles: Record<string, string> = {
     red: "bg-red-50 text-red-700 border-red-200/60",
     amber: "bg-amber-50 text-amber-700 border-amber-200/60",
-    blue: "bg-slate-100 text-slate-800 border-slate-200/60",
+    blue: "bg-indigo-50 text-indigo-700 border-indigo-200/60",
     purple: "bg-purple-50 text-purple-700 border-purple-200/60",
     green: "bg-emerald-50 text-emerald-700 border-emerald-200/60",
     orange: "bg-orange-50 text-orange-700 border-orange-200/60",
@@ -364,7 +364,7 @@ function DashboardContent() {
         <header className="sticky top-0 bg-white/80 backdrop-blur-2xl border-b border-gray-200/60 z-20">
           <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center shadow-sm">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center shadow-sm">
                 <Zap className="w-4 h-4 text-white" />
               </div>
               <div>
@@ -393,7 +393,7 @@ function DashboardContent() {
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-gray-200/60 z-20">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center shadow-sm">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center shadow-sm">
               <Zap className="w-4 h-4 text-white" />
             </div>
             <div>
@@ -413,7 +413,7 @@ function DashboardContent() {
                   )}
                 </Link>
                 <Link href="/worker/profile" className="relative flex items-center gap-2 p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center text-white font-bold text-[11px] shadow-sm">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center text-white font-bold text-[11px] shadow-sm">
                     {profile.full_name?.charAt(0) || "W"}
                   </div>
                   {profile.availability && AVAIL_CONFIG[profile.availability] && (
@@ -436,25 +436,25 @@ function DashboardContent() {
             profile.plan_status === "active"
               ? "bg-emerald-50 border border-emerald-200"
               : profile.plan_status === "trial"
-                ? "bg-slate-50 border border-slate-200"
+                ? "bg-indigo-50 border border-indigo-200"
               : "bg-amber-50 border border-amber-200"
           }`}>
             <div className="flex items-center gap-2">
               {profile.plan_status === "active" ? (
                 <CreditCard className="w-4 h-4 text-emerald-600" />
               ) : profile.plan_status === "trial" ? (
-                <Clock className="w-4 h-4 text-slate-700" />
+                <Clock className="w-4 h-4 text-indigo-700" />
               ) : (
                 <AlertCircle className="w-4 h-4 text-amber-600" />
               )}
               <div>
                 <p className={`text-xs font-semibold ${
-                  profile.plan_status === "active" ? "text-emerald-800" : profile.plan_status === "trial" ? "text-slate-800" : "text-amber-800"
+                  profile.plan_status === "active" ? "text-emerald-800" : profile.plan_status === "trial" ? "text-indigo-700" : "text-amber-800"
                 }`}>
                   {profile.plan_status === "active" ? "Subscription Active" : profile.plan_status === "trial" ? "Free Trial" : "Plan Expired"}
                 </p>
                 {profile.plan_status === "trial" && profile.trial_end_date && (
-                  <p className={`text-[10px] ${profile.plan_status === "trial" ? "text-slate-600" : ""}`}>
+                  <p className={`text-[10px] ${profile.plan_status === "trial" ? "text-indigo-600" : ""}`}>
                     {Math.ceil((new Date(profile.trial_end_date).getTime() - Date.now()) / 86400000)} days remaining
                   </p>
                 )}
@@ -479,7 +479,7 @@ function DashboardContent() {
         )}
         {/* Welcome banner */}
         {profile && tab === "browse" && browseEvents.length > 0 && (
-          <div className="mb-3 bg-slate-800 rounded-2xl p-4 text-white shadow-sm">
+          <div className="mb-3 bg-indigo-700 rounded-2xl p-4 text-white shadow-sm">
             <p className="text-sm opacity-90">Hey <span className="font-semibold">{profile.full_name?.split(" ")[0] || "there"}</span></p>
             <p className="text-lg font-bold mt-0.5">{browseEvents.length} event{browseEvents.length !== 1 ? "s" : ""} available</p>
             <div className="flex items-center gap-2 mt-1.5">
@@ -500,13 +500,13 @@ function DashboardContent() {
         <div className="flex gap-2 mb-4 bg-white/80 backdrop-blur-xl rounded-lg p-1 border border-gray-200/60 shadow-sm shadow-black/[0.02]">
           <button onClick={() => setTab("browse")}
             className={`flex-1 h-10 rounded-lg text-sm font-medium transition-all ${
-              tab === "browse" ? "bg-slate-800 text-white shadow-sm" : "text-gray-500 hover:text-gray-800"
+              tab === "browse" ? "bg-indigo-700 text-white shadow-sm" : "text-gray-500 hover:text-gray-800"
             }`}>
             Browse {browseEvents.length > 0 && `(${browseEvents.length})`}
           </button>
           <button onClick={() => setTab("applied")}
             className={`flex-1 h-10 rounded-lg text-sm font-medium transition-all ${
-              tab === "applied" ? "bg-slate-800 text-white shadow-sm" : "text-gray-500 hover:text-gray-800"
+              tab === "applied" ? "bg-indigo-700 text-white shadow-sm" : "text-gray-500 hover:text-gray-800"
             }`}>
             Applied {appliedEvents.length > 0 && `(${appliedEvents.length})`}
           </button>
@@ -521,12 +521,12 @@ function DashboardContent() {
                 <div className="flex gap-2 min-w-max pb-1">
                   <button onClick={() => setCategoryFilter("")}
                     className={`h-9 px-4 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
-                      !categoryFilter ? "bg-slate-800 text-white shadow-sm" : "bg-white text-gray-600 border border-gray-200/80 hover:border-gray-300 shadow-sm"
+                      !categoryFilter ? "bg-indigo-700 text-white shadow-sm" : "bg-white text-gray-600 border border-gray-200/80 hover:border-gray-300 shadow-sm"
                     }`}>All</button>
                   {allCategories.map(cat => (
                     <button key={cat} onClick={() => setCategoryFilter(cat)}
                       className={`h-9 px-4 rounded-lg text-xs font-medium capitalize transition-all whitespace-nowrap ${
-                        categoryFilter === cat ? "bg-slate-800 text-white shadow-sm" : "bg-white text-gray-600 border border-gray-200/80 hover:border-gray-300 shadow-sm"
+                        categoryFilter === cat ? "bg-indigo-700 text-white shadow-sm" : "bg-white text-gray-600 border border-gray-200/80 hover:border-gray-300 shadow-sm"
                       }`}>{CATEGORY_LABELS[cat] || cat.replace(/_/g, " ")}</button>
                   ))}
                 </div>
@@ -549,7 +549,7 @@ function DashboardContent() {
                 </p>
                 {categoryFilter && (
                   <button               onClick={() => setCategoryFilter("")}
-                    className="mt-5 h-11 px-6 rounded-lg bg-slate-800 text-white text-sm font-semibold hover:bg-slate-900 transition-all active:scale-[0.97]">
+                    className="mt-5 h-11 px-6 rounded-lg bg-indigo-700 text-white text-sm font-semibold hover:bg-indigo-800 transition-all active:scale-[0.97]">
                     Clear filter
                   </button>
                 )}
@@ -593,8 +593,8 @@ function DashboardContent() {
                   cardAccent = "border-amber-200/80";
                   shadowBoost = "shadow-amber-500/5";
                 } else if (isTrusted) {
-                  cardAccent = "border-slate-200/80";
-                  shadowBoost = "shadow-slate-500/5";
+                  cardAccent = "border-indigo-200/80";
+                  shadowBoost = "shadow-indigo-500/5";
                 }
 
                 return (
@@ -611,15 +611,15 @@ function DashboardContent() {
                           : isFillingFast
                             ? "bg-amber-400"
                             : isTrusted
-                              ? "bg-slate-600"
+                              ? "bg-indigo-600"
                               : isNew
-                                ? "bg-slate-500"
+                                ? "bg-indigo-500"
                                 : "bg-gray-200"
                     }`} />
 
                     {/* === PREMIUM TRUST STRIP === */}
                     <div className={`px-4 pt-3.5 pb-2 flex items-center justify-between ${
-                      isVerified ? "bg-gradient-to-r from-indigo-50/60 via-slate-50/30 to-transparent" : ""
+                      isVerified ? "bg-gradient-to-r from-indigo-50/60 via-indigo-50/30 to-transparent" : ""
                     }`}>
                       <div className="flex items-center gap-3 min-w-0 flex-1">
                           <div className="relative shrink-0">
@@ -631,7 +631,7 @@ function DashboardContent() {
                             <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0 ${
                               isTrusted
                                 ? "bg-gradient-to-br from-emerald-500 to-teal-600"
-                                : "bg-gradient-to-br from-slate-500 to-slate-700"
+                                : "bg-gradient-to-br from-indigo-500 to-indigo-700"
                             }`}>
                               {org?.full_name?.charAt(0) || "O"}
                             </div>
@@ -652,7 +652,7 @@ function DashboardContent() {
                               </span>
                             )}
                             {!isTrusted && isProfileVerified && (
-                              <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-slate-700 bg-slate-100 border border-slate-200/60 px-1.5 py-0.5 rounded-md shadow-sm">
+                              <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200/60 px-1.5 py-0.5 rounded-md shadow-sm">
                                 <ShieldCheck className="w-2.5 h-2.5" />
                                 Verified
                               </span>
@@ -688,12 +688,12 @@ function DashboardContent() {
                           </span>
                         )}
                         {isNewlyPosted && (
-                          <span className="text-[10px] font-semibold bg-slate-700 text-white px-2.5 py-0.5 rounded-lg animate-pulse">
+                          <span className="text-[10px] font-semibold bg-indigo-700 text-white px-2.5 py-0.5 rounded-lg animate-pulse">
                             New
                           </span>
                         )}
                         {!isNewlyPosted && isNew && !deadlinePassed && (
-                          <span className="text-[10px] font-semibold bg-slate-700 text-white px-2.5 py-0.5 rounded-lg">
+                          <span className="text-[10px] font-semibold bg-indigo-700 text-white px-2.5 py-0.5 rounded-lg">
                             New
                           </span>
                         )}
@@ -776,7 +776,7 @@ function DashboardContent() {
                         <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                           <div
                             className={`h-full rounded-full transition-all duration-700 ease-out ${
-                              fillPercent >= 80 ? "bg-red-500" : fillPercent >= 50 ? "bg-amber-500" : "bg-slate-600"
+                              fillPercent >= 80 ? "bg-red-500" : fillPercent >= 50 ? "bg-amber-500" : "bg-indigo-600"
                             } ${isNearlyFull ? "animate-pulse" : ""}`}
                             style={{ width: `${Math.max(2, fillPercent)}%` }}
                           />
@@ -797,7 +797,7 @@ function DashboardContent() {
                           </span>
                         )}
                         {event.travel_included && (
-                          <span className="text-[10px] font-medium bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-lg border border-slate-200/60 flex items-center gap-1">
+                          <span className="text-[10px] font-medium bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-lg border border-indigo-200/60 flex items-center gap-1">
                             <Car className="w-3 h-3" /> Travel
                           </span>
                         )}
@@ -881,7 +881,7 @@ function DashboardContent() {
                               ? "bg-red-600 text-white hover:bg-red-700"
                               : isNearlyFull
                                 ? "bg-amber-600 text-white hover:bg-amber-700"
-                                : "bg-slate-800 text-white hover:bg-slate-900"
+                                : "bg-indigo-700 text-white hover:bg-indigo-800"
                           }`}>
                         {applyingId === event.id ? (
                           <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -909,7 +909,7 @@ function DashboardContent() {
             You haven&apos;t applied to any events yet. Browse available opportunities and send your first application to get started.
             </p>
             <button onClick={() => setTab("browse")}
-              className="mt-6 h-11 px-6 rounded-lg bg-slate-800 text-white text-sm font-semibold hover:bg-slate-900 transition-all active:scale-[0.97]">
+              className="mt-6 h-11 px-6 rounded-lg bg-indigo-700 text-white text-sm font-semibold hover:bg-indigo-800 transition-all active:scale-[0.97]">
               Browse Events
             </button>
           </div>
@@ -956,7 +956,7 @@ function DashboardContent() {
                           <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm shrink-0 ${
                             app.status === "approved"
                               ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white"
-                              : "bg-gradient-to-br from-slate-500 to-slate-700 text-white"
+                              : "bg-gradient-to-br from-indigo-500 to-indigo-700 text-white"
                           }`}>
                             {org?.full_name?.charAt(0) || "E"}
                           </div>
@@ -1094,9 +1094,9 @@ function DashboardContent() {
                           <Info className="w-4 h-4 text-gray-400 shrink-0" />
                           <span className="text-xs text-gray-600">{cfg.message}</span>
                         </div>
-                        <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-100 border border-slate-200">
+                        <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-indigo-50 border border-indigo-200">
                           <ArrowUpRight className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                          <span className="text-xs text-slate-700 font-medium">Browse other opportunities</span>
+                          <span className="text-xs text-indigo-700 font-medium">Browse other opportunities</span>
                         </div>
                       </div>
                     )}

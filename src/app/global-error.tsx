@@ -25,7 +25,7 @@ export default function GlobalError({
           <h1 className="text-base font-bold text-gray-900 mb-1">Something went wrong</h1>
           <p className="text-sm text-gray-500 mb-4">The application encountered an unexpected error. Please try again.</p>
           <button onClick={reset}
-            className="h-11 px-6 rounded-lg bg-slate-800 text-white text-sm font-semibold hover:bg-slate-900 active:scale-[0.97] transition-all shadow-sm">
+            className="h-11 px-6 rounded-lg bg-indigo-700 text-white text-sm font-semibold hover:bg-indigo-800 active:scale-[0.97] transition-all shadow-sm">
             Try again
           </button>
           <p className="text-[10px] text-gray-400 mt-3">

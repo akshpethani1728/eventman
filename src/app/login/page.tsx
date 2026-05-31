@@ -144,7 +144,7 @@ const previewCards = [
     id: "feed",
     label: "Worker Feed",
     icon: Search,
-    color: "from-slate-600 to-slate-700",
+    color: "from-indigo-500 to-indigo-600",
     content: (
       <div className="space-y-2.5 p-4">
         <div className="flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-2 text-xs text-gray-400">
@@ -168,12 +168,12 @@ const previewCards = [
                 </div>
               </div>
               <span className={`rounded-full px-2 py-0.5 text-[9px] font-medium ${
-                ev.status === "new" ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-700"
+                ev.status === "new" ? "bg-green-100 text-green-700" : "bg-indigo-50 text-indigo-700"
               }`}>{ev.status === "new" ? "NEW" : "Filling"}</span>
             </div>
             <div className="mt-1.5 flex items-center justify-between">
               <span className="text-[10px] font-semibold text-gray-700">{ev.pay}</span>
-              <button className="rounded-lg bg-slate-800 px-3 py-1 text-[9px] font-medium text-white">Apply</button>
+              <button className="rounded-lg bg-indigo-700 px-3 py-1 text-[9px] font-medium text-white">Apply</button>
             </div>
           </div>
         ))}
@@ -189,12 +189,12 @@ const previewCards = [
       <div className="space-y-2.5 p-4">
         <div className="flex items-center justify-between">
           <p className="text-xs font-semibold text-gray-900">Your Events (4)</p>
-          <span className="text-[9px] text-slate-600">View All</span>
+          <span className="text-[9px] text-indigo-600">View All</span>
         </div>
         {[
           { title: "Wedding", filled: 12, total: 20, color: "bg-emerald-500" },
           { title: "Conference", filled: 5, total: 15, color: "bg-amber-500" },
-          { title: "Concert", filled: 24, total: 30, color: "bg-slate-500" },
+          { title: "Concert", filled: 24, total: 30, color: "bg-indigo-500" },
         ].map((ev, i) => (
           <div key={i} className="rounded-lg border border-gray-100 bg-white p-2.5 shadow-sm">
             <div className="flex items-center justify-between">
@@ -206,8 +206,8 @@ const previewCards = [
             </div>
           </div>
         ))}
-        <div className="flex items-center justify-between rounded-lg bg-slate-100 p-2">
-          <span className="text-[9px] font-medium text-slate-700">12 pending approvals</span>
+        <div className="flex items-center justify-between rounded-lg bg-indigo-50 p-2">
+          <span className="text-[9px] font-medium text-indigo-700">12 pending approvals</span>
           <ChevronRight className="h-3 w-3 text-slate-500" />
         </div>
       </div>
@@ -221,7 +221,7 @@ const previewCards = [
     content: (
       <div className="space-y-2.5 p-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-700 text-sm font-bold text-white">RS</div>
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-700 text-sm font-bold text-white">RS</div>
             <div>
               <p className="text-sm font-semibold text-gray-900">Rahul Sharma</p>
               <div className="flex items-center gap-1 text-[10px] text-gray-500">
@@ -231,7 +231,7 @@ const previewCards = [
           </div>
         <div className="flex flex-wrap gap-1.5">
           {["Photography", "Videography", "Editing"].map((s, i) => (
-            <span key={i} className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-medium text-slate-700">{s}</span>
+            <span key={i} className="rounded-full bg-indigo-50 px-2 py-0.5 text-[9px] font-medium text-indigo-700">{s}</span>
           ))}
         </div>
         <div className="flex items-center gap-3 text-[10px] text-gray-500">
@@ -250,7 +250,7 @@ const previewCards = [
       <div className="space-y-2.5 p-4">
         {[
           { text: "You're approved for Wedding Photography", time: "2 min ago", color: "text-emerald-600", icon: CheckCircle },
-          { text: "New: Corporate Gala accepting applications", time: "15 min ago", color: "text-slate-700", icon: Sparkles },
+          { text: "New: Corporate Gala accepting applications", time: "15 min ago", color: "text-indigo-700", icon: Sparkles },
           { text: "Concert Setup needs more workers", time: "1 hour ago", color: "text-amber-600", icon: Users },
         ].map((n, i) => {
           const Icon = n.icon;
@@ -288,7 +288,7 @@ function EcosystemPreview() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <FadeSection>
           <div className="text-center">
-            <span className="inline-block rounded-full bg-slate-800 px-4 py-1 text-[11px] font-semibold tracking-wide text-white uppercase">Ecosystem Preview</span>
+            <span className="inline-block rounded-full bg-indigo-700 px-4 py-1 text-[11px] font-semibold tracking-wide text-white uppercase">Ecosystem Preview</span>
             <h2 className="mt-4 text-2xl font-bold tracking-tight text-gray-900 md:text-4xl">See the Platform in Action</h2>
             <p className="mx-auto mt-3 max-w-2xl text-sm text-gray-500 md:text-base">
               Real interfaces you will use every day — worker feed, organizer dashboard, profile, and live notifications
@@ -333,7 +333,7 @@ const roleCards = [
     title: "I'm a Worker",
     subtitle: "Find event work & earn",
     features: ["Browse event opportunities", "Apply in one tap", "Build a trusted profile", "Get approved faster"],
-    gradient: "from-slate-700 to-slate-800",
+    gradient: "from-indigo-600 to-indigo-700",
     shadow: "shadow-sm",
   },
   {
@@ -342,7 +342,7 @@ const roleCards = [
     title: "I'm an Organizer",
     subtitle: "Hire & manage staff",
     features: ["Create & manage events", "Find workers instantly", "Track manpower live", "Approve with one click"],
-    gradient: "from-slate-600 to-slate-700",
+    gradient: "from-indigo-500 to-indigo-600",
     shadow: "shadow-sm",
   },
 ];
@@ -371,12 +371,12 @@ function RoleSelection({ selected, onSelect }: { selected: string; onSelect: (r:
                 onClick={() => onSelect(role.type)}
                 className={`group relative overflow-hidden rounded-2xl border-2 p-6 text-left transition-all duration-300 ${
                   active
-                    ? "border-slate-800 bg-slate-50 shadow-sm scale-[1.02]"
+                    ? "border-indigo-700 bg-indigo-50 shadow-sm scale-[1.02]"
                     : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm hover:scale-[1.01]"
                 }`}
               >
                 {active && (
-                  <div className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-slate-800 animate-scale-in">
+                  <div className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-indigo-700 animate-scale-in">
                     <CheckCircle className="h-4 w-4 text-white" />
                   </div>
                 )}
@@ -388,7 +388,7 @@ function RoleSelection({ selected, onSelect }: { selected: string; onSelect: (r:
                 <ul className="mt-4 space-y-2">
                   {role.features.map((f, i) => (
                     <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                      <CheckCircle className={`h-4 w-4 ${active ? "text-slate-800" : "text-gray-300"}`} />
+                      <CheckCircle className={`h-4 w-4 ${active ? "text-indigo-700" : "text-gray-300"}`} />
                       {f}
                     </li>
                   ))}
@@ -430,8 +430,8 @@ function TrustSection() {
               const Icon = s.icon;
               return (
                 <div key={i} className="group relative rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-gray-100 transition-shadow hover:shadow-md">
-                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-slate-100 to-slate-50">
-                    <Icon className="h-6 w-6 text-slate-700" />
+                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-50 to-indigo-50">
+                    <Icon className="h-6 w-6 text-indigo-700" />
                   </div>
                   <p className="text-3xl font-bold tracking-tight text-gray-900 md:text-4xl">
                     <AnimatedCounter end={s.value} suffix={s.suffix} />
@@ -451,8 +451,8 @@ function TrustSection() {
               const Icon = f.icon;
               return (
                 <div key={i} className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-gray-100 transition-shadow hover:shadow-md">
-                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100">
-                    <Icon className="h-5 w-5 text-slate-700" />
+                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50">
+                    <Icon className="h-5 w-5 text-indigo-700" />
                   </div>
                   <h3 className="text-sm font-semibold text-gray-900">{f.title}</h3>
                   <p className="mt-1 text-xs text-gray-500 leading-relaxed">{f.desc}</p>
@@ -528,8 +528,8 @@ function OtpInput({ value, onChange, onComplete }: {
           onKeyDown={(e) => handleKeyDown(i, e)}
           onPaste={i === 0 ? handlePaste : undefined}
           className={`h-12 w-10 rounded-lg border-2 text-center text-lg font-bold tracking-wider outline-none transition-all sm:h-14 sm:w-12 sm:text-xl ${
-            d ? "border-slate-800 bg-slate-50 text-slate-800" : "border-gray-200 bg-gray-50 text-gray-900"
-          } focus:border-slate-500 focus:ring-2 focus:ring-slate-500/20`}
+            d ? "border-indigo-700 bg-indigo-50 text-indigo-700" : "border-gray-200 bg-gray-50 text-gray-900"
+          } focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20`}
         />
       ))}
     </div>
@@ -712,7 +712,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
     }
   };
 
-  const inputClass = "w-full h-12 pl-10 pr-3 rounded-lg border border-gray-200 bg-white text-sm outline-none transition-all focus:border-slate-500 focus:ring-1 focus:ring-slate-500/20";
+  const inputClass = "w-full h-12 pl-10 pr-3 rounded-lg border border-gray-200 bg-white text-sm outline-none transition-all focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20";
   const inputIconClass = "absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400";
 
   return (
@@ -721,7 +721,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
         <FadeSection>
           {step === "auth" && (
             <div className="relative bg-white rounded-2xl shadow-sm ring-1 ring-gray-200/80 overflow-hidden">
-              <div className="h-1 bg-gradient-to-r from-slate-700 to-slate-800" />
+              <div className="h-1 bg-gradient-to-r from-indigo-600 to-indigo-700" />
               <div className="p-6 sm:p-8">
                 {/* Back button */}
                 <button
@@ -734,7 +734,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                 </button>
 
                 <div className="text-center mb-6">
-                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-slate-700 to-slate-800 shadow-sm">
+                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-indigo-700 shadow-sm">
                     <Mail className="h-6 w-6 text-white" />
                   </div>
                   <h2 className="text-xl font-bold text-gray-900">Welcome to EventMan</h2>
@@ -783,7 +783,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                         onChange={e => { setPassword(e.target.value); setError(""); }}
                         placeholder="Your password"
                         autoComplete="current-password"
-                        className="w-full h-12 pl-10 pr-10 rounded-lg border border-gray-200 bg-white text-sm outline-none transition-all focus:border-slate-500 focus:ring-1 focus:ring-slate-500/20"
+                        className="w-full h-12 pl-10 pr-10 rounded-lg border border-gray-200 bg-white text-sm outline-none transition-all focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20"
                       />
                       <button
                         type="button"
@@ -800,13 +800,13 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                       type="checkbox"
                       checked={agreeToTerms}
                       onChange={e => setAgreeToTerms(e.target.checked)}
-                      className="mt-0.5 h-4 w-4 rounded border-gray-300 text-slate-800 focus:ring-slate-500/30 focus:ring-offset-0"
+                      className="mt-0.5 h-4 w-4 rounded border-gray-300 text-indigo-700 focus:ring-indigo-500/30 focus:ring-offset-0"
                     />
                     <span className="text-xs text-gray-500 leading-relaxed group-hover:text-gray-700 transition-colors">
                       I agree to the{" "}
-                      <Link href="/terms" target="_blank" className="text-slate-800 hover:text-slate-900 underline font-medium">Terms &amp; Conditions</Link>
+                      <Link href="/terms" target="_blank" className="text-indigo-700 hover:text-slate-900 underline font-medium">Terms &amp; Conditions</Link>
                       {" "}and{" "}
-                      <Link href="/privacy" target="_blank" className="text-slate-800 hover:text-slate-900 underline font-medium">Privacy Policy</Link>
+                      <Link href="/privacy" target="_blank" className="text-indigo-700 hover:text-slate-900 underline font-medium">Privacy Policy</Link>
                     </span>
                   </label>
 
@@ -814,7 +814,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                     type="button"
                     disabled={loading}
                     onClick={handleSignIn}
-                    className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-slate-800 text-sm font-semibold text-white hover:bg-slate-900 transition-all active:scale-[0.98] disabled:opacity-60"
+                    className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-indigo-700 text-sm font-semibold text-white hover:bg-indigo-800 transition-all active:scale-[0.98] disabled:opacity-60"
                   >
                     {loading ? (
                       <span className="flex items-center gap-2">
@@ -850,7 +850,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                     type="button"
                     disabled={loading}
                     onClick={handleCreateAccount}
-                    className="flex h-11 w-full items-center justify-center gap-2 rounded-lg border-2 border-slate-800 bg-white text-sm font-semibold text-slate-800 transition-all active:scale-[0.98] hover:bg-slate-50 disabled:opacity-60"
+                    className="flex h-11 w-full items-center justify-center gap-2 rounded-lg border-2 border-indigo-700 bg-white text-sm font-semibold text-indigo-700 transition-all active:scale-[0.98] hover:bg-indigo-50 disabled:opacity-60"
                   >
                     {loading ? (
                       <span className="flex items-center gap-2">
@@ -868,7 +868,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
 
           {step === "otp" && (
             <div className="relative bg-white rounded-2xl shadow-sm ring-1 ring-gray-200/80 overflow-hidden">
-              <div className="h-1 bg-gradient-to-r from-slate-700 to-slate-800" />
+              <div className="h-1 bg-gradient-to-r from-indigo-600 to-indigo-700" />
               <div className="p-6 sm:p-8">
                 <button
                   type="button"
@@ -881,7 +881,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
 
             <form onSubmit={(e) => { e.preventDefault(); handleVerifyOtp(); }} className="space-y-5">
               <div className="text-center">
-                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-slate-700 to-slate-800 shadow-sm">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-indigo-700 shadow-sm">
                   <KeyRound className="h-6 w-6 text-white" />
                 </div>
                 <h2 className="text-xl font-bold text-gray-900">Check Your Email</h2>
@@ -904,7 +904,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
               <button
                 type="submit"
                 disabled={loading || otp.join("").length < 6}
-                className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-slate-800 text-sm font-semibold text-white hover:bg-slate-900 transition-all active:scale-[0.98] disabled:opacity-60"
+                className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-indigo-700 text-sm font-semibold text-white hover:bg-indigo-800 transition-all active:scale-[0.98] disabled:opacity-60"
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
@@ -929,7 +929,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                     <button
                       type="button"
                       onClick={handleResend}
-                      className="font-semibold text-slate-800 transition-colors hover:text-slate-900"
+                      className="font-semibold text-indigo-700 transition-colors hover:text-slate-900"
                     >
                       Resend code
                     </button>
@@ -1003,7 +1003,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                       onClick={() => setRole(r)}
                       className={`flex h-16 flex-col items-center justify-center gap-1 rounded-lg border-2 transition-all ${
                         role === r
-                          ? "border-slate-800 bg-slate-50 text-slate-800"
+                          ? "border-indigo-700 bg-indigo-50 text-indigo-700"
                           : "border-gray-200 bg-gray-50 text-gray-500 hover:border-gray-300"
                       }`}
                     >
@@ -1017,7 +1017,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
               <button
                 type="submit"
                 disabled={loading}
-                className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-slate-800 text-sm font-semibold text-white hover:bg-slate-900 transition-all active:scale-[0.98] disabled:opacity-60"
+                className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-indigo-700 text-sm font-semibold text-white hover:bg-indigo-800 transition-all active:scale-[0.98] disabled:opacity-60"
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
@@ -1039,11 +1039,11 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
 // ─── HERO ────────────────────────────────────────────────────────
 function HeroSection({ onCta }: { onCta: () => void }) {
   return (
-    <section className="relative flex min-h-[90dvh] flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <section className="relative flex min-h-[90dvh] flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-indigo-900 via-indigo-800 to-indigo-950">
       {/* Animated bg orbs */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-slate-600/15 blur-3xl animate-float" />
-        <div className="absolute -bottom-32 -right-32 h-80 w-80 rounded-full bg-slate-700/15 blur-3xl animate-float" style={{ animationDelay: "1.5s" }} />
+        <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-indigo-500/15 blur-3xl animate-float" />
+        <div className="absolute -bottom-32 -right-32 h-80 w-80 rounded-full bg-indigo-600/15 blur-3xl animate-float" style={{ animationDelay: "1.5s" }} />
         <div className="absolute left-1/2 top-1/3 h-64 w-64 -translate-x-1/2 rounded-full bg-white/5 blur-3xl animate-pulse-soft" />
       </div>
 
@@ -1060,13 +1060,13 @@ function HeroSection({ onCta }: { onCta: () => void }) {
         <FadeSection className="mt-2">
           <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-white md:text-6xl lg:text-7xl">
             Ahmedabad&apos;s Event<br />
-            <span className="bg-gradient-to-r from-slate-200 to-slate-300 bg-clip-text text-transparent">Workforce Platform</span>
+            <span className="bg-gradient-to-r from-indigo-100 to-indigo-200 bg-clip-text text-transparent">Workforce Platform</span>
           </h1>
         </FadeSection>
 
         {/* Subheading */}
         <FadeSection className="mt-6">
-          <p className="mx-auto max-w-xl text-base leading-relaxed text-slate-200/80 md:text-lg">
+          <p className="mx-auto max-w-xl text-base leading-relaxed text-indigo-100/80 md:text-lg">
             Find event work or hire trusted staff — all in one place.
             No WhatsApp groups. No confusion. Just professional manpower coordination.
           </p>
@@ -1076,7 +1076,7 @@ function HeroSection({ onCta }: { onCta: () => void }) {
         <FadeSection className="mt-10">
           <button
             onClick={onCta}
-            className="group inline-flex items-center gap-2.5 rounded-2xl bg-white px-8 py-4 text-base font-bold text-slate-800 shadow-sm transition-all hover:scale-105 active:scale-[0.97]"
+            className="group inline-flex items-center gap-2.5 rounded-2xl bg-white px-8 py-4 text-base font-bold text-indigo-700 shadow-sm transition-all hover:scale-105 active:scale-[0.97]"
           >
             Get Started
             <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
@@ -1085,7 +1085,7 @@ function HeroSection({ onCta }: { onCta: () => void }) {
 
         {/* Trust bump */}
         <FadeSection className="mt-12">
-          <div className="flex items-center justify-center gap-8 text-slate-200/70">
+          <div className="flex items-center justify-center gap-8 text-indigo-100/70">
             <div className="flex items-center gap-2 text-xs">
               <Shield className="h-3.5 w-3.5" />
               Verified
@@ -1105,11 +1105,11 @@ function HeroSection({ onCta }: { onCta: () => void }) {
       {/* Scroll indicator */}
       <div className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 animate-float">
         <div className="flex flex-col items-center gap-1">
-          <span className="text-[10px] font-medium tracking-wide text-slate-200/60 uppercase">Scroll</span>
+          <span className="text-[10px] font-medium tracking-wide text-indigo-100/60 uppercase">Scroll</span>
           <div className="flex flex-col items-center gap-0.5">
-            <div className="h-1 w-1 rounded-full bg-slate-200/40" />
-            <div className="h-1 w-1 rounded-full bg-slate-200/40" />
-            <div className="h-1 w-1 rounded-full bg-slate-200/60" />
+            <div className="h-1 w-1 rounded-full bg-indigo-100/40" />
+            <div className="h-1 w-1 rounded-full bg-indigo-100/40" />
+            <div className="h-1 w-1 rounded-full bg-indigo-100/60" />
           </div>
         </div>
       </div>
