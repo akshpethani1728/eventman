@@ -214,7 +214,7 @@ export default function OrganizerDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-28">
+    <div className="min-h-screen bg-gradient-to-b from-indigo-50/40 to-gray-50 pb-28">
       {/* Header */}
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-gray-200/60 z-20">
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
@@ -255,19 +255,19 @@ export default function OrganizerDashboard() {
         )}
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4">
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200/70 shadow-black/[0.02]">
-            <p className="text-2xl font-bold text-gray-900">{activeEvents.length}</p>
+          <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-l-indigo-400 border border-gray-200/70 shadow-black/[0.02]">
+            <p className="text-2xl font-bold text-indigo-700">{activeEvents.length}</p>
             <p className="text-[11px] text-gray-500 mt-1 flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-indigo-600" /> Active events</p>
           </div>
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200/70 shadow-black/[0.02]">
+          <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-l-amber-400 border border-gray-200/70 shadow-black/[0.02]">
             <p className="text-2xl font-bold text-amber-600">{totalWorkersNeeded}</p>
             <p className="text-[11px] text-gray-500 mt-1 flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> Workers needed</p>
           </div>
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200/70 shadow-black/[0.02]">
+          <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-l-indigo-400 border border-gray-200/70 shadow-black/[0.02]">
             <p className="text-2xl font-bold text-indigo-700">{totalPendingApprovals}</p>
             <p className="text-[11px] text-gray-500 mt-1 flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-indigo-600" /> Pending approvals</p>
           </div>
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200/70 shadow-black/[0.02]">
+          <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-l-red-400 border border-gray-200/70 shadow-black/[0.02]">
             <p className="text-2xl font-bold text-red-600">{needsAttention.length}</p>
             <p className="text-[11px] text-gray-500 mt-1 flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Needs attention</p>
           </div>
@@ -290,7 +290,7 @@ export default function OrganizerDashboard() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-4 bg-white/80 backdrop-blur-xl rounded-xl p-1 border border-gray-200/60 shadow-sm shadow-black/[0.02]">
+        <div className="flex gap-1 mb-4 bg-white/95 backdrop-blur-xl rounded-xl p-1 border border-indigo-100/60 shadow-sm shadow-indigo-200/10">
           {(["active", "past"] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`flex-1 h-9 rounded-lg text-sm font-medium transition-all capitalize ${

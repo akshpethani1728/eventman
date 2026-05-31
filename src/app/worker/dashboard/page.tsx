@@ -360,7 +360,7 @@ function DashboardContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f5f5f7]">
+      <div className="min-h-screen bg-gradient-to-b from-indigo-50/40 to-white">
         <header className="sticky top-0 bg-white/80 backdrop-blur-2xl border-b border-gray-200/60 z-20">
           <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
@@ -388,17 +388,19 @@ function DashboardContent() {
 }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7]">
+    <div className="min-h-screen bg-gradient-to-b from-indigo-50/40 to-white">
       {/* Header */}
-      <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-gray-200/60 z-20">
+      <header className="sticky top-0 bg-gradient-to-r from-indigo-50/95 to-white/95 backdrop-blur-xl border-b border-indigo-100/80 z-20">
+        {/* Accent bar */}
+        <div className="h-0.5 bg-gradient-to-r from-indigo-600 via-indigo-500 to-indigo-400" />
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center shadow-sm">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center shadow-sm shadow-indigo-200/40">
               <Zap className="w-4 h-4 text-white" />
             </div>
             <div>
-              <Logo size="sm" />
-              <p className="text-[10px] text-gray-400 -mt-0.5">Find work near you</p>
+              <div className="text-indigo-700 font-bold text-sm leading-tight">EventMan</div>
+              <p className="text-[10px] text-indigo-400 -mt-0.5 font-medium">Find work near you</p>
             </div>
           </div>
           <div className="flex items-center gap-0.5">
@@ -479,7 +481,9 @@ function DashboardContent() {
         )}
         {/* Welcome banner */}
         {profile && tab === "browse" && browseEvents.length > 0 && (
-          <div className="mb-3 bg-indigo-700 rounded-2xl p-4 text-white shadow-sm">
+          <div className="mb-3 bg-indigo-700 rounded-2xl p-4 text-white shadow-sm shadow-indigo-200/30 relative overflow-hidden">
+            <div className="absolute -top-4 -right-4 w-24 h-24 rounded-full bg-white/5" />
+            <div className="absolute -bottom-4 -left-4 w-16 h-16 rounded-full bg-white/5" />
             <p className="text-sm opacity-90">Hey <span className="font-semibold">{profile.full_name?.split(" ")[0] || "there"}</span></p>
             <p className="text-lg font-bold mt-0.5">{browseEvents.length} event{browseEvents.length !== 1 ? "s" : ""} available</p>
             <div className="flex items-center gap-2 mt-1.5">
@@ -497,7 +501,7 @@ function DashboardContent() {
         )}
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-4 bg-white/80 backdrop-blur-xl rounded-lg p-1 border border-gray-200/60 shadow-sm shadow-black/[0.02]">
+        <div className="flex gap-2 mb-4 bg-white/95 backdrop-blur-xl rounded-xl p-1 border border-indigo-100/60 shadow-sm shadow-indigo-200/10">
           <button onClick={() => setTab("browse")}
             className={`flex-1 h-10 rounded-lg text-sm font-medium transition-all ${
               tab === "browse" ? "bg-indigo-700 text-white shadow-sm" : "text-gray-500 hover:text-gray-800"
@@ -521,12 +525,12 @@ function DashboardContent() {
                 <div className="flex gap-2 min-w-max pb-1">
                   <button onClick={() => setCategoryFilter("")}
                     className={`h-9 px-4 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
-                      !categoryFilter ? "bg-indigo-700 text-white shadow-sm" : "bg-white text-gray-600 border border-gray-200/80 hover:border-gray-300 shadow-sm"
+                      !categoryFilter ? "bg-indigo-700 text-white shadow-sm" : "bg-white text-gray-600 border border-indigo-100/50 hover:border-indigo-200 hover:bg-indigo-50/50 shadow-sm"
                     }`}>All</button>
                   {allCategories.map(cat => (
                     <button key={cat} onClick={() => setCategoryFilter(cat)}
                       className={`h-9 px-4 rounded-lg text-xs font-medium capitalize transition-all whitespace-nowrap ${
-                        categoryFilter === cat ? "bg-indigo-700 text-white shadow-sm" : "bg-white text-gray-600 border border-gray-200/80 hover:border-gray-300 shadow-sm"
+                        categoryFilter === cat ? "bg-indigo-700 text-white shadow-sm" : "bg-white text-gray-600 border border-indigo-100/50 hover:border-indigo-200 hover:bg-indigo-50/50 shadow-sm"
                       }`}>{CATEGORY_LABELS[cat] || cat.replace(/_/g, " ")}</button>
                   ))}
                 </div>
@@ -536,8 +540,8 @@ function DashboardContent() {
             {/* Empty state */}
             {browseEvents.length === 0 && (
               <div className="text-center py-16 px-4">
-                <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200/60 flex items-center justify-center mx-auto mb-5 shadow-sm">
-                  <Gauge className="w-9 h-9 text-gray-300" />
+                <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-50 to-indigo-100 border border-indigo-200/60 flex items-center justify-center mx-auto mb-5 shadow-sm shadow-indigo-200/20">
+                  <Gauge className="w-9 h-9 text-indigo-400" />
                 </div>
                 <p className="text-lg font-bold text-gray-900">
                   {categoryFilter ? "No events match this category" : "No events available"}
@@ -599,7 +603,7 @@ function DashboardContent() {
 
                 return (
                   <Link key={event.id} href={`/worker/events/${event.id}`}
-                    className={`block bg-white rounded-2xl border overflow-hidden shadow-sm hover:shadow-lg hover:border-gray-300 transition-all duration-300 active:scale-[0.99] animate-slide-up ${cardAccent} ${shadowBoost}`}
+                    className={`block bg-white rounded-2xl border overflow-hidden shadow-sm hover:shadow-lg hover:border-indigo-200 transition-all duration-300 active:scale-[0.99] animate-slide-up ${cardAccent} ${shadowBoost}`}
                     style={{ animationDelay: `${idx * 60}ms`, animationFillMode: "both" }}>
 
                     {/* === INTELLIGENCE ACCENT BAR === */}
@@ -822,7 +826,7 @@ function DashboardContent() {
                     </div>
 
                     {/* === DIVIDER === */}
-                    <div className="h-px bg-gray-100 mx-4" />
+                    <div className="h-px bg-indigo-100/50 mx-4" />
 
                     {/* === CTA SECTION === */}
                     <div className="px-4 py-3 flex items-center justify-between gap-3">
@@ -901,8 +905,8 @@ function DashboardContent() {
         {/* ========== APPLIED TAB ========== */}
         {tab === "applied" && appliedEvents.length === 0 && (
           <div className="text-center py-16 px-4">
-            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200/60 flex items-center justify-center mx-auto mb-5 shadow-sm">
-              <Send className="w-9 h-9 text-gray-300" />
+            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-50 to-indigo-100 border border-indigo-200/60 flex items-center justify-center mx-auto mb-5 shadow-sm shadow-indigo-200/20">
+              <Send className="w-9 h-9 text-indigo-400" />
             </div>
             <p className="text-lg font-bold text-gray-900">No applications yet</p>
             <p className="text-sm text-gray-500 mt-2 leading-relaxed max-w-xs mx-auto">

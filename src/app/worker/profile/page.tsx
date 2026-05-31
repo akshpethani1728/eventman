@@ -114,7 +114,7 @@ export default function WorkerProfilePage() {
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
         {/* Profile Completion */}
         {profile && (
-          <Card padding="md" className="shadow-sm shadow-black/[0.02]">
+          <Card padding="md" className="bg-indigo-50/60 rounded-xl p-4 border border-indigo-100/50 shadow-sm shadow-black/[0.02]">
             <div className="flex items-center justify-between mb-3">
               <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Profile Strength</span>
               <span className={`text-sm font-bold ${completion.percent >= 80 ? "text-emerald-600" : completion.percent >= 50 ? "text-amber-600" : "text-gray-500"}`}>{completion.percent}%</span>
@@ -142,7 +142,7 @@ export default function WorkerProfilePage() {
         <form onSubmit={(e) => { e.preventDefault(); saveProfile(); }}>
           {/* Avatar */}
           <Card padding="lg" className="text-center shadow-sm shadow-black/[0.02]">
-            <div className="w-20 h-20 rounded-full bg-indigo-50 flex items-center justify-center mx-auto mb-3 ring-1 ring-indigo-200">
+            <div className="w-20 h-20 rounded-full bg-indigo-100 flex items-center justify-center mx-auto mb-3 ring-4 ring-indigo-200">
               <span className="text-2xl font-bold text-indigo-700">{profile?.full_name?.charAt(0)?.toUpperCase() || "W"}</span>
             </div>
             <p className="font-semibold text-lg">{profile?.full_name}</p>

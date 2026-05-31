@@ -86,8 +86,8 @@ export default function OrganizerProfilePage() {
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
         <form onSubmit={(e) => { e.preventDefault(); saveProfile(); }}>
-          <div className="bg-white rounded-xl p-6 text-center shadow-sm shadow-black/[0.02] border border-gray-200/70">
-            <div className="w-20 h-20 rounded-full bg-indigo-50 flex items-center justify-center mx-auto mb-3 ring-1 ring-indigo-200">
+          <div className="bg-indigo-50/40 rounded-xl p-6 text-center shadow-sm shadow-black/[0.02] border border-indigo-100/50">
+            <div className="w-20 h-20 rounded-full bg-indigo-100 flex items-center justify-center mx-auto mb-3 ring-4 ring-indigo-200">
               <span className="text-2xl font-bold text-indigo-700">{profile?.full_name?.charAt(0)?.toUpperCase() || "O"}</span>
             </div>
             <div className="flex items-center justify-center gap-2">
@@ -120,7 +120,7 @@ export default function OrganizerProfilePage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-5 space-y-4 shadow-sm shadow-black/[0.02] border border-gray-200/70">
+          <div className="bg-indigo-50/40 rounded-xl p-5 space-y-4 shadow-sm shadow-black/[0.02] border border-indigo-100/50">
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Full Name</label>
               <div className="relative">
@@ -158,7 +158,7 @@ export default function OrganizerProfilePage() {
           </div>
 
           {/* About section */}
-          <div className="bg-white rounded-xl p-5 space-y-4 shadow-sm shadow-black/[0.02] border border-gray-200/70">
+          <div className="bg-indigo-50/40 rounded-xl p-5 space-y-4 shadow-sm shadow-black/[0.02] border border-indigo-100/50">
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">About</h3>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Description / About</label>

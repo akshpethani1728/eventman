@@ -364,9 +364,7 @@ export default function EventDetailPage() {
 
         {/* Organizer Info — contact hidden until approved */}
         {organizer && (
-          <div className={`bg-white border rounded-xl p-5 mb-3 space-y-3 ${
-            showContact ? "border-emerald-200 bg-gradient-to-br from-white to-emerald-50/30" : "border-gray-200"
-          }`}>
+          <div className="bg-indigo-50/60 rounded-xl p-4 border border-indigo-100/50 space-y-3 mb-3">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wide">Organized by</h3>
               {showContact && (
