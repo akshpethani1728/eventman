@@ -41,47 +41,52 @@ export default function EventDetailPage() {
   }, [application?.status]);
 
   const loadEvent = async () => {
-    const { data: evt } = await supabase.from("events").select("*").eq("id", id).single();
-    if (!evt) { router.push("/worker/dashboard"); return; }
-    setEvent(evt);
+    try {
+      const { data: evt } = await supabase.from("events").select("*").eq("id", id).maybeSingle();
+      if (!evt) { router.push("/worker/dashboard"); return; }
+      setEvent(evt);
 
-    const { count } = await supabase.from("applications").select("id", { count: "exact", head: true }).eq("event_id", id).eq("status", "approved");
-    setApprovedCount(count || 0);
+      const { count } = await supabase.from("applications").select("id", { count: "exact", head: true }).eq("event_id", id).eq("status", "approved");
+      setApprovedCount(count || 0);
 
-    const { data: org } = await supabase.from("profiles").select("*").eq("user_id", evt.organizer_id).single();
-    if (org) {
-      setOrganizer(org);
-      const { count: pc } = await supabase.from("events").select("*", { count: "exact", head: true }).eq("organizer_id", org.user_id).in("status", ["completed", "cancelled"]);
-      setOrganizerPastEvents(pc || 0);
-    }
-
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
-      if (prof) {
-        const now = new Date();
-        if (!prof.plan_status) {
-          const trialEnd = new Date(now);
-          trialEnd.setDate(trialEnd.getDate() + 10);
-          await supabase.from("profiles").update({
-            plan_status: "trial", trial_start_date: now.toISOString(), trial_end_date: trialEnd.toISOString(),
-          }).eq("user_id", user.id);
-          prof.plan_status = "trial";
-          prof.trial_start_date = now.toISOString();
-          prof.trial_end_date = trialEnd.toISOString();
-        } else if (prof.plan_status === "trial" && prof.trial_end_date && new Date(prof.trial_end_date) <= now) {
-          await supabase.from("profiles").update({ plan_status: "expired" }).eq("user_id", user.id);
-          prof.plan_status = "expired";
-        } else if (prof.plan_status === "active" && prof.subscription_end_date && new Date(prof.subscription_end_date) <= now) {
-          await supabase.from("profiles").update({ plan_status: "expired" }).eq("user_id", user.id);
-          prof.plan_status = "expired";
-        }
-        setWorkerProfile(prof);
+      const { data: org } = await supabase.from("profiles").select("*").eq("user_id", evt.organizer_id).maybeSingle();
+      if (org) {
+        setOrganizer(org);
+        const { count: pc } = await supabase.from("events").select("*", { count: "exact", head: true }).eq("organizer_id", org.user_id).in("status", ["completed", "cancelled"]);
+        setOrganizerPastEvents(pc || 0);
       }
-      const { data: app } = await supabase.from("applications").select("*").eq("event_id", id).eq("worker_id", user.id).maybeSingle();
-      if (app) setApplication(app);
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
+        if (prof) {
+          const now = new Date();
+          if (!prof.plan_status) {
+            const trialEnd = new Date(now);
+            trialEnd.setDate(trialEnd.getDate() + 10);
+            await supabase.from("profiles").update({
+              plan_status: "trial", trial_start_date: now.toISOString(), trial_end_date: trialEnd.toISOString(),
+            }).eq("user_id", user.id);
+            prof.plan_status = "trial";
+            prof.trial_start_date = now.toISOString();
+            prof.trial_end_date = trialEnd.toISOString();
+          } else if (prof.plan_status === "trial" && prof.trial_end_date && new Date(prof.trial_end_date) <= now) {
+            await supabase.from("profiles").update({ plan_status: "expired" }).eq("user_id", user.id);
+            prof.plan_status = "expired";
+          } else if (prof.plan_status === "active" && prof.subscription_end_date && new Date(prof.subscription_end_date) <= now) {
+            await supabase.from("profiles").update({ plan_status: "expired" }).eq("user_id", user.id);
+            prof.plan_status = "expired";
+          }
+          setWorkerProfile(prof);
+        }
+        const { data: app } = await supabase.from("applications").select("*").eq("event_id", id).eq("worker_id", user.id).maybeSingle();
+        if (app) setApplication(app);
+      }
+    } catch (err) {
+      console.error("[EventDetailPage] error:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleApply = async () => {

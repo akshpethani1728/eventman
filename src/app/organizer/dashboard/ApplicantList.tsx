@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -48,8 +48,7 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
 
   useEffect(() => { loadApplicants(); }, [event.id]);
 
-  const loadApplicants = async () => {
-    const { data: apps } = await supabase
+  const loadApplicants = async () => { try { const { data: apps } = await supabase
       .from("applications")
       .select("*")
       .eq("event_id", event.id)
@@ -60,14 +59,13 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
     const withProfiles = await Promise.all(
       apps.map(async (app) => {
         const { data: prof } = await supabase
-          .from("profiles").select("*").eq("user_id", app.worker_id).single();
+          .from("profiles").select("*").eq("user_id", app.worker_id).maybeSingle();
         return { ...app, profile: prof! } as ApplicantWithProfile;
       })
     );
 
     setApplicants(withProfiles.filter(a => a.profile));
-    setLoading(false);
-  };
+     } catch (err) { console.error("[ApplicantList] error:", err); } finally { setLoading(false); } };
 
   const updateStatus = async (applicationId: string, status: "approved" | "rejected") => {
     const { error } = await supabase
@@ -149,8 +147,8 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
             <h2 className="font-semibold text-base text-gray-900 truncate">{event.title}</h2>
             <p className="text-xs text-gray-500 mt-0.5">
               {applicants.length} applicant{applicants.length !== 1 ? "s" : ""}
-              {pendingCount > 0 && ` · ${pendingCount} pending`}
-              {approvedCount > 0 && ` · ${approvedCount} approved`}
+              {pendingCount > 0 && ` Â· ${pendingCount} pending`}
+              {approvedCount > 0 && ` Â· ${approvedCount} approved`}
             </p>
           </div>
           <div className="flex items-center gap-1">
@@ -222,8 +220,8 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
                       <p className="font-medium text-sm text-gray-900 truncate">{app.profile.full_name}</p>
                       <p className="text-xs text-gray-500 truncate">
                         {app.profile.age && `${app.profile.age} yrs`}
-                        {app.profile.gender && ` · ${app.profile.gender}`}
-                        {app.profile.city && ` · ${app.profile.city}`}
+                        {app.profile.gender && ` Â· ${app.profile.gender}`}
+                        {app.profile.city && ` Â· ${app.profile.city}`}
                       </p>
                     </div>
                   </div>
@@ -324,3 +322,4 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
     </div>
   );
 }
+

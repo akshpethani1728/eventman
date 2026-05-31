@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -24,18 +24,16 @@ export default function AdminDashboard() {
 
   useEffect(() => { loadData(); }, []);
 
-  const loadData = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+  const loadData = async () => { try { const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.push("/login"); return; }
-    const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
+    const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
     if (!prof || prof.role !== "admin") { router.push("/login"); return; }
     setProfile(prof);
     const { data: allUsers } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
     setUsers(allUsers || []);
     const { data: allEvents } = await supabase.from("events").select("*").order("created_at", { ascending: false });
     setEvents(allEvents || []);
-    setLoading(false);
-  };
+     } catch (err) { console.error("[AdminDashboard] error:", err); } finally { setLoading(false); } };
 
   const updateUserStatus = async (userId: string, status: "unverified" | "basic_verified" | "trusted") => {
     const { error } = await supabase.from("profiles").update({ status }).eq("user_id", userId);
@@ -108,13 +106,13 @@ export default function AdminDashboard() {
                       {u.role === "worker" && u.plan_status === "active" && <CreditCard className="w-3 h-3 text-blue-500 shrink-0" />}
                       {u.role === "worker" && u.plan_status === "expired" && <Clock className="w-3 h-3 text-red-400 shrink-0" />}
                     </div>
-                    <p className="text-xs text-gray-500 truncate">{u.role} · {u.email || u.phone || "—"}</p>
+                    <p className="text-xs text-gray-500 truncate">{u.role} Â· {u.email || u.phone || "â€”"}</p>
                     {u.role === "worker" && u.plan_status && (
                       <p className="text-[10px] text-gray-400 mt-0.5">
                         Plan: {u.plan_status}
-                        {u.subscription_start_date && ` · Since ${new Date(u.subscription_start_date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`}
-                        {u.subscription_end_date && ` · Till ${new Date(u.subscription_end_date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`}
-                        {u.trial_end_date && u.plan_status === "trial" && ` · Trial ends ${new Date(u.trial_end_date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`}
+                        {u.subscription_start_date && ` Â· Since ${new Date(u.subscription_start_date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`}
+                        {u.subscription_end_date && ` Â· Till ${new Date(u.subscription_end_date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`}
+                        {u.trial_end_date && u.plan_status === "trial" && ` Â· Trial ends ${new Date(u.trial_end_date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`}
                       </p>
                     )}
                   </div>
@@ -158,7 +156,7 @@ export default function AdminDashboard() {
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <p className="font-medium text-sm truncate">{e.title}</p>
-                    <p className="text-xs text-gray-500 truncate">{e.date} · {e.location} · {e.worker_count} workers</p>
+                    <p className="text-xs text-gray-500 truncate">{e.date} Â· {e.location} Â· {e.worker_count} workers</p>
                   </div>
                   <button onClick={() => deleteEvent(e.id)}
                     className="h-8 px-3 rounded-lg bg-red-50 text-red-600 text-xs font-medium shrink-0 hover:bg-red-100 transition-colors">
@@ -173,3 +171,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+

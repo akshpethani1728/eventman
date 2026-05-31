@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -66,14 +66,13 @@ export default function OrganizerEventDetailPage() {
 
   useEffect(() => { loadData(); }, [id]);
 
-  const loadData = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+  const loadData = async () => { try { const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.push("/login"); return; }
 
-    const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
+    const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
     if (!prof || prof.role !== "organizer") { router.push("/login"); return; }
 
-    const { data: evt } = await supabase.from("events").select("*").eq("id", id).single();
+    const { data: evt } = await supabase.from("events").select("*").eq("id", id).maybeSingle();
     if (!evt || evt.organizer_id !== user.id) { router.push("/organizer/dashboard"); return; }
     setEvent(evt);
 
@@ -82,13 +81,12 @@ export default function OrganizerEventDetailPage() {
 
     const withProfiles = await Promise.all(
       (apps || []).map(async (app) => {
-        const { data: p } = await supabase.from("profiles").select("*").eq("user_id", app.worker_id).single();
+        const { data: p } = await supabase.from("profiles").select("*").eq("user_id", app.worker_id).maybeSingle();
         return { ...app, profile: p! } as Application & { profile: Profile };
       })
     );
     setApplicants(withProfiles.filter(a => a.profile));
-    setLoading(false);
-  };
+     } catch (err) { console.error("[OrganizerEventDetailPage] error:", err); } finally { setLoading(false); } };
 
   const handleApprove = async (applicationId: string) => {
     if (!event) return;
@@ -264,8 +262,8 @@ export default function OrganizerEventDetailPage() {
             {event.payment_info && <div className="col-span-2 flex items-center gap-1.5 text-green-700"><IndianRupee className="w-3.5 h-3.5 shrink-0" />{event.payment_info}</div>}
             {(event.food_included || event.travel_included) && (
               <div className="col-span-2 flex gap-3 text-xs text-gray-500">
-                {event.food_included && <span>✓ Food included</span>}
-                {event.travel_included && <span>✓ Travel included</span>}
+                {event.food_included && <span>âœ“ Food included</span>}
+                {event.travel_included && <span>âœ“ Travel included</span>}
               </div>
             )}
           </div>
@@ -332,7 +330,7 @@ export default function OrganizerEventDetailPage() {
                           )}
                         </div>
                         <p className="text-xs text-gray-500 truncate">
-                          {app.profile.age && `${app.profile.age} yrs`}{app.profile.gender && ` · ${app.profile.gender}`}{app.profile.city && ` · ${app.profile.city}`}
+                          {app.profile.age && `${app.profile.age} yrs`}{app.profile.gender && ` Â· ${app.profile.gender}`}{app.profile.city && ` Â· ${app.profile.city}`}
                         </p>
                       </div>
                     </div>
@@ -461,3 +459,4 @@ export default function OrganizerEventDetailPage() {
     </div>
   );
 }
+

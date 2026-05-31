@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -55,16 +55,14 @@ export default function WorkerDatabasePage() {
 
   useEffect(() => { loadWorkers(); }, []);
 
-  const loadWorkers = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+  const loadWorkers = async () => { try { const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.push("/login"); return; }
     setOrganizerId(user.id);
-    const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
+    const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
     if (!prof || prof.role !== "organizer") { router.push("/login"); return; }
     const { data } = await supabase.from("profiles").select("*").eq("role", "worker").order("full_name", { ascending: true });
     setWorkers(data || []);
-    setLoading(false);
-  };
+     } catch (err) { console.error("[WorkerDatabasePage] error:", err); } finally { setLoading(false); } };
 
   const filtered = workers.filter(w => {
     const q = query.toLowerCase();
@@ -200,7 +198,7 @@ export default function WorkerDatabasePage() {
                       )}
                     </div>
                     <p className="text-xs text-gray-500 mt-0.5">
-                      {w.age && `${w.age} yrs`}{w.gender && ` · ${w.gender}`}{w.city && ` · ${w.city}`}
+                      {w.age && `${w.age} yrs`}{w.gender && ` Â· ${w.gender}`}{w.city && ` Â· ${w.city}`}
                     </p>
                     <div className="flex flex-wrap gap-1 mt-1.5">
                       {w.skills?.slice(0, 3).map((s, i) => <span key={i} className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">{s}</span>)}
@@ -241,3 +239,4 @@ export default function WorkerDatabasePage() {
     </div>
   );
 }
+

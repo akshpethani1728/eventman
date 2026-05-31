@@ -54,20 +54,25 @@ export default function WorkerProfilePage() {
   useEffect(() => { loadProfile(); }, []);
 
   const loadProfile = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { router.push("/login"); return; }
-    const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
-    if (!prof || prof.role !== "worker") { router.push("/login"); return; }
-    setProfile(prof);
-    setCompletion(computeCompletion(prof));
-    setForm({
-      full_name: prof.full_name || "", phone: prof.phone || "",
-      age: prof.age ? String(prof.age) : "", gender: prof.gender || "",
-      city: prof.city || "", area: prof.area || "",
-      skills: prof.skills?.join(", ") || "", experience: prof.experience || "",
-      availability: prof.availability || "", bio: prof.bio || "",
-    });
-    setLoading(false);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.push("/login"); return; }
+      const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
+      if (!prof || prof.role !== "worker") { router.push("/login"); return; }
+      setProfile(prof);
+      setCompletion(computeCompletion(prof));
+      setForm({
+        full_name: prof.full_name || "", phone: prof.phone || "",
+        age: prof.age ? String(prof.age) : "", gender: prof.gender || "",
+        city: prof.city || "", area: prof.area || "",
+        skills: prof.skills?.join(", ") || "", experience: prof.experience || "",
+        availability: prof.availability || "", bio: prof.bio || "",
+      });
+    } catch (err) {
+      console.error("[WorkerProfilePage] error:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const saveProfile = async () => {

@@ -30,18 +30,23 @@ export default function WorkerNotificationsPage() {
   useEffect(() => { loadNotifications(); }, []);
 
   const loadNotifications = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { router.push("/login"); return; }
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.push("/login"); return; }
 
-    const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
-    if (!prof || prof.role !== "worker") { router.push("/login"); return; }
+      const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
+      if (!prof || prof.role !== "worker") { router.push("/login"); return; }
 
-    const { data } = await supabase
-      .from("notifications").select("*").eq("user_id", user.id)
-      .order("created_at", { ascending: false }).limit(50);
+      const { data } = await supabase
+        .from("notifications").select("*").eq("user_id", user.id)
+        .order("created_at", { ascending: false }).limit(50);
 
-    setNotifications(data || []);
-    setLoading(false);
+      setNotifications(data || []);
+    } catch (err) {
+      console.error("[WorkerNotificationsPage] error:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const markAllRead = async () => {

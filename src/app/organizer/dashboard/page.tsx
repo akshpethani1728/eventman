@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -55,11 +55,10 @@ export default function OrganizerDashboard() {
 
   useEffect(() => { loadData(); }, []);
 
-  const loadData = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+  const loadData = async () => { try { const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.push("/login"); return; }
 
-    const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
+    const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
     if (!prof || prof.role !== "organizer") { router.push("/login"); return; }
     setProfile(prof);
 
@@ -97,8 +96,7 @@ export default function OrganizerDashboard() {
     );
 
     setEvents(eventsWithCounts);
-    setLoading(false);
-  };
+     } catch (err) { console.error("[OrganizerDashboard] error:", err); } finally { setLoading(false); } };
 
   const updateEventStatus = async (eventId: string, status: string) => {
     const { error } = await supabase.from("events").update({ status, updated_at: new Date().toISOString() }).eq("id", eventId);
@@ -164,6 +162,10 @@ export default function OrganizerDashboard() {
 
   const signOut = async () => { await supabase.auth.signOut(); router.push("/login"); };
 
+  const todayStr = new Date().toISOString().split("T")[0];
+  const pastCutoff = new Date(); pastCutoff.setDate(pastCutoff.getDate() - 1);
+  const pastCutoffStr = pastCutoff.toISOString().split("T")[0];
+
   const activeEvents = events.filter(e =>
     !["completed", "cancelled"].includes(e.status) && !e.is_template && e.date >= pastCutoffStr
   );
@@ -171,10 +173,6 @@ export default function OrganizerDashboard() {
     (["completed", "cancelled"].includes(e.status) || e.date < pastCutoffStr) && !e.is_template
   );
   const templates = events.filter(e => e.is_template);
-
-  const todayStr = new Date().toISOString().split("T")[0];
-  const pastCutoff = new Date(); pastCutoff.setDate(pastCutoff.getDate() - 1);
-  const pastCutoffStr = pastCutoff.toISOString().split("T")[0];
   const totalWorkersNeeded = activeEvents.reduce((s, e) => s + Math.max(0, e.worker_count - (e.approvedCount || 0)), 0);
   const totalPendingApprovals = activeEvents.reduce((s, e) => s + (e.pendingCount || 0), 0);
 
@@ -314,7 +312,7 @@ export default function OrganizerDashboard() {
               <div key={tmpl.id} className="bg-white border border-gray-200 rounded-xl p-3.5 flex items-center justify-between gap-3 shadow-sm">
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-sm text-gray-900 truncate">{tmpl.template_name || tmpl.title}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{tmpl.worker_count} workers · {CATEGORY_LABELS[tmpl.category || ""] || tmpl.category || "General"}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{tmpl.worker_count} workers Â· {CATEGORY_LABELS[tmpl.category || ""] || tmpl.category || "General"}</p>
                 </div>
                 <div className="flex gap-1.5 shrink-0">
                   <button onClick={() => { setCreateFromTemplate(tmpl); setShowCreate(true); }}
@@ -324,7 +322,7 @@ export default function OrganizerDashboard() {
                 </div>
               </div>
             ))}
-            <button onClick={() => setTab("active")} className="text-xs text-blue-600 mt-1">← Back to active</button>
+            <button onClick={() => setTab("active")} className="text-xs text-blue-600 mt-1">â† Back to active</button>
           </div>
         )}
 
@@ -505,7 +503,7 @@ export default function OrganizerDashboard() {
                       )}
                       {event.status === "published" && (
                         <span className="text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
-                          <CheckCircle className="w-3 h-3" /> Published — accepting apps
+                          <CheckCircle className="w-3 h-3" /> Published â€” accepting apps
                         </span>
                       )}
                       {deadlinePassed && (
@@ -574,7 +572,7 @@ export default function OrganizerDashboard() {
                         <span className="text-[10px] text-gray-500">{event.pendingCount} pending applicant{event.pendingCount !== 1 ? "s" : ""}</span>
                         <button onClick={() => { setSelectedEvent(event); }}
                           className="text-[10px] text-blue-600 font-medium hover:underline ml-auto">
-                          Review all →
+                          Review all â†’
                         </button>
                       </div>
                     )}
@@ -718,3 +716,4 @@ export default function OrganizerDashboard() {
     </div>
   );
 }
+

@@ -678,42 +678,48 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
   };
 
   const createProfile = async () => {
-    setError("");
-    if (!name.trim()) { setError("Please enter your name"); return; }
-    if (!agreeToTerms) { setError("Please agree to the Terms & Conditions and Privacy Policy"); return; }
-    setLoading(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      setError("Session expired. Please login again.");
-      setLoading(false);
-      onStepChange("auth");
-      return;
-    }
-    const now = new Date();
-    const trialEnd = new Date(now);
-    trialEnd.setDate(trialEnd.getDate() + 10);
-
-    const profileData: Record<string, any> = {
-      user_id: user.id, full_name: name.trim(), role, email: user.email, status: "unverified",
-    };
-
-    if (role === "worker") {
-      profileData.plan_status = "trial";
-      profileData.trial_start_date = now.toISOString();
-      profileData.trial_end_date = trialEnd.toISOString();
-    }
-
-    const { error: insertError } = await supabase.from("profiles").insert(profileData);
-    setLoading(false);
-    if (insertError) {
-      if (insertError.message.includes("duplicate")) {
-        const { data } = await supabase.from("profiles").select("role").eq("user_id", user.id).single();
-        if (data) { router.push(data.role === "admin" ? "/admin" : `/${data.role}/dashboard`); return; }
+    try {
+      setError("");
+      if (!name.trim()) { setError("Please enter your name"); return; }
+      if (!agreeToTerms) { setError("Please agree to the Terms & Conditions and Privacy Policy"); return; }
+      setLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setError("Session expired. Please login again.");
+        setLoading(false);
+        onStepChange("auth");
+        return;
       }
-      setError(insertError.message);
-      return;
+      const now = new Date();
+      const trialEnd = new Date(now);
+      trialEnd.setDate(trialEnd.getDate() + 10);
+
+      const profileData: Record<string, any> = {
+        user_id: user.id, full_name: name.trim(), role, email: user.email, status: "unverified",
+      };
+
+      if (role === "worker") {
+        profileData.plan_status = "trial";
+        profileData.trial_start_date = now.toISOString();
+        profileData.trial_end_date = trialEnd.toISOString();
+      }
+
+      const { error: insertError } = await supabase.from("profiles").insert(profileData);
+      setLoading(false);
+      if (insertError) {
+        if (insertError.message.includes("duplicate")) {
+          const { data } = await supabase.from("profiles").select("role").eq("user_id", user.id).maybeSingle();
+          if (data) { router.push(data.role === "admin" ? "/admin" : `/${data.role}/dashboard`); return; }
+        }
+        setError(insertError.message);
+        return;
+      }
+      router.replace(`/${role}/dashboard`);
+    } catch (err) {
+      console.error("[LoginPage] error:", err);
+    } finally {
+      setLoading(false);
     }
-    router.replace(`/${role}/dashboard`);
   };
 
   const inputClass = "w-full h-12 pl-10 pr-3 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none transition-all focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20";

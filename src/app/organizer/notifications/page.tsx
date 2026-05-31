@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -26,11 +26,10 @@ export default function NotificationsPage() {
 
   useEffect(() => { loadNotifications(); }, []);
 
-  const loadNotifications = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+  const loadNotifications = async () => { try { const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.push("/login"); return; }
 
-    const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
+    const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
     if (!prof || prof.role !== "organizer") { router.push("/login"); return; }
 
     const { data } = await supabase
@@ -38,8 +37,7 @@ export default function NotificationsPage() {
       .order("created_at", { ascending: false }).limit(50);
 
     setNotifications(data || []);
-    setLoading(false);
-  };
+     } catch (err) { console.error("[NotificationsPage] error:", err); } finally { setLoading(false); } };
 
   const markAllRead = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -129,3 +127,4 @@ export default function NotificationsPage() {
     </div>
   );
 }
+

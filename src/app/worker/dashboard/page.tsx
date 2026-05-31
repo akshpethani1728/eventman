@@ -195,110 +195,105 @@ function DashboardContent() {
   useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { router.push("/login"); return; }
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { router.push("/login"); return; }
 
-    const { data: profRaw } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
-    if (!profRaw || profRaw.role !== "worker") { router.push("/login"); return; }
+      const { data: profRaw } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
+      if (!profRaw || profRaw.role !== "worker") { router.push("/login"); return; }
 
-    const prof = profRaw;
+      const prof = profRaw;
 
-    // Subscription auto-heal: ensure every worker always has valid subscription data
-    if (prof.role === "worker") {
-      const now = new Date();
-
-      // Case 1: No subscription record at all → auto-initialize trial
-      if (!prof.plan_status) {
-        const trialEnd = new Date(now);
-        trialEnd.setDate(trialEnd.getDate() + 10);
-        await supabase.from("profiles").update({
-          plan_status: "trial",
-          trial_start_date: now.toISOString(),
-          trial_end_date: trialEnd.toISOString(),
-        }).eq("user_id", user.id);
-        prof.plan_status = "trial";
-        prof.trial_start_date = now.toISOString();
-        prof.trial_end_date = trialEnd.toISOString();
+      if (prof.role === "worker") {
+        const now = new Date();
+        if (!prof.plan_status) {
+          const trialEnd = new Date(now);
+          trialEnd.setDate(trialEnd.getDate() + 10);
+          await supabase.from("profiles").update({
+            plan_status: "trial",
+            trial_start_date: now.toISOString(),
+            trial_end_date: trialEnd.toISOString(),
+          }).eq("user_id", user.id);
+          prof.plan_status = "trial";
+          prof.trial_start_date = now.toISOString();
+          prof.trial_end_date = trialEnd.toISOString();
+        } else if (prof.plan_status === "trial" && prof.trial_end_date && new Date(prof.trial_end_date) <= now) {
+          await supabase.from("profiles").update({ plan_status: "expired" }).eq("user_id", user.id);
+          prof.plan_status = "expired";
+        } else if (prof.plan_status === "active" && prof.subscription_end_date && new Date(prof.subscription_end_date) <= now) {
+          await supabase.from("profiles").update({ plan_status: "expired" }).eq("user_id", user.id);
+          prof.plan_status = "expired";
+        }
       }
-      // Case 2: Trial expired → mark expired
-      else if (prof.plan_status === "trial" && prof.trial_end_date && new Date(prof.trial_end_date) <= now) {
-        await supabase.from("profiles").update({ plan_status: "expired" }).eq("user_id", user.id);
-        prof.plan_status = "expired";
+
+      setProfile(prof);
+      const { count } = await supabase.from("notifications").select("*", { count: "exact", head: true }).eq("user_id", user.id).eq("read", false);
+      setUnreadNotifCount(count || 0);
+
+      const { data: apps } = await supabase.from("applications").select("*").eq("worker_id", user.id);
+      const appMap: Record<string, Application> = {};
+      apps?.forEach((a: Application) => { appMap[a.event_id] = a; });
+      const appliedEventIds = Object.keys(appMap);
+
+      const browseCutoff = new Date(); browseCutoff.setDate(browseCutoff.getDate() - 1);
+      const browseCutoffStr = browseCutoff.toISOString().split("T")[0];
+      const { data: browseEvts } = await supabase
+        .from("events").select("*").in("status", ["published", "filling"]).gte("date", browseCutoffStr).order("date", { ascending: true });
+
+      let appliedEvts: any[] = [];
+      if (appliedEventIds.length > 0) {
+        const { data } = await supabase.from("events").select("*").in("id", appliedEventIds);
+        appliedEvts = data || [];
       }
-      // Case 3: Subscription expired → mark expired
-      else if (prof.plan_status === "active" && prof.subscription_end_date && new Date(prof.subscription_end_date) <= now) {
-        await supabase.from("profiles").update({ plan_status: "expired" }).eq("user_id", user.id);
-        prof.plan_status = "expired";
+
+      const seen = new Set<string>();
+      const allEvts: any[] = [];
+      for (const e of [...(browseEvts || []), ...appliedEvts]) {
+        if (!seen.has(e.id)) { seen.add(e.id); allEvts.push(e); }
       }
+
+      if (allEvts.length === 0) { setEvents([]); setLoading(false); return; }
+
+      const allEventIds = allEvts.map(e => e.id);
+
+      const { data: counts } = await supabase
+        .from("applications").select("event_id, status").in("event_id", allEventIds);
+      const approvedMap: Record<string, number> = {};
+      const totalMap: Record<string, number> = {};
+      counts?.forEach((c: any) => {
+        totalMap[c.event_id] = (totalMap[c.event_id] || 0) + 1;
+        if (c.status === "approved") approvedMap[c.event_id] = (approvedMap[c.event_id] || 0) + 1;
+      });
+
+      const orgIds = [...new Set(allEvts.map(e => e.organizer_id))];
+      const { data: orgProfiles } = await supabase.from("profiles").select("*").in("user_id", orgIds);
+      const orgMap: Record<string, Profile> = {};
+      orgProfiles?.forEach(p => { orgMap[p.user_id] = p; });
+
+      const { data: pastCounts } = await supabase
+        .from("events").select("organizer_id").in("organizer_id", orgIds).in("status", ["completed", "cancelled"]);
+      const pastCountMap: Record<string, number> = {};
+      pastCounts?.forEach((e: any) => {
+        pastCountMap[e.organizer_id] = (pastCountMap[e.organizer_id] || 0) + 1;
+      });
+
+      const enriched = allEvts.map(e => ({
+        ...e,
+        application: appMap[e.id] || undefined,
+        approved_count: approvedMap[e.id] || 0,
+        total_applications: totalMap[e.id] || 0,
+        organizer: orgMap[e.organizer_id],
+        organizer_past_events: pastCountMap[e.organizer_id] || 0,
+      }));
+
+      enriched.sort((a, b) => computePriorityScore(b) - computePriorityScore(a));
+
+      setEvents(enriched);
+    } catch (err) {
+      console.error("[Dashboard] loadData error:", err);
+    } finally {
+      setLoading(false);
     }
-
-    setProfile(prof);
-    const { count } = await supabase.from("notifications").select("*", { count: "exact", head: true }).eq("user_id", user.id).eq("read", false);
-    setUnreadNotifCount(count || 0);
-
-    const { data: apps } = await supabase.from("applications").select("*").eq("worker_id", user.id);
-    const appMap: Record<string, Application> = {};
-    apps?.forEach((a: Application) => { appMap[a.event_id] = a; });
-    const appliedEventIds = Object.keys(appMap);
-
-    // Load browse events: actively accepting applications, exclude events >1 day past event date
-    const browseCutoff = new Date(); browseCutoff.setDate(browseCutoff.getDate() - 1);
-    const browseCutoffStr = browseCutoff.toISOString().split("T")[0];
-    const { data: browseEvts } = await supabase
-      .from("events").select("*").in("status", ["published", "filling"]).gte("date", browseCutoffStr).order("date", { ascending: true });
-
-    // Load applied events: any status so applied tab tracks them even if event became full/closed
-    let appliedEvts: any[] = [];
-    if (appliedEventIds.length > 0) {
-      const { data } = await supabase.from("events").select("*").in("id", appliedEventIds);
-      appliedEvts = data || [];
-    }
-
-    // Merge: union of browse events + applied events, deduped by id
-    const seen = new Set<string>();
-    const allEvts: any[] = [];
-    for (const e of [...(browseEvts || []), ...appliedEvts]) {
-      if (!seen.has(e.id)) { seen.add(e.id); allEvts.push(e); }
-    }
-
-    if (allEvts.length === 0) { setEvents([]); setLoading(false); return; }
-
-    const allEventIds = allEvts.map(e => e.id);
-
-    const { data: counts } = await supabase
-      .from("applications").select("event_id, status").in("event_id", allEventIds);
-    const approvedMap: Record<string, number> = {};
-    const totalMap: Record<string, number> = {};
-    counts?.forEach((c: any) => {
-      totalMap[c.event_id] = (totalMap[c.event_id] || 0) + 1;
-      if (c.status === "approved") approvedMap[c.event_id] = (approvedMap[c.event_id] || 0) + 1;
-    });
-
-    const orgIds = [...new Set(allEvts.map(e => e.organizer_id))];
-    const { data: orgProfiles } = await supabase.from("profiles").select("*").in("user_id", orgIds);
-    const orgMap: Record<string, Profile> = {};
-    orgProfiles?.forEach(p => { orgMap[p.user_id] = p; });
-
-    const { data: pastCounts } = await supabase
-      .from("events").select("organizer_id").in("organizer_id", orgIds).in("status", ["completed", "cancelled"]);
-    const pastCountMap: Record<string, number> = {};
-    pastCounts?.forEach((e: any) => {
-      pastCountMap[e.organizer_id] = (pastCountMap[e.organizer_id] || 0) + 1;
-    });
-
-    const enriched = allEvts.map(e => ({
-      ...e,
-      application: appMap[e.id] || undefined,
-      approved_count: approvedMap[e.id] || 0,
-      total_applications: totalMap[e.id] || 0,
-      organizer: orgMap[e.organizer_id],
-      organizer_past_events: pastCountMap[e.organizer_id] || 0,
-    }));
-
-    enriched.sort((a, b) => computePriorityScore(b) - computePriorityScore(a));
-
-    setEvents(enriched);
-    setLoading(false);
   };
 
   const apply = async (eventId: string) => {

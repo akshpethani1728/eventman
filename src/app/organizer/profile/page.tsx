@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -28,15 +28,14 @@ export default function OrganizerProfilePage() {
     loadProfile();
   }, []);
 
-  const loadProfile = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+  const loadProfile = async () => { try { const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.push("/login"); return; }
 
     const { data: prof } = await supabase
       .from("profiles")
       .select("*")
       .eq("user_id", user.id)
-      .single();
+      .maybeSingle();
 
     if (!prof || prof.role !== "organizer") { router.push("/login"); return; }
     setProfile(prof);
@@ -52,8 +51,7 @@ export default function OrganizerProfilePage() {
       .from("events").select("*", { count: "exact", head: true }).eq("organizer_id", user.id).in("status", ["completed", "cancelled"]);
     setPastEventCount(pc || 0);
 
-    setLoading(false);
-  };
+     } catch (err) { console.error("[OrganizerProfilePage] error:", err); } finally { setLoading(false); } };
 
   const saveProfile = async () => {
     setSaving(true);
@@ -189,3 +187,4 @@ export default function OrganizerProfilePage() {
     </div>
   );
 }
+
