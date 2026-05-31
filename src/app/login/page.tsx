@@ -730,125 +730,171 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
       <div className="mx-auto max-w-md px-4 sm:px-6">
         <FadeSection>
           {step === "auth" && (
-            <form onSubmit={(e) => { e.preventDefault(); }} className="space-y-5">
-              <div className="text-center">
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-200/40">
-                  <Mail className="h-7 w-7 text-white" />
-                </div>
-                <h2 className="text-2xl font-bold text-gray-900">Welcome to EventMan</h2>
-                <p className="mt-1 text-sm text-gray-500">
-                  Sign in or create your account
-                </p>
-              </div>
+            <div className="relative bg-white rounded-2xl shadow-xl border border-gray-200/80 overflow-hidden">
+              <div className="h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-600" />
+              <div className="p-6 sm:p-8">
+                {/* Back button */}
+                <button
+                  type="button"
+                  onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); setError(""); }}
+                  className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors mb-5"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                  Back to home
+                </button>
 
-              {error && (
-                <div className="animate-slide-down rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-                  <p className="text-sm text-red-700">{error}</p>
+                <div className="text-center mb-6">
+                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-200/40">
+                    <Mail className="h-6 w-6 text-white" />
+                  </div>
+                  <h2 className="text-xl font-bold text-gray-900">Welcome to EventMan</h2>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Sign in or create your account
+                  </p>
                 </div>
-              )}
 
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700">Email address</label>
-                <div className="relative">
-                  <Mail className={inputIconClass} />
-                  <input
-                    ref={inputRef}
-                    type="email"
-                    value={email}
-                    onChange={e => { setEmail(e.target.value); setError(""); }}
-                    placeholder="you@example.com"
-                    autoComplete="email"
-                    className={inputClass}
-                  />
-                </div>
-              </div>
+                {error && (
+                  <div className="animate-slide-down mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+                    <p className="text-sm text-red-700">{error}</p>
+                  </div>
+                )}
 
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-gray-700">Password</label>
-                <div className="relative">
-                  <Lock className={inputIconClass} />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={e => { setPassword(e.target.value); setError(""); }}
-                    placeholder="Your password"
-                    autoComplete="current-password"
-                    className="w-full h-12 pl-10 pr-10 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none transition-all focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20"
-                  />
+                {/* Sign In Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <div className="h-px flex-1 bg-gray-100" />
+                    <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Sign In</span>
+                    <div className="h-px flex-1 bg-gray-100" />
+                  </div>
+
+                  <div>
+                    <label className="mb-1.5 block text-sm font-medium text-gray-700">Email address</label>
+                    <div className="relative">
+                      <Mail className={inputIconClass} />
+                      <input
+                        ref={inputRef}
+                        type="email"
+                        value={email}
+                        onChange={e => { setEmail(e.target.value); setError(""); }}
+                        placeholder="you@example.com"
+                        autoComplete="email"
+                        className={inputClass}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="mb-1.5 block text-sm font-medium text-gray-700">Password</label>
+                    <div className="relative">
+                      <Lock className={inputIconClass} />
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={e => { setPassword(e.target.value); setError(""); }}
+                        placeholder="Your password"
+                        autoComplete="current-password"
+                        className="w-full h-12 pl-10 pr-10 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none transition-all focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    disabled={loading}
+                    onClick={handleSignIn}
+                    className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-sm font-semibold text-white shadow-lg shadow-blue-200/50 transition-all active:scale-[0.98] disabled:opacity-60"
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {loading ? (
+                      <span className="flex items-center gap-2">
+                        <RefreshCw className="h-4 w-4 animate-spin" />
+                        Signing in...
+                      </span>
+                    ) : (
+                      <>Sign In <ArrowRight className="h-4 w-4" /></>
+                    )}
+                  </button>
+                </div>
+
+                {/* Divider */}
+                <div className="my-6 flex items-center gap-3">
+                  <div className="flex-1 border-t border-gray-200" />
+                  <span className="text-xs text-gray-400 font-medium">or</span>
+                  <div className="flex-1 border-t border-gray-200" />
+                </div>
+
+                {/* Create Account Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <div className="h-px flex-1 bg-gray-100" />
+                    <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Create Account</span>
+                    <div className="h-px flex-1 bg-gray-100" />
+                  </div>
+
+                  <p className="text-xs text-gray-400 text-center -mt-1">
+                    New here? Set up your account in seconds
+                  </p>
+
+                  <label className="flex items-start gap-2.5 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={agreeToTerms}
+                      onChange={e => setAgreeToTerms(e.target.checked)}
+                      className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500/30 focus:ring-offset-0"
+                    />
+                    <span className="text-xs text-gray-500 leading-relaxed group-hover:text-gray-700 transition-colors">
+                      I agree to the{" "}
+                      <Link href="/terms" target="_blank" className="text-blue-600 hover:text-blue-700 underline font-medium">Terms &amp; Conditions</Link>
+                      {" "}and{" "}
+                      <Link href="/privacy" target="_blank" className="text-blue-600 hover:text-blue-700 underline font-medium">Privacy Policy</Link>
+                    </span>
+                  </label>
+
+                  <button
+                    type="button"
+                    disabled={loading}
+                    onClick={handleCreateAccount}
+                    className="flex h-11 w-full items-center justify-center gap-2 rounded-xl border-2 border-blue-600 bg-white text-sm font-semibold text-blue-600 transition-all active:scale-[0.98] hover:bg-blue-50 disabled:opacity-60"
+                  >
+                    {loading ? (
+                      <span className="flex items-center gap-2">
+                        <RefreshCw className="h-4 w-4 animate-spin" />
+                        Creating account...
+                      </span>
+                    ) : (
+                      <>Create Account <ArrowRight className="h-4 w-4" /></>
+                    )}
                   </button>
                 </div>
               </div>
-
-              <div className="flex flex-col gap-3">
-                <button
-                  type="button"
-                  disabled={loading}
-                  onClick={handleSignIn}
-                  className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-base font-semibold text-white shadow-lg shadow-blue-200/50 transition-all active:scale-[0.98] disabled:opacity-60"
-                >
-                  {loading ? (
-                    <span className="flex items-center gap-2">
-                      <RefreshCw className="h-4 w-4 animate-spin" />
-                      Signing in...
-                    </span>
-                  ) : (
-                    <>Sign In <ArrowRight className="h-4 w-4" /></>
-                  )}
-                </button>
-
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 border-t border-gray-200" />
-                  <span className="text-xs text-gray-400">or</span>
-                  <div className="flex-1 border-t border-gray-200" />
-              </div>
-
-              <label className="flex items-start gap-2.5 cursor-pointer group">
-                <input
-                  type="checkbox"
-                  checked={agreeToTerms}
-                  onChange={e => setAgreeToTerms(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500/30 focus:ring-offset-0"
-                />
-                <span className="text-xs text-gray-500 leading-relaxed group-hover:text-gray-700 transition-colors">
-                  I agree to the{" "}
-                  <Link href="/terms" target="_blank" className="text-blue-600 hover:text-blue-700 underline font-medium">Terms &amp; Conditions</Link>
-                  {" "}and{" "}
-                  <Link href="/privacy" target="_blank" className="text-blue-600 hover:text-blue-700 underline font-medium">Privacy Policy</Link>
-                </span>
-              </label>
-
-              <button
-                  type="button"
-                  disabled={loading}
-                  onClick={handleCreateAccount}
-                  className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border-2 border-blue-600 bg-white text-base font-semibold text-blue-600 transition-all active:scale-[0.98] hover:bg-blue-50 disabled:opacity-60"
-                >
-                  {loading ? (
-                    <span className="flex items-center gap-2">
-                      <RefreshCw className="h-4 w-4 animate-spin" />
-                      Creating account...
-                    </span>
-                  ) : (
-                    <>Create Account <ArrowRight className="h-4 w-4" /></>
-                  )}
-                </button>
-              </div>
-            </form>
+            </div>
           )}
 
           {step === "otp" && (
+            <div className="relative bg-white rounded-2xl shadow-xl border border-gray-200/80 overflow-hidden">
+              <div className="h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-600" />
+              <div className="p-6 sm:p-8">
+                <button
+                  type="button"
+                  onClick={() => { window.scrollTo({ top: 0, behavior: "smooth" }); setError(""); }}
+                  className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors mb-5"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                  Back to home
+                </button>
+
             <form onSubmit={(e) => { e.preventDefault(); handleVerifyOtp(); }} className="space-y-5">
               <div className="text-center">
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-200/40">
-                  <KeyRound className="h-7 w-7 text-white" />
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg shadow-blue-200/40">
+                  <KeyRound className="h-6 w-6 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900">Check Your Email</h2>
+                <h2 className="text-xl font-bold text-gray-900">Check Your Email</h2>
                 <p className="mt-1 text-sm text-gray-500">
                   We sent a code to <span className="font-medium text-gray-700">{email}</span>
                 </p>
@@ -868,7 +914,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
               <button
                 type="submit"
                 disabled={loading || otp.join("").length < 6}
-                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-base font-semibold text-white shadow-lg shadow-blue-200/50 transition-all active:scale-[0.98] disabled:opacity-60"
+                className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-sm font-semibold text-white shadow-lg shadow-blue-200/50 transition-all active:scale-[0.98] disabled:opacity-60"
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
@@ -911,15 +957,29 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                 </button>
               </p>
             </form>
+              </div>
+            </div>
           )}
 
           {step === "profile" && (
+            <div className="relative bg-white rounded-2xl shadow-xl border border-gray-200/80 overflow-hidden">
+              <div className="h-1.5 bg-gradient-to-r from-emerald-500 to-teal-500" />
+              <div className="p-6 sm:p-8">
+                <button
+                  type="button"
+                  onClick={() => { onStepChange("auth"); setError(""); }}
+                  className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors mb-5"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                  Back to sign in
+                </button>
+
             <form onSubmit={(e) => { e.preventDefault(); createProfile(); }} className="space-y-5">
               <div className="text-center">
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg shadow-emerald-200/40">
-                  <User className="h-7 w-7 text-white" />
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg shadow-emerald-200/40">
+                  <User className="h-6 w-6 text-white" />
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900">Complete Profile</h2>
+                <h2 className="text-xl font-bold text-gray-900">Complete Profile</h2>
                 <p className="mt-1 text-sm text-gray-500">Just a few more details to get started</p>
               </div>
 
@@ -967,7 +1027,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
               <button
                 type="submit"
                 disabled={loading}
-                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-base font-semibold text-white shadow-lg shadow-blue-200/50 transition-all active:scale-[0.98] disabled:opacity-60"
+                className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-sm font-semibold text-white shadow-lg shadow-blue-200/50 transition-all active:scale-[0.98] disabled:opacity-60"
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
@@ -977,6 +1037,8 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                 ) : "Continue"}
               </button>
             </form>
+              </div>
+            </div>
           )}
         </FadeSection>
       </div>
