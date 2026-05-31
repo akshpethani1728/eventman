@@ -262,27 +262,32 @@ export default function OrganizerDashboard() {
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
           {[
-            { value: activeEvents.length, label: "Active events", color: "indigo", icon: LayoutDashboard },
-            { value: totalWorkersNeeded, label: "Workers needed", color: "amber", icon: Users },
-            { value: totalPendingApprovals, label: "Pending approvals", color: "indigo", icon: Clock3 },
-            { value: needsAttention.length, label: "Needs attention", color: "red", icon: AlertTriangle },
-          ].map(({ value, label, color, icon: Icon }) => {
+            { value: activeEvents.length, label: "Active events", color: "indigo", icon: LayoutDashboard, primary: true },
+            { value: totalWorkersNeeded, label: "Workers needed", color: "amber", icon: Users, primary: false },
+            { value: totalPendingApprovals, label: "Pending approvals", color: "indigo", icon: Clock3, primary: false },
+            { value: needsAttention.length, label: "Needs attention", color: "red", icon: AlertTriangle, primary: false },
+          ].map(({ value, label, color, icon: Icon, primary }) => {
             const isIndigo = color === "indigo";
             const isAmber = color === "amber";
             const isRed = color === "red";
+            const isAttention = label === "Needs attention";
+            const hasAttention = value > 0;
             const valueCls = isAmber ? "text-amber-600" : isRed ? "text-red-600" : "text-indigo-700";
-            const dotCls = isAmber ? "bg-amber-500" : isRed ? "bg-red-500" : "bg-indigo-600";
+            const dotCls = isAmber ? "bg-amber-500" : isRed ? "bg-red-500" : "text-indigo-600";
             const iconBg = isAmber ? "bg-amber-100" : isRed ? "bg-red-100" : "bg-indigo-100";
             const iconCls = isAmber ? "text-amber-600" : isRed ? "text-red-600" : "text-indigo-700";
+            const valueSize = primary ? "text-3xl" : isAttention && hasAttention ? "text-3xl" : "text-2xl";
+            const cardRing = isAttention && hasAttention ? "ring-2 ring-red-200/60" : "";
             return (
-              <div key={label} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-200/70 shadow-black/[0.02] active:scale-[0.98] transition-all duration-200 hover:shadow-md group">
-                <div className="flex items-start justify-between mb-2">
-                  <div className={`w-8 h-8 rounded-xl ${iconBg} flex items-center justify-center ${iconCls} group-hover:scale-110 transition-transform duration-200`}>
-                    <Icon className="w-4 h-4" />
+              <div key={label} className={`bg-white rounded-2xl p-4 shadow-sm border border-gray-200/70 shadow-black/[0.02] active:scale-[0.98] transition-all duration-200 hover:shadow-md group ${cardRing}`}>
+                <div className="flex items-start justify-between mb-3">
+                  <div className={`w-9 h-9 rounded-xl ${iconBg} flex items-center justify-center ${iconCls} group-hover:scale-110 transition-transform duration-200 ${isAttention && hasAttention ? "animate-pulse-soft" : ""}`}>
+                    <Icon className={`${primary ? "w-5 h-5" : "w-4 h-4"}`} />
                   </div>
+                  <span className={`w-2 h-2 rounded-full ${dotCls}`} />
                 </div>
-                <p className={`text-2xl font-bold ${valueCls}`}>{value}</p>
-                <p className="text-[11px] text-gray-500 mt-0.5 flex items-center gap-1.5"><span className={`w-1.5 h-1.5 rounded-full ${dotCls}`} /> {label}</p>
+                <p className={`${valueSize} font-bold ${valueCls} leading-none`}>{formatCount(value)}</p>
+                <p className="text-[10px] text-gray-400 mt-1.5 uppercase tracking-wider font-medium">{label}</p>
               </div>
             );
           })}
@@ -378,17 +383,28 @@ export default function OrganizerDashboard() {
               const isFull = event.status === "full";
               const hasWaitlisted = (event.waitlistCount || 0) > 0;
 
+              const urgencyLevel = hasDanger ? "danger" : hasWarnings ? "warning" : isFull ? "full" : "normal";
+              const urgencyBar = urgencyLevel === "danger" ? "bg-gradient-to-r from-red-500 to-red-400" :
+                urgencyLevel === "warning" ? "bg-gradient-to-r from-amber-500 to-amber-400" :
+                urgencyLevel === "full" ? "bg-gradient-to-r from-purple-500 to-purple-400" :
+                "bg-gradient-to-r from-gray-200 to-gray-100";
+
+              const cardPadding = hasDanger ? "pt-5" : "pt-4";
+              const cardShadow = hasDanger ? "shadow-md shadow-red-200/30" :
+                hasWarnings ? "shadow-sm shadow-amber-200/30" : "shadow-sm";
+
               return (
                 <div key={event.id}
-                  className={`bg-white rounded-2xl border overflow-hidden shadow-sm transition-all duration-200 hover:shadow-md ${
+                  className={`bg-white rounded-2xl border overflow-hidden transition-all duration-200 hover:shadow-md ${
                     hasDanger ? "border-red-200/80" : hasWarnings ? "border-amber-200/80" : isFull ? "border-purple-200/80" : "border-gray-200/80"
-                  }`}>
+                  } ${cardShadow}`}>
+                  <div className={`h-1 ${urgencyBar}`} />
 
                   {/* Header */}
-                  <div className="px-4 pt-4 pb-1 flex items-start justify-between gap-2">
+                  <div className={`px-4 ${cardPadding} pb-1 flex items-start justify-between gap-2`}>
                     <div className="min-w-0 flex-1">
-                      <Link href={`/organizer/events/${event.id}`} className="hover:text-indigo-700 transition-colors">
-                        <h3 className="font-bold text-base leading-snug text-gray-900 truncate group-hover:text-indigo-700">{event.title}</h3>
+                      <Link href={`/organizer/events/${event.id}`} className="hover:text-indigo-700 transition-colors block">
+                        <h3 className="font-bold text-lg leading-tight text-gray-900 truncate group-hover:text-indigo-700 transition-colors">{event.title}</h3>
                       </Link>
                       <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
                         <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-lg border ${STATUS_STYLES[event.status]}`}>
@@ -465,32 +481,38 @@ export default function OrganizerDashboard() {
 
                   {/* Main operational section */}
                   <div className="px-4 py-2">
-                    {/* Stats & Progress */}
+                    {/* Stats & Progress — priority sized */}
                     <div className="flex items-center gap-4 mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="text-center">
-                          <p className={`text-lg font-bold ${needsApproval ? "text-amber-600" : "text-gray-900"}`}>{event.approvedCount}</p>
-                          <p className="text-[10px] text-gray-500">Approved</p>
+                        <div className="text-center min-w-[48px]">
+                          <p className={`font-bold leading-none transition-colors ${
+                            needsApproval ? "text-amber-600 text-xl" : remaining <= 3 && remaining > 0 ? "text-gray-900 text-base" : "text-gray-900 text-2xl"
+                          }`}>{event.approvedCount}</p>
+                          <p className="text-[9px] text-gray-400 mt-0.5 uppercase tracking-wider font-medium">Approved</p>
                         </div>
                         <div className="w-px h-8 bg-gray-100" />
-                        <div className="text-center">
-                          <p className={`text-lg font-bold ${needsApproval ? "text-amber-600" : "text-gray-900"}`}>{event.pendingCount}</p>
-                          <p className="text-[10px] text-gray-500">Pending</p>
+                        <div className="text-center min-w-[48px]">
+                          <p className={`font-bold leading-none transition-colors ${
+                            needsApproval ? "text-amber-600 text-2xl" : "text-gray-900 text-base"
+                          }`}>{event.pendingCount}</p>
+                          <p className="text-[9px] text-gray-400 mt-0.5 uppercase tracking-wider font-medium">Pending</p>
                         </div>
                         <div className="w-px h-8 bg-gray-100" />
-                        <div className="text-center">
-                          <p className={`text-lg font-bold ${remaining <= 3 && remaining > 0 ? "text-red-600" : remaining === 0 ? "text-gray-400" : "text-gray-900"}`}>
+                        <div className="text-center min-w-[48px]">
+                          <p className={`font-bold leading-none transition-colors ${
+                            remaining <= 3 && remaining > 0 ? "text-red-600 text-2xl" : remaining === 0 ? "text-gray-400 text-base" : "text-gray-900 text-base"
+                          }`}>
                             {remaining <= 0 ? "Full" : remaining}
                           </p>
-                          <p className="text-[10px] text-gray-500">Remaining</p>
+                          <p className="text-[9px] text-gray-400 mt-0.5 uppercase tracking-wider font-medium">Seats left</p>
                         </div>
                       </div>
                       <div className="flex-1 min-w-[80px]">
-                        <div className="flex items-center justify-between text-[10px] mb-1">
-                          <span className="text-gray-500">{fillPercent}%</span>
-                          <span className="text-gray-400">{event.approvedCount}/{event.worker_count}</span>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className={`font-medium ${hasDanger ? "text-red-600 text-xs" : "text-[10px] text-gray-500"}`}>{fillPercent}%</span>
+                          <span className="text-[10px] text-gray-400">{event.approvedCount}/{event.worker_count}</span>
                         </div>
-                        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div className={`${hasDanger ? "h-2" : "h-1.5"} bg-gray-100 rounded-full overflow-hidden`}>
                           <div className={`h-full rounded-full transition-all duration-500 ${
                             fillPercent >= 100 ? "bg-purple-500" : fillPercent >= 80 ? "bg-emerald-500" : fillPercent >= 50 ? "bg-indigo-600" : "bg-amber-500"
                           }`} style={{ width: `${Math.max(4, fillPercent)}%` }} />
@@ -520,36 +542,31 @@ export default function OrganizerDashboard() {
                       )}
                     </div>
 
-                    {/* Key alerts (max 2 most important) */}
+                    {/* Key alerts — prioritized, max 2 */}
                     <div className="flex flex-wrap gap-1.5 mb-2">
                       {needsApproval && (
                         <button onClick={() => setSelectedEvent(event)}
-                          className="text-[10px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded-lg flex items-center gap-1 hover:bg-indigo-100 transition-colors">
+                          className="text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 px-2.5 py-0.5 rounded-lg flex items-center gap-1.5 hover:bg-indigo-100 transition-colors shadow-sm">
                           <Users className="w-3 h-3" /> {event.pendingCount} pending
                         </button>
                       )}
                       {remaining <= 3 && remaining > 0 && (
-                        <span className="text-[10px] font-medium bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                        <span className="text-[11px] font-bold bg-red-50 text-red-600 border border-red-200 px-2.5 py-0.5 rounded-lg flex items-center gap-1.5 shadow-sm">
                           <AlertTriangle className="w-3 h-3" /> {remaining} left
                         </span>
                       )}
-                      {deadlineToday && (
-                        <span className="text-[10px] font-medium bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
+                      {!needsApproval && remaining > 3 && deadlineToday && (
+                        <span className="text-[10px] font-semibold bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-sm">
                           <Clock3 className="w-3 h-3" /> Deadline today
                         </span>
                       )}
-                      {event.status === "draft" && (
+                      {!needsApproval && remaining > 3 && !deadlineToday && event.status === "draft" && (
                         <button onClick={() => { setEditingEvent(event); }}
                           className="text-[10px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded-lg flex items-center gap-1 hover:bg-indigo-100 transition-colors">
                           <Edit3 className="w-3 h-3" /> Publish
                         </button>
                       )}
-                      {event.status === "published" && (
-                        <span className="text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
-                          <CheckCircle className="w-3 h-3" /> Accepting apps
-                        </span>
-                      )}
-                      {hasWaitlisted && (
+                      {!needsApproval && remaining > 3 && !deadlineToday && event.status !== "draft" && hasWaitlisted && (
                         <span className="text-[10px] font-medium bg-purple-50 text-purple-700 border border-purple-200 px-2 py-0.5 rounded-lg flex items-center gap-1">
                           <Users className="w-3 h-3" /> {event.waitlistCount} waitlisted
                         </span>
