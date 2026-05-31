@@ -527,7 +527,7 @@ function OtpInput({ value, onChange, onComplete }: {
           onChange={(e) => handleChange(i, e.target.value)}
           onKeyDown={(e) => handleKeyDown(i, e)}
           onPaste={i === 0 ? handlePaste : undefined}
-          className={`h-12 w-10 rounded-xl border-2 text-center text-lg font-bold tracking-wider outline-none transition-all sm:h-14 sm:w-12 sm:text-xl ${
+          className={`h-12 w-10 rounded-lg border-2 text-center text-lg font-bold tracking-wider outline-none transition-all sm:h-14 sm:w-12 sm:text-xl ${
             d ? "border-blue-500 bg-blue-50 text-blue-700" : "border-gray-200 bg-gray-50 text-gray-900"
           } focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20`}
         />
@@ -712,7 +712,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
     }
   };
 
-  const inputClass = "w-full h-12 pl-10 pr-3 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none transition-all focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20";
+  const inputClass = "w-full h-12 pl-10 pr-3 rounded-lg border border-gray-200 bg-white text-sm outline-none transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20";
   const inputIconClass = "absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400";
 
   return (
@@ -720,8 +720,8 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
       <div className="mx-auto max-w-md px-4 sm:px-6">
         <FadeSection>
           {step === "auth" && (
-            <div className="relative bg-white rounded-2xl shadow-xl border border-gray-200/80 overflow-hidden">
-              <div className="h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-600" />
+            <div className="relative bg-white rounded-2xl shadow-sm ring-1 ring-gray-200/80 overflow-hidden">
+              <div className="h-1 bg-gradient-to-r from-blue-500 to-indigo-500" />
               <div className="p-6 sm:p-8">
                 {/* Back button */}
                 <button
@@ -783,7 +783,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                         onChange={e => { setPassword(e.target.value); setError(""); }}
                         placeholder="Your password"
                         autoComplete="current-password"
-                        className="w-full h-12 pl-10 pr-10 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none transition-all focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20"
+                        className="w-full h-12 pl-10 pr-10 rounded-lg border border-gray-200 bg-white text-sm outline-none transition-all focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20"
                       />
                       <button
                         type="button"
@@ -814,7 +814,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                     type="button"
                     disabled={loading}
                     onClick={handleSignIn}
-                    className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-sm font-semibold text-white shadow-lg shadow-blue-200/50 transition-all active:scale-[0.98] disabled:opacity-60"
+                    className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700 transition-all active:scale-[0.98] disabled:opacity-60"
                   >
                     {loading ? (
                       <span className="flex items-center gap-2">
@@ -867,8 +867,8 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
           )}
 
           {step === "otp" && (
-            <div className="relative bg-white rounded-2xl shadow-xl border border-gray-200/80 overflow-hidden">
-              <div className="h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-blue-600" />
+            <div className="relative bg-white rounded-2xl shadow-sm ring-1 ring-gray-200/80 overflow-hidden">
+              <div className="h-1 bg-gradient-to-r from-blue-500 to-indigo-500" />
               <div className="p-6 sm:p-8">
                 <button
                   type="button"
@@ -904,7 +904,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
               <button
                 type="submit"
                 disabled={loading || otp.join("").length < 6}
-                className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-sm font-semibold text-white shadow-lg shadow-blue-200/50 transition-all active:scale-[0.98] disabled:opacity-60"
+                className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700 transition-all active:scale-[0.98] disabled:opacity-60"
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
@@ -952,8 +952,8 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
           )}
 
           {step === "profile" && (
-            <div className="relative bg-white rounded-2xl shadow-xl border border-gray-200/80 overflow-hidden">
-              <div className="h-1.5 bg-gradient-to-r from-emerald-500 to-teal-500" />
+            <div className="relative bg-white rounded-2xl shadow-sm ring-1 ring-gray-200/80 overflow-hidden">
+              <div className="h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
               <div className="p-6 sm:p-8">
                 <button
                   type="button"
@@ -1001,7 +1001,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                       key={r}
                       type="button"
                       onClick={() => setRole(r)}
-                      className={`flex h-16 flex-col items-center justify-center gap-1 rounded-xl border-2 transition-all ${
+                      className={`flex h-16 flex-col items-center justify-center gap-1 rounded-lg border-2 transition-all ${
                         role === r
                           ? "border-blue-600 bg-blue-50 text-blue-700"
                           : "border-gray-200 bg-gray-50 text-gray-500 hover:border-gray-300"
@@ -1017,7 +1017,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
               <button
                 type="submit"
                 disabled={loading}
-                className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-sm font-semibold text-white shadow-lg shadow-blue-200/50 transition-all active:scale-[0.98] disabled:opacity-60"
+                className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700 transition-all active:scale-[0.98] disabled:opacity-60"
               >
                 {loading ? (
                   <span className="flex items-center gap-2">

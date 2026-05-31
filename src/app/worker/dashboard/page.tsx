@@ -21,11 +21,11 @@ function isRemovedByOrganizer(app: Application) { return app.status === "cancell
 type ApplicationStatusDisplay = "pending" | "approved" | "rejected" | "cancelled" | "waitlisted";
 
 const STATUS_CONFIG: Record<ApplicationStatusDisplay, { label: string; badge: string; icon: any; accent: string; message: string }> = {
-  pending:   { label: "Pending",   badge: "bg-amber-100 text-amber-700", icon: Hourglass,   accent: "from-amber-300 via-amber-400 to-orange-400", message: "Awaiting organizer response" },
-  approved:  { label: "Selected",  badge: "bg-emerald-100 text-emerald-700", icon: CheckCircle, accent: "from-emerald-400 via-emerald-500 to-teal-500", message: "You're confirmed for this event" },
-  rejected:  { label: "Not Selected", badge: "bg-gray-200 text-gray-600", icon: XCircle,    accent: "from-gray-300 via-gray-400 to-slate-400",  message: "Not selected this time" },
-  cancelled: { label: "Cancelled", badge: "bg-gray-100 text-gray-400", icon: XCircle,    accent: "from-gray-200 via-gray-300 to-gray-300",  message: "Application withdrawn" },
-  waitlisted: { label: "Waitlisted", badge: "bg-purple-100 text-purple-700", icon: ListPlus, accent: "from-purple-300 via-purple-400 to-violet-400", message: "On waitlist — spot may open up" },
+  pending:   { label: "Pending",   badge: "bg-amber-100 text-amber-700", icon: Hourglass,   accent: "bg-amber-400", message: "Awaiting organizer response" },
+  approved:  { label: "Selected",  badge: "bg-emerald-100 text-emerald-700", icon: CheckCircle, accent: "bg-emerald-500", message: "You're confirmed for this event" },
+  rejected:  { label: "Not Selected", badge: "bg-gray-200 text-gray-600", icon: XCircle,    accent: "bg-gray-300",  message: "Not selected this time" },
+  cancelled: { label: "Cancelled", badge: "bg-gray-100 text-gray-400", icon: XCircle,    accent: "bg-gray-200",  message: "Application withdrawn" },
+  waitlisted: { label: "Waitlisted", badge: "bg-purple-100 text-purple-700", icon: ListPlus, accent: "bg-purple-400", message: "On waitlist — spot may open up" },
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -152,17 +152,17 @@ function SkeletonCard() {
 
 function EventBadge({ children, variant, pulse }: { children: React.ReactNode; variant: "red" | "amber" | "blue" | "purple" | "green" | "orange" | "slate" | "emerald"; pulse?: boolean }) {
   const styles: Record<string, string> = {
-    red: "bg-gradient-to-r from-red-50 to-rose-50 text-red-700 border-red-200/80 shadow-red-200/40",
-    amber: "bg-gradient-to-r from-amber-50 to-orange-50 text-amber-700 border-amber-200/80 shadow-amber-200/40",
-    blue: "bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border-blue-200/80 shadow-blue-200/40",
-    purple: "bg-gradient-to-r from-purple-50 to-violet-50 text-purple-700 border-purple-200/80 shadow-purple-200/40",
-    green: "bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-700 border-emerald-200/80 shadow-emerald-200/40",
-    orange: "bg-gradient-to-r from-orange-50 to-amber-50 text-orange-700 border-orange-200/80 shadow-orange-200/40",
-    slate: "bg-gradient-to-r from-slate-50 to-gray-50 text-slate-600 border-slate-200/80 shadow-slate-200/40",
-    emerald: "bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 border-emerald-200/80 shadow-emerald-200/40",
+    red: "bg-red-50 text-red-700 border-red-200/60",
+    amber: "bg-amber-50 text-amber-700 border-amber-200/60",
+    blue: "bg-blue-50 text-blue-700 border-blue-200/60",
+    purple: "bg-purple-50 text-purple-700 border-purple-200/60",
+    green: "bg-emerald-50 text-emerald-700 border-emerald-200/60",
+    orange: "bg-orange-50 text-orange-700 border-orange-200/60",
+    slate: "bg-gray-50 text-gray-600 border-gray-200/60",
+    emerald: "bg-emerald-50 text-emerald-700 border-emerald-200/60",
   };
   return (
-    <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-lg border shadow-sm ${styles[variant]} ${pulse ? "animate-pulse shadow-lg" : ""}`}>
+    <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-lg border ${styles[variant]} ${pulse ? "animate-pulse" : ""}`}>
       {children}
     </span>
   );
@@ -479,7 +479,7 @@ function DashboardContent() {
         )}
         {/* Welcome banner */}
         {profile && tab === "browse" && browseEvents.length > 0 && (
-          <div className="mb-3 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-4 text-white shadow-lg shadow-blue-600/20">
+          <div className="mb-3 bg-blue-600 rounded-2xl p-4 text-white shadow-sm">
             <p className="text-sm opacity-90">Hey <span className="font-semibold">{profile.full_name?.split(" ")[0] || "there"}</span></p>
             <p className="text-lg font-bold mt-0.5">{browseEvents.length} event{browseEvents.length !== 1 ? "s" : ""} available</p>
             <div className="flex items-center gap-2 mt-1.5">
@@ -548,8 +548,8 @@ function DashboardContent() {
                     : "New opportunities are added daily. Check back soon or adjust your preferences."}
                 </p>
                 {categoryFilter && (
-                  <button onClick={() => setCategoryFilter("")}
-                    className="mt-5 h-11 px-6 rounded-xl bg-blue-600 text-white text-sm font-semibold shadow-md shadow-blue-600/20 hover:shadow-lg transition-all active:scale-[0.97]">
+                  <button               onClick={() => setCategoryFilter("")}
+                    className="mt-5 h-11 px-6 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-all active:scale-[0.97]">
                     Clear filter
                   </button>
                 )}
@@ -605,16 +605,16 @@ function DashboardContent() {
                     {/* === INTELLIGENCE ACCENT BAR === */}
                     <div className={`h-1 ${
                       isToday || hoursUntilEvent < 12
-                        ? "bg-gradient-to-r from-red-400 to-rose-500"
+                        ? "bg-red-500"
                         : isNearlyFull
-                          ? "bg-gradient-to-r from-amber-400 to-orange-500"
+                          ? "bg-amber-500"
                           : isFillingFast
-                            ? "bg-gradient-to-r from-amber-300 to-orange-400"
+                            ? "bg-amber-400"
                             : isTrusted
-                              ? "bg-gradient-to-r from-blue-400 to-indigo-500"
+                              ? "bg-blue-500"
                               : isNew
-                                ? "bg-gradient-to-r from-blue-300 to-indigo-400"
-                                : "bg-gradient-to-r from-gray-200 to-gray-300"
+                                ? "bg-blue-400"
+                                : "bg-gray-200"
                     }`} />
 
                     {/* === PREMIUM TRUST STRIP === */}
@@ -688,12 +688,12 @@ function DashboardContent() {
                           </span>
                         )}
                         {isNewlyPosted && (
-                          <span className="text-[10px] font-semibold bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-2.5 py-0.5 rounded-lg shadow-sm animate-pulse">
+                          <span className="text-[10px] font-semibold bg-blue-600 text-white px-2.5 py-0.5 rounded-lg animate-pulse">
                             New
                           </span>
                         )}
                         {!isNewlyPosted && isNew && !deadlinePassed && (
-                          <span className="text-[10px] font-semibold bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-2.5 py-0.5 rounded-lg shadow-sm">
+                          <span className="text-[10px] font-semibold bg-blue-600 text-white px-2.5 py-0.5 rounded-lg">
                             New
                           </span>
                         )}
@@ -739,7 +739,7 @@ function DashboardContent() {
                       {/* Payment — HERO */}
                       {event.payment_info && (
                         <div className="mb-2.5">
-                          <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200/60 rounded-lg px-3 py-1.5 shadow-sm">
+                          <div className="inline-flex items-center gap-1.5 bg-emerald-50 border border-emerald-200/60 rounded-lg px-3 py-1.5">
                             <IndianRupee className="w-4 h-4 text-emerald-600" />
                             <span className="text-base font-bold text-emerald-700">{event.payment_info}</span>
                           </div>
@@ -776,7 +776,7 @@ function DashboardContent() {
                         <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                           <div
                             className={`h-full rounded-full transition-all duration-700 ease-out ${
-                              fillPercent >= 80 ? "bg-gradient-to-r from-red-400 to-red-500" : fillPercent >= 50 ? "bg-gradient-to-r from-amber-400 to-amber-500" : "bg-gradient-to-r from-blue-400 to-blue-500"
+                              fillPercent >= 80 ? "bg-red-500" : fillPercent >= 50 ? "bg-amber-500" : "bg-blue-500"
                             } ${isNearlyFull ? "animate-pulse" : ""}`}
                             style={{ width: `${Math.max(2, fillPercent)}%` }}
                           />
@@ -858,14 +858,14 @@ function DashboardContent() {
                       ) : !canApply ? (
                         <Link href="/worker/plans"
                           onClick={(e) => { e.stopPropagation(); }}
-                          className="h-9 px-4 rounded-lg font-semibold text-xs flex items-center gap-1.5 shadow-sm bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:shadow-lg transition-all active:scale-[0.97]">
+                          className="h-9 px-4 rounded-lg font-semibold text-xs flex items-center gap-1.5 bg-amber-600 text-white hover:bg-amber-700 transition-all active:scale-[0.97]">
                           <CreditCard className="w-3.5 h-3.5" /> Subscribe
                         </Link>
                       ) : isFull ? (
                         <button
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); joinWaitlist(event.id); }}
                           disabled={applyingId === event.id}
-                          className="h-9 px-4 rounded-lg font-semibold text-xs flex items-center gap-1.5 transition-all active:scale-[0.97] disabled:opacity-60 shadow-sm bg-purple-600 text-white shadow-purple-600/20 hover:shadow-lg">
+                          className="h-9 px-4 rounded-lg font-semibold text-xs flex items-center gap-1.5 transition-all active:scale-[0.97] disabled:opacity-60 bg-purple-600 text-white hover:bg-purple-700">
                           {applyingId === event.id ? (
                             <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                           ) : (
@@ -876,12 +876,12 @@ function DashboardContent() {
                         <button
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); apply(event.id); }}
                           disabled={applyingId === event.id}
-                          className={`h-9 px-4 rounded-lg font-semibold text-xs flex items-center gap-1.5 transition-all active:scale-[0.97] disabled:opacity-60 shadow-sm ${
+                          className={`h-9 px-4 rounded-lg font-semibold text-xs flex items-center gap-1.5 transition-all active:scale-[0.97] disabled:opacity-60 ${
                             isToday || hoursUntilEvent < 12
-                              ? "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-red-500/20 hover:shadow-lg"
+                              ? "bg-red-600 text-white hover:bg-red-700"
                               : isNearlyFull
-                                ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-amber-500/20 hover:shadow-lg"
-                                : "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-blue-600/20 hover:shadow-lg"
+                                ? "bg-amber-600 text-white hover:bg-amber-700"
+                                : "bg-blue-600 text-white hover:bg-blue-700"
                           }`}>
                         {applyingId === event.id ? (
                           <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -909,7 +909,7 @@ function DashboardContent() {
             You haven&apos;t applied to any events yet. Browse available opportunities and send your first application to get started.
             </p>
             <button onClick={() => setTab("browse")}
-              className="mt-6 h-11 px-6 rounded-xl bg-blue-600 text-white text-sm font-semibold shadow-md shadow-blue-600/20 hover:shadow-lg transition-all active:scale-[0.97]">
+              className="mt-6 h-11 px-6 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-all active:scale-[0.97]">
               Browse Events
             </button>
           </div>
@@ -942,7 +942,7 @@ function DashboardContent() {
                   style={{ animationDelay: `${idx * 50}ms`, animationFillMode: "both" }}>
 
                   {/* Accent bar — distinct per status */}
-                  <div className={`h-1.5 bg-gradient-to-r ${isWaitlisted(app) ? "from-purple-300 via-purple-400 to-violet-400" : cfg.accent}`} />
+                  <div className={`h-1 ${isWaitlisted(app) ? "bg-purple-400" : cfg.accent}`} />
 
                   <div className="p-4">
                     {/* Header: avatar, title, status badge */}
@@ -969,7 +969,7 @@ function DashboardContent() {
                           </div>
                         </div>
                       </div>
-                      <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold shadow-sm shrink-0 ${cfg.badge}`}>
+                      <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold shrink-0 ${cfg.badge}`}>
                         <StatusIcon className="w-3.5 h-3.5" />
                         {cfg.label}
                       </div>
@@ -1030,8 +1030,8 @@ function DashboardContent() {
                         <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                           <div className={`h-full rounded-full transition-all duration-500 ${
                             app.status === "approved" && fillPercent >= 80
-                              ? "bg-gradient-to-r from-emerald-400 to-teal-500"
-                              : "bg-gradient-to-r from-amber-400 to-orange-400"
+                              ? "bg-emerald-500"
+                              : "bg-amber-400"
                           }`} style={{ width: `${fillPercent}%` }} />
                         </div>
                       </div>
