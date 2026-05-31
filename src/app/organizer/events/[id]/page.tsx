@@ -33,7 +33,7 @@ function computeCompletion(p: Profile): number {
 
 const AVAIL_CONFIG: Record<string, { label: string; dot: string; badge: string }> = {
   available_today: { label: "Available Today", dot: "bg-emerald-500", badge: "bg-emerald-100 text-emerald-700 border-emerald-200" },
-  available_this_week: { label: "Available This Week", dot: "bg-blue-500", badge: "bg-blue-100 text-blue-700 border-blue-200" },
+  available_this_week: { label: "Available This Week", dot: "bg-slate-600", badge: "bg-slate-100 text-slate-700 border-slate-200" },
   available: { label: "Available", dot: "bg-emerald-500", badge: "bg-emerald-100 text-emerald-700 border-emerald-200" },
   weekends: { label: "Weekends", dot: "bg-amber-500", badge: "bg-amber-100 text-amber-700 border-amber-200" },
   evenings: { label: "Evenings", dot: "bg-purple-500", badge: "bg-purple-100 text-purple-700 border-purple-200" },
@@ -42,7 +42,7 @@ const AVAIL_CONFIG: Record<string, { label: string; dot: string; badge: string }
 };
 
 const STATUS_STYLES: Record<string, string> = {
-  draft: "bg-gray-100 text-gray-600", published: "bg-blue-100 text-blue-700",
+  draft: "bg-gray-100 text-gray-600", published: "bg-slate-100 text-slate-700",
   filling: "bg-green-100 text-green-700", full: "bg-purple-100 text-purple-700",
   closed: "bg-amber-100 text-amber-700", completed: "bg-gray-100 text-gray-500",
   cancelled: "bg-red-100 text-red-700",
@@ -230,7 +230,7 @@ export default function OrganizerEventDetailPage() {
           {remaining <= 3 && remaining > 0 && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-lg px-3 py-2 flex items-center gap-2"><AlertTriangle className="w-3.5 h-3.5" />Only {remaining} seat{remaining !== 1 ? "s" : ""} left</div>}
           {deadlineToday && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-lg px-3 py-2 flex items-center gap-2"><AlertTriangle className="w-3.5 h-3.5" />Application deadline is today</div>}
           {deadlineSoon && !deadlineToday && <div className="text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-lg px-3 py-2 flex items-center gap-2"><Clock3 className="w-3.5 h-3.5" />Deadline closing soon</div>}
-          {pendingCount > 0 && <div className="text-xs bg-blue-50 text-blue-700 border border-blue-200 rounded-lg px-3 py-2 flex items-center gap-2"><Users className="w-3.5 h-3.5" />{pendingCount} pending approval{pendingCount !== 1 ? "s" : ""}</div>}
+          {pendingCount > 0 && <div className="text-xs bg-slate-50 text-slate-700 border border-slate-200 rounded-lg px-3 py-2 flex items-center gap-2"><Users className="w-3.5 h-3.5" />{pendingCount} pending approval{pendingCount !== 1 ? "s" : ""}</div>}
         </div>
 
         {/* Status & Quick Stats */}
@@ -238,7 +238,7 @@ export default function OrganizerEventDetailPage() {
           <CardHeader className="mb-3">
             <div className="flex items-center gap-2 flex-wrap">
               <Badge variant={event.status as any || "draft"}>{STATUS_LABELS[event.status]}</Badge>
-              {event.category && <span className="text-[10px] font-medium bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full capitalize">{event.category.replace(/_/g, " ")}</span>}
+              {event.category && <span className="text-[10px] font-medium bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full capitalize">{event.category.replace(/_/g, " ")}</span>}
             </div>
             <span className="text-[10px] text-gray-400">{event.id.slice(0, 8)}</span>
           </CardHeader>
@@ -278,7 +278,7 @@ export default function OrganizerEventDetailPage() {
               {(event.min_age || event.max_age) && <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">{event.min_age || 0}-{event.max_age || 99} yrs</span>}
               {(event.work_description || event.experience_required) && <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">{event.work_description || event.experience_required}</span>}
               {event.dress_code && <span className="bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">{event.dress_code}</span>}
-              {event.skill_requirements?.map((s, i) => <span key={i} className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">{s}</span>)}
+              {event.skill_requirements?.map((s, i) => <span key={i} className="bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full">{s}</span>)}
             </div>
           </Card>
         )}
@@ -293,7 +293,7 @@ export default function OrganizerEventDetailPage() {
               {([["", `All (${applicants.length})`], ["pending", `Pending (${pendingCount})`], ["approved", `Approved (${approvedCount})`], ["rejected", `Rejected (${rejectedCount})`]] as const).map(([key, label]) => (
                 <button key={key} onClick={() => setFilter(key)}
                   className={`h-7 px-2.5 rounded-lg text-[10px] font-medium transition-colors ${
-                    filter === key ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-600"
+                    filter === key ? "bg-slate-800 text-white" : "bg-gray-100 text-gray-600"
                   }`}>{label}</button>
               ))}
             </div>
@@ -312,7 +312,7 @@ export default function OrganizerEventDetailPage() {
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2.5 min-w-0 flex-1">
                       <div className="relative shrink-0">
-                        <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm">
+                        <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 font-semibold text-sm">
                           {app.profile.full_name?.charAt(0) || "W"}
                         </div>
                         {avail && (
@@ -387,7 +387,7 @@ export default function OrganizerEventDetailPage() {
                       <div className="flex items-center gap-1.5 mt-1">
                         <div className="flex-1 max-w-[80px] h-1.5 bg-gray-100 rounded-full overflow-hidden">
                           <div className={`h-full rounded-full ${
-                            completion >= 80 ? "bg-emerald-500" : completion >= 50 ? "bg-amber-500" : "bg-blue-500"
+                            completion >= 80 ? "bg-emerald-500" : completion >= 50 ? "bg-amber-500" : "bg-slate-600"
                           }`} style={{ width: `${completion}%` }} />
                         </div>
                         <span className={`text-[10px] font-medium ${

@@ -1,7 +1,14 @@
 import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
 import { OfflineBanner, InstallPrompt, PWARegistration } from "@/components/PWA";
 import "./globals.css";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
   title: "EventMan - Event Manpower Management",
@@ -25,7 +32,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#2563eb",
+  themeColor: "#1e293b",
   viewportFit: "cover",
 };
 
@@ -35,11 +42,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="gu" className="antialiased">
+    <html lang="gu" className={`${inter.variable} antialiased`}>
       <head>
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className="bg-[#f5f5f7] min-h-screen safe-area-padding">
+      <body className="min-h-screen safe-area-padding" style={{ backgroundColor: "#f5f5f7" }}>
         {children}
         <Toaster richColors position="top-center" />
         <PWARegistration />

@@ -68,14 +68,14 @@ export function InstallPrompt() {
   return (
     <div className="fixed bottom-20 left-4 right-4 z-50 max-w-lg mx-auto animate-slide-up">
       <div className="bg-white rounded-xl border border-gray-200/80 shadow-xl px-4 py-3.5 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center shadow-sm shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center shadow-sm shrink-0">
           <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14"/></svg>
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-gray-900">Install EventMan</p>
           <p className="text-xs text-gray-500">Add to home screen for quick access</p>
         </div>
-        <button onClick={install} className="h-9 px-4 rounded-xl bg-blue-600 text-white text-xs font-semibold shadow-sm hover:bg-blue-700 active:scale-95 transition-all">
+        <button onClick={install} className="h-9 px-4 rounded-xl bg-slate-800 text-white text-xs font-semibold shadow-sm hover:bg-slate-900 active:scale-95 transition-all">
           Install
         </button>
         <button onClick={() => setShow(false)} className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">

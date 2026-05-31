@@ -32,7 +32,7 @@ export default function OrganizerLayout({ children }: { children: React.ReactNod
                   href={href}
                   className={`flex flex-col items-center justify-center gap-0.5 min-w-0 px-2 py-1 rounded-xl transition-all duration-200 ${
                     active
-                      ? "text-blue-600"
+                      ? "text-slate-800"
                       : "text-gray-400 hover:text-gray-600 active:scale-95"
                   }`}
                 >
@@ -47,7 +47,7 @@ export default function OrganizerLayout({ children }: { children: React.ReactNod
                     {label}
                   </span>
                   {active && (
-                    <div className="w-5 h-0.5 rounded-full bg-blue-600" />
+                    <div className="w-5 h-0.5 rounded-full bg-slate-800" />
                   )}
                 </Link>
               );

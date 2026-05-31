@@ -26,7 +26,7 @@ export default function ErrorPage({
         <p className="text-sm text-gray-500 mb-4">This page ran into a problem. Try again or go back.</p>
         <div className="flex gap-2 justify-center">
           <button onClick={reset}
-            className="h-11 px-6 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 active:scale-[0.97] transition-all shadow-sm">
+            className="h-11 px-6 rounded-lg bg-slate-800 text-white text-sm font-semibold hover:bg-slate-900 active:scale-[0.97] transition-all shadow-sm">
             Retry
           </button>
           <Link href="/login"

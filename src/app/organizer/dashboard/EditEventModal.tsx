@@ -155,13 +155,13 @@ export default function EditEventModal({ event, onClose, onUpdated }: Props) {
           <form onSubmit={handleSubmit} className="space-y-4">
 
             {/* A. Event Basics */}
-            <SectionCard emoji="📋" label="Event Basics" accentCls="bg-gradient-to-r from-blue-50/80 to-indigo-50/80">
+            <SectionCard emoji="📋" label="Event Basics" accentCls="bg-gradient-to-r from-slate-100/80 to-slate-200/80">
               <div>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Event Title</label>
                 <input required value={form.title} onChange={e => update("title", e.target.value)}
                   maxLength={100}
                  
-                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all form-input" />
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-100 outline-none transition-all form-input" />
                 <div className="text-right mt-1">
                   <span className="text-[10px] text-gray-400">{form.title.length}/100</span>
                 </div>
@@ -170,7 +170,7 @@ export default function EditEventModal({ event, onClose, onUpdated }: Props) {
                 <div>
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Category</label>
                   <select value={form.category} onChange={e => update("category", e.target.value)}
-                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all form-input">
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-slate-400 focus:ring-2 focus:ring-slate-100 outline-none transition-all form-input">
                     <option value="">Select category</option>
                     {CATEGORIES.map(c => <option key={c} value={c}>{c.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}</option>)}
                   </select>
@@ -179,37 +179,37 @@ export default function EditEventModal({ event, onClose, onUpdated }: Props) {
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Workers Needed</label>
                   <input type="number" min={1} value={form.worker_count} onChange={e => update("worker_count", e.target.value)}
                     required
-                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all form-input" />
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-100 outline-none transition-all form-input" />
                 </div>
               </InputGroup>
               <InputGroup>
                 <div>
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Event Date</label>
                   <input required type="date" value={form.date} onChange={e => update("date", e.target.value)}
-                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all form-input" />
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-slate-400 focus:ring-2 focus:ring-slate-100 outline-none transition-all form-input" />
                 </div>
                 <div>
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Start Time</label>
                   <input required type="time" value={form.time} onChange={e => update("time", e.target.value)}
-                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all form-input" />
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-slate-400 focus:ring-2 focus:ring-slate-100 outline-none transition-all form-input" />
                 </div>
               </InputGroup>
               <InputGroup>
                 <div>
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Display Date <span className="text-gray-400 normal-case font-normal">(e.g., 26,27,30 May)</span></label>
                   <input value={form.date_display} onChange={e => update("date_display", e.target.value)}
-                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all form-input" />
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm placeholder-gray-400 focus:border-slate-400 focus:ring-2 focus:ring-slate-100 outline-none transition-all form-input" />
                 </div>
                 <div>
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">End Time <span className="text-gray-400 normal-case font-normal">(optional)</span></label>
                   <input type="time" value={form.end_time} onChange={e => update("end_time", e.target.value)}
-                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all form-input" />
+                    className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-slate-400 focus:ring-2 focus:ring-slate-100 outline-none transition-all form-input" />
                 </div>
               </InputGroup>
               <div>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Application Deadline <span className="text-gray-400 normal-case font-normal">(optional)</span></label>
                 <input type="date" value={form.application_deadline} onChange={e => update("application_deadline", e.target.value)}
-                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-100 outline-none transition-all form-input" />
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 bg-white text-sm focus:border-slate-400 focus:ring-2 focus:ring-slate-100 outline-none transition-all form-input" />
               </div>
             </SectionCard>
 

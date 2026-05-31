@@ -59,9 +59,9 @@ interface ConfirmDialogProps {
 
 export function ConfirmDialog({ open, onClose, onConfirm, title, message, confirmLabel = "Confirm", variant = "danger" }: ConfirmDialogProps) {
   const variantStyles = {
-    danger: "bg-gradient-to-r from-red-600 to-rose-500 text-white shadow-sm shadow-red-600/20 hover:shadow-md hover:shadow-red-600/30",
-    warning: "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-sm shadow-amber-500/20 hover:shadow-md",
-    primary: "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-sm shadow-blue-600/20 hover:shadow-md",
+    danger: "bg-red-600 text-white hover:bg-red-700",
+    warning: "bg-amber-600 text-white hover:bg-amber-700",
+    primary: "bg-slate-800 text-white hover:bg-slate-900",
   };
   return (
     <Modal open={open} onClose={onClose} title={title}>

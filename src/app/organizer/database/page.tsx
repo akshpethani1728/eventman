@@ -28,7 +28,7 @@ function computeCompletion(p: Profile): number {
 
 const AVAIL_CONFIG: Record<string, { label: string; dot: string; badge: string }> = {
   available_today: { label: "Available Today", dot: "bg-emerald-500", badge: "emerald-100 text-emerald-700 border-emerald-200" },
-  available_this_week: { label: "Available This Week", dot: "bg-blue-500", badge: "blue-100 text-blue-700 border-blue-200" },
+  available_this_week: { label: "Available This Week", dot: "bg-slate-600", badge: "slate-100 text-slate-700 border-slate-200" },
   available: { label: "Available", dot: "bg-emerald-500", badge: "emerald-100 text-emerald-700 border-emerald-200" },
   weekends: { label: "Weekends", dot: "bg-amber-500", badge: "amber-100 text-amber-700 border-amber-200" },
   evenings: { label: "Evenings", dot: "bg-purple-500", badge: "purple-100 text-purple-700 border-purple-200" },
@@ -96,11 +96,11 @@ export default function WorkerDatabasePage() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search by name, area, or skills..."
-              className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm form-input outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all" />
+              className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm form-input outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500/20 transition-all" />
           </div>
           <button type="button" onClick={() => setShowFilters(!showFilters)}
             className={`h-10 px-3 rounded-lg border text-sm flex items-center gap-1.5 transition-all ${
-              showFilters ? "bg-blue-50 border-blue-300 text-blue-700" : "border-gray-300 text-gray-600 bg-white"
+              showFilters ? "bg-slate-50 border-slate-300 text-slate-700" : "border-gray-300 text-gray-600 bg-white"
             }`}>
             <Filter className="w-4 h-4" /> Filters
           </button>
@@ -145,7 +145,7 @@ export default function WorkerDatabasePage() {
             </div>
             {(filters.gender || filters.availability || filters.city || filters.skills) && (
               <button type="button" onClick={() => setFilters({ gender: "", availability: "", city: "", skills: "" })}
-                className="text-xs text-blue-600 flex items-center gap-1"><X className="w-3 h-3" /> Clear filters</button>
+                className="text-xs text-slate-600 flex items-center gap-1"><X className="w-3 h-3" /> Clear filters</button>
             )}
           </form>
         )}
@@ -163,7 +163,7 @@ export default function WorkerDatabasePage() {
                 onClick={() => setSelectedWorker(w)}>
                 <div className="flex items-start gap-3">
                   <div className="relative shrink-0">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-blue-700 font-semibold text-sm group-hover:ring-2 group-hover:ring-blue-300 transition-all">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-slate-700 font-semibold text-sm group-hover:ring-2 group-hover:ring-slate-300 transition-all">
                       {w.full_name?.charAt(0) || "W"}
                     </div>
                     {avail && <StatusDot variant={
@@ -176,11 +176,11 @@ export default function WorkerDatabasePage() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-medium text-sm text-gray-900 group-hover:text-blue-700 transition-colors">{w.full_name}</p>
+                      <p className="font-medium text-sm text-gray-900 group-hover:text-slate-800 transition-colors">{w.full_name}</p>
                       {avail && (
                         <span className={`inline-flex items-center gap-1 text-[9px] font-medium px-1.5 py-0.5 rounded-full border ${
                           w.availability === "available_today" || w.availability === "available" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
-                          w.availability === "available_this_week" ? "bg-blue-50 text-blue-700 border-blue-200" :
+                          w.availability === "available_this_week" ? "bg-slate-50 text-slate-700 border-slate-200" :
                           w.availability === "weekends" ? "bg-amber-50 text-amber-700 border-amber-200" :
                           w.availability === "evenings" ? "bg-purple-50 text-purple-700 border-purple-200" :
                           w.availability === "busy" ? "bg-red-50 text-red-700 border-red-200" :
@@ -188,7 +188,7 @@ export default function WorkerDatabasePage() {
                         }`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${
                             w.availability === "available_today" || w.availability === "available" ? "bg-emerald-500" :
-                            w.availability === "available_this_week" ? "bg-blue-500" :
+                            w.availability === "available_this_week" ? "bg-slate-600" :
                             w.availability === "weekends" ? "bg-amber-500" :
                             w.availability === "evenings" ? "bg-purple-500" :
                             w.availability === "busy" ? "bg-red-500" :
@@ -211,7 +211,7 @@ export default function WorkerDatabasePage() {
                     <div className="flex items-center gap-2 mt-1.5">
                       <div className="flex items-center gap-1.5 flex-1">
                         <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden max-w-[100px]">
-                          <div className={`h-full rounded-full ${completion >= 80 ? "bg-emerald-500" : completion >= 50 ? "bg-amber-500" : "bg-blue-500"}`}
+                          <div className={`h-full rounded-full ${completion >= 80 ? "bg-emerald-500" : completion >= 50 ? "bg-amber-500" : "bg-slate-600"}`}
                             style={{ width: `${completion}%` }} />
                         </div>
                         <span className={`text-[10px] font-medium ${completion >= 80 ? "text-emerald-600" : completion >= 50 ? "text-amber-600" : "text-gray-400"}`}>{completion}%</span>

@@ -265,7 +265,7 @@ export default function EventDetailPage() {
         <div className="bg-white border border-gray-200 rounded-xl p-5 mb-3">
           <h2 className="text-lg font-bold mb-1">{event.title}</h2>
           <div className="flex flex-wrap gap-2 mt-2">
-            {event.category && <span className="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full capitalize">{event.category.replace(/_/g, " ")}</span>}
+            {event.category && <span className="text-xs bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full capitalize">{event.category.replace(/_/g, " ")}</span>}
             <span className={`text-xs px-2.5 py-1 rounded-full ${event.worker_count - approvedCount === 0 ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-600"}`}>
               {event.worker_count - approvedCount} of {event.worker_count} spots left
             </span>
@@ -292,7 +292,7 @@ export default function EventDetailPage() {
                 <p className="text-gray-500 text-xs">Location</p>
                 <p className="font-medium">{event.location}</p>
                 <a href={`https://www.google.com/maps/search/${encodeURIComponent(event.location)}`} target="_blank" rel="noopener noreferrer"
-                  className="text-xs text-blue-600 font-medium mt-0.5 inline-block">Open in Google Maps &rarr;</a>
+                  className="text-xs text-slate-600 font-medium mt-0.5 inline-block">Open in Google Maps &rarr;</a>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -376,7 +376,7 @@ export default function EventDetailPage() {
             <div className="flex items-center gap-3">
               {organizer.avatar_url ? (
                 <img src={organizer.avatar_url} alt="" className={`w-11 h-11 rounded-full object-cover ring-2 shrink-0 ${
-                  showContact ? "ring-emerald-200" : organizer.is_trusted_organizer ? "ring-emerald-200" : organizer.status === "trusted" || organizer.status === "basic_verified" ? "ring-blue-200" : "ring-gray-100"
+                  showContact ? "ring-emerald-200" : organizer.is_trusted_organizer ? "ring-emerald-200" : organizer.status === "trusted" || organizer.status === "basic_verified" ? "ring-slate-200" : "ring-gray-100"
                 }`} />
               ) : (
                 <div className={`w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-base shrink-0 ${
@@ -385,8 +385,8 @@ export default function EventDetailPage() {
                     : organizer.is_trusted_organizer
                       ? "bg-gradient-to-br from-emerald-500 to-teal-600"
                       : organizer.status === "trusted" || organizer.status === "basic_verified"
-                        ? "bg-gradient-to-br from-blue-500 to-indigo-600"
-                        : "bg-gradient-to-br from-blue-500 to-blue-600"
+                        ? "bg-gradient-to-br from-slate-600 to-slate-800"
+                        : "bg-gradient-to-br from-slate-500 to-slate-700"
                 }`}>
                   {organizer.full_name?.charAt(0) || "O"}
                 </div>
@@ -401,7 +401,7 @@ export default function EventDetailPage() {
                     </span>
                   )}
                   {!organizer.is_trusted_organizer && (organizer.status === "trusted" || organizer.status === "basic_verified") && (
-                    <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-blue-700 bg-blue-50 border border-blue-200/60 px-1.5 py-0.5 rounded-md">
+                    <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold text-slate-700 bg-slate-100 border border-slate-200/60 px-1.5 py-0.5 rounded-md">
                       <ShieldCheck className="w-3 h-3" />
                       Verified
                     </span>
@@ -517,7 +517,7 @@ export default function EventDetailPage() {
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
           <div className="max-w-lg mx-auto">
             <button onClick={handleApply} disabled={applying}
-              className="w-full h-12 rounded-lg bg-blue-600 text-white font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-blue-700 flex items-center justify-center gap-2">
+              className="w-full h-12 rounded-lg bg-slate-800 text-white font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-slate-900 flex items-center justify-center gap-2">
               {applying ? (
                 <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
               ) : (
@@ -603,7 +603,7 @@ export default function EventDetailPage() {
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
           <div className="max-w-lg mx-auto">
             <button onClick={handleReApply} disabled={applying}
-              className="w-full h-12 rounded-lg bg-blue-600 text-white font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-blue-700 flex items-center justify-center gap-2">
+              className="w-full h-12 rounded-lg bg-slate-800 text-white font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-slate-900 flex items-center justify-center gap-2">
               {applying ? (
                 <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
               ) : (
@@ -618,7 +618,7 @@ export default function EventDetailPage() {
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
           <div className="max-w-lg mx-auto">
             <Link href="/worker/dashboard"
-              className="w-full h-12 rounded-lg bg-blue-600 text-white font-medium text-base flex items-center justify-center gap-2 hover:bg-blue-700">
+              className="w-full h-12 rounded-lg bg-slate-800 text-white font-medium text-base flex items-center justify-center gap-2 hover:bg-slate-900">
               <ArrowUpRight className="w-4 h-4" /> Browse More Events
             </Link>
           </div>

@@ -153,7 +153,7 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
           </div>
           <div className="flex items-center gap-1">
             <button onClick={() => setShowFilters(!showFilters)}
-              className={`p-1.5 rounded-lg ${showFilters ? "bg-blue-100 text-blue-700" : "hover:bg-gray-100 text-gray-500"}`}>
+              className={`p-1.5 rounded-lg ${showFilters ? "bg-slate-100 text-slate-700" : "hover:bg-gray-100 text-gray-500"}`}>
               <Filter className="w-4 h-4" />
             </button>
             <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg">
@@ -213,7 +213,7 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
               <div className="p-3">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                    <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm shrink-0">
+                    <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 font-semibold text-sm shrink-0">
                       {app.profile.full_name?.charAt(0) || "W"}
                     </div>
                     <div className="min-w-0">
@@ -307,7 +307,7 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
                     </div>
                     <span className={`inline-block text-[10px] px-2 py-0.5 rounded-full mt-1 ${
                       app.profile.status === "trusted" ? "bg-green-100 text-green-700" :
-                      app.profile.status === "basic_verified" ? "bg-blue-100 text-blue-700" :
+                      app.profile.status === "basic_verified" ? "bg-slate-100 text-slate-700" :
                       "bg-gray-100 text-gray-500"
                     }`}>
                       {app.profile.status.replace(/_/g, " ")}

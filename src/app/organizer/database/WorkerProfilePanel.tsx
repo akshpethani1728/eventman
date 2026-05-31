@@ -90,7 +90,7 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
         </button>
 
         {/* Hero section */}
-        <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 px-5 pt-10 pb-6">
+        <div className="bg-gradient-to-br from-slate-800 via-slate-800 to-slate-900 px-5 pt-10 pb-6">
           <div className="flex items-end gap-4">
             <div className="relative shrink-0">
               <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white text-2xl font-bold ring-2 ring-white/30 shadow-lg">
@@ -100,11 +100,11 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
                   worker.full_name?.charAt(0) || "W"
                 )}
               </div>
-              {avail && <StatusDot variant={avail.dotColor} className="absolute -bottom-1 -right-1 border-2 border-blue-700" />}
+              {avail && <StatusDot variant={avail.dotColor} className="absolute -bottom-1 -right-1 border-2 border-slate-800" />}
             </div>
             <div className="min-w-0 flex-1">
               <h2 className="text-white font-bold text-lg leading-tight truncate">{worker.full_name}</h2>
-              <p className="text-blue-200/80 text-xs mt-0.5">Worker · {worker.city || "Location not set"}</p>
+              <p className="text-slate-200/80 text-xs mt-0.5">Worker · {worker.city || "Location not set"}</p>
               <div className="flex items-center gap-2 mt-2">
                 <Badge variant={statusVariant}>
                   {worker.status === "trusted" ? <ShieldCheck className="w-3 h-3" /> : worker.status === "basic_verified" ? <ShieldAlert className="w-3 h-3" /> : null}
@@ -128,7 +128,7 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
               <span className={`text-sm font-bold ${completion.percent >= 80 ? "text-emerald-600" : completion.percent >= 50 ? "text-amber-600" : "text-gray-500"}`}>{completion.percent}%</span>
             </div>
             <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div className={`h-full rounded-full transition-all duration-700 ${completion.percent >= 80 ? "bg-emerald-500" : completion.percent >= 50 ? "bg-amber-500" : "bg-blue-500"}`}
+              <div className={`h-full rounded-full transition-all duration-700 ${completion.percent >= 80 ? "bg-emerald-500" : completion.percent >= 50 ? "bg-amber-500" : "bg-slate-600"}`}
                 style={{ width: `${completion.percent}%` }} />
             </div>
             {completion.missing.length > 0 && (
@@ -180,7 +180,7 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
                 <div>
                   <div className="flex flex-wrap gap-1.5">
                     {worker.skills.map((s, i) => (
-                      <span key={i} className="text-[11px] bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-1 rounded-lg font-medium">{s}</span>
+                      <span key={i} className="text-[11px] bg-slate-100 text-slate-700 border border-slate-200 px-2.5 py-1 rounded-lg font-medium">{s}</span>
                     ))}
                   </div>
                 </div>

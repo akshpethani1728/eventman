@@ -72,7 +72,7 @@ export default function AdminDashboard() {
       <header className="sticky top-0 bg-white/80 backdrop-blur-2xl border-b border-gray-200/60 z-10">
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Shield className="w-5 h-5 text-blue-600" />
+            <Shield className="w-5 h-5 text-slate-600" />
             <h1 className="font-bold text-lg">Admin</h1>
           </div>
           <div className="flex items-center gap-2">
@@ -87,7 +87,7 @@ export default function AdminDashboard() {
           {(["users", "events"] as AdminTab[]).map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`flex-1 h-11 rounded-lg text-sm font-medium capitalize transition-all ${
-                tab === t ? "bg-blue-600 text-white shadow-md shadow-blue-600/20" : "text-gray-500 hover:text-gray-800"
+                tab === t ? "bg-slate-800 text-white shadow-sm" : "text-gray-500 hover:text-gray-800"
               }`}>
               {t} ({t === "users" ? users.length : events.length})
             </button>
@@ -103,7 +103,7 @@ export default function AdminDashboard() {
                     <div className="flex items-center gap-1.5">
                       <p className="font-medium text-sm truncate">{u.full_name}</p>
                       {u.role === "organizer" && u.is_trusted_organizer && <Crown className="w-3 h-3 text-emerald-500 shrink-0" />}
-                      {u.role === "worker" && u.plan_status === "active" && <CreditCard className="w-3 h-3 text-blue-500 shrink-0" />}
+                      {u.role === "worker" && u.plan_status === "active" && <CreditCard className="w-3 h-3 text-slate-500 shrink-0" />}
                       {u.role === "worker" && u.plan_status === "expired" && <Clock className="w-3 h-3 text-red-400 shrink-0" />}
                     </div>
                     <p className="text-xs text-gray-500 truncate">{u.role} Â· {u.email || u.phone || "â€”"}</p>

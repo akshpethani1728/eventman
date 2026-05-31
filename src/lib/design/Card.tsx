@@ -14,7 +14,7 @@ interface CardProps {
 const ACCENT_BORDERS: Record<string, string> = {
   red: "border-red-200/70",
   amber: "border-amber-200/70",
-  blue: "border-blue-200/70",
+  blue: "border-slate-200/70",
   purple: "border-purple-200/70",
   emerald: "border-emerald-200/70",
 };
@@ -62,7 +62,7 @@ export function CardStats({ children, columns = 3 }: { children: React.ReactNode
 export function CardStat({ label, value, color = "gray" }: { label: string; value: React.ReactNode; color?: string }) {
   const colors: Record<string, string> = {
     gray: "text-gray-900",
-    blue: "text-blue-600",
+    blue: "text-slate-800",
     amber: "text-amber-600",
     red: "text-red-600",
     emerald: "text-emerald-600",
