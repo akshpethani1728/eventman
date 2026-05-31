@@ -140,9 +140,9 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-6 p-3 overflow-y-auto">
-      <div className="w-full max-w-xl bg-white rounded-xl shadow-xl">
+      <div className="w-full max-w-xl bg-white rounded-3xl shadow-sm shadow-black/[0.03]">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 sticky top-0 bg-white z-10 rounded-t-xl">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 sticky top-0 bg-white z-10 rounded-t-2xl">
           <div className="min-w-0 flex-1 mr-3">
             <h2 className="font-semibold text-base text-gray-900 truncate">{event.title}</h2>
             <p className="text-xs text-gray-500 mt-0.5">
@@ -153,10 +153,10 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
           </div>
           <div className="flex items-center gap-1">
             <button onClick={() => setShowFilters(!showFilters)}
-              className={`p-1.5 rounded-lg ${showFilters ? "bg-indigo-50 text-indigo-700" : "hover:bg-gray-100 text-gray-500"}`}>
+              className={`p-1.5 rounded-xl ${showFilters ? "bg-indigo-50 text-indigo-700" : "hover:bg-gray-100 text-gray-500"}`}>
               <Filter className="w-4 h-4" />
             </button>
-            <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg">
+            <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-xl">
               <X className="w-4 h-4 text-gray-500" />
             </button>
           </div>
@@ -167,21 +167,21 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
           <form onSubmit={e => e.preventDefault()} className="px-4 py-3 border-b border-gray-100 bg-gray-50 space-y-2">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               <select value={filters.gender} onChange={e => setFilters(f => ({ ...f, gender: e.target.value }))}
-                className="h-8 px-2 rounded-lg border border-gray-200 text-xs bg-white">
+                className="h-8 px-2 rounded-xl border border-gray-200 text-xs bg-white">
                 <option value="">Any gender</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
               </select>
               <input type="number" value={filters.ageMin} onChange={e => setFilters(f => ({ ...f, ageMin: e.target.value }))}
-                placeholder="Min age" className="h-8 px-2 rounded-lg border border-gray-200 text-xs bg-white" />
+                placeholder="Min age" className="h-8 px-2 rounded-xl border border-gray-200 text-xs bg-white" />
               <input type="number" value={filters.ageMax} onChange={e => setFilters(f => ({ ...f, ageMax: e.target.value }))}
-                placeholder="Max age" className="h-8 px-2 rounded-lg border border-gray-200 text-xs bg-white" />
+                placeholder="Max age" className="h-8 px-2 rounded-xl border border-gray-200 text-xs bg-white" />
               <input value={filters.area} onChange={e => setFilters(f => ({ ...f, area: e.target.value }))}
-                placeholder="Area" className="h-8 px-2 rounded-lg border border-gray-200 text-xs bg-white" />
+                placeholder="Area" className="h-8 px-2 rounded-xl border border-gray-200 text-xs bg-white" />
               <input value={filters.skills} onChange={e => setFilters(f => ({ ...f, skills: e.target.value }))}
-                placeholder="Skills" className="h-8 px-2 rounded-lg border border-gray-200 text-xs bg-white" />
+                placeholder="Skills" className="h-8 px-2 rounded-xl border border-gray-200 text-xs bg-white" />
               <select value={filters.availability} onChange={e => setFilters(f => ({ ...f, availability: e.target.value }))}
-                className="h-8 px-2 rounded-lg border border-gray-200 text-xs bg-white">
+                className="h-8 px-2 rounded-xl border border-gray-200 text-xs bg-white">
                 <option value="">Any availability</option>
                 <option value="available">Available</option>
                 <option value="weekends">Weekends</option>
@@ -209,7 +209,7 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
           )}
 
           {filtered.map(app => (
-            <div key={app.id} className="border border-gray-200 rounded-xl overflow-hidden">
+            <div key={app.id} className="border border-gray-200 rounded-3xl overflow-hidden">
               <div className="p-3">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2.5 min-w-0 flex-1">

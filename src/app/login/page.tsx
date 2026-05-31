@@ -65,7 +65,7 @@ function TiltCard({ children, className = "" }: { children: React.ReactNode; cla
   return (
     <div
       ref={ref}
-      className={`relative overflow-hidden rounded-2xl bg-white shadow-xl transition-shadow duration-300 ${isHovered ? "shadow-2xl" : ""} ${className}`}
+      className={`relative overflow-hidden rounded-3xl bg-white shadow-sm shadow-black/[0.03] transition-shadow duration-300 ${isHovered ? "shadow-md" : ""} ${className}`}
       style={{
         transform: `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${isHovered ? 1.02 : 1})`,
         transition: "transform 0.15s ease-out, box-shadow 0.3s ease",
@@ -147,7 +147,7 @@ const previewCards = [
     color: "from-indigo-500 to-indigo-600",
     content: (
       <div className="space-y-2.5 p-4">
-        <div className="flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-2 text-xs text-gray-400">
+        <div className="flex items-center gap-2 rounded-2xl bg-gray-100 px-3 py-2 text-xs text-gray-400">
           <Search className="h-3.5 w-3.5" />
           Search events near you...
         </div>
@@ -156,7 +156,7 @@ const previewCards = [
           { title: "Corporate Gala", date: "Jun 2", pay: "₹2,000 - 3,500", status: "new" },
           { title: "Concert Setup", date: "Jun 5", pay: "₹1,800 - 2,800", status: "filling" },
         ].map((ev, i) => (
-          <div key={i} className="rounded-xl border border-gray-100 bg-white p-3 shadow-sm">
+          <div key={i} className="rounded-2xl border border-gray-100 bg-white p-3 shadow-sm">
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-semibold text-gray-900">{ev.title}</p>
@@ -173,7 +173,7 @@ const previewCards = [
             </div>
             <div className="mt-1.5 flex items-center justify-between">
               <span className="text-[10px] font-semibold text-gray-700">{ev.pay}</span>
-              <button className="rounded-lg bg-indigo-700 px-3 py-1 text-[9px] font-medium text-white">Apply</button>
+              <button className="rounded-2xl bg-indigo-700 px-3 py-1 text-[9px] font-medium text-white">Apply</button>
             </div>
           </div>
         ))}
@@ -196,7 +196,7 @@ const previewCards = [
           { title: "Conference", filled: 5, total: 15, color: "bg-amber-500" },
           { title: "Concert", filled: 24, total: 30, color: "bg-indigo-500" },
         ].map((ev, i) => (
-          <div key={i} className="rounded-lg border border-gray-100 bg-white p-2.5 shadow-sm">
+          <div key={i} className="rounded-2xl border border-gray-100 bg-white p-2.5 shadow-sm">
             <div className="flex items-center justify-between">
               <p className="text-[10px] font-medium text-gray-700">{ev.title}</p>
               <span className="text-[9px] text-gray-400">{ev.filled}/{ev.total} filled</span>
@@ -206,7 +206,7 @@ const previewCards = [
             </div>
           </div>
         ))}
-        <div className="flex items-center justify-between rounded-lg bg-indigo-50 p-2">
+        <div className="flex items-center justify-between rounded-2xl bg-indigo-50 p-2">
           <span className="text-[9px] font-medium text-indigo-700">12 pending approvals</span>
           <ChevronRight className="h-3 w-3 text-slate-500" />
         </div>
@@ -255,7 +255,7 @@ const previewCards = [
         ].map((n, i) => {
           const Icon = n.icon;
           return (
-            <div key={i} className="flex items-start gap-2.5 rounded-lg border border-gray-100 bg-white p-2.5 shadow-sm">
+            <div key={i} className="flex items-start gap-2.5 rounded-2xl border border-gray-100 bg-white p-2.5 shadow-sm">
               <div className={`mt-0.5 ${n.color}`}><Icon className="h-3.5 w-3.5" /></div>
               <div className="flex-1">
                 <p className="text-[10px] text-gray-700">{n.text}</p>
@@ -369,7 +369,7 @@ function RoleSelection({ selected, onSelect }: { selected: string; onSelect: (r:
                 key={role.type}
                 type="button"
                 onClick={() => onSelect(role.type)}
-                className={`group relative overflow-hidden rounded-2xl border-2 p-6 text-left transition-all duration-300 ${
+                className={`group relative overflow-hidden rounded-3xl border-2 p-6 text-left transition-all duration-300 ${
                   active
                     ? "border-indigo-700 bg-indigo-50 shadow-sm scale-[1.02]"
                     : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm hover:scale-[1.01]"
@@ -380,7 +380,7 @@ function RoleSelection({ selected, onSelect }: { selected: string; onSelect: (r:
                     <CheckCircle className="h-4 w-4 text-white" />
                   </div>
                 )}
-                <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${role.gradient} text-white shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 ${active ? "scale-110 rotate-3" : ""} ${role.shadow}`}>
+                <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${role.gradient} text-white shadow-sm shadow-black/[0.03] transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 ${active ? "scale-110 rotate-3" : ""}`}>
                   <Icon className="h-6 w-6" />
                 </div>
                 <h3 className="text-lg font-bold text-gray-900">{role.title}</h3>
@@ -429,8 +429,8 @@ function TrustSection() {
             {stats.map((s, i) => {
               const Icon = s.icon;
               return (
-                <div key={i} className="group relative rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-gray-100 transition-shadow hover:shadow-md">
-                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-50 to-indigo-50">
+                <div key={i} className="group relative rounded-3xl bg-white p-6 text-center shadow-sm ring-1 ring-gray-100 transition-shadow hover:shadow-md">
+                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-50 to-indigo-50">
                     <Icon className="h-6 w-6 text-indigo-700" />
                   </div>
                   <p className="text-3xl font-bold tracking-tight text-gray-900 md:text-4xl">
@@ -450,8 +450,8 @@ function TrustSection() {
             {features.map((f, i) => {
               const Icon = f.icon;
               return (
-                <div key={i} className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-gray-100 transition-shadow hover:shadow-md">
-                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-50">
+                <div key={i} className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100 transition-shadow hover:shadow-md">
+                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-50">
                     <Icon className="h-5 w-5 text-indigo-700" />
                   </div>
                   <h3 className="text-sm font-semibold text-gray-900">{f.title}</h3>
@@ -527,7 +527,7 @@ function OtpInput({ value, onChange, onComplete }: {
           onChange={(e) => handleChange(i, e.target.value)}
           onKeyDown={(e) => handleKeyDown(i, e)}
           onPaste={i === 0 ? handlePaste : undefined}
-          className={`h-12 w-10 rounded-lg border-2 text-center text-lg font-bold tracking-wider outline-none transition-all sm:h-14 sm:w-12 sm:text-xl ${
+          className={`h-12 w-10 rounded-2xl border-2 text-center text-lg font-bold tracking-wider outline-none transition-all sm:h-14 sm:w-12 sm:text-xl ${
             d ? "border-indigo-700 bg-indigo-50 text-indigo-700" : "border-gray-200 bg-gray-50 text-gray-900"
           } focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20`}
         />
@@ -712,7 +712,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
     }
   };
 
-  const inputClass = "w-full h-12 pl-10 pr-3 rounded-lg border border-gray-200 bg-white text-sm outline-none transition-all focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20";
+  const inputClass = "w-full h-12 pl-10 pr-3 rounded-2xl border border-gray-200 bg-white text-sm outline-none transition-all focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20";
   const inputIconClass = "absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400";
 
   return (
@@ -720,7 +720,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
       <div className="mx-auto max-w-md px-4 sm:px-6">
         <FadeSection>
           {step === "auth" && (
-            <div className="relative bg-white rounded-2xl shadow-sm ring-1 ring-gray-200/80 overflow-hidden">
+            <div className="relative bg-white rounded-3xl shadow-sm ring-1 ring-gray-200/80 overflow-hidden">
               <div className="h-1 bg-gradient-to-r from-indigo-600 to-indigo-700" />
               <div className="p-6 sm:p-8">
                 {/* Back button */}
@@ -734,7 +734,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                 </button>
 
                 <div className="text-center mb-6">
-                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-indigo-700 shadow-sm">
+                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-3xl bg-gradient-to-br from-indigo-600 to-indigo-700 shadow-sm">
                     <Mail className="h-6 w-6 text-white" />
                   </div>
                   <h2 className="text-xl font-bold text-gray-900">Welcome to EventMan</h2>
@@ -744,7 +744,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                 </div>
 
                 {error && (
-                  <div className="animate-slide-down mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+                  <div className="animate-slide-down mb-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3">
                     <p className="text-sm text-red-700">{error}</p>
                   </div>
                 )}
@@ -783,7 +783,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                         onChange={e => { setPassword(e.target.value); setError(""); }}
                         placeholder="Your password"
                         autoComplete="current-password"
-                        className="w-full h-12 pl-10 pr-10 rounded-lg border border-gray-200 bg-white text-sm outline-none transition-all focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20"
+                        className="w-full h-12 pl-10 pr-10 rounded-2xl border border-gray-200 bg-white text-sm outline-none transition-all focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20"
                       />
                       <button
                         type="button"
@@ -814,7 +814,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                     type="button"
                     disabled={loading}
                     onClick={handleSignIn}
-                    className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-indigo-700 text-sm font-semibold text-white hover:bg-indigo-800 transition-all active:scale-[0.98] disabled:opacity-60"
+                    className="flex h-11 w-full items-center justify-center gap-2 rounded-2xl bg-indigo-700 text-sm font-semibold text-white hover:bg-indigo-800 transition-all active:scale-[0.98] disabled:opacity-60"
                   >
                     {loading ? (
                       <span className="flex items-center gap-2">
@@ -850,7 +850,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                     type="button"
                     disabled={loading}
                     onClick={handleCreateAccount}
-                    className="flex h-11 w-full items-center justify-center gap-2 rounded-lg border-2 border-indigo-700 bg-white text-sm font-semibold text-indigo-700 transition-all active:scale-[0.98] hover:bg-indigo-50 disabled:opacity-60"
+                    className="flex h-11 w-full items-center justify-center gap-2 rounded-2xl border-2 border-indigo-700 bg-white text-sm font-semibold text-indigo-700 transition-all active:scale-[0.98] hover:bg-indigo-50 disabled:opacity-60"
                   >
                     {loading ? (
                       <span className="flex items-center gap-2">
@@ -867,7 +867,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
           )}
 
           {step === "otp" && (
-            <div className="relative bg-white rounded-2xl shadow-sm ring-1 ring-gray-200/80 overflow-hidden">
+            <div className="relative bg-white rounded-3xl shadow-sm ring-1 ring-gray-200/80 overflow-hidden">
               <div className="h-1 bg-gradient-to-r from-indigo-600 to-indigo-700" />
               <div className="p-6 sm:p-8">
                 <button
@@ -881,7 +881,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
 
             <form onSubmit={(e) => { e.preventDefault(); handleVerifyOtp(); }} className="space-y-5">
               <div className="text-center">
-                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-indigo-700 shadow-sm">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-3xl bg-gradient-to-br from-indigo-600 to-indigo-700 shadow-sm">
                   <KeyRound className="h-6 w-6 text-white" />
                 </div>
                 <h2 className="text-xl font-bold text-gray-900">Check Your Email</h2>
@@ -891,7 +891,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
               </div>
 
               {error && (
-                <div className="animate-slide-down rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+                <div className="animate-slide-down rounded-2xl border border-red-200 bg-red-50 px-4 py-3">
                   <p className="text-sm text-red-700">{error}</p>
                 </div>
               )}
@@ -904,7 +904,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
               <button
                 type="submit"
                 disabled={loading || otp.join("").length < 6}
-                className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-indigo-700 text-sm font-semibold text-white hover:bg-indigo-800 transition-all active:scale-[0.98] disabled:opacity-60"
+                className="flex h-11 w-full items-center justify-center gap-2 rounded-2xl bg-indigo-700 text-sm font-semibold text-white hover:bg-indigo-800 transition-all active:scale-[0.98] disabled:opacity-60"
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
@@ -952,7 +952,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
           )}
 
           {step === "profile" && (
-            <div className="relative bg-white rounded-2xl shadow-sm ring-1 ring-gray-200/80 overflow-hidden">
+            <div className="relative bg-white rounded-3xl shadow-sm ring-1 ring-gray-200/80 overflow-hidden">
               <div className="h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
               <div className="p-6 sm:p-8">
                 <button
@@ -966,7 +966,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
 
             <form onSubmit={(e) => { e.preventDefault(); createProfile(); }} className="space-y-5">
               <div className="text-center">
-                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg shadow-emerald-200/40">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-3xl bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-sm shadow-black/[0.03]">
                   <User className="h-6 w-6 text-white" />
                 </div>
                 <h2 className="text-xl font-bold text-gray-900">Complete Profile</h2>
@@ -974,7 +974,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
               </div>
 
               {error && (
-                <div className="animate-slide-down rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+                <div className="animate-slide-down rounded-2xl border border-red-200 bg-red-50 px-4 py-3">
                   <p className="text-sm text-red-700">{error}</p>
                 </div>
               )}
@@ -1001,7 +1001,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                       key={r}
                       type="button"
                       onClick={() => setRole(r)}
-                      className={`flex h-16 flex-col items-center justify-center gap-1 rounded-lg border-2 transition-all ${
+                      className={`flex h-16 flex-col items-center justify-center gap-1 rounded-2xl border-2 transition-all ${
                         role === r
                           ? "border-indigo-700 bg-indigo-50 text-indigo-700"
                           : "border-gray-200 bg-gray-50 text-gray-500 hover:border-gray-300"
@@ -1017,7 +1017,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
               <button
                 type="submit"
                 disabled={loading}
-                className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-indigo-700 text-sm font-semibold text-white hover:bg-indigo-800 transition-all active:scale-[0.98] disabled:opacity-60"
+                className="flex h-11 w-full items-center justify-center gap-2 rounded-2xl bg-indigo-700 text-sm font-semibold text-white hover:bg-indigo-800 transition-all active:scale-[0.98] disabled:opacity-60"
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
@@ -1050,7 +1050,7 @@ function HeroSection({ onCta }: { onCta: () => void }) {
       <div className="relative z-10 mx-auto max-w-4xl px-4 text-center">
         {/* Brand */}
         <FadeSection>
-          <div className="mb-6 inline-flex items-center gap-3 rounded-2xl bg-white/10 px-5 py-2.5 shadow-lg backdrop-blur-md">
+          <div className="mb-6 inline-flex items-center gap-3 rounded-3xl bg-white/10 px-5 py-2.5 shadow-sm shadow-black/[0.03] backdrop-blur-md">
             <Logo showText={false} />
             <span className="text-sm font-bold tracking-wide text-white">EventMan</span>
           </div>
@@ -1076,7 +1076,7 @@ function HeroSection({ onCta }: { onCta: () => void }) {
         <FadeSection className="mt-10">
           <button
             onClick={onCta}
-            className="group inline-flex items-center gap-2.5 rounded-2xl bg-white px-8 py-4 text-base font-bold text-indigo-700 shadow-sm transition-all hover:scale-105 active:scale-[0.97]"
+            className="group inline-flex items-center gap-2.5 rounded-3xl bg-white px-8 py-4 text-base font-bold text-indigo-700 shadow-sm transition-all hover:scale-105 active:scale-[0.97]"
           >
             Get Started
             <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
@@ -1146,7 +1146,7 @@ export default function LoginPage() {
   }, []);
 
   return (
-    <div className="min-h-dvh bg-white">
+    <div className="min-h-dvh bg-gradient-to-b from-gray-50 to-white">
       {/* HERO */}
       <HeroSection onCta={scrollToAuth} />
 

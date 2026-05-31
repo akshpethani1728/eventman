@@ -14,7 +14,7 @@ interface BadgeProps {
 
 export function Badge({ children, variant = "pending", icon, pulse = false, className = "" }: BadgeProps) {
   return (
-    <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-lg border ${BADGE[variant]} ${pulse ? "animate-pulse" : ""} ${className}`}>
+    <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-0.5 rounded-xl border ${BADGE[variant]} ${pulse ? "animate-pulse" : ""} ${className}`}>
       {icon && <span className="w-3 h-3">{icon}</span>}
       {children}
     </span>
@@ -43,5 +43,5 @@ export function StatusDot({ variant = "gray", pulse = false, className = "" }: S
 }
 
 export function Divider({ className = "" }: { className?: string }) {
-  return <div className={`h-px bg-gray-100 ${className}`} />;
+  return <div className={`h-px bg-gray-100/80 ${className}`} />;
 }

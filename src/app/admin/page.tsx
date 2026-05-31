@@ -68,7 +68,7 @@ export default function AdminDashboard() {
   if (loading) return <PageLoader />;
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7]">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <header className="sticky top-0 bg-white/80 backdrop-blur-2xl border-b border-gray-200/60 z-10">
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -83,10 +83,10 @@ export default function AdminDashboard() {
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-4">
-        <div className="flex gap-2 mb-4 bg-white/80 backdrop-blur-xl rounded-2xl p-1 border border-gray-200/60 shadow-sm">
+        <div className="flex gap-2 mb-4 bg-white/80 backdrop-blur-xl rounded-3xl p-1 border border-gray-200/60 shadow-sm">
           {(["users", "events"] as AdminTab[]).map(t => (
             <button key={t} onClick={() => setTab(t)}
-              className={`flex-1 h-11 rounded-lg text-sm font-medium capitalize transition-all ${
+              className={`flex-1 h-11 rounded-xl text-sm font-medium capitalize transition-all ${
                 tab === t ? "bg-indigo-700 text-white shadow-sm" : "text-gray-500 hover:text-gray-800"
               }`}>
               {t} ({t === "users" ? users.length : events.length})
@@ -126,14 +126,14 @@ export default function AdminDashboard() {
                 </CardHeader>
                 <div className="flex flex-wrap gap-1.5">
                   <select value={u.status} onChange={e => updateUserStatus(u.user_id, e.target.value as any)}
-                    className="h-8 px-2 rounded-lg border border-gray-200 bg-white text-xs flex-1 min-w-0">
+                    className="h-8 px-2 rounded-xl border border-gray-200 bg-white text-xs flex-1 min-w-0">
                     <option value="unverified">Unverified</option>
                     <option value="basic_verified">Basic Verify</option>
                     <option value="trusted">Trusted</option>
                   </select>
                   {u.role === "organizer" && (
                     <button onClick={() => toggleOrganizerTrust(u.user_id, u.is_trusted_organizer)}
-                      className={`h-8 px-3 rounded-lg text-xs font-medium shrink-0 inline-flex items-center gap-1 transition-all ${
+                      className={`h-8 px-3 rounded-xl text-xs font-medium shrink-0 inline-flex items-center gap-1 transition-all ${
                         u.is_trusted_organizer ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                       }`}>
                       <Crown className="w-3 h-3" />
@@ -141,7 +141,7 @@ export default function AdminDashboard() {
                     </button>
                   )}
                   <button onClick={() => deleteUser(u.user_id)}
-                    className="h-8 w-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center shrink-0 hover:bg-red-100 transition-colors"
+                    className="h-8 w-8 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shrink-0 hover:bg-red-100 transition-colors"
                     title="Delete user"><Ban className="w-3.5 h-3.5" /></button>
                 </div>
               </Card>
@@ -159,7 +159,7 @@ export default function AdminDashboard() {
                     <p className="text-xs text-gray-500 truncate">{e.date} Â· {e.location} Â· {e.worker_count} workers</p>
                   </div>
                   <button onClick={() => deleteEvent(e.id)}
-                    className="h-8 px-3 rounded-lg bg-red-50 text-red-600 text-xs font-medium shrink-0 hover:bg-red-100 transition-colors">
+                    className="h-8 px-3 rounded-xl bg-red-50 text-red-600 text-xs font-medium shrink-0 hover:bg-red-100 transition-colors">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>

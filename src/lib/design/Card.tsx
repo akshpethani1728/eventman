@@ -9,6 +9,7 @@ interface CardProps {
   accent?: "none" | "red" | "amber" | "blue" | "purple" | "emerald";
   padding?: "sm" | "md" | "lg" | "none";
   onClick?: () => void;
+  variant?: "default" | "inner" | "section" | "floating";
 }
 
 const ACCENT_BORDERS: Record<string, string> = {
@@ -20,17 +21,24 @@ const ACCENT_BORDERS: Record<string, string> = {
 };
 
 const PADDING: Record<string, string> = {
-  sm: "p-3",
-  md: "p-4",
-  lg: "p-5",
+  sm: "p-4",
+  md: "p-5",
+  lg: "p-6",
   none: "",
 };
 
-export function Card({ children, className = "", hover = false, accent = "none", padding = "md", onClick }: CardProps) {
+const VARIANT_CLASSES: Record<string, string> = {
+  default: `${CARD.base} ${CARD.radius}`,
+  inner: CARD.inner,
+  section: CARD.section,
+  floating: CARD.floating,
+};
+
+export function Card({ children, className = "", hover = false, accent = "none", padding = "md", onClick, variant = "default" }: CardProps) {
   return (
     <div
       onClick={onClick}
-      className={`${CARD.radius} ${CARD.base} ${PADDING[padding]} ${hover ? CARD.hover + " " + CARD.active : ""} ${accent !== "none" ? ACCENT_BORDERS[accent] : ""} ${onClick ? "cursor-pointer" : ""} ${className}`}
+      className={`${VARIANT_CLASSES[variant]} ${PADDING[padding]} ${hover ? CARD.hover + " " + CARD.active : ""} ${accent !== "none" ? ACCENT_BORDERS[accent] : ""} ${onClick ? "cursor-pointer" : ""} ${className}`}
     >
       {children}
     </div>
@@ -42,18 +50,18 @@ export function CardHeader({ children, className = "" }: { children: React.React
 }
 
 export function CardTitle({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <h3 className={`font-semibold text-sm text-gray-900 ${className}`}>{children}</h3>;
+  return <h3 className={`font-semibold text-base text-gray-900 ${className}`}>{children}</h3>;
 }
 
 export function CardSection({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <div className={`border-t border-gray-100 pt-4 mt-4 space-y-3 ${className}`}>{children}</div>;
+  return <div className={`border-t border-gray-100 pt-5 mt-5 space-y-4 ${className}`}>{children}</div>;
 }
 
 const GRID_COLS: Record<number, string> = { 2: "grid-cols-2", 3: "grid-cols-3", 4: "grid-cols-4" };
 
 export function CardStats({ children, columns = 3 }: { children: React.ReactNode; columns?: number }) {
   return (
-    <div className={`grid ${GRID_COLS[columns] || "grid-cols-3"} gap-2.5`}>
+    <div className={`grid ${GRID_COLS[columns] || "grid-cols-3"} gap-3`}>
       {children}
     </div>
   );
@@ -69,9 +77,25 @@ export function CardStat({ label, value, color = "gray" }: { label: string; valu
     purple: "text-purple-600",
   };
   return (
-    <div className="bg-gray-50/80 rounded-xl p-3 text-center ring-1 ring-gray-100/50">
+    <div className="bg-gray-50/80 rounded-2xl p-3.5 text-center border border-gray-100/70 shadow-sm shadow-black/[0.01]">
       <p className="text-[11px] font-medium text-gray-500">{label}</p>
-      <p className={`text-xl font-bold mt-0.5 ${colors[color] || colors.gray}`}>{value}</p>
+      <p className={`text-xl font-bold mt-1 ${colors[color] || colors.gray}`}>{value}</p>
+    </div>
+  );
+}
+
+export function InnerCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={`${CARD.inner} ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+export function FloatingCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={`${CARD.floating} ${className}`}>
+      {children}
     </div>
   );
 }

@@ -31,15 +31,15 @@ export default function OrganizerLayout({ children }: { children: React.ReactNod
                 <Link
                   key={href}
                   href={href}
-                  className={`flex flex-col items-center justify-center gap-0.5 min-w-0 px-2 py-1 rounded-xl transition-all duration-200 ${
-                    active
-                      ? "text-indigo-700"
-                      : "text-gray-400 hover:text-gray-600 active:scale-95"
-                  }`}
+                   className={`flex flex-col items-center justify-center gap-0.5 min-w-0 px-2 py-1 rounded-2xl transition-all duration-200 ${
+                     active
+                       ? "text-indigo-700"
+                       : "text-gray-400 hover:text-gray-600 active:scale-95"
+                   }`}
                 >
-                  <div className={`relative flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-200 ${
-                    active ? "bg-indigo-50 scale-110" : ""
-                  }`}>
+                   <div className={`relative flex items-center justify-center w-8 h-8 rounded-2xl transition-all duration-200 ${
+                     active ? "bg-indigo-50 scale-110" : ""
+                   }`}>
                     <Icon className={`w-5 h-5 transition-all duration-200 ${active ? "scale-100" : ""}`} />
                   </div>
                   <span className={`text-[10px] font-medium leading-tight transition-all duration-200 ${

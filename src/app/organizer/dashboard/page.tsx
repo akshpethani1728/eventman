@@ -206,7 +206,7 @@ export default function OrganizerDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-indigo-50/40 to-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center">
         <div className="text-center animate-fade-in">
           <div className="w-10 h-10 border-2 border-indigo-700 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <div className="space-y-2">
@@ -219,7 +219,7 @@ export default function OrganizerDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50/40 to-gray-50 pb-28">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white pb-28">
       {/* Header */}
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-gray-200/60 z-20">
         <div className="h-0.5 bg-gradient-to-r from-indigo-200 via-indigo-500 to-indigo-200" />
@@ -234,18 +234,18 @@ export default function OrganizerDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-0.5">
-            <Link href="/organizer/notifications" className="p-2 text-gray-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition-all relative">
+            <Link href="/organizer/notifications" className="p-2 text-gray-400 hover:text-indigo-600 rounded-xl hover:bg-indigo-50 transition-all relative">
               <Bell className="w-4 h-4" />
             </Link>
-            <Link href="/organizer/database" className="p-2 text-gray-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition-all">
+            <Link href="/organizer/database" className="p-2 text-gray-400 hover:text-indigo-600 rounded-xl hover:bg-indigo-50 transition-all">
               <Search className="w-4 h-4" />
             </Link>
-            <Link href="/organizer/profile" className="flex items-center gap-2 p-1.5 hover:bg-indigo-50 rounded-lg transition-all ml-1">
+            <Link href="/organizer/profile" className="flex items-center gap-2 p-1.5 hover:bg-indigo-50 rounded-xl transition-all ml-1">
               <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center text-white font-bold text-[11px] shadow-sm shadow-indigo-200">
                 {profile?.full_name?.charAt(0) || "O"}
               </div>
             </Link>
-            <button onClick={signOut} className="p-2 text-gray-400 hover:text-red-500 rounded-lg hover:bg-red-50 transition-all">
+            <button onClick={signOut} className="p-2 text-gray-400 hover:text-red-500 rounded-xl hover:bg-red-50 transition-all">
               <LogOut className="w-4 h-4" />
             </button>
           </div>
@@ -279,15 +279,15 @@ export default function OrganizerDashboard() {
             const valueSize = primary ? "text-3xl" : isAttention && hasAttention ? "text-3xl" : "text-2xl";
             const cardRing = isAttention && hasAttention ? "ring-2 ring-red-200/60" : "";
             return (
-              <div key={label} className={`bg-white rounded-2xl p-4 shadow-sm border border-gray-200/70 shadow-black/[0.02] active:scale-[0.98] transition-all duration-200 hover:shadow-md group ${cardRing}`}>
+              <div key={label} className={`bg-white rounded-3xl p-5 shadow-sm border border-gray-200/70 shadow-black/[0.03] active:scale-[0.98] transition-all duration-200 hover:shadow-lg group ${cardRing}`}>
                 <div className="flex items-start justify-between mb-3">
-                  <div className={`w-9 h-9 rounded-xl ${iconBg} flex items-center justify-center ${iconCls} group-hover:scale-110 transition-transform duration-200 ${isAttention && hasAttention ? "animate-pulse-soft" : ""}`}>
+                  <div className={`w-9 h-9 rounded-2xl ${iconBg} flex items-center justify-center ${iconCls} group-hover:scale-110 transition-transform duration-200 ${isAttention && hasAttention ? "animate-pulse-soft" : ""}`}>
                     <Icon className={`${primary ? "w-5 h-5" : "w-4 h-4"}`} />
                   </div>
                   <span className={`w-2 h-2 rounded-full ${dotCls}`} />
                 </div>
                 <p className={`${valueSize} font-bold ${valueCls} leading-none`}>{formatCount(value)}</p>
-                <p className="text-[10px] text-gray-400 mt-1.5 uppercase tracking-wider font-medium">{label}</p>
+                <p className="text-[11px] text-gray-400 mt-1.5 uppercase tracking-wider font-medium">{label}</p>
               </div>
             );
           })}
@@ -296,7 +296,7 @@ export default function OrganizerDashboard() {
         {/* Quick Actions */}
         <div className="flex gap-2 mb-5">
           <button onClick={() => { setCreateFromTemplate(null); setShowCreate(true); }}
-            className="flex-1 h-11 rounded-xl bg-indigo-700 text-white text-sm font-semibold flex items-center justify-center gap-2 shadow-sm shadow-indigo-200 active:scale-[0.97] transition-all duration-150 hover:bg-indigo-800 hover:shadow-md hover:shadow-indigo-200">
+            className="flex-1 h-11 rounded-2xl bg-indigo-700 text-white text-sm font-semibold flex items-center justify-center gap-2 shadow-sm shadow-indigo-200 active:scale-[0.97] transition-all duration-150 hover:bg-indigo-800 hover:shadow-md hover:shadow-indigo-200">
             <Plus className="w-4 h-4" /> Create Event
           </button>
           {templates.length > 0 && (

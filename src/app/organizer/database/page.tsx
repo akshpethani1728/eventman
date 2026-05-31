@@ -82,11 +82,11 @@ export default function WorkerDatabasePage() {
   if (loading) return <PageLoader />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50/30 to-gray-50 pb-24">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white pb-24">
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-gray-200/60 z-10">
         <div className="h-0.5 bg-gradient-to-r from-indigo-200 via-indigo-500 to-indigo-200" />
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center gap-3">
-          <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-indigo-700 hover:bg-indigo-50 rounded-xl transition-all"><ArrowLeft className="w-5 h-5" /></Link>
+          <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-indigo-700 hover:bg-indigo-50 rounded-2xl transition-all"><ArrowLeft className="w-5 h-5" /></Link>
           <h1 className="font-semibold text-sm">Worker Database</h1>
           <span className="text-xs text-gray-400 ml-auto font-medium">{workers.length} workers</span>
         </div>
@@ -97,10 +97,10 @@ export default function WorkerDatabasePage() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search by name, area, or skills..."
-              className="w-full h-11 pl-10 pr-4 rounded-xl border border-gray-200 bg-white text-sm form-input outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-50 transition-all" />
+              className="w-full h-11 pl-10 pr-4 rounded-2xl border border-gray-200 bg-white text-sm form-input outline-none focus:border-indigo-300 focus:ring-2 focus:ring-indigo-50/50 transition-all" />
           </div>
           <button type="button" onClick={() => setShowFilters(!showFilters)}
-            className={`h-11 px-4 rounded-xl border text-sm flex items-center gap-1.5 transition-all ${
+            className={`h-11 px-4 rounded-2xl border text-sm flex items-center gap-1.5 transition-all ${
               showFilters ? "bg-indigo-50 border-indigo-300 text-indigo-700 shadow-sm" : "border-gray-200 text-gray-600 bg-white hover:border-gray-300"
             }`}>
             <Filter className="w-4 h-4" /> Filters
@@ -109,7 +109,7 @@ export default function WorkerDatabasePage() {
 
         <div className="flex items-center gap-2 mb-3">
           <button onClick={() => setAvailableOnly(!availableOnly)}
-            className={`h-8 px-3 rounded-xl text-[10px] font-medium transition-all flex items-center gap-1.5 ${
+            className={`h-8 px-3 rounded-2xl text-[11px] font-medium transition-all flex items-center gap-1.5 ${
               availableOnly ? "bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm" : "bg-white text-gray-500 border border-gray-200 hover:border-gray-300"
             }`}>
             {availableOnly && <CheckCircle className="w-3 h-3" />} Available only
@@ -120,16 +120,16 @@ export default function WorkerDatabasePage() {
         </div>
 
         {showFilters && (
-          <form onSubmit={e => e.preventDefault()} className="bg-white border border-gray-200/80 rounded-2xl p-4 mb-3 space-y-3 shadow-sm animate-fade-in">
+          <form onSubmit={e => e.preventDefault()} className="bg-white border border-gray-200/80 rounded-3xl p-5 mb-3 space-y-3 shadow-sm shadow-black/[0.03] animate-fade-in">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               <select value={filters.gender} onChange={e => setFilters(f => ({ ...f, gender: e.target.value }))}
-                className="h-9 px-3 rounded-xl border border-gray-200 text-xs bg-white">
+                className="h-9 px-3 rounded-2xl border border-gray-200 text-xs bg-white">
                 <option value="">Any gender</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
               </select>
               <select value={filters.availability} onChange={e => setFilters(f => ({ ...f, availability: e.target.value }))}
-                className="h-9 px-3 rounded-xl border border-gray-200 text-xs bg-white">
+                className="h-9 px-3 rounded-2xl border border-gray-200 text-xs bg-white">
                 <option value="">Any availability</option>
                 <option value="available_today">Available Today</option>
                 <option value="available_this_week">Available This Week</option>
@@ -140,9 +140,9 @@ export default function WorkerDatabasePage() {
                 <option value="unavailable">Unavailable</option>
               </select>
               <input value={filters.city} onChange={e => setFilters(f => ({ ...f, city: e.target.value }))}
-                placeholder="City" className="h-9 px-3 rounded-xl border border-gray-200 text-xs bg-white" />
+                placeholder="City" className="h-9 px-3 rounded-2xl border border-gray-200 text-xs bg-white" />
               <input value={filters.skills} onChange={e => setFilters(f => ({ ...f, skills: e.target.value }))}
-                placeholder="Skill" className="h-9 px-3 rounded-xl border border-gray-200 text-xs bg-white" />
+                placeholder="Skill" className="h-9 px-3 rounded-2xl border border-gray-200 text-xs bg-white" />
             </div>
             {(filters.gender || filters.availability || filters.city || filters.skills) && (
               <button type="button" onClick={() => setFilters({ gender: "", availability: "", city: "", skills: "" })}
@@ -160,7 +160,7 @@ export default function WorkerDatabasePage() {
             const completion = computeCompletion(w);
             const avail = w.availability ? AVAIL_CONFIG[w.availability] : null;
             return (
-              <Card key={w.id} padding="sm" hover className="cursor-pointer transition-all duration-200 active:scale-[0.99] group border-0 shadow-sm"
+              <Card key={w.id} padding="md" hover className="cursor-pointer transition-all duration-200 active:scale-[0.99] group border-0 shadow-sm"
                 onClick={() => setSelectedWorker(w)}>
                 <div className="flex items-start gap-3">
                   <div className="relative shrink-0">
@@ -179,7 +179,7 @@ export default function WorkerDatabasePage() {
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="font-semibold text-sm text-gray-900 group-hover:text-indigo-700 transition-colors">{w.full_name}</p>
                       {avail && (
-                        <span className={`inline-flex items-center gap-1 text-[9px] font-medium px-1.5 py-0.5 rounded-lg border ${
+                        <span className={`inline-flex items-center gap-1 text-[9px] font-medium px-1.5 py-0.5 rounded-xl border ${
                           w.availability === "available_today" || w.availability === "available" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
                           w.availability === "available_this_week" ? "bg-indigo-50 text-indigo-700 border-indigo-200" :
                           w.availability === "weekends" ? "bg-amber-50 text-amber-700 border-amber-200" :
@@ -202,7 +202,7 @@ export default function WorkerDatabasePage() {
                       {w.age && `${w.age} yrs`}{w.gender && ` · ${w.gender}`}{w.city && ` · ${w.city}`}
                     </p>
                     <div className="flex flex-wrap gap-1 mt-1.5">
-                      {w.skills?.slice(0, 3).map((s, i) => <span key={i} className="text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-lg">{s}</span>)}
+                      {w.skills?.slice(0, 3).map((s, i) => <span key={i} className="text-[11px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-xl">{s}</span>)}
                       {(w.skills?.length || 0) > 3 && <span className="text-[10px] text-gray-400 font-medium">+{w.skills!.length - 3}</span>}
                     </div>
                     <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1.5 text-[11px] text-gray-500">
