@@ -60,23 +60,6 @@ export default function EventDetailPage() {
       if (user) {
         const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
         if (prof) {
-          const now = new Date();
-          if (!prof.plan_status) {
-            const trialEnd = new Date(now);
-            trialEnd.setDate(trialEnd.getDate() + 10);
-            await supabase.from("profiles").update({
-              plan_status: "trial", trial_start_date: now.toISOString(), trial_end_date: trialEnd.toISOString(),
-            }).eq("user_id", user.id);
-            prof.plan_status = "trial";
-            prof.trial_start_date = now.toISOString();
-            prof.trial_end_date = trialEnd.toISOString();
-          } else if (prof.plan_status === "trial" && prof.trial_end_date && new Date(prof.trial_end_date) <= now) {
-            await supabase.from("profiles").update({ plan_status: "expired" }).eq("user_id", user.id);
-            prof.plan_status = "expired";
-          } else if (prof.plan_status === "active" && prof.subscription_end_date && new Date(prof.subscription_end_date) <= now) {
-            await supabase.from("profiles").update({ plan_status: "expired" }).eq("user_id", user.id);
-            prof.plan_status = "expired";
-          }
           setWorkerProfile(prof);
         }
         const { data: app } = await supabase.from("applications").select("*").eq("event_id", id).eq("worker_id", user.id).maybeSingle();

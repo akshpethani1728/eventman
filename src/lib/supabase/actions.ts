@@ -31,23 +31,12 @@ export async function createProfile(
   phone: string
 ) {
   const supabase = await createServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "Not authenticated" };
 
   const profileData: Record<string, any> = {
-    user_id: userId,
-    full_name: fullName,
-    role,
-    phone,
-    status: "unverified",
+    user_id: userId, full_name: fullName.trim(), role, email: user.email || "", status: "unverified",
   };
-
-  if (role === "worker") {
-    const now = new Date();
-    const trialEnd = new Date(now);
-    trialEnd.setDate(trialEnd.getDate() + 10);
-    profileData.plan_status = "trial";
-    profileData.trial_start_date = now.toISOString();
-    profileData.trial_end_date = trialEnd.toISOString();
-  }
 
   const { error } = await supabase.from("profiles").insert(profileData);
 

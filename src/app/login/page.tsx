@@ -690,19 +690,9 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
         onStepChange("auth");
         return;
       }
-      const now = new Date();
-      const trialEnd = new Date(now);
-      trialEnd.setDate(trialEnd.getDate() + 10);
-
       const profileData: Record<string, any> = {
         user_id: user.id, full_name: name.trim(), role, email: user.email, status: "unverified",
       };
-
-      if (role === "worker") {
-        profileData.plan_status = "trial";
-        profileData.trial_start_date = now.toISOString();
-        profileData.trial_end_date = trialEnd.toISOString();
-      }
 
       const { error: insertError } = await supabase.from("profiles").insert(profileData);
       setLoading(false);
