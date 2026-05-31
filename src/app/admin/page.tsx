@@ -86,7 +86,7 @@ export default function AdminDashboard() {
         <div className="flex gap-2 mb-4 bg-white/80 backdrop-blur-xl rounded-2xl p-1 border border-gray-200/60 shadow-sm">
           {(["users", "events"] as AdminTab[]).map(t => (
             <button key={t} onClick={() => setTab(t)}
-              className={`flex-1 h-11 rounded-xl text-sm font-medium capitalize transition-all ${
+              className={`flex-1 h-11 rounded-lg text-sm font-medium capitalize transition-all ${
                 tab === t ? "bg-blue-600 text-white shadow-md shadow-blue-600/20" : "text-gray-500 hover:text-gray-800"
               }`}>
               {t} ({t === "users" ? users.length : events.length})

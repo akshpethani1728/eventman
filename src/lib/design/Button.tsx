@@ -43,7 +43,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
     <button
       ref={ref}
       aria-label={label}
-      className={`inline-flex items-center justify-center shrink-0 rounded-xl transition-all duration-200 ${VARIANTS[variant]} ${size === "sm" ? "w-8 h-8" : "w-10 h-10"} ${className}`}
+      className={`inline-flex items-center justify-center shrink-0 rounded-lg transition-all duration-200 ${VARIANTS[variant]} ${size === "sm" ? "w-8 h-8" : "w-10 h-10"} ${className}`}
       {...props}
     />
   )

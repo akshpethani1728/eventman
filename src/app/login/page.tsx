@@ -814,7 +814,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                     type="button"
                     disabled={loading}
                     onClick={handleSignIn}
-                    className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-sm font-semibold text-white shadow-lg shadow-blue-200/50 transition-all active:scale-[0.98] disabled:opacity-60"
+                    className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-sm font-semibold text-white shadow-lg shadow-blue-200/50 transition-all active:scale-[0.98] disabled:opacity-60"
                   >
                     {loading ? (
                       <span className="flex items-center gap-2">
@@ -850,7 +850,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                     type="button"
                     disabled={loading}
                     onClick={handleCreateAccount}
-                    className="flex h-11 w-full items-center justify-center gap-2 rounded-xl border-2 border-blue-600 bg-white text-sm font-semibold text-blue-600 transition-all active:scale-[0.98] hover:bg-blue-50 disabled:opacity-60"
+                    className="flex h-11 w-full items-center justify-center gap-2 rounded-lg border-2 border-blue-600 bg-white text-sm font-semibold text-blue-600 transition-all active:scale-[0.98] hover:bg-blue-50 disabled:opacity-60"
                   >
                     {loading ? (
                       <span className="flex items-center gap-2">
@@ -904,7 +904,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
               <button
                 type="submit"
                 disabled={loading || otp.join("").length < 6}
-                className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-sm font-semibold text-white shadow-lg shadow-blue-200/50 transition-all active:scale-[0.98] disabled:opacity-60"
+                className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-sm font-semibold text-white shadow-lg shadow-blue-200/50 transition-all active:scale-[0.98] disabled:opacity-60"
               >
                 {loading ? (
                   <span className="flex items-center gap-2">
@@ -1017,7 +1017,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
               <button
                 type="submit"
                 disabled={loading}
-                className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-sm font-semibold text-white shadow-lg shadow-blue-200/50 transition-all active:scale-[0.98] disabled:opacity-60"
+                className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-sm font-semibold text-white shadow-lg shadow-blue-200/50 transition-all active:scale-[0.98] disabled:opacity-60"
               >
                 {loading ? (
                   <span className="flex items-center gap-2">

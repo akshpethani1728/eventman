@@ -333,14 +333,14 @@ export default function WorkerPlansPage() {
             {/* CTA */}
             <div className="px-6 pt-4 pb-6">
               {isActive ? (
-                <div className="w-full h-12 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 font-semibold text-sm gap-2">
+                <div className="w-full h-12 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 font-semibold text-sm gap-2">
                   <CheckCircle className="w-4 h-4" /> Currently Active
                 </div>
               ) : barrier ? (
                 <button
                   onClick={handlePurchase}
                   disabled={purchasing || !razorpayLoaded}
-                  className="w-full h-13 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 shadow-lg shadow-blue-600/25 hover:shadow-xl hover:shadow-blue-600/30 flex items-center justify-center gap-2"
+                  className="w-full h-13 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 shadow-lg shadow-blue-600/25 hover:shadow-xl hover:shadow-blue-600/30 flex items-center justify-center gap-2"
                 >
                   {purchasing ? (
                     <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
@@ -354,7 +354,7 @@ export default function WorkerPlansPage() {
                 <button
                   onClick={handlePurchase}
                   disabled={purchasing || !razorpayLoaded}
-                  className="w-full h-13 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 shadow-lg shadow-blue-600/25 hover:shadow-xl hover:shadow-blue-600/30 flex items-center justify-center gap-2"
+                  className="w-full h-13 rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 shadow-lg shadow-blue-600/25 hover:shadow-xl hover:shadow-blue-600/30 flex items-center justify-center gap-2"
                 >
                   {purchasing ? (
                     <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>

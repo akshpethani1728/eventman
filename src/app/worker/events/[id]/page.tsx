@@ -492,7 +492,7 @@ export default function EventDetailPage() {
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
           <div className="max-w-lg mx-auto">
             <button onClick={handleJoinWaitlist} disabled={applying}
-              className="w-full h-12 rounded-xl bg-purple-600 text-white font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 shadow-md shadow-purple-600/20 flex items-center justify-center gap-2">
+              className="w-full h-12 rounded-lg bg-purple-600 text-white font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 shadow-md shadow-purple-600/20 flex items-center justify-center gap-2">
               {applying ? (
                 <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
               ) : (
@@ -506,7 +506,7 @@ export default function EventDetailPage() {
       {!application && !deadlinePassed && isFull && !canApply && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
           <div className="max-w-lg mx-auto">
-            <Link href="/worker/plans" className="w-full h-12 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-medium text-base active:scale-[0.98] transition-all shadow-md shadow-amber-600/20 flex items-center justify-center gap-2">
+            <Link href="/worker/plans" className="w-full h-12 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white font-medium text-base active:scale-[0.98] transition-all shadow-md shadow-amber-600/20 flex items-center justify-center gap-2">
               <CreditCard className="w-4 h-4" /> Subscribe to Join Waitlist
             </Link>
           </div>
@@ -517,7 +517,7 @@ export default function EventDetailPage() {
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
           <div className="max-w-lg mx-auto">
             <button onClick={handleApply} disabled={applying}
-              className="w-full h-12 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 shadow-md shadow-blue-600/20 flex items-center justify-center gap-2">
+              className="w-full h-12 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 shadow-md shadow-blue-600/20 flex items-center justify-center gap-2">
               {applying ? (
                 <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
               ) : (
@@ -531,7 +531,7 @@ export default function EventDetailPage() {
       {!application && !deadlinePassed && !isFull && (event.status === "published" || event.status === "filling") && !canApply && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
           <div className="max-w-lg mx-auto">
-            <Link href="/worker/plans" className="w-full h-12 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-medium text-base active:scale-[0.98] transition-all shadow-md shadow-amber-600/20 flex items-center justify-center gap-2">
+            <Link href="/worker/plans" className="w-full h-12 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white font-medium text-base active:scale-[0.98] transition-all shadow-md shadow-amber-600/20 flex items-center justify-center gap-2">
               <CreditCard className="w-4 h-4" /> Subscribe to Apply
             </Link>
           </div>
@@ -563,7 +563,7 @@ export default function EventDetailPage() {
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
           <div className="max-w-lg mx-auto">
             <button onClick={handleLeaveWaitlist} disabled={applying}
-              className="w-full h-12 rounded-xl border-2 border-purple-200 bg-purple-50 text-purple-700 font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+              className="w-full h-12 rounded-lg border-2 border-purple-200 bg-purple-50 text-purple-700 font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2">
               {applying ? (
                 <span className="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin inline-block" />
               ) : (
@@ -607,7 +607,7 @@ export default function EventDetailPage() {
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
           <div className="max-w-lg mx-auto">
             <button onClick={handleReApply} disabled={applying}
-              className="w-full h-12 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 shadow-md shadow-blue-600/20 flex items-center justify-center gap-2">
+              className="w-full h-12 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 shadow-md shadow-blue-600/20 flex items-center justify-center gap-2">
               {applying ? (
                 <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
               ) : (
@@ -622,7 +622,7 @@ export default function EventDetailPage() {
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
           <div className="max-w-lg mx-auto">
             <Link href="/worker/dashboard"
-              className="w-full h-12 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium text-base flex items-center justify-center gap-2 shadow-md shadow-blue-600/20">
+              className="w-full h-12 rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 text-white font-medium text-base flex items-center justify-center gap-2 shadow-md shadow-blue-600/20">
               <ArrowUpRight className="w-4 h-4" /> Browse More Events
             </Link>
           </div>

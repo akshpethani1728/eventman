@@ -26,11 +26,11 @@ export default function OrgErrorPage({
         <p className="text-sm text-gray-500 mb-4">We encountered an error loading your organizer dashboard. Please try again.</p>
         <div className="flex gap-2 justify-center">
           <button onClick={reset}
-            className="h-11 px-6 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 active:scale-[0.97] transition-all shadow-sm">
+            className="h-11 px-6 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 active:scale-[0.97] transition-all shadow-sm">
             Retry
           </button>
           <Link href="/login"
-            className="h-11 px-6 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 active:scale-[0.97] transition-all shadow-sm flex items-center">
+            className="h-11 px-6 rounded-lg border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 active:scale-[0.97] transition-all shadow-sm flex items-center">
             Login
           </Link>
         </div>

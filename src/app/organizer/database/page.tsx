@@ -96,10 +96,10 @@ export default function WorkerDatabasePage() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search by name, area, or skills..."
-              className="w-full h-10 pl-9 pr-3 rounded-xl border border-gray-300 bg-white text-sm form-input" />
+              className="w-full h-10 pl-9 pr-3 rounded-lg border border-gray-300 bg-white text-sm form-input outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all" />
           </div>
           <button type="button" onClick={() => setShowFilters(!showFilters)}
-            className={`h-10 px-3 rounded-xl border text-sm flex items-center gap-1.5 transition-all ${
+            className={`h-10 px-3 rounded-lg border text-sm flex items-center gap-1.5 transition-all ${
               showFilters ? "bg-blue-50 border-blue-300 text-blue-700" : "border-gray-300 text-gray-600 bg-white"
             }`}>
             <Filter className="w-4 h-4" /> Filters
