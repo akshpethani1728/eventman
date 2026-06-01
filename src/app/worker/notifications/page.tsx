@@ -10,7 +10,7 @@ import type { Notification } from "@/lib/supabase/types";
 const ICONS: Record<string, any> = {
   "Application Approved": <CheckCircle className="w-4 h-4 text-green-600" />,
   "Application Rejected": <XCircle className="w-4 h-4 text-red-600" />,
-  "Trial Ending Soon": <Clock className="w-4 h-4 text-indigo-700" />,
+  "Trial Ending Soon": <Clock className="w-4 h-4 text-[#0D9488]" />,
   "Trial Expired": <AlertCircle className="w-4 h-4 text-amber-600" />,
   "Welcome": <BadgeCheck className="w-4 h-4 text-emerald-600" />,
   "Subscription Active": <CheckCircle className="w-4 h-4 text-emerald-600" />,
@@ -57,7 +57,7 @@ export default function WorkerNotificationsPage() {
   };
 
   if (loading) {
-    return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><p className="text-gray-500">Loading...</p></div>;
+    return <div className="min-h-screen bg-[#F8F8F6] flex items-center justify-center"><p className="text-[#6B6B6B]">Loading...</p></div>;
   }
 
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -77,13 +77,13 @@ export default function WorkerNotificationsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7] pb-24">
-      <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-gray-200/60 z-10">
+    <div className="min-h-screen bg-[#F8F8F6] pb-24">
+      <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
           <Link href="/worker/dashboard" className="p-1 -ml-1 text-gray-500"><ArrowLeft className="w-5 h-5" /></Link>
-          <h1 className="font-semibold text-sm">Notifications</h1>
+          <h1 className="font-semibold text-sm text-[#1A1A1A]">Notifications</h1>
           {unreadCount > 0 && (
-            <span className="text-xs bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full ml-auto font-semibold">{unreadCount} new</span>
+            <span className="text-xs bg-[#0D9488]/10 text-[#0D9488] px-2 py-0.5 rounded-full ml-auto font-semibold">{unreadCount} new</span>
           )}
         </div>
       </header>
@@ -91,18 +91,18 @@ export default function WorkerNotificationsPage() {
       <main className="max-w-lg mx-auto px-4 py-4">
         {unreadCount > 0 && (
           <button onClick={markAllRead}
-            className="w-full h-9 mb-4 rounded-[14px] bg-white text-gray-600 text-sm font-medium flex items-center justify-center gap-2 border border-gray-200/70 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] hover:bg-gray-50 active:scale-[0.98] transition-all">
+            className="w-full h-9 mb-4 rounded-[10px] bg-white text-[#6B6B6B] text-sm font-medium flex items-center justify-center gap-2 border border-[rgba(0,0,0,0.06)] hover:bg-[#F8F8F6] active:scale-[0.98] transition-all">
             <CheckCheck className="w-4 h-4" /> Mark all as read
           </button>
         )}
 
         {notifications.length === 0 && (
           <div className="text-center py-20">
-            <div className="w-12 h-12 rounded-[14px] bg-indigo-50 flex items-center justify-center mx-auto mb-3 ring-1 ring-indigo-200">
-              <Bell className="w-5 h-5 text-indigo-600" />
+            <div className="w-12 h-12 rounded-full bg-teal-50 flex items-center justify-center mx-auto mb-3">
+              <Bell className="w-5 h-5 text-[#0D9488]" />
             </div>
-            <p className="text-sm font-medium text-gray-500">No notifications yet</p>
-            <p className="text-xs text-gray-400 mt-1">Updates about your applications will appear here</p>
+            <p className="text-sm font-medium text-[#6B6B6B]">No notifications yet</p>
+            <p className="text-xs text-[#A1A1AA] mt-1">Updates about your applications will appear here</p>
           </div>
         )}
 
@@ -110,23 +110,25 @@ export default function WorkerNotificationsPage() {
           {sortedGroups.map(([eventName, notifs]) => (
             <div key={eventName}>
               <div className="flex items-center gap-1.5 mb-2">
-                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider truncate">
+                <span className="text-xs font-semibold text-[#6B6B6B] uppercase tracking-wider truncate">
                   {eventName}
                 </span>
-                <span className="text-[10px] text-gray-400 ml-auto bg-gray-100 px-1.5 py-0.5 rounded-md font-medium">{notifs.length}</span>
+                <span className="text-[10px] text-[#A1A1AA] ml-auto bg-gray-100 px-1.5 py-0.5 rounded-md font-medium">{notifs.length}</span>
               </div>
               <div className="space-y-1.5">
                 {notifs.map(n => (
-                  <div key={n.id} className={`rounded-[14px] p-3 flex items-start gap-2.5 border shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-black/[0.02] transition-all ${
-                    n.read ? "border-gray-200/70 bg-white" : "border-indigo-200 bg-indigo-50"
+                  <div key={n.id} className={`card-base p-3 flex items-start gap-2.5 transition-all ${
+                    n.read ? "" : "bg-teal-50/40 border-l-2 border-l-[#0D9488]"
                   }`}>
-                    <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
-                      {ICONS[n.title] || <Bell className="w-3.5 h-3.5 text-gray-400" />}
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${
+                      n.read ? "bg-white" : "bg-white"
+                    }`}>
+                      {ICONS[n.title] || <Bell className="w-3.5 h-3.5 text-[#A1A1AA]" />}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs font-medium text-gray-900">{n.title}</p>
-                      <p className="text-xs text-gray-600 mt-0.5">{n.message}</p>
-                      <p className="text-[10px] text-gray-400 mt-0.5">
+                      <p className="text-xs font-medium text-[#1A1A1A]">{n.title}</p>
+                      <p className="text-xs text-[#6B6B6B] mt-0.5">{n.message}</p>
+                      <p className="text-[10px] text-[#A1A1AA] mt-0.5">
                         {new Date(n.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
                       </p>
                     </div>

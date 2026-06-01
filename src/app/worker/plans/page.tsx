@@ -99,7 +99,7 @@ export default function WorkerPlansPage() {
         description: "Monthly Worker Plan",
         order_id: orderData.orderId,
         prefill: { name: profile?.full_name || "", email: profile?.email || "", contact: profile?.phone || "" },
-        theme: { color: "#2563eb" },
+        theme: { color: "#0D9488" },
         handler: async (response: any) => {
           const verifyRes = await fetch("/api/razorpay/verify-payment", {
             method: "POST",
@@ -136,8 +136,8 @@ export default function WorkerPlansPage() {
     return (
       <div className="min-h-dvh bg-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="w-6 h-6 text-indigo-700 animate-spin" />
-          <p className="text-xs text-gray-400">Loading...</p>
+          <Loader2 className="w-6 h-6 text-[#0D9488] animate-spin" />
+          <p className="text-xs text-[#A1A1AA]">Loading...</p>
         </div>
       </div>
     );
@@ -151,21 +151,21 @@ export default function WorkerPlansPage() {
   const barrier = isExpired;
 
   return (
-    <div className="min-h-dvh bg-[#f5f5f7] pb-28">
+    <div className="min-h-dvh bg-[#F8F8F6] pb-28">
       {/* HEADER */}
-      <header className="sticky top-0 bg-white/80 backdrop-blur-2xl border-b border-gray-200/60 z-10">
+      <header className="sticky top-0 bg-white/80 backdrop-blur-2xl border-b border-[rgba(0,0,0,0.06)] z-10">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
           <Link href="/worker/dashboard" className="p-1 -ml-1 text-gray-500">
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          <h1 className="font-semibold">Subscription</h1>
+          <h1 className="font-semibold text-[#1A1A1A]">Subscription</h1>
         </div>
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-6 space-y-5">
         {/* ─── PAYMENT STATUS ─── */}
         {paymentStatus === "success" && (
-          <div className="rounded-[18px] bg-emerald-50 border border-emerald-200 p-4 flex items-start gap-3 animate-slide-down shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
+          <div className="card-base p-4 flex items-start gap-3 animate-slide-down">
             <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
               <CheckCircle className="w-5 h-5 text-emerald-600" />
             </div>
@@ -176,7 +176,7 @@ export default function WorkerPlansPage() {
           </div>
         )}
         {paymentStatus === "failed" && (
-          <div className="rounded-[18px] bg-red-50 border border-red-200 p-4 flex items-start gap-3 animate-slide-down shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
+          <div className="card-base p-4 flex items-start gap-3 animate-slide-down">
             <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
               <XCircle className="w-5 h-5 text-red-600" />
             </div>
@@ -187,7 +187,7 @@ export default function WorkerPlansPage() {
           </div>
         )}
         {paymentStatus === "cancelled" && (
-          <div className="rounded-[18px] bg-amber-50 border border-amber-200 p-4 flex items-start gap-3 animate-slide-down shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
+          <div className="card-base p-4 flex items-start gap-3 animate-slide-down">
             <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
               <AlertCircle className="w-5 h-5 text-amber-600" />
             </div>
@@ -202,9 +202,9 @@ export default function WorkerPlansPage() {
         <div className="card-base overflow-hidden">
           {/* Gradient header */}
           <div className={`relative px-5 py-4 ${
-            isActive ? "bg-gradient-to-r from-emerald-500 to-emerald-600" :
-            isTrialing ? "bg-gradient-to-r from-indigo-600 to-indigo-700" :
-            "bg-gradient-to-r from-indigo-500 to-indigo-600"
+            isActive ? "bg-gradient-to-r from-[#0D9488] to-[#0A7C73]" :
+            isTrialing ? "bg-gradient-to-r from-emerald-500 to-emerald-600" :
+            "bg-gradient-to-r from-amber-500 to-amber-600"
           }`}>
             <div className="flex items-center justify-between relative z-10">
               <div className="flex items-center gap-2.5">
@@ -224,7 +224,7 @@ export default function WorkerPlansPage() {
               </div>
               <StatusBadge
                 label={isActive ? "ACTIVE" : isTrialing ? "TRIAL" : "EXPIRED"}
-                color={isActive ? "bg-emerald-600/30 text-emerald-100" : isTrialing ? "bg-indigo-700/30 text-indigo-100" : "bg-indigo-600/30 text-indigo-100"}
+                color={isActive ? "bg-emerald-600/30 text-emerald-100" : isTrialing ? "bg-[#0D9488]/30 text-[#0D9488]/90" : "bg-amber-600/30 text-amber-100"}
               />
             </div>
             {/* Decorative circles */}
@@ -237,31 +237,31 @@ export default function WorkerPlansPage() {
             {!isExpired && (
               <div className="space-y-1.5">
                 <div className="flex justify-between text-xs">
-                  <span className="text-gray-500">Plan progress</span>
-                  <span className={`font-medium ${isActive ? "text-emerald-600" : "text-indigo-700"}`}>
+                  <span className="text-[#6B6B6B]">Plan progress</span>
+                  <span className={`font-medium ${isActive ? "text-emerald-600" : "text-[#0D9488]"}`}>
                     {daysRemaining} day{daysRemaining !== 1 ? "s" : ""} left
                   </span>
                 </div>
                 <ProgressBar
                   value={daysRemaining}
                   max={isActive ? 30 : 10}
-                  color={isActive ? "bg-emerald-400" : "bg-indigo-600"}
+                  color={isActive ? "bg-emerald-400" : "bg-[#0D9488]"}
                 />
               </div>
             )}
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gray-50 rounded-[14px] p-3 text-center">
-                <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Status</p>
+              <div className="bg-[#F8F8F6] rounded-[16px] p-3 text-center">
+                <p className="text-[10px] text-[#6B6B6B] uppercase tracking-wider font-medium">Status</p>
                 <p className={`text-sm font-bold mt-0.5 ${
-                  isActive ? "text-emerald-600" : isTrialing ? "text-indigo-700" : "text-red-500"
+                  isActive ? "text-emerald-600" : isTrialing ? "text-[#0D9488]" : "text-red-500"
                 }`}>
                   {isActive ? "Active" : isTrialing ? "In Trial" : "Expired"}
                 </p>
               </div>
-              <div className="bg-gray-50 rounded-[14px] p-3 text-center">
-                <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Expires</p>
-                <p className="text-sm font-bold text-gray-900 mt-0.5">
+              <div className="bg-[#F8F8F6] rounded-[16px] p-3 text-center">
+                <p className="text-[10px] text-[#6B6B6B] uppercase tracking-wider font-medium">Expires</p>
+                <p className="text-sm font-bold text-[#1A1A1A] mt-0.5">
                   {endDate
                     ? new Date(endDate).toLocaleDateString("en-IN", { day: "numeric", month: "short" })
                     : "—"}
@@ -270,7 +270,7 @@ export default function WorkerPlansPage() {
             </div>
 
             {isExpired && (
-              <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 rounded-[14px] px-3 py-2.5">
+              <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 rounded-[16px] px-3 py-2.5">
                 <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                 Renew your plan to continue applying for events.
               </div>
@@ -282,31 +282,31 @@ export default function WorkerPlansPage() {
         <div className="relative">
           {/* Premium corner badge */}
           <div className="absolute -top-[1px] -right-[1px] z-10">
-            <div className="bg-gradient-to-l from-indigo-700 to-indigo-600 text-white text-[9px] font-bold px-4 py-1.5 rounded-bl-2xl rounded-tr-2xl tracking-wider shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] flex items-center gap-1">
+            <div className="bg-gradient-to-l from-[#0D9488] to-[#0A7C73] text-white text-[9px] font-bold px-4 py-1.5 rounded-bl-2xl rounded-tr-2xl tracking-wider flex items-center gap-1">
               <BadgeCheck className="w-2.5 h-2.5" /> BEST VALUE
             </div>
           </div>
 
-          <div className="card-base border-2 border-indigo-200/70 shadow-[0_2px_8px_rgba(67,56,202,0.08)]">
+          <div className="card-base border-2 border-[#0D9488]/20 shadow-[0_4px_16px_rgba(13,148,136,0.08)]">
             {/* Plan header */}
             <div className="px-6 pt-7 pb-2 text-center">
-              <div className="mx-auto mb-3 w-14 h-14 rounded-[18px] bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] ring-4 ring-indigo-50">
+              <div className="mx-auto mb-3 w-14 h-14 rounded-[18px] bg-gradient-to-br from-[#0D9488] to-[#0A7C73] flex items-center justify-center ring-4 ring-[#0D9488]/10">
                 <Crown className="w-7 h-7 text-white" />
               </div>
-              <h2 className="text-xl font-extrabold text-gray-900 tracking-tight">Monthly Access</h2>
-              <p className="text-xs text-gray-500 mt-1">Everything you need to find event work</p>
+              <h2 className="text-xl font-extrabold text-[#1A1A1A] tracking-tight">Monthly Access</h2>
+              <p className="text-xs text-[#6B6B6B] mt-1">Everything you need to find event work</p>
             </div>
 
             {/* Pricing */}
-            <div className="px-6 py-5 text-center border-b border-gray-100">
+            <div className="px-6 py-5 text-center border-b border-[rgba(0,0,0,0.06)]">
               <div className="flex items-baseline justify-center gap-0.5">
-                <span className="text-3xl font-bold text-gray-900">₹</span>
-                <span className="text-5xl font-black text-gray-900 tracking-tight">{MONTHLY_PRICE}</span>
-                <span className="text-sm text-gray-400 ml-1 font-medium">/month</span>
+                <span className="text-3xl font-bold text-[#1A1A1A]">₹</span>
+                <span className="text-5xl font-black text-[#1A1A1A] tracking-tight">{MONTHLY_PRICE}</span>
+                <span className="text-sm text-[#A1A1AA] ml-1 font-medium">/month</span>
               </div>
-              <p className="text-xs text-gray-400 mt-2 flex items-center justify-center gap-1">
-                <Zap className="w-3 h-3 text-slate-500" />
-                Just <span className="font-semibold text-gray-600">₹{PER_DAY}/day</span> — less than a cup of chai
+              <p className="text-xs text-[#A1A1AA] mt-2 flex items-center justify-center gap-1">
+                <Zap className="w-3 h-3 text-[#A1A1AA]" />
+                Just <span className="font-semibold text-[#6B6B6B]">₹{PER_DAY}/day</span> — less than a cup of chai
               </p>
             </div>
 
@@ -319,12 +319,12 @@ export default function WorkerPlansPage() {
                 { icon: Calendar, text: "Full 30-day access", sub: "No restrictions, cancel anytime" },
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-3">
-                  <div className="w-7 h-7 rounded-[14px] bg-indigo-50 flex items-center justify-center shrink-0 mt-0.5">
-                    <item.icon className="w-3.5 h-3.5 text-indigo-700" />
+                  <div className="w-7 h-7 rounded-[10px] bg-teal-50 flex items-center justify-center shrink-0 mt-0.5">
+                    <item.icon className="w-3.5 h-3.5 text-[#0D9488]" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">{item.text}</p>
-                    <p className="text-[11px] text-gray-400">{item.sub}</p>
+                    <p className="text-sm font-semibold text-[#1A1A1A]">{item.text}</p>
+                    <p className="text-[11px] text-[#A1A1AA]">{item.sub}</p>
                   </div>
                 </div>
               ))}
@@ -333,14 +333,14 @@ export default function WorkerPlansPage() {
             {/* CTA */}
             <div className="px-6 pt-4 pb-6">
               {isActive ? (
-                <div className="w-full h-12 rounded-[14px] bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 font-semibold text-sm gap-2">
+                <div className="w-full h-12 rounded-[16px] bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 font-semibold text-sm gap-2">
                   <CheckCircle className="w-4 h-4" /> Currently Active
                 </div>
               ) : barrier ? (
                 <button
                   onClick={handlePurchase}
                   disabled={purchasing || !razorpayLoaded}
-                  className="w-full h-13 rounded-[14px] bg-indigo-700 text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-indigo-800 flex items-center justify-center gap-2"
+                  className="w-full h-13 rounded-[16px] bg-gradient-to-r from-[#0D9488] to-[#0A7C73] text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:from-[#0A7C73] hover:to-[#086B62] flex items-center justify-center gap-2"
                 >
                   {purchasing ? (
                     <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
@@ -354,7 +354,7 @@ export default function WorkerPlansPage() {
                 <button
                   onClick={handlePurchase}
                   disabled={purchasing || !razorpayLoaded}
-                  className="w-full h-13 rounded-[14px] bg-indigo-700 text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-indigo-800 flex items-center justify-center gap-2"
+                  className="w-full h-13 rounded-[16px] bg-gradient-to-r from-[#0D9488] to-[#0A7C73] text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:from-[#0A7C73] hover:to-[#086B62] flex items-center justify-center gap-2"
                 >
                   {purchasing ? (
                     <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
@@ -367,13 +367,13 @@ export default function WorkerPlansPage() {
               )}
 
               {!barrier && !isActive && (
-                <p className="text-[10px] text-gray-400 text-center mt-3">
+                <p className="text-[10px] text-[#A1A1AA] text-center mt-3">
                   Your free trial continues. Subscribe before it ends to keep applying.
                 </p>
               )}
 
               {isExpired && (
-                <p className="text-[10px] text-gray-400 text-center mt-3">
+                <p className="text-[10px] text-[#A1A1AA] text-center mt-3">
                   Your plan has expired. Renew to start applying again.
                 </p>
               )}
@@ -383,7 +383,7 @@ export default function WorkerPlansPage() {
 
         {/* ─── TRUST STRIP ─── */}
         <div className="card-base p-4">
-          <div className="flex items-center justify-center gap-4 text-[10px] text-gray-400 flex-wrap">
+          <div className="flex items-center justify-center gap-4 text-[10px] text-[#A1A1AA] flex-wrap">
             <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> 256-bit SSL</span>
             <span className="w-1 h-1 rounded-full bg-gray-300" />
             <span className="flex items-center gap-1"><CreditCard className="w-3 h-3" /> Razorpay</span>

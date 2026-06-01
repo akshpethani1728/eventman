@@ -30,11 +30,11 @@ export function Modal({ open, onClose, title, children, className = "" }: ModalP
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div ref={overlayRef} className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" onClick={onClose} />
-      <div className={`relative w-full sm:max-w-lg bg-white rounded-[26px] sm:rounded-[26px] shadow-[0_16px_40px_rgba(0,0,0,0.12),0_4px_8px_rgba(0,0,0,0.04)] animate-scale-in max-h-[90vh] overflow-y-auto ${className}`}>
+      <div className={`relative w-full sm:max-w-lg bg-white rounded-[20px] sm:rounded-[20px] shadow-[0_24px_64px_rgba(0,0,0,0.15),0_8px_20px_rgba(0,0,0,0.08)] animate-scale-in max-h-[90vh] overflow-y-auto ${className}`}>
         {title && (
-          <div className="sticky top-0 bg-white/95 backdrop-blur-xl border-b border-gray-100 z-10 px-6 h-14 flex items-center justify-between rounded-[26px]">
-            <h2 className="font-semibold text-base text-gray-900">{title}</h2>
-            <button onClick={onClose} className="w-9 h-9 rounded-[14px] flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+          <div className="sticky top-0 bg-white/95 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10 px-6 h-14 flex items-center justify-between rounded-[20px] rounded-b-none">
+            <h2 className="font-semibold text-[16px] text-[#1A1A1A]">{title}</h2>
+            <button onClick={onClose} className="w-9 h-9 rounded-[10px] flex items-center justify-center text-[#A1A1AA] hover:text-[#6B6B6B] hover:bg-[#F0F0EE] transition-colors">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -65,14 +65,14 @@ export function ConfirmDialog({ open, onClose, onConfirm, title, message, confir
   };
   return (
     <Modal open={open} onClose={onClose} title={title}>
-      <p className="text-sm text-gray-600 leading-relaxed mb-6">{message}</p>
+      <p className="text-[15px] text-[#6B6B6B] leading-relaxed mb-6">{message}</p>
       <div className="flex gap-3">
         <button onClick={onClose}
-          className="btn-base flex-1 h-12 rounded-[14px] btn-secondary text-sm font-semibold">
+          className="btn-base flex-1 h-11 rounded-[10px] btn-secondary text-[14px] font-semibold">
           Cancel
         </button>
         <button onClick={() => { onConfirm(); onClose(); }}
-          className={`btn-base flex-1 h-12 rounded-[14px] text-sm font-semibold ${variantStyles[variant]}`}>
+          className={`btn-base flex-1 h-11 rounded-[10px] text-[14px] font-semibold ${variantStyles[variant]}`}>
           {confirmLabel}
         </button>
       </div>

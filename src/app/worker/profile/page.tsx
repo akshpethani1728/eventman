@@ -7,7 +7,6 @@ import { createClient } from "@/lib/supabase/client";
 import { ArrowLeft, Save, User, Phone, MapPin, Award, Briefcase, AlertCircle, CheckCircle, Clock, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/lib/design/Button";
-import { Card } from "@/lib/design/Card";
 import { Badge } from "@/lib/design/Badge";
 import { PageLoader } from "@/lib/design/Loading";
 import type { Profile } from "@/lib/supabase/types";
@@ -103,32 +102,50 @@ export default function WorkerProfilePage() {
   if (loading) return <PageLoader />;
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7] pb-24">
-      <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-gray-200/60 z-10">
+    <div className="min-h-screen bg-[#F8F8F6] pb-24">
+      <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
           <Link href="/worker/dashboard" className="p-1 -ml-1 text-gray-500"><ArrowLeft className="w-5 h-5" /></Link>
-          <h1 className="font-semibold text-sm">My Profile</h1>
+          <h1 className="font-semibold text-sm text-[#1A1A1A]">My Profile</h1>
         </div>
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
-        {/* Profile Completion */}
+        {/* Profile Hero */}
         {profile && (
-          <Card padding="md" className="bg-indigo-50/60 rounded-[14px] p-4 border border-indigo-100/50 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-black/[0.02]">
+          <div className="card-base p-6 text-center">
+            <div className="w-20 h-20 rounded-full bg-[#0D9488] flex items-center justify-center mx-auto mb-3 ring-4 ring-[#0D9488]/20">
+              <span className="text-2xl font-bold text-white">{profile?.full_name?.charAt(0)?.toUpperCase() || "W"}</span>
+            </div>
+            <p className="font-semibold text-lg text-[#1A1A1A]">{profile?.full_name}</p>
+            <div className="flex items-center justify-center gap-1.5 mt-1">
+              <p className="text-sm text-[#6B6B6B] capitalize">{profile?.role}</p>
+              {profile?.availability && (
+                <Badge variant={profile.availability === "unavailable" || profile.availability === "busy" ? "closed" : "published"}>
+                  {AVAILABILITY_OPTIONS.find(o => o.value === profile.availability)?.label || profile.availability}
+                </Badge>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Profile Strength */}
+        {profile && (
+          <div className="card-base p-4">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Profile Strength</span>
-              <span className={`text-sm font-bold ${completion.percent >= 80 ? "text-emerald-600" : completion.percent >= 50 ? "text-amber-600" : "text-gray-500"}`}>{completion.percent}%</span>
+              <span className="text-xs font-semibold text-[#6B6B6B] uppercase tracking-wide">Profile Strength</span>
+              <span className={`text-sm font-bold ${completion.percent >= 80 ? "text-emerald-600" : completion.percent >= 50 ? "text-amber-600" : "text-[#6B6B6B]"}`}>{completion.percent}%</span>
             </div>
             <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-              <div className={`h-full rounded-full transition-all duration-700 ${completion.percent >= 80 ? "bg-emerald-500" : completion.percent >= 50 ? "bg-amber-500" : "bg-indigo-600"}`}
+              <div className={`h-full rounded-full transition-all duration-700 ${completion.percent >= 80 ? "bg-emerald-500" : completion.percent >= 50 ? "bg-amber-500" : "bg-[#0D9488]"}`}
                 style={{ width: `${completion.percent}%` }} />
             </div>
             {completion.missing.length > 0 && (
               <div className="mt-3 space-y-1.5">
-                <p className="text-[10px] text-gray-500 flex items-center gap-1"><AlertCircle className="w-3 h-3 text-amber-500" /> Add these to strengthen your profile:</p>
+                <p className="text-[10px] text-[#6B6B6B] flex items-center gap-1"><AlertCircle className="w-3 h-3 text-amber-500" /> Add these to strengthen your profile:</p>
                 <div className="flex flex-wrap gap-1">
                   {completion.missing.map(m => (
-                    <span key={m} className="text-[10px] bg-amber-50 text-amber-700 border border-amber-200/60 px-2 py-0.5 rounded-lg">{m}</span>
+                    <span key={m} className="text-[10px] bg-amber-50 text-amber-700 px-2 py-0.5 rounded-lg">{m}</span>
                   ))}
                 </div>
               </div>
@@ -136,55 +153,39 @@ export default function WorkerProfilePage() {
             {completion.percent === 100 && (
               <p className="mt-2 text-[10px] text-emerald-600 flex items-center gap-1"><CheckCircle className="w-3 h-3" /> Complete profile &mdash; you look great to organizers!</p>
             )}
-          </Card>
+          </div>
         )}
 
         <form onSubmit={(e) => { e.preventDefault(); saveProfile(); }}>
-          {/* Avatar */}
-          <Card padding="lg" className="text-center shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-black/[0.02]">
-            <div className="w-20 h-20 rounded-full bg-indigo-100 flex items-center justify-center mx-auto mb-3 ring-4 ring-indigo-200">
-              <span className="text-2xl font-bold text-indigo-700">{profile?.full_name?.charAt(0)?.toUpperCase() || "W"}</span>
-            </div>
-            <p className="font-semibold text-lg">{profile?.full_name}</p>
-            <div className="flex items-center justify-center gap-1.5 mt-1">
-              <p className="text-sm text-gray-500 capitalize">{profile?.role}</p>
-              {profile?.availability && (
-                <Badge variant={profile.availability === "unavailable" || profile.availability === "busy" ? "closed" : "published"}>
-                  {AVAILABILITY_OPTIONS.find(o => o.value === profile.availability)?.label || profile.availability}
-                </Badge>
-              )}
-            </div>
-          </Card>
-
           {/* Basic Info */}
-          <Card padding="lg" className="space-y-4 mt-4 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-black/[0.02]">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Basic Info</h3>
+          <div className="card-base p-5 space-y-4">
+            <h3 className="text-xs font-semibold text-[#6B6B6B] uppercase tracking-wider">Basic Info</h3>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Full Name</label>
+              <label className="block text-xs font-medium text-[#6B6B6B] mb-1">Full Name</label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A1A1AA]" />
                 <input value={form.full_name} onChange={e => update("full_name", e.target.value)}
-                  className="w-full h-10 pl-9 pr-3 rounded-[14px] border border-gray-200/80 bg-white text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all" />
+                  className="w-full h-10 pl-9 pr-3 input-base focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488]/20" />
               </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Phone</label>
+              <label className="block text-xs font-medium text-[#6B6B6B] mb-1">Phone</label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A1A1AA]" />
                 <input value={form.phone} onChange={e => update("phone", e.target.value)} placeholder="9876543210"
-                  className="w-full h-10 pl-9 pr-3 rounded-[14px] border border-gray-200/80 bg-white text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all" />
+                  className="w-full h-10 pl-9 pr-3 input-base focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488]/20" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Age</label>
+                <label className="block text-xs font-medium text-[#6B6B6B] mb-1">Age</label>
                 <input type="number" value={form.age} onChange={e => update("age", e.target.value)}
-                  className="w-full h-10 px-3 rounded-[14px] border border-gray-200/80 bg-white text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all" />
+                  className="w-full h-10 px-3 input-base focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488]/20" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Gender</label>
+                <label className="block text-xs font-medium text-[#6B6B6B] mb-1">Gender</label>
                 <select value={form.gender} onChange={e => update("gender", e.target.value)}
-                  className="w-full h-10 px-3 rounded-[14px] border border-gray-200/80 bg-white text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all">
+                  className="w-full h-10 px-3 input-base focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488]/20">
                   <option value="">Select</option>
                   <option value="male">Male</option>
                   <option value="female">Female</option>
@@ -192,61 +193,61 @@ export default function WorkerProfilePage() {
               </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">City</label>
+              <label className="block text-xs font-medium text-[#6B6B6B] mb-1">City</label>
               <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A1A1AA]" />
                 <input value={form.city} onChange={e => update("city", e.target.value)} placeholder="Ahmedabad"
-                  className="w-full h-10 pl-9 pr-3 rounded-[14px] border border-gray-200/80 bg-white text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all" />
+                  className="w-full h-10 pl-9 pr-3 input-base focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488]/20" />
               </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Area</label>
+              <label className="block text-xs font-medium text-[#6B6B6B] mb-1">Area</label>
               <input value={form.area} onChange={e => update("area", e.target.value)} placeholder="e.g., Navrangpura"
-                className="w-full h-10 px-3 rounded-[14px] border border-gray-200/80 bg-white text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all" />
+                className="w-full h-10 px-3 input-base focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488]/20" />
             </div>
-          </Card>
+          </div>
 
           {/* Work Info */}
-          <Card padding="lg" className="space-y-4 mt-4 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-black/[0.02]">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Work Info</h3>
+          <div className="card-base p-5 space-y-4 mt-4">
+            <h3 className="text-xs font-semibold text-[#6B6B6B] uppercase tracking-wider">Work Info</h3>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Skills (comma separated)</label>
+              <label className="block text-xs font-medium text-[#6B6B6B] mb-1">Skills (comma separated)</label>
               <div className="relative">
-                <Award className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Award className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A1A1AA]" />
                 <input value={form.skills} onChange={e => update("skills", e.target.value)}
                   placeholder="e.g., Promotion, Event setup, Crowd management"
-                  className="w-full h-10 pl-9 pr-3 rounded-[14px] border border-gray-200/80 bg-white text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all" />
+                  className="w-full h-10 pl-9 pr-3 input-base focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488]/20" />
               </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Experience</label>
+              <label className="block text-xs font-medium text-[#6B6B6B] mb-1">Experience</label>
               <div className="relative">
-                <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A1A1AA]" />
                 <input value={form.experience} onChange={e => update("experience", e.target.value)}
                   placeholder="e.g., 2 years in event management"
-                  className="w-full h-10 pl-9 pr-3 rounded-[14px] border border-gray-200/80 bg-white text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all" />
+                  className="w-full h-10 pl-9 pr-3 input-base focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488]/20" />
               </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Availability</label>
+              <label className="block text-xs font-medium text-[#6B6B6B] mb-1">Availability</label>
               <div className="relative">
-                <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A1A1AA]" />
                 <select value={form.availability} onChange={e => update("availability", e.target.value)}
-                  className="w-full h-10 pl-9 pr-3 rounded-[14px] border border-gray-200/80 bg-white text-sm appearance-none outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all">
+                  className="w-full h-10 pl-9 pr-3 input-base appearance-none focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488]/20">
                   {AVAILABILITY_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">About / Bio</label>
+              <label className="block text-xs font-medium text-[#6B6B6B] mb-1">About / Bio</label>
               <textarea value={form.bio} onChange={e => update("bio", e.target.value)}
                 placeholder="Tell organizers about yourself..."
-                className="w-full h-24 px-3 py-2 rounded-[14px] border border-gray-200/80 bg-white text-sm resize-none outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 transition-all" />
+                className="w-full h-24 px-3 py-2 input-base resize-none focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488]/20" />
             </div>
-          </Card>
+          </div>
 
           <div className="mt-4">
-            <Button type="submit" size="lg" loading={saving} icon={<Save className="w-4 h-4" />} className="w-full">
+            <Button type="submit" size="lg" loading={saving} icon={<Save className="w-4 h-4" />} className="w-full btn-primary">
               {saving ? "Saving..." : "Save Profile"}
             </Button>
           </div>

@@ -117,34 +117,31 @@ function computePriorityScore(event: any): number {
 
 function SkeletonCard() {
   return (
-    <div className="card-base overflow-hidden">
-      <div className="px-4 pt-3.5 pb-2 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-[14px] bg-gray-200 animate-pulse" />
-          <div className="space-y-1.5">
-            <div className="w-28 h-3 rounded bg-gray-200 animate-pulse" />
-            <div className="w-20 h-2.5 rounded bg-gray-100 animate-pulse" />
-          </div>
+    <div className="card-base rounded-[16px] overflow-hidden">
+      <div className="px-4 pt-3.5 pb-2 flex items-center gap-3">
+        <div className="w-8 h-8 rounded-[10px] bg-gray-200 animate-pulse shrink-0" />
+        <div className="flex-1 space-y-1.5">
+          <div className="w-28 h-3 rounded bg-gray-200 animate-pulse" />
+          <div className="w-20 h-2.5 rounded bg-gray-100 animate-pulse" />
         </div>
-        <div className="w-14 h-5 rounded-[14px] bg-gray-200 animate-pulse" />
+        <div className="w-16 h-5 rounded-[10px] bg-gray-200 animate-pulse" />
       </div>
-      <div className="px-4 py-2 space-y-3">
-        <div className="flex gap-1.5">
-          <div className="w-16 h-5 rounded-[14px] bg-gray-100 animate-pulse" />
-          <div className="w-20 h-5 rounded-[14px] bg-gray-100 animate-pulse" />
+      <div className="px-4 py-1">
+        <div className="flex gap-1.5 mb-3">
+          <div className="w-16 h-5 rounded-[10px] bg-gray-100 animate-pulse" />
+          <div className="w-20 h-5 rounded-[10px] bg-gray-100 animate-pulse" />
         </div>
-        <div className="w-3/4 h-5 rounded bg-gray-200 animate-pulse" />
-        <div className="w-32 h-7 rounded-[14px] bg-gray-100 animate-pulse" />
-        <div className="w-full h-3 rounded bg-gray-100 animate-pulse" />
-        <div className="w-full h-2 rounded-full bg-gray-100 animate-pulse" />
-        <div className="flex gap-1.5">
-          <div className="w-14 h-5 rounded-[14px] bg-gray-100 animate-pulse" />
-          <div className="w-16 h-5 rounded-[14px] bg-gray-100 animate-pulse" />
+        <div className="w-3/4 h-5 rounded bg-gray-200 animate-pulse mb-3" />
+        <div className="w-32 h-7 rounded bg-gray-100 animate-pulse mb-3" />
+        <div className="w-full h-3 rounded bg-gray-100 animate-pulse mb-2" />
+        <div className="flex gap-1.5 mb-3">
+          <div className="w-14 h-5 rounded-[10px] bg-gray-100 animate-pulse" />
+          <div className="w-16 h-5 rounded-[10px] bg-gray-100 animate-pulse" />
         </div>
+        <div className="w-full h-1.5 rounded-full bg-gray-100 animate-pulse" />
       </div>
-      <div className="h-px bg-gray-100 mx-4" />
-      <div className="px-4 py-3 flex justify-end">
-        <div className="w-28 h-10 rounded-[14px] bg-gray-200 animate-pulse" />
+      <div className="px-4 py-3">
+        <div className="w-full h-10 rounded-[10px] bg-gray-200 animate-pulse" />
       </div>
     </div>
   );
@@ -360,25 +357,27 @@ function DashboardContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f5f5f7]">
-        <header className="sticky top-0 bg-white/80 backdrop-blur-2xl border-b border-gray-200/60 z-20">
+      <div className="min-h-screen bg-[#F8F8F6]">
+        <header className="sticky top-0 bg-white backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-20">
           <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-[14px] bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
+              <div className="w-8 h-8 rounded-[14px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-sm">
                 <Zap className="w-4 h-4 text-white" />
               </div>
               <div>
-                <Logo size="sm" />
-                <p className="text-[10px] text-gray-400 -mt-0.5">Find work near you</p>
+                <div className="text-sm font-bold text-[#1A1A1A]">EventMan</div>
               </div>
             </div>
-            <div className="w-7 h-7 rounded-full bg-gray-200 animate-pulse" />
-            <div className="w-7 h-7 rounded-full bg-gray-200 animate-pulse" />
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-full bg-gray-200 animate-pulse" />
+              <div className="w-7 h-7 rounded-full bg-gray-200 animate-pulse" />
+              <div className="w-7 h-7 rounded-full bg-gray-200 animate-pulse" />
+            </div>
           </div>
         </header>
         <main className="max-w-lg mx-auto px-4 py-4 pb-28 space-y-4">
-          <div className="w-full h-24 rounded-[18px] bg-gradient-to-br from-gray-200 to-gray-100 animate-pulse" />
-          <div className="w-full h-11 rounded-[18px] bg-gray-200 animate-pulse" />
+          <div className="w-full h-24 rounded-[16px] bg-gradient-to-br from-teal-200 to-teal-100 animate-pulse" />
+          <div className="w-full h-11 rounded-[10px] bg-gray-200 animate-pulse" />
           <SkeletonCard />
           <SkeletonCard />
           <SkeletonCard />
@@ -388,129 +387,95 @@ function DashboardContent() {
 }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7]">
+    <div className="min-h-screen bg-[#F8F8F6]">
       {/* Header */}
-      <header className="sticky top-0 bg-gradient-to-r from-indigo-50/95 to-white/95 backdrop-blur-xl border-b border-indigo-100/80 z-20">
-        {/* Accent bar */}
-        <div className="h-0.5 bg-gradient-to-r from-indigo-600 via-indigo-500 to-indigo-400" />
+      <header className="sticky top-0 bg-white backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-20">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-[14px] bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-indigo-200/40">
+            <div className="w-8 h-8 rounded-[10px] bg-[#0D9488] flex items-center justify-center shadow-sm">
               <Zap className="w-4 h-4 text-white" />
             </div>
-            <div>
-              <div className="text-indigo-700 font-bold text-sm leading-tight">EventMan</div>
-              <p className="text-[10px] text-indigo-400 -mt-0.5 font-medium">Find work near you</p>
-            </div>
+            <div className="text-[#1A1A1A] font-bold text-sm">EventMan</div>
           </div>
-          <div className="flex items-center gap-0.5">
+          <div className="flex items-center gap-1.5">
             {profile && (
               <>
-                <Link href="/worker/notifications" className="btn-base relative p-2 text-gray-400 hover:text-gray-600 rounded-[14px] hover:bg-gray-100 transition-colors">
+                <Link href="/worker/notifications" className="btn-base relative p-2 text-[#6B6B6B] hover:text-[#1A1A1A] rounded-[10px] hover:bg-gray-100 transition-colors">
                   <Bell className="w-4 h-4" />
                   {unreadNotifCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
+                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center shadow-sm">
                       {unreadNotifCount > 9 ? "9+" : unreadNotifCount}
                     </span>
                   )}
                 </Link>
-                <Link href="/worker/profile" className="btn-base relative flex items-center gap-2 p-1.5 hover:bg-gray-100 rounded-[14px] transition-colors">
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center text-white font-bold text-[11px] shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
+                <Link href="/worker/profile" className="btn-base relative flex items-center gap-2 p-1 hover:bg-gray-100 rounded-[10px] transition-colors">
+                  <div className="w-7 h-7 rounded-full bg-[#0D9488] flex items-center justify-center text-white font-bold text-[11px] shadow-sm">
                     {profile.full_name?.charAt(0) || "W"}
                   </div>
                   {profile.availability && AVAIL_CONFIG[profile.availability] && (
                     <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-[1.5px] border-white ${AVAIL_CONFIG[profile.availability].dot}`} />
                   )}
                 </Link>
+                <button onClick={signOut} className="btn-base p-2 text-[#6B6B6B] hover:text-[#1A1A1A] rounded-[10px] hover:bg-gray-100 transition-colors">
+                  <LogOut className="w-4 h-4" />
+                </button>
               </>
             )}
-            <button onClick={signOut} className="btn-base p-2 text-gray-400 hover:text-gray-600 rounded-[14px] hover:bg-gray-100 transition-colors">
-              <LogOut className="w-4 h-4" />
-            </button>
           </div>
         </div>
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-4 pb-28">
         {/* Subscription status banner */}
-        {profile && profile.plan_status && (
-          <div className={`mb-3 rounded-[14px] px-4 py-3 flex items-center justify-between ${
-            profile.plan_status === "active"
-              ? "bg-emerald-50 border border-emerald-200"
-              : profile.plan_status === "trial"
-                ? "bg-indigo-50 border border-indigo-200"
-              : "bg-amber-50 border border-amber-200"
-          }`}>
-            <div className="flex items-center gap-2">
+          {profile && profile.plan_status && (
+            <div className={`mb-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold ${
+              profile.plan_status === "active"
+                ? "bg-emerald-100 text-emerald-700"
+                : profile.plan_status === "trial"
+                  ? "bg-teal-100 text-teal-700"
+                : "bg-amber-100 text-amber-700"
+            }`}>
               {profile.plan_status === "active" ? (
-                <CreditCard className="w-4 h-4 text-emerald-600" />
+                <><CreditCard className="w-3 h-3" /> Active Plan</>
               ) : profile.plan_status === "trial" ? (
-                <Clock className="w-4 h-4 text-indigo-700" />
+                <><Clock className="w-3 h-3" /> Free Trial {profile.trial_end_date ? `· ${Math.ceil((new Date(profile.trial_end_date).getTime() - Date.now()) / 86400000)}d left` : ""}</>
               ) : (
-                <AlertCircle className="w-4 h-4 text-amber-600" />
+                <><AlertCircle className="w-3 h-3" /> Plan Expired <Link href="/worker/plans" className="underline ml-1">Renew</Link></>
               )}
-              <div>
-                <p className={`text-xs font-semibold ${
-                  profile.plan_status === "active" ? "text-emerald-800" : profile.plan_status === "trial" ? "text-indigo-700" : "text-amber-800"
-                }`}>
-                  {profile.plan_status === "active" ? "Subscription Active" : profile.plan_status === "trial" ? "Free Trial" : "Plan Expired"}
-                </p>
-                {profile.plan_status === "trial" && profile.trial_end_date && (
-                  <p className={`text-[10px] ${profile.plan_status === "trial" ? "text-indigo-600" : ""}`}>
-                    {Math.ceil((new Date(profile.trial_end_date).getTime() - Date.now()) / 86400000)} days remaining
-                  </p>
+            </div>
+          )}
+        {/* Welcome banner */}
+          {profile && tab === "browse" && browseEvents.length > 0 && (
+            <div className="mb-3 bg-gradient-to-br from-[#0D9488] to-teal-800 rounded-[16px] p-5 text-white shadow-lg relative overflow-hidden">
+              <div className="absolute -top-6 -right-6 w-32 h-32 rounded-full bg-white/5" />
+              <div className="absolute -bottom-6 -left-6 w-20 h-20 rounded-full bg-white/5" />
+              <p className="text-sm opacity-90">Hey <span className="font-semibold">{profile.full_name?.split(" ")[0] || "there"}</span></p>
+              <p className="text-xl font-bold mt-0.5">{browseEvents.length} event{browseEvents.length !== 1 ? "s" : ""} available</p>
+              <div className="flex items-center gap-2 mt-2">
+                {profile.availability && AVAIL_CONFIG[profile.availability] ? (
+                  <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2.5 py-1 rounded-[10px] bg-white/20 text-white`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${AVAIL_CONFIG[profile.availability].dot}`} />
+                    {AVAIL_CONFIG[profile.availability].label}
+                  </span>
+                ) : (
+                  <Link href="/worker/profile" className="text-[10px] opacity-75 underline">Set your availability</Link>
                 )}
-                {profile.plan_status === "active" && profile.subscription_end_date && (
-                  <p className="text-[10px] text-emerald-600">
-                    Expires {new Date(profile.subscription_end_date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
-                  </p>
-                )}
+                {profile.availability === "busy" && <span className="text-[10px] opacity-75">— you&apos;re marked as unavailable</span>}
               </div>
             </div>
-            {profile.plan_status === "expired" && (
-              <Link href="/worker/plans" className="btn-base text-[10px] font-semibold text-amber-700 bg-amber-100 px-3 py-1 rounded-[14px] hover:bg-amber-200 transition-colors">
-                Renew
-              </Link>
-            )}
-            {(profile.plan_status === "trial" || profile.plan_status === "active") && (
-              <Link href="/worker/plans" className="text-[10px] font-medium text-gray-500 hover:text-gray-700 transition-colors">
-                Details
-              </Link>
-            )}
-          </div>
-        )}
-        {/* Welcome banner */}
-        {profile && tab === "browse" && browseEvents.length > 0 && (
-          <div className="mb-3 bg-indigo-700 rounded-[18px] p-4 text-white shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-indigo-200/30 relative overflow-hidden">
-            <div className="absolute -top-4 -right-4 w-24 h-24 rounded-full bg-white/5" />
-            <div className="absolute -bottom-4 -left-4 w-16 h-16 rounded-full bg-white/5" />
-            <p className="text-sm opacity-90">Hey <span className="font-semibold">{profile.full_name?.split(" ")[0] || "there"}</span></p>
-            <p className="text-lg font-bold mt-0.5">{browseEvents.length} event{browseEvents.length !== 1 ? "s" : ""} available</p>
-            <div className="flex items-center gap-2 mt-1.5">
-              {profile.availability && AVAIL_CONFIG[profile.availability] ? (
-                <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-lg bg-white/20 text-white`}>
-                  <span className={`w-1.5 h-1.5 rounded-full ${AVAIL_CONFIG[profile.availability].dot}`} />
-                  {AVAIL_CONFIG[profile.availability].label}
-                </span>
-              ) : (
-                <Link href="/worker/profile" className="text-[10px] opacity-75 underline">Set your availability</Link>
-              )}
-              {profile.availability === "busy" && <span className="text-[10px] opacity-75">— you&apos;re marked as unavailable</span>}
-            </div>
-          </div>
-        )}
+          )}
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-4 bg-white/95 backdrop-blur-xl rounded-[14px] p-1 border border-indigo-100/60 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-indigo-200/10">
+        <div className="flex gap-1.5 mb-4 bg-gray-100/80 rounded-[10px] p-1">
           <button onClick={() => setTab("browse")}
-            className={`btn-base flex-1 h-10 rounded-[14px] text-sm font-medium transition-all ${
-              tab === "browse" ? "bg-indigo-700 text-white shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]" : "text-gray-500 hover:text-gray-800"
+            className={`btn-base flex-1 h-9 rounded-[10px] text-sm font-medium transition-all ${
+              tab === "browse" ? "bg-white text-[#0D9488] shadow-sm" : "text-[#6B6B6B] hover:text-[#1A1A1A]"
             }`}>
             Browse {browseEvents.length > 0 && `(${browseEvents.length})`}
           </button>
           <button onClick={() => setTab("applied")}
-            className={`btn-base flex-1 h-10 rounded-[14px] text-sm font-medium transition-all ${
-              tab === "applied" ? "bg-indigo-700 text-white shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]" : "text-gray-500 hover:text-gray-800"
+            className={`btn-base flex-1 h-9 rounded-[10px] text-sm font-medium transition-all ${
+              tab === "applied" ? "bg-white text-[#0D9488] shadow-sm" : "text-[#6B6B6B] hover:text-[#1A1A1A]"
             }`}>
             Applied {appliedEvents.length > 0 && `(${appliedEvents.length})`}
           </button>
@@ -524,13 +489,13 @@ function DashboardContent() {
               <div className="mb-3 overflow-x-auto -mx-4 px-4 scrollbar-none">
                 <div className="flex gap-2 min-w-max pb-1">
                   <button onClick={() => setCategoryFilter("")}
-                    className={`btn-base h-9 px-4 rounded-[14px] text-xs font-medium transition-all whitespace-nowrap ${
-                      !categoryFilter ? "bg-indigo-700 text-white shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]" : "bg-white text-gray-600 border border-indigo-100/50 hover:border-indigo-200 hover:bg-indigo-50/50 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]"
+                    className={`btn-base h-8 px-3.5 rounded-[10px] text-xs font-medium transition-all whitespace-nowrap ${
+                      !categoryFilter ? "bg-[#0D9488] text-white shadow-sm" : "bg-white text-[#6B6B6B] border border-gray-200 hover:border-gray-300"
                     }`}>All</button>
                   {allCategories.map(cat => (
                     <button key={cat} onClick={() => setCategoryFilter(cat)}
-                      className={`btn-base h-9 px-4 rounded-[14px] text-xs font-medium capitalize transition-all whitespace-nowrap ${
-                        categoryFilter === cat ? "bg-indigo-700 text-white shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]" : "bg-white text-gray-600 border border-indigo-100/50 hover:border-indigo-200 hover:bg-indigo-50/50 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]"
+                      className={`btn-base h-8 px-3.5 rounded-[10px] text-xs font-medium capitalize transition-all whitespace-nowrap ${
+                        categoryFilter === cat ? "bg-[#0D9488] text-white shadow-sm" : "bg-white text-[#6B6B6B] border border-gray-200 hover:border-gray-300"
                       }`}>{CATEGORY_LABELS[cat] || cat.replace(/_/g, " ")}</button>
                   ))}
                 </div>
@@ -540,20 +505,20 @@ function DashboardContent() {
             {/* Empty state */}
             {browseEvents.length === 0 && (
               <div className="text-center py-16 px-4">
-                <div className="w-20 h-20 rounded-[22px] bg-gradient-to-br from-indigo-50 to-indigo-100 border border-indigo-200/60 flex items-center justify-center mx-auto mb-5 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-indigo-200/20">
-                  <Gauge className="w-9 h-9 text-indigo-400" />
+                <div className="w-20 h-20 rounded-[16px] bg-gradient-to-br from-teal-50 to-teal-100 flex items-center justify-center mx-auto mb-5">
+                  <Gauge className="w-9 h-9 text-[#0D9488]" />
                 </div>
-                <p className="text-lg font-bold text-gray-900">
+                <p className="text-lg font-bold text-[#1A1A1A]">
                   {categoryFilter ? "No events match this category" : "No events available"}
                 </p>
-                <p className="text-sm text-gray-500 mt-1.5 leading-relaxed max-w-xs mx-auto">
+                <p className="text-sm text-[#6B6B6B] mt-1.5 leading-relaxed max-w-xs mx-auto">
                   {categoryFilter
                     ? "Try a different category or clear the filter to see all opportunities"
                     : "New opportunities are added daily. Check back soon or adjust your preferences."}
                 </p>
                 {categoryFilter && (
-                  <button               onClick={() => setCategoryFilter("")}
-                    className="btn-base mt-5 h-11 px-6 rounded-[14px] bg-indigo-700 text-white text-sm font-semibold hover:bg-indigo-800 transition-all active:scale-[0.97]">
+                  <button onClick={() => setCategoryFilter("")}
+                    className="btn-base mt-5 h-11 px-6 rounded-[10px] bg-[#0D9488] text-white text-sm font-semibold hover:bg-teal-700 transition-all active:scale-[0.97]">
                     Clear filter
                   </button>
                 )}
@@ -603,10 +568,10 @@ function DashboardContent() {
 
                 return (
                   <Link key={event.id} href={`/worker/events/${event.id}`}
-                    className={`block card-elevated overflow-hidden hover:border-indigo-200 transition-all duration-300 active:scale-[0.99] animate-slide-up ${cardAccent} ${shadowBoost}`}
+                    className="block card-elevated overflow-hidden transition-all duration-300 active:scale-[0.99] animate-slide-up"
                     style={{ animationDelay: `${idx * 60}ms`, animationFillMode: "both" }}>
 
-                    {/* === INTELLIGENCE ACCENT BAR === */}
+                    {/* === ACCENT BAR === */}
                     <div className={`h-1 ${
                       isToday || hoursUntilEvent < 12
                         ? "bg-red-500"
@@ -615,244 +580,236 @@ function DashboardContent() {
                           : isFillingFast
                             ? "bg-amber-400"
                             : isTrusted
-                              ? "bg-indigo-600"
+                              ? "bg-[#0D9488]"
                               : isNew
-                                ? "bg-indigo-500"
+                                ? "bg-[#0D9488]"
                                 : "bg-gray-200"
                     }`} />
 
-                    {/* === PREMIUM TRUST STRIP === */}
-                    <div className={`px-4 pt-3.5 pb-2 flex items-center justify-between ${
-                      isVerified ? "bg-gradient-to-r from-indigo-50/60 via-indigo-50/30 to-transparent" : ""
-                    }`}>
-                      <div className="flex items-center gap-3 min-w-0 flex-1">
-                          <div className="relative shrink-0">
-                            {org?.avatar_url ? (
-                              <img src={org.avatar_url} alt="" className={`w-10 h-10 rounded-[14px] object-cover ring-2 shrink-0 ${
-                                isTrusted ? "ring-emerald-200" : "ring-gray-100"
-                              }`} />
-                            ) : (
-                            <div className={`w-10 h-10 rounded-[14px] flex items-center justify-center text-white font-bold text-sm shrink-0 ${
-                              isTrusted
-                                ? "bg-gradient-to-br from-emerald-500 to-teal-600"
-                                : "bg-gradient-to-br from-indigo-500 to-indigo-700"
-                            }`}>
-                              {org?.full_name?.charAt(0) || "O"}
-                            </div>
-                          )}
-                          {isTrusted && (
-                            <div className="absolute -bottom-1 -right-1 w-4.5 h-4.5 rounded-full bg-emerald-500 border-[2.5px] border-white flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
-                              <BadgeCheck className="w-2.5 h-2.5 text-white" />
-                            </div>
-                          )}
-                        </div>
-                          <div className="min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-sm font-bold text-gray-900 truncate">{org?.full_name || "Event Organizer"}</span>
-                            {isTrusted && (
-                              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.5 rounded-md shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
-                                <BadgeCheck className="w-2.5 h-2.5" />
-                                Trusted
-                              </span>
-                            )}
-                            {!isTrusted && isProfileVerified && (
-                              <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200/60 px-1.5 py-0.5 rounded-md shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
-                                <ShieldCheck className="w-2.5 h-2.5" />
-                                Verified
-                              </span>
-                            )}
+                    {/* === ORGANIZER ROW === */}
+                    <div className="px-4 pt-3.5 pb-2 flex items-center gap-3">
+                      <div className="relative shrink-0">
+                        {org?.avatar_url ? (
+                          <img src={org.avatar_url} alt="" className="w-8 h-8 rounded-[10px] object-cover ring-2 shrink-0 ring-gray-100" />
+                        ) : (
+                          <div className={`w-8 h-8 rounded-[10px] flex items-center justify-center text-white font-bold text-sm shrink-0 ${
+                            isTrusted
+                              ? "bg-gradient-to-br from-emerald-500 to-[#0D9488]"
+                              : "bg-gradient-to-br from-[#0D9488] to-teal-700"
+                          }`}>
+                            {org?.full_name?.charAt(0) || "O"}
                           </div>
-                          {(event.organizer_past_events ?? 0) > 0 && (
-                              <span className="text-[9px] text-gray-400 flex items-center gap-0.5">
-                                <CheckCircle className="w-2.5 h-2.5 text-gray-300" />
-                                {event.organizer_past_events} event{event.organizer_past_events !== 1 ? "s" : ""}
-                              </span>
-                            )}
+                        )}
+                        {isTrusted && (
+                          <div className="absolute -bottom-1 -right-1 w-4.5 h-4.5 rounded-full bg-[#0D9488] border-[2.5px] border-white flex items-center justify-center shadow-sm">
+                            <BadgeCheck className="w-2.5 h-2.5 text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-sm font-bold text-[#1A1A1A] truncate">{org?.full_name || "Event Organizer"}</span>
+                          {isTrusted && (
+                            <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-[#0D9488] bg-teal-50 px-1.5 py-0.5 rounded-[10px]">
+                              <BadgeCheck className="w-2.5 h-2.5" />
+                              Trusted
+                            </span>
+                          )}
+                          {!isTrusted && isProfileVerified && (
+                            <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-[#0D9488] bg-teal-50 px-1.5 py-0.5 rounded-[10px]">
+                              <ShieldCheck className="w-2.5 h-2.5" />
+                              Verified
+                            </span>
+                          )}
                         </div>
+                        {(event.organizer_past_events ?? 0) > 0 && (
+                          <span className="text-[10px] text-[#6B6B6B] flex items-center gap-0.5">
+                            <CheckCircle className="w-2.5 h-2.5 text-[#A1A1AA]" />
+                            {event.organizer_past_events} event{event.organizer_past_events !== 1 ? "s" : ""}
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
                         {event.category && (
-                          <span className={`text-[10px] font-semibold px-2.5 py-0.5 rounded-lg capitalize ${CATEGORY_COLORS[event.category] || "bg-gray-50 text-gray-600 border border-gray-200/60"}`}>
+                          <span className={`text-[10px] font-semibold px-2.5 py-0.5 rounded-[10px] capitalize ${CATEGORY_COLORS[event.category] || "bg-gray-50 text-[#6B6B6B]"}`}>
                             {CATEGORY_LABELS[event.category] || event.category}
                           </span>
                         )}
-                        {deadlinePassed && (
-                          <span className="text-[10px] font-semibold bg-gray-100/50 text-gray-500 px-2.5 py-0.5 rounded-lg border border-gray-200/60">
-                            Deadline Passed
-                          </span>
-                        )}
-                        {!deadlinePassed && isFull && (
-                          <span className="text-[10px] font-semibold bg-purple-50 text-purple-700 px-2.5 py-0.5 rounded-lg border border-purple-200/60">
-                            Full
-                          </span>
-                        )}
-                        {waitlisted && (
-                          <span className="text-[10px] font-semibold bg-purple-50 text-purple-700 px-2.5 py-0.5 rounded-lg border border-purple-200/60">
-                            Waitlisted
-                          </span>
-                        )}
                         {isNewlyPosted && (
-                          <span className="text-[10px] font-semibold bg-indigo-700 text-white px-2.5 py-0.5 rounded-lg animate-pulse">
+                          <span className="text-[10px] font-semibold bg-[#0D9488] text-white px-2.5 py-0.5 rounded-[10px] animate-pulse">
                             New
                           </span>
                         )}
                         {!isNewlyPosted && isNew && !deadlinePassed && (
-                          <span className="text-[10px] font-semibold bg-indigo-700 text-white px-2.5 py-0.5 rounded-lg">
+                          <span className="text-[10px] font-semibold bg-[#0D9488] text-white px-2.5 py-0.5 rounded-[10px]">
                             New
                           </span>
                         )}
+                        {deadlinePassed && (
+                          <span className="text-[10px] font-semibold bg-gray-100 text-[#A1A1AA] px-2.5 py-0.5 rounded-[10px]">
+                            Deadline Passed
+                          </span>
+                        )}
+                        {!deadlinePassed && isFull && (
+                          <span className="text-[10px] font-semibold bg-purple-50 text-purple-700 px-2.5 py-0.5 rounded-[10px]">
+                            Full
+                          </span>
+                        )}
+                        {waitlisted && (
+                          <span className="text-[10px] font-semibold bg-purple-50 text-purple-700 px-2.5 py-0.5 rounded-[10px]">
+                            Waitlisted
+                          </span>
+                        )}
                       </div>
                     </div>
 
-                    {/* === MAIN CONTENT === */}
-                    <div className="px-4 py-2">
-                      {/* Intelligence badges row */}
-                      <div className="flex flex-wrap gap-1.5 mb-2">
-                        {isToday && (
-                          <EventBadge variant="red" pulse><Flame className="w-3 h-3" /> Starts Today</EventBadge>
-                        )}
-                        {daysUntil === 1 && !isToday && (
-                          <EventBadge variant="amber"><Clock3 className="w-3 h-3" /> Starts Tomorrow</EventBadge>
-                        )}
-                        {isUrgent && !isToday && daysUntil !== 1 && (
-                          <EventBadge variant="amber"><Clock3 className="w-3 h-3" /> {daysUntil} days away</EventBadge>
-                        )}
-                        {isFillingFast && !isNearlyFull && (
-                          <EventBadge variant="orange"><TrendingUp className="w-3 h-3" /> Filling Fast</EventBadge>
-                        )}
-                        {isNearlyFull && (
-                          <EventBadge variant="red" pulse><Users className="w-3 h-3" /> Only {remaining} Left</EventBadge>
-                        )}
-                        {deadlineToday && (
-                          <EventBadge variant="red" pulse><AlertCircle className="w-3 h-3" /> Deadline Today</EventBadge>
-                        )}
-                        {deadlineSoon && !deadlineToday && (
-                          <EventBadge variant="amber"><Clock className="w-3 h-3" /> Deadline Soon</EventBadge>
-                        )}
-                        {isHighDemand && (
-                          <EventBadge variant="purple"><Flame className="w-3 h-3" /> High Demand</EventBadge>
-                        )}
-                        {isPopular && !isHighDemand && (
-                          <EventBadge variant="purple"><TrendingUp className="w-3 h-3" /> Popular</EventBadge>
-                        )}
-                      </div>
-
-                      {/* Event title */}
-                      <h3 className="font-bold text-base leading-snug text-gray-900 mb-2">{event.title}</h3>
-
-                      {/* Payment — HERO */}
-                      {event.payment_info && (
-                        <div className="mb-2.5">
-                          <div className="inline-flex items-center gap-1.5 bg-emerald-50 border border-emerald-200/60 rounded-lg px-3 py-1.5">
-                            <IndianRupee className="w-4 h-4 text-emerald-600" />
-                            <span className="text-base font-bold text-emerald-700">{event.payment_info}</span>
-                          </div>
-                        </div>
+                    {/* === INTELLIGENCE BADGES ROW === */}
+                    <div className="px-4 py-1 flex flex-wrap gap-1.5">
+                      {isToday && (
+                        <EventBadge variant="red" pulse><Flame className="w-3 h-3" /> Starts Today</EventBadge>
                       )}
-
-                      {/* Date / Time / Location */}
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-600 mb-3">
-                        <div className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 shrink-0 text-gray-400" />
-                          <span>{event.date_display || new Date(event.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <Clock className="w-3.5 h-3.5 shrink-0 text-gray-400" />
-                          <span>{event.time}{event.end_time ? `-${event.end_time}` : ""}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 truncate max-w-[200px]">
-                          <MapPin className="w-3.5 h-3.5 shrink-0 text-gray-400" />
-                          <span className="truncate">{event.location}</span>
-                        </div>
-                      </div>
-
-                      {/* Seats progress */}
-                      <div className="mb-2.5">
-                        <div className="flex items-center justify-between text-xs mb-1.5">
-                          <div className="flex items-center gap-1.5">
-                            <Users className="w-3.5 h-3.5 text-gray-400" />
-                            <span className={`font-medium ${remaining === 0 ? "text-red-600" : remaining <= 3 ? "text-amber-600" : "text-gray-700"}`}>
-                              {remaining} of {event.worker_count} remaining
-                            </span>
-                          </div>
-                          <span className="text-gray-400">{fillPercent}% filled</span>
-                        </div>
-                        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full transition-all duration-700 ease-out ${
-                              fillPercent >= 80 ? "bg-red-500" : fillPercent >= 50 ? "bg-amber-500" : "bg-indigo-600"
-                            } ${isNearlyFull ? "animate-pulse" : ""}`}
-                            style={{ width: `${Math.max(2, fillPercent)}%` }}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Requirement chips */}
-                      <div className="flex flex-wrap gap-1.5">
-                        {event.gender_requirement && (
-                          <span className="text-[10px] font-medium bg-gray-50 text-gray-600 px-2.5 py-0.5 rounded-lg border border-gray-200/60 capitalize">{event.gender_requirement}</span>
-                        )}
-                        {(event.min_age || event.max_age) && (
-                          <span className="text-[10px] font-medium bg-gray-50 text-gray-600 px-2.5 py-0.5 rounded-lg border border-gray-200/60">{event.min_age || 0}-{event.max_age || 99} yrs</span>
-                        )}
-                        {event.food_included && (
-                          <span className="text-[10px] font-medium bg-green-50 text-green-700 px-2.5 py-0.5 rounded-lg border border-green-200/60 flex items-center gap-1">
-                            <UtensilsCrossed className="w-3 h-3" /> Food
-                          </span>
-                        )}
-                        {event.travel_included && (
-                          <span className="text-[10px] font-medium bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-lg border border-indigo-200/60 flex items-center gap-1">
-                            <Car className="w-3 h-3" /> Travel
-                          </span>
-                        )}
-                        {event.dress_code && (
-                          <span className="text-[10px] font-medium bg-gray-50 text-gray-600 px-2.5 py-0.5 rounded-lg border border-gray-200/60">{event.dress_code}</span>
-                        )}
-                        {event.skill_requirements && event.skill_requirements.length > 0 && (
-                          <span className="text-[10px] font-medium bg-violet-50 text-violet-700 px-2.5 py-0.5 rounded-lg border border-violet-200/60">
-                            {event.skill_requirements.slice(0, 2).join(", ")}{event.skill_requirements.length > 2 ? ` +${event.skill_requirements.length - 2}` : ""}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Application deadline countdown */}
-                      {event.application_deadline && (
-                        <div className="mt-2 flex items-center gap-1 text-[10px] text-gray-500">
-                          <Clock className="w-3 h-3" />
-                          Apply by {new Date(event.application_deadline).toLocaleDateString("en-IN", { day: "numeric", month: "short" })} ·
-                          <CountdownTimer targetDate={event.application_deadline} />
-                        </div>
+                      {daysUntil === 1 && !isToday && (
+                        <EventBadge variant="amber"><Clock3 className="w-3 h-3" /> Starts Tomorrow</EventBadge>
+                      )}
+                      {isUrgent && !isToday && daysUntil !== 1 && (
+                        <EventBadge variant="amber"><Clock3 className="w-3 h-3" /> {daysUntil} days away</EventBadge>
+                      )}
+                      {isFillingFast && !isNearlyFull && (
+                        <EventBadge variant="orange"><TrendingUp className="w-3 h-3" /> Filling Fast</EventBadge>
+                      )}
+                      {isNearlyFull && (
+                        <EventBadge variant="red" pulse><Users className="w-3 h-3" /> Only {remaining} Left</EventBadge>
+                      )}
+                      {deadlineToday && (
+                        <EventBadge variant="red" pulse><AlertCircle className="w-3 h-3" /> Deadline Today</EventBadge>
+                      )}
+                      {deadlineSoon && !deadlineToday && (
+                        <EventBadge variant="amber"><Clock className="w-3 h-3" /> Deadline Soon</EventBadge>
+                      )}
+                      {isHighDemand && (
+                        <EventBadge variant="purple"><Flame className="w-3 h-3" /> High Demand</EventBadge>
+                      )}
+                      {isPopular && !isHighDemand && (
+                        <EventBadge variant="purple"><TrendingUp className="w-3 h-3" /> Popular</EventBadge>
                       )}
                     </div>
 
-                    {/* === DIVIDER === */}
-                    <div className="h-px bg-indigo-100/50 mx-4" />
+                    {/* === EVENT TITLE === */}
+                    <div className="px-4 mt-1">
+                      <h3 className="font-bold text-[16px] leading-snug text-[#1A1A1A]">{event.title}</h3>
+                    </div>
+
+                    {/* === PAYMENT === */}
+                    {event.payment_info && (
+                      <div className="px-4 mt-1.5">
+                        <div className="inline-flex items-center gap-1">
+                          <IndianRupee className="w-5 h-5 text-emerald-600" />
+                          <span className="text-lg font-bold text-emerald-700">{event.payment_info}</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* === DATE / TIME / LOCATION === */}
+                    <div className="px-4 mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#6B6B6B]">
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5 shrink-0 text-[#A1A1AA]" />
+                        <span>{event.date_display || new Date(event.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 shrink-0 text-[#A1A1AA]" />
+                        <span>{event.time}{event.end_time ? `-${event.end_time}` : ""}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 truncate max-w-[200px]">
+                        <MapPin className="w-3.5 h-3.5 shrink-0 text-[#A1A1AA]" />
+                        <span className="truncate">{event.location}</span>
+                      </div>
+                    </div>
+
+                    {/* === REQUIREMENTS CHIPS === */}
+                    <div className="px-4 mt-3 flex flex-wrap gap-1.5">
+                      {event.gender_requirement && (
+                        <span className="text-[10px] font-medium bg-gray-50 text-[#6B6B6B] px-2.5 py-0.5 rounded-[10px] capitalize">{event.gender_requirement}</span>
+                      )}
+                      {(event.min_age || event.max_age) && (
+                        <span className="text-[10px] font-medium bg-gray-50 text-[#6B6B6B] px-2.5 py-0.5 rounded-[10px]">{event.min_age || 0}-{event.max_age || 99} yrs</span>
+                      )}
+                      {event.food_included && (
+                        <span className="text-[10px] font-medium bg-green-50 text-green-700 px-2.5 py-0.5 rounded-[10px] flex items-center gap-1">
+                          <UtensilsCrossed className="w-3 h-3" /> Food
+                        </span>
+                      )}
+                      {event.travel_included && (
+                        <span className="text-[10px] font-medium bg-teal-50 text-[#0D9488] px-2.5 py-0.5 rounded-[10px] flex items-center gap-1">
+                          <Car className="w-3 h-3" /> Travel
+                        </span>
+                      )}
+                      {event.dress_code && (
+                        <span className="text-[10px] font-medium bg-gray-50 text-[#6B6B6B] px-2.5 py-0.5 rounded-[10px]">{event.dress_code}</span>
+                      )}
+                      {event.skill_requirements && event.skill_requirements.length > 0 && (
+                        <span className="text-[10px] font-medium bg-violet-50 text-violet-700 px-2.5 py-0.5 rounded-[10px]">
+                          {event.skill_requirements.slice(0, 2).join(", ")}{event.skill_requirements.length > 2 ? ` +${event.skill_requirements.length - 2}` : ""}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* === STAFFING PROGRESS === */}
+                    <div className="px-4 mt-3">
+                      <div className="flex items-center justify-between text-xs mb-1.5">
+                        <div className="flex items-center gap-1.5">
+                          <Users className="w-3.5 h-3.5 text-[#A1A1AA]" />
+                          <span className={`font-medium ${remaining === 0 ? "text-red-600" : remaining <= 3 ? "text-amber-600" : "text-[#6B6B6B]"}`}>
+                            {remaining} of {event.worker_count} remaining
+                          </span>
+                        </div>
+                        <span className="text-[#A1A1AA]">{fillPercent}% filled</span>
+                      </div>
+                      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-700 ease-out ${
+                            fillPercent >= 80 ? "bg-red-500" : fillPercent >= 50 ? "bg-amber-500" : "bg-[#0D9488]"
+                          } ${isNearlyFull ? "animate-pulse" : ""}`}
+                          style={{ width: `${Math.max(2, fillPercent)}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* === DEADLINE COUNTDOWN === */}
+                    {event.application_deadline && (
+                      <div className="px-4 mt-2 flex items-center gap-1 text-[10px] text-[#A1A1AA]">
+                        <Clock className="w-3 h-3" />
+                        Apply by {new Date(event.application_deadline).toLocaleDateString("en-IN", { day: "numeric", month: "short" })} ·
+                        <CountdownTimer targetDate={event.application_deadline} />
+                      </div>
+                    )}
 
                     {/* === CTA SECTION === */}
-                    <div className="px-4 py-3 flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-2 min-w-0">
-                        {event.total_applications && event.total_applications > 0 && (
-                          <span className="text-[10px] text-gray-400 flex items-center gap-1">
-                            <Users className="w-3 h-3" />
-                            {formatCount(event.total_applications)} applicant{event.total_applications !== 1 ? "s" : ""}
-                          </span>
-                        )}
-                        {hoursUntilEvent > 0 && hoursUntilEvent < 48 && !isToday && (
-                          <span className="text-[10px] text-gray-400 flex items-center gap-1">
-                            <Clock3 className="w-3 h-3" />
-                            In {hoursUntilEvent}h
-                          </span>
-                        )}
+                    <div className="px-4 py-3 flex flex-col gap-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 min-w-0">
+                          {event.total_applications && event.total_applications > 0 && (
+                            <span className="text-[10px] text-[#A1A1AA] flex items-center gap-1">
+                              <Users className="w-3 h-3" />
+                              {formatCount(event.total_applications)} applicant{event.total_applications !== 1 ? "s" : ""}
+                            </span>
+                          )}
+                          {hoursUntilEvent > 0 && hoursUntilEvent < 48 && !isToday && (
+                            <span className="text-[10px] text-[#A1A1AA] flex items-center gap-1">
+                              <Clock3 className="w-3 h-3" />
+                              In {hoursUntilEvent}h
+                            </span>
+                          )}
+                        </div>
                       </div>
                       {deadlinePassed ? (
-                        <div className="btn-base h-9 px-4 rounded-[14px] bg-gray-100 text-gray-400 text-xs font-semibold flex items-center gap-1.5">
+                        <div className="btn-base w-full h-10 rounded-[10px] bg-gray-100 text-[#A1A1AA] text-xs font-semibold flex items-center justify-center gap-1.5">
                           <Clock className="w-3.5 h-3.5" /> Applications Closed
                         </div>
                       ) : waitlisted ? (
                         <button
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); leaveWaitlist(event.application!); }}
                           disabled={applyingId === event.id}
-                          className="btn-base h-9 px-4 rounded-[14px] font-semibold text-xs flex items-center gap-1.5 transition-all active:scale-[0.97] shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] bg-purple-50 text-purple-700 border border-purple-200/60 hover:bg-purple-100">
+                          className="btn-base w-full h-10 rounded-[10px] font-semibold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-[0.97] bg-purple-50 text-purple-700 border border-purple-200/60 hover:bg-purple-100">
                           {applyingId === event.id ? (
                             <span className="w-3.5 h-3.5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
                           ) : (
@@ -862,14 +819,14 @@ function DashboardContent() {
                       ) : !canApply ? (
                         <Link href="/worker/plans"
                           onClick={(e) => { e.stopPropagation(); }}
-                          className="btn-base h-9 px-4 rounded-[14px] font-semibold text-xs flex items-center gap-1.5 bg-amber-600 text-white hover:bg-amber-700 transition-all active:scale-[0.97]">
+                          className="btn-base w-full h-10 rounded-[10px] font-semibold text-xs flex items-center justify-center gap-1.5 bg-amber-600 text-white hover:bg-amber-700 transition-all active:scale-[0.97]">
                           <CreditCard className="w-3.5 h-3.5" /> Subscribe
                         </Link>
                       ) : isFull ? (
                         <button
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); joinWaitlist(event.id); }}
                           disabled={applyingId === event.id}
-                          className="btn-base h-9 px-4 rounded-[14px] font-semibold text-xs flex items-center gap-1.5 transition-all active:scale-[0.97] disabled:opacity-60 bg-purple-600 text-white hover:bg-purple-700">
+                          className="btn-base w-full h-10 rounded-[10px] font-semibold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-[0.97] disabled:opacity-60 bg-purple-600 text-white hover:bg-purple-700">
                           {applyingId === event.id ? (
                             <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                           ) : (
@@ -880,19 +837,19 @@ function DashboardContent() {
                         <button
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); apply(event.id); }}
                           disabled={applyingId === event.id}
-                          className={`btn-base h-9 px-4 rounded-[14px] font-semibold text-xs flex items-center gap-1.5 transition-all active:scale-[0.97] disabled:opacity-60 ${
+                          className={`btn-base w-full h-10 rounded-[10px] font-semibold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-[0.97] disabled:opacity-60 ${
                             isToday || hoursUntilEvent < 12
                               ? "bg-red-600 text-white hover:bg-red-700"
                               : isNearlyFull
                                 ? "bg-amber-600 text-white hover:bg-amber-700"
-                                : "bg-indigo-700 text-white hover:bg-indigo-800"
+                                : "bg-[#0D9488] text-white hover:bg-teal-700"
                           }`}>
-                        {applyingId === event.id ? (
-                          <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <><ArrowUpRight className="w-3.5 h-3.5" /> {(event.application && (event.application.status === "cancelled" || event.application.status === "rejected")) ? "Re-apply" : "Apply"}</>
-                        )}
-                      </button>
+                          {applyingId === event.id ? (
+                            <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <><ArrowUpRight className="w-3.5 h-3.5" /> {(event.application && (event.application.status === "cancelled" || event.application.status === "rejected")) ? "Re-apply" : "Apply"}</>
+                          )}
+                        </button>
                       )}
                     </div>
                   </Link>
@@ -905,15 +862,15 @@ function DashboardContent() {
         {/* ========== APPLIED TAB ========== */}
         {tab === "applied" && appliedEvents.length === 0 && (
           <div className="text-center py-16 px-4">
-            <div className="w-20 h-20 rounded-[22px] bg-gradient-to-br from-indigo-50 to-indigo-100 border border-indigo-200/60 flex items-center justify-center mx-auto mb-5 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-indigo-200/20">
-              <Send className="w-9 h-9 text-indigo-400" />
+            <div className="w-20 h-20 rounded-[16px] bg-gradient-to-br from-teal-50 to-teal-100 flex items-center justify-center mx-auto mb-5">
+              <Send className="w-9 h-9 text-[#0D9488]" />
             </div>
-            <p className="text-lg font-bold text-gray-900">No applications yet</p>
-            <p className="text-sm text-gray-500 mt-2 leading-relaxed max-w-xs mx-auto">
+            <p className="text-lg font-bold text-[#1A1A1A]">No applications yet</p>
+            <p className="text-sm text-[#6B6B6B] mt-2 leading-relaxed max-w-xs mx-auto">
             You haven&apos;t applied to any events yet. Browse available opportunities and send your first application to get started.
             </p>
             <button onClick={() => setTab("browse")}
-              className="btn-base mt-6 h-11 px-6 rounded-[14px] bg-indigo-700 text-white text-sm font-semibold hover:bg-indigo-800 transition-all active:scale-[0.97]">
+              className="btn-base mt-6 h-11 px-6 rounded-[10px] bg-[#0D9488] text-white text-sm font-semibold hover:bg-teal-700 transition-all active:scale-[0.97]">
               Browse Events
             </button>
           </div>
@@ -934,15 +891,7 @@ function DashboardContent() {
 
               return (
                 <Link key={event.id} href={`/worker/events/${event.id}`}
-                  className={`block card-elevated overflow-hidden transition-all duration-300 active:scale-[0.99] animate-slide-up ${
-                    isWaitlisted(app)
-                      ? "border-purple-200/80 shadow-purple-500/5"
-                      : app.status === "approved"
-                        ? "border-emerald-200/80 shadow-emerald-500/5"
-                        : app.status === "rejected" || app.status === "cancelled"
-                          ? "border-gray-200/60 opacity-80"
-                          : "border-amber-200/60"
-                  }`}
+                  className="block card-elevated overflow-hidden transition-all duration-300 active:scale-[0.99] animate-slide-up"
                   style={{ animationDelay: `${idx * 50}ms`, animationFillMode: "both" }}>
 
                   {/* Accent bar — distinct per status */}
@@ -953,27 +902,25 @@ function DashboardContent() {
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="flex items-center gap-2.5 min-w-0 flex-1">
                         {org?.avatar_url ? (
-                          <img src={org.avatar_url} alt="" className={`w-10 h-10 rounded-[14px] object-cover ring-2 shrink-0 ${
-                            app.status === "approved" ? "ring-emerald-200" : "ring-gray-100"
-                          }`} />
+                          <img src={org.avatar_url} alt="" className="w-9 h-9 rounded-[10px] object-cover ring-2 shrink-0 ring-gray-100" />
                         ) : (
-                          <div className={`w-10 h-10 rounded-[14px] flex items-center justify-center font-bold text-sm shrink-0 ${
+                          <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center font-bold text-sm shrink-0 ${
                             app.status === "approved"
-                              ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white"
-                              : "bg-gradient-to-br from-indigo-500 to-indigo-700 text-white"
+                              ? "bg-gradient-to-br from-emerald-500 to-[#0D9488] text-white"
+                              : "bg-gradient-to-br from-[#0D9488] to-teal-700 text-white"
                           }`}>
                             {org?.full_name?.charAt(0) || "E"}
                           </div>
                         )}
                         <div className="min-w-0">
-                          <h3 className="font-semibold text-sm text-gray-900 truncate">{event.title}</h3>
-                          <div className="flex items-center gap-1.5 text-[10px] text-gray-500 mt-0.5">
+                          <h3 className="font-semibold text-sm text-[#1A1A1A] truncate">{event.title}</h3>
+                          <div className="flex items-center gap-1.5 text-[10px] text-[#6B6B6B] mt-0.5">
                             <MapPin className="w-3 h-3 shrink-0" />
                             <span className="truncate">{event.location}</span>
                           </div>
                         </div>
                       </div>
-                      <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold shrink-0 ${cfg.badge}`}>
+                      <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-[10px] text-xs font-semibold shrink-0 ${cfg.badge}`}>
                         <StatusIcon className="w-3.5 h-3.5" />
                         {cfg.label}
                       </div>
@@ -981,15 +928,15 @@ function DashboardContent() {
 
                     {/* Date/time chips */}
                     <div className="flex flex-wrap items-center gap-1.5 mb-2.5">
-                      <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-gray-50 text-[10px] text-gray-600">
+                      <div className="flex items-center gap-1 px-2 py-0.5 rounded-[10px] bg-gray-50 text-[10px] text-[#6B6B6B]">
                         <Calendar className="w-3 h-3" />
                         {event.date_display || event.date}
                       </div>
-                      <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-gray-50 text-[10px] text-gray-600">
+                      <div className="flex items-center gap-1 px-2 py-0.5 rounded-[10px] bg-gray-50 text-[10px] text-[#6B6B6B]">
                         <span>{event.time}</span>
                       </div>
                       {event.category && (
-                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-gray-50 text-[10px] text-gray-600 capitalize">
+                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-[10px] bg-gray-50 text-[10px] text-[#6B6B6B] capitalize">
                           {CATEGORY_LABELS[event.category] || event.category}
                         </div>
                       )}
@@ -1005,7 +952,7 @@ function DashboardContent() {
                       )}
                       {!event.payment_info && <div />}
                       {app.status !== "cancelled" && app.status !== "rejected" && (
-                        <div className={`flex items-center gap-1 text-xs font-medium ${isUrgent ? "text-red-600" : "text-gray-500"}`}>
+                        <div className={`flex items-center gap-1 text-xs font-medium ${isUrgent ? "text-red-600" : "text-[#6B6B6B]"}`}>
                           <Clock className="w-3.5 h-3.5" />
                           <span>
                             {hoursUntil <= 0
@@ -1028,8 +975,8 @@ function DashboardContent() {
                     {event.worker_count > 0 && (app.status === "pending" || app.status === "approved") && (
                       <div className="mb-3">
                         <div className="flex items-center justify-between text-xs mb-1">
-                          <span className="text-gray-400">Staffing</span>
-                          <span className="font-medium text-gray-500">{event.approved_count || 0}/{event.worker_count}</span>
+                          <span className="text-[#A1A1AA]">Staffing</span>
+                          <span className="font-medium text-[#6B6B6B]">{event.approved_count || 0}/{event.worker_count}</span>
                         </div>
                         <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                           <div className={`h-full rounded-full transition-all duration-500 ${
@@ -1048,10 +995,10 @@ function DashboardContent() {
                       <div className="space-y-2">
                         {/* Countdown banner */}
                         {hoursUntil > 0 && (
-                          <div className={`flex items-center gap-2 px-3 py-2 rounded-[14px] ${
+                          <div className={`flex items-center gap-2 px-3 py-2 rounded-[10px] ${
                             isUrgent
-                              ? "bg-red-50 text-red-700 border border-red-100"
-                              : "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                              ? "bg-red-50 text-red-700"
+                              : "bg-emerald-50 text-emerald-700"
                           }`}>
                             <Timer className={`w-4 h-4 ${isUrgent ? "animate-pulse" : ""}`} />
                             <span className="text-xs font-semibold">
@@ -1066,18 +1013,18 @@ function DashboardContent() {
 
                         {/* Contact information */}
                         {org?.phone && (
-                          <div className="flex items-center gap-2 px-3 py-2 rounded-[14px] bg-white border border-emerald-100">
+                          <div className="flex items-center gap-2 px-3 py-2 rounded-[10px] bg-white border border-emerald-100">
                             <Phone className="w-4 h-4 text-emerald-500 shrink-0" />
-                            <span className="text-xs font-medium text-gray-700">Contact:</span>
-                            <span className="text-xs font-semibold text-gray-900">{org.phone}</span>
+                            <span className="text-xs font-medium text-[#6B6B6B]">Contact:</span>
+                            <span className="text-xs font-semibold text-[#1A1A1A]">{org.phone}</span>
                           </div>
                         )}
 
                         {/* Reporting info */}
                         {event.reporting_details && (
-                          <div className="flex items-start gap-2 px-3 py-2 rounded-[14px] bg-gray-50 border border-gray-100">
-                            <Info className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
-                            <div className="text-xs text-gray-600 leading-relaxed">{event.reporting_details}</div>
+                          <div className="flex items-start gap-2 px-3 py-2 rounded-[10px] bg-gray-50 border border-gray-100">
+                            <Info className="w-4 h-4 text-[#A1A1AA] shrink-0 mt-0.5" />
+                            <div className="text-xs text-[#6B6B6B] leading-relaxed">{event.reporting_details}</div>
                           </div>
                         )}
                       </div>
@@ -1085,7 +1032,7 @@ function DashboardContent() {
 
                     {/* --- PENDING: Status message --- */}
                     {app.status === "pending" && (
-                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-[14px] bg-amber-50 border border-amber-100">
+                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-[10px] bg-amber-50">
                         <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0" />
                         <span className="text-xs text-amber-700 font-medium">{cfg.message}</span>
                       </div>
@@ -1094,20 +1041,20 @@ function DashboardContent() {
                     {/* --- REJECTED: Respectful message + reapply option --- */}
                     {app.status === "rejected" && (
                       <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2 px-3 py-2.5 rounded-[14px] bg-gray-50 border border-gray-100">
-                          <Info className="w-4 h-4 text-gray-400 shrink-0" />
-                          <span className="text-xs text-gray-600">{cfg.message}</span>
+                        <div className="flex items-center gap-2 px-3 py-2.5 rounded-[10px] bg-gray-50">
+                          <Info className="w-4 h-4 text-[#A1A1AA] shrink-0" />
+                          <span className="text-xs text-[#6B6B6B]">{cfg.message}</span>
                         </div>
-                        <div className="flex items-center gap-2 px-3 py-2 rounded-[14px] bg-indigo-50 border border-indigo-200">
-                          <ArrowUpRight className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                          <span className="text-xs text-indigo-700 font-medium">Browse other opportunities</span>
+                        <div className="flex items-center gap-2 px-3 py-2 rounded-[10px] bg-teal-50">
+                          <ArrowUpRight className="w-3.5 h-3.5 text-[#0D9488] shrink-0" />
+                          <span className="text-xs text-[#0D9488] font-medium">Browse other opportunities</span>
                         </div>
                       </div>
                     )}
 
                     {/* --- WAITLISTED: Calm purple info --- */}
                     {isWaitlisted(app) && (
-                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-[14px] bg-purple-50 border border-purple-100">
+                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-[10px] bg-purple-50">
                         <ListPlus className="w-4 h-4 text-purple-500 shrink-0" />
                         <span className="text-xs text-purple-700">On waitlist — may get a spot if someone drops out</span>
                       </div>
@@ -1115,7 +1062,7 @@ function DashboardContent() {
 
                     {/* --- REMOVED BY ORGANIZER --- */}
                     {isRemovedByOrganizer(app) && (
-                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-[14px] bg-red-50 border border-red-100">
+                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-[10px] bg-red-50">
                         <Info className="w-4 h-4 text-red-400 shrink-0" />
                         <span className="text-xs text-red-600">Removed by organizer — you can re-apply</span>
                       </div>
@@ -1123,18 +1070,18 @@ function DashboardContent() {
 
                     {/* --- CANCELLED: Clear neutral message --- */}
                     {app.status === "cancelled" && !isRemovedByOrganizer(app) && (
-                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-[14px] bg-gray-50 border border-gray-100">
-                        <Info className="w-4 h-4 text-gray-400 shrink-0" />
-                        <span className="text-xs text-gray-500">{cfg.message}</span>
+                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-[10px] bg-gray-50">
+                        <Info className="w-4 h-4 text-[#A1A1AA] shrink-0" />
+                        <span className="text-xs text-[#6B6B6B]">{cfg.message}</span>
                       </div>
                     )}
 
                     {/* Organizer info row */}
                     {org && !isWaitlisted(app) && app.status !== "cancelled" && app.status !== "rejected" && (
                       <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
-                        <span className="text-[10px] text-gray-400">by</span>
-                        <span className="text-xs text-gray-600 font-semibold truncate">{org.full_name}</span>
-                        {org.is_trusted_organizer && <ShieldCheck className="w-3 h-3 text-slate-500 shrink-0" />}
+                        <span className="text-[10px] text-[#A1A1AA]">by</span>
+                        <span className="text-xs text-[#6B6B6B] font-semibold truncate">{org.full_name}</span>
+                        {org.is_trusted_organizer && <BadgeCheck className="w-3 h-3 text-[#0D9488] shrink-0" />}
                       </div>
                     )}
                   </div>

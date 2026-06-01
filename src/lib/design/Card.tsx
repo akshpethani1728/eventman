@@ -50,11 +50,11 @@ export function CardHeader({ children, className = "" }: { children: React.React
 }
 
 export function CardTitle({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <h3 className={`font-semibold text-base text-gray-900 ${className}`}>{children}</h3>;
+  return <h3 className={`font-semibold text-[16px] text-[#1A1A1A] ${className}`}>{children}</h3>;
 }
 
 export function CardSection({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <div className={`border-t border-gray-100 pt-5 mt-5 space-y-4 ${className}`}>{children}</div>;
+  return <div className={`border-t border-[rgba(0,0,0,0.06)] pt-5 mt-5 space-y-4 ${className}`}>{children}</div>;
 }
 
 const GRID_COLS: Record<number, string> = { 2: "grid-cols-2", 3: "grid-cols-3", 4: "grid-cols-4" };
@@ -70,7 +70,7 @@ export function CardStats({ children, columns = 3 }: { children: React.ReactNode
 export function CardStat({ label, value, color = "gray" }: { label: string; value: React.ReactNode; color?: string }) {
   const colors: Record<string, string> = {
     gray: "text-gray-900",
-    blue: "text-indigo-700",
+    blue: "text-[#0D9488]",
     amber: "text-amber-600",
     red: "text-red-600",
     emerald: "text-emerald-600",
@@ -78,7 +78,7 @@ export function CardStat({ label, value, color = "gray" }: { label: string; valu
   };
   return (
     <div className="card-inner p-3.5 text-center">
-      <p className="text-[11px] font-medium text-gray-500">{label}</p>
+      <p className="text-[11px] font-medium text-[#6B6B6B]">{label}</p>
       <p className={`text-xl font-bold mt-1 ${colors[color] || colors.gray}`}>{value}</p>
     </div>
   );

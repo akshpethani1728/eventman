@@ -7,11 +7,11 @@ export function Logo({ showText = true, size = "sm", muted = false }: { showText
 
   return (
     <div className="flex items-center justify-center gap-2.5">
-      <div className={`flex items-center justify-center rounded-[14px] bg-gradient-to-br from-slate-800 to-slate-900 text-white shadow-[0_2px_8px_rgba(0,0,0,0.1)] ${iconSizes[size]}`}>
+      <div className={`flex items-center justify-center rounded-[10px] bg-gradient-to-br from-[#0D9488] to-[#0F766E] text-white shadow-[0_2px_12px_rgba(13,148,136,0.25)] ${iconSizes[size]}`}>
         <Briefcase className={iconInner[size]} />
       </div>
       {showText && (
-        <span className={`font-extrabold tracking-tight ${muted ? "text-gray-400" : "text-gray-900"} ${textSizes[size]}`}>
+        <span className={`font-extrabold tracking-tight ${muted ? "text-[#A1A1AA]" : "text-[#1A1A1A]"} ${textSizes[size]}`}>
           EventMan
         </span>
       )}

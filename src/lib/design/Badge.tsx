@@ -31,9 +31,9 @@ const DOT_COLORS: Record<string, string> = {
   green: "bg-emerald-500",
   amber: "bg-amber-500",
   red: "bg-red-500",
-  blue: "bg-indigo-600",
+  blue: "bg-[#0D9488]",
   purple: "bg-purple-500",
-  gray: "bg-gray-400",
+  gray: "bg-[#A1A1AA]",
 };
 
 export function StatusDot({ variant = "gray", pulse = false, className = "" }: StatusDotProps) {
@@ -43,5 +43,5 @@ export function StatusDot({ variant = "gray", pulse = false, className = "" }: S
 }
 
 export function Divider({ className = "" }: { className?: string }) {
-  return <div className={`h-px bg-gray-100/80 ${className}`} />;
+  return <div className={`h-px bg-[rgba(0,0,0,0.06)] ${className}`} />;
 }
