@@ -18,7 +18,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     <button
       ref={ref}
       disabled={disabled || loading}
-      className={`inline-flex items-center justify-center gap-2 ${BUTTON.font} ${BUTTON.radius} ${BUTTON.heights[size]} ${BUTTON.padding[size]} transition-all duration-200 ${VARIANTS[variant]} ${className}`}
+      className={`btn-base ${BUTTON.font} ${BUTTON.radius} ${BUTTON.heights[size]} ${BUTTON.padding[size]} ${VARIANTS[variant]} ${className}`}
       {...props}
     >
       {loading ? (
@@ -43,7 +43,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
     <button
       ref={ref}
       aria-label={label}
-      className={`inline-flex items-center justify-center shrink-0 rounded-2xl transition-all duration-200 ${VARIANTS[variant]} ${size === "sm" ? "w-9 h-9" : "w-11 h-11"} ${className}`}
+      className={`inline-flex items-center justify-center shrink-0 rounded-[14px] transition-all duration-200 ${VARIANTS[variant]} ${size === "sm" ? "w-9 h-9" : "w-11 h-11"} ${className}`}
       {...props}
     />
   )

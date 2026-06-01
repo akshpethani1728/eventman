@@ -206,7 +206,7 @@ export default function OrganizerDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center">
+      <div className="min-h-screen bg-[#f5f5f7] flex items-center justify-center">
         <div className="text-center animate-fade-in">
           <div className="w-10 h-10 border-2 border-indigo-700 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <div className="space-y-2">
@@ -219,13 +219,13 @@ export default function OrganizerDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white pb-28">
+    <div className="min-h-screen bg-[#f5f5f7] pb-28">
       {/* Header */}
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-gray-200/60 z-20">
         <div className="h-0.5 bg-gradient-to-r from-indigo-200 via-indigo-500 to-indigo-200" />
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center shadow-sm shadow-indigo-200">
+            <div className="w-8 h-8 rounded-[14px] bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-indigo-200">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
             <div>
@@ -234,18 +234,18 @@ export default function OrganizerDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-0.5">
-            <Link href="/organizer/notifications" className="p-2 text-gray-400 hover:text-indigo-600 rounded-xl hover:bg-indigo-50 transition-all relative">
+            <Link href="/organizer/notifications" className="p-2 text-gray-400 hover:text-indigo-600 rounded-[14px] hover:bg-indigo-50 transition-all relative">
               <Bell className="w-4 h-4" />
             </Link>
-            <Link href="/organizer/database" className="p-2 text-gray-400 hover:text-indigo-600 rounded-xl hover:bg-indigo-50 transition-all">
+            <Link href="/organizer/database" className="p-2 text-gray-400 hover:text-indigo-600 rounded-[14px] hover:bg-indigo-50 transition-all">
               <Search className="w-4 h-4" />
             </Link>
-            <Link href="/organizer/profile" className="flex items-center gap-2 p-1.5 hover:bg-indigo-50 rounded-xl transition-all ml-1">
-              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center text-white font-bold text-[11px] shadow-sm shadow-indigo-200">
+            <Link href="/organizer/profile" className="flex items-center gap-2 p-1.5 hover:bg-indigo-50 rounded-[14px] transition-all ml-1">
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center text-white font-bold text-[11px] shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-indigo-200">
                 {profile?.full_name?.charAt(0) || "O"}
               </div>
             </Link>
-            <button onClick={signOut} className="p-2 text-gray-400 hover:text-red-500 rounded-xl hover:bg-red-50 transition-all">
+            <button onClick={signOut} className="p-2 text-gray-400 hover:text-red-500 rounded-[14px] hover:bg-red-50 transition-all">
               <LogOut className="w-4 h-4" />
             </button>
           </div>
@@ -279,9 +279,9 @@ export default function OrganizerDashboard() {
             const valueSize = primary ? "text-3xl" : isAttention && hasAttention ? "text-3xl" : "text-2xl";
             const cardRing = isAttention && hasAttention ? "ring-2 ring-red-200/60" : "";
             return (
-              <div key={label} className={`bg-white rounded-3xl p-5 shadow-sm border border-gray-200/70 shadow-black/[0.03] active:scale-[0.98] transition-all duration-200 hover:shadow-lg group ${cardRing}`}>
+              <div key={label} className={`card-base p-5 active:scale-[0.98] transition-all duration-200 hover:shadow-lg group ${cardRing}`}>
                 <div className="flex items-start justify-between mb-3">
-                  <div className={`w-9 h-9 rounded-2xl ${iconBg} flex items-center justify-center ${iconCls} group-hover:scale-110 transition-transform duration-200 ${isAttention && hasAttention ? "animate-pulse-soft" : ""}`}>
+                  <div className={`w-9 h-9 rounded-[18px] ${iconBg} flex items-center justify-center ${iconCls} group-hover:scale-110 transition-transform duration-200 ${isAttention && hasAttention ? "animate-pulse-soft" : ""}`}>
                     <Icon className={`${primary ? "w-5 h-5" : "w-4 h-4"}`} />
                   </div>
                   <span className={`w-2 h-2 rounded-full ${dotCls}`} />
@@ -296,13 +296,13 @@ export default function OrganizerDashboard() {
         {/* Quick Actions */}
         <div className="flex gap-2 mb-5">
           <button onClick={() => { setCreateFromTemplate(null); setShowCreate(true); }}
-            className="flex-1 h-11 rounded-2xl bg-indigo-700 text-white text-sm font-semibold flex items-center justify-center gap-2 shadow-sm shadow-indigo-200 active:scale-[0.97] transition-all duration-150 hover:bg-indigo-800 hover:shadow-md hover:shadow-indigo-200">
+            className="flex-1 h-11 rounded-[18px] bg-indigo-700 text-white text-sm font-semibold flex items-center justify-center gap-2 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-indigo-200 active:scale-[0.97] transition-all duration-150 hover:bg-indigo-800 hover:shadow-[0_4px_12px_rgba(0,0,0,0.04),0_1px_3px_rgba(0,0,0,0.02)] hover:shadow-indigo-200">
             <Plus className="w-4 h-4" /> Create Event
           </button>
           {templates.length > 0 && (
             <button onClick={() => setTab("templates")}
-              className={`h-11 px-4 rounded-xl border text-sm font-medium flex items-center gap-2 transition-all ${
-                tab === "templates" ? "bg-indigo-700 text-white border-indigo-700 shadow-sm shadow-indigo-200" : "bg-white text-gray-700 border-gray-200/80 shadow-sm active:scale-[0.98] hover:border-gray-300"
+              className={`h-11 px-4 rounded-[14px] border text-sm font-medium flex items-center gap-2 transition-all ${
+                tab === "templates" ? "bg-indigo-700 text-white border-indigo-700 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-indigo-200" : "bg-white text-gray-700 border-gray-200/80 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] active:scale-[0.98] hover:border-gray-300"
               }`}>
               <BookTemplate className="w-4 h-4" />
             </button>
@@ -310,12 +310,12 @@ export default function OrganizerDashboard() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1.5 mb-4 bg-white/95 backdrop-blur-xl rounded-2xl p-1.5 border border-gray-100/80 shadow-sm">
+        <div className="flex gap-1.5 mb-4 bg-white/95 backdrop-blur-xl rounded-[18px] p-1.5 border border-gray-100/80 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
           {(["active", "past"] as const).map(t => (
             <button key={t} onClick={() => setTab(t)}
-              className={`flex-1 h-9 rounded-xl text-sm font-medium transition-all capitalize ${
+              className={`flex-1 h-9 rounded-[14px] text-sm font-medium transition-all capitalize ${
                 tab === t
-                  ? "bg-indigo-700 text-white shadow-sm shadow-indigo-200"
+                  ? "bg-indigo-700 text-white shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-indigo-200"
                   : "text-gray-500 hover:text-gray-800 hover:bg-gray-50"
               }`}>
               {t} ({t === "active" ? activeEvents.length : pastEvents.length})
@@ -331,16 +331,16 @@ export default function OrganizerDashboard() {
               <div className="text-center py-12 text-gray-400 text-sm">No templates yet.</div>
             )}
             {templates.map(tmpl => (
-              <div key={tmpl.id} className="bg-white border border-gray-200/80 rounded-2xl p-4 flex items-center justify-between gap-3 shadow-sm hover:shadow-md transition-all">
+              <div key={tmpl.id} className="bg-white border border-gray-200/80 rounded-[18px] p-4 flex items-center justify-between gap-3 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.04),0_1px_3px_rgba(0,0,0,0.02)] transition-all">
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-sm text-gray-900 truncate">{tmpl.template_name || tmpl.title}</p>
                   <p className="text-xs text-gray-500 mt-0.5">{tmpl.worker_count} workers · {CATEGORY_LABELS[tmpl.category || ""] || tmpl.category || "General"}</p>
                 </div>
                 <div className="flex gap-1.5 shrink-0">
                   <button onClick={() => { setCreateFromTemplate(tmpl); setShowCreate(true); }}
-                    className="h-8 px-4 rounded-xl bg-indigo-700 text-white text-xs font-medium hover:bg-indigo-800 active:scale-95 transition-all">Use</button>
+                    className="h-8 px-4 rounded-[14px] bg-indigo-700 text-white text-xs font-medium hover:bg-indigo-800 active:scale-95 transition-all">Use</button>
                   <button onClick={() => deleteEvent(tmpl.id)}
-                    className="h-8 w-8 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 active:scale-95 transition-all"><Trash2 className="w-3.5 h-3.5" /></button>
+                    className="h-8 w-8 rounded-[14px] bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 active:scale-95 transition-all"><Trash2 className="w-3.5 h-3.5" /></button>
                 </div>
               </div>
             ))}
@@ -358,7 +358,7 @@ export default function OrganizerDashboard() {
                 description="Create your first event to start receiving applications from workers."
                 action={
                   <button onClick={() => { setCreateFromTemplate(null); setShowCreate(true); }}
-                    className="h-10 px-5 rounded-xl bg-indigo-700 text-white text-sm font-semibold flex items-center gap-2 hover:bg-indigo-800 active:scale-[0.97] transition-all shadow-sm shadow-indigo-200">
+                    className="h-10 px-5 rounded-[14px] bg-indigo-700 text-white text-sm font-semibold flex items-center gap-2 hover:bg-indigo-800 active:scale-[0.97] transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-indigo-200">
                     <Plus className="w-4 h-4" /> Create Event
                   </button>
                 }
@@ -390,12 +390,12 @@ export default function OrganizerDashboard() {
                 "bg-gradient-to-r from-gray-200 to-gray-100";
 
               const cardPadding = hasDanger ? "pt-5" : "pt-4";
-              const cardShadow = hasDanger ? "shadow-md shadow-red-200/30" :
-                hasWarnings ? "shadow-sm shadow-amber-200/30" : "shadow-sm";
+              const cardShadow = hasDanger ? "shadow-[0_4px_12px_rgba(0,0,0,0.04),0_1px_3px_rgba(0,0,0,0.02)] shadow-red-200/30" :
+                hasWarnings ? "shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-amber-200/30" : "shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]";
 
               return (
                 <div key={event.id}
-                  className={`bg-white rounded-2xl border overflow-hidden transition-all duration-200 hover:shadow-md ${
+                  className={`card-base overflow-hidden transition-all duration-200 hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] ${
                     hasDanger ? "border-red-200/80" : hasWarnings ? "border-amber-200/80" : isFull ? "border-purple-200/80" : "border-gray-200/80"
                   } ${cardShadow}`}>
                   <div className={`h-1 ${urgencyBar}`} />
@@ -423,54 +423,54 @@ export default function OrganizerDashboard() {
                     {/* Action menu */}
                     <div className="relative shrink-0">
                       <button onClick={() => setActionMenu(actionMenu === event.id ? null : event.id)}
-                        className="h-8 w-8 rounded-xl hover:bg-gray-100 flex items-center justify-center text-gray-400 transition-colors">
+                        className="h-8 w-8 rounded-[14px] hover:bg-gray-100 flex items-center justify-center text-gray-400 transition-colors">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/></svg>
                       </button>
                       {actionMenu === event.id && (
                         <>
                           <div className="fixed inset-0 z-10" onClick={() => setActionMenu(null)} />
-                          <div className="absolute right-0 top-9 w-48 bg-white rounded-2xl border border-gray-200 shadow-xl shadow-black/[0.08] z-20 py-1.5 overflow-hidden animate-scale-in">
+                          <div className="absolute right-0 top-9 w-48 bg-white rounded-[18px] border border-gray-200 shadow-xl shadow-black/[0.08] z-20 py-1.5 overflow-hidden animate-scale-in">
                             <div className="px-3 pb-1.5 mb-1 border-b border-gray-100">
                               <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Actions</p>
                             </div>
                             {isFilling && (
                               <button onClick={() => { setEditingEvent(event); setActionMenu(null); }}
-                                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors rounded-lg">
+                                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors rounded-[14px]">
                                 <Edit3 className="w-3.5 h-3.5" /> Edit Event
                               </button>
                             )}
                             <button onClick={() => { setSelectedEvent(event); setActionMenu(null); }}
-                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors rounded-lg">
+                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors rounded-[14px]">
                               <Users className="w-3.5 h-3.5" /> View Applicants
                             </button>
                             <Link href={`/organizer/events/${event.id}`} onClick={() => setActionMenu(null)}
-                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors rounded-lg">
+                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors rounded-[14px]">
                               <ArrowUpRight className="w-3.5 h-3.5" /> Open Detail
                             </Link>
                             <div className="h-px bg-gray-100 my-1 mx-3" />
                             <button onClick={() => { duplicateEvent(event); setActionMenu(null); }}
-                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors rounded-lg">
+                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors rounded-[14px]">
                               <Copy className="w-3.5 h-3.5" /> Duplicate
                             </button>
                             <button onClick={() => { saveAsTemplate(event); setActionMenu(null); }}
-                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors rounded-lg">
+                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors rounded-[14px]">
                               <BookTemplate className="w-3.5 h-3.5" /> Save as Template
                             </button>
                             <div className="h-px bg-gray-100 my-1 mx-3" />
                             {isFilling && (
                               <button onClick={() => { updateEventStatus(event.id, "closed"); }}
-                                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-amber-700 hover:bg-amber-50 transition-colors rounded-lg">
+                                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-amber-700 hover:bg-amber-50 transition-colors rounded-[14px]">
                                 <XCircle className="w-3.5 h-3.5" /> Close Event
                               </button>
                             )}
                             {isFilling && (
                               <button onClick={() => { updateEventStatus(event.id, "completed"); }}
-                                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-gray-50 transition-colors rounded-lg">
+                                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-gray-50 transition-colors rounded-[14px]">
                                 <CheckCircle className="w-3.5 h-3.5" /> Mark Completed
                               </button>
                             )}
                             <button onClick={() => { deleteEvent(event.id); }}
-                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-red-600 hover:bg-red-50 transition-colors rounded-lg">
+                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-red-600 hover:bg-red-50 transition-colors rounded-[14px]">
                               <Trash2 className="w-3.5 h-3.5" /> Delete
                             </button>
                           </div>
@@ -546,23 +546,23 @@ export default function OrganizerDashboard() {
                     <div className="flex flex-wrap gap-1.5 mb-2">
                       {needsApproval && (
                         <button onClick={() => setSelectedEvent(event)}
-                          className="text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 px-2.5 py-0.5 rounded-lg flex items-center gap-1.5 hover:bg-indigo-100 transition-colors shadow-sm">
+                          className="text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 px-2.5 py-0.5 rounded-[14px] flex items-center gap-1.5 hover:bg-indigo-100 transition-colors shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
                           <Users className="w-3 h-3" /> {event.pendingCount} pending
                         </button>
                       )}
                       {remaining <= 3 && remaining > 0 && (
-                        <span className="text-[11px] font-bold bg-red-50 text-red-600 border border-red-200 px-2.5 py-0.5 rounded-lg flex items-center gap-1.5 shadow-sm">
+                        <span className="text-[11px] font-bold bg-red-50 text-red-600 border border-red-200 px-2.5 py-0.5 rounded-lg flex items-center gap-1.5 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
                           <AlertTriangle className="w-3 h-3" /> {remaining} left
                         </span>
                       )}
                       {!needsApproval && remaining > 3 && deadlineToday && (
-                        <span className="text-[10px] font-semibold bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-sm">
+                        <span className="text-[10px] font-semibold bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
                           <Clock3 className="w-3 h-3" /> Deadline today
                         </span>
                       )}
                       {!needsApproval && remaining > 3 && !deadlineToday && event.status === "draft" && (
                         <button onClick={() => { setEditingEvent(event); }}
-                          className="text-[10px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded-lg flex items-center gap-1 hover:bg-indigo-100 transition-colors">
+                          className="text-[10px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-0.5 rounded-[14px] flex items-center gap-1 hover:bg-indigo-100 transition-colors">
                           <Edit3 className="w-3 h-3" /> Publish
                         </button>
                       )}
@@ -599,20 +599,20 @@ export default function OrganizerDashboard() {
                   {/* Quick action bar */}
                   <div className="px-4 py-2.5 border-t border-gray-100 flex gap-1.5 overflow-x-auto">
                     <button onClick={() => { setEditingEvent(event); }}
-                      className="h-8 px-3 rounded-xl bg-gray-100 text-gray-700 text-[11px] font-medium flex items-center gap-1.5 hover:bg-gray-200 active:scale-95 transition-all shrink-0">
+                      className="h-8 px-3 rounded-[14px] bg-gray-100 text-gray-700 text-[11px] font-medium flex items-center gap-1.5 hover:bg-gray-200 active:scale-95 transition-all shrink-0">
                       <Edit3 className="w-3 h-3" /> Edit
                     </button>
                     <button onClick={() => { setSelectedEvent(event); }}
-                      className="h-8 px-3 rounded-xl bg-gray-100 text-gray-700 text-[11px] font-medium flex items-center gap-1.5 hover:bg-gray-200 active:scale-95 transition-all shrink-0">
+                      className="h-8 px-3 rounded-[14px] bg-gray-100 text-gray-700 text-[11px] font-medium flex items-center gap-1.5 hover:bg-gray-200 active:scale-95 transition-all shrink-0">
                       <Users className="w-3 h-3" /> Applicants
                     </button>
                     <Link href={`/organizer/events/${event.id}`}
-                      className="h-8 px-4 rounded-xl bg-indigo-700 text-white text-[11px] font-semibold flex items-center gap-1.5 hover:bg-indigo-800 active:scale-95 transition-all shrink-0 shadow-sm shadow-indigo-200">
+                      className="h-8 px-4 rounded-[14px] bg-indigo-700 text-white text-[11px] font-semibold flex items-center gap-1.5 hover:bg-indigo-800 active:scale-95 transition-all shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-indigo-200">
                       Manage <ChevronRight className="w-3 h-3" />
                     </Link>
                     {needsApproval && (
                       <button onClick={() => { setSelectedEvent(event); }}
-                        className="h-8 px-3 rounded-xl bg-amber-50 text-amber-700 text-[11px] font-medium flex items-center gap-1.5 hover:bg-amber-100 active:scale-95 transition-all shrink-0">
+                        className="h-8 px-3 rounded-[14px] bg-amber-50 text-amber-700 text-[11px] font-medium flex items-center gap-1.5 hover:bg-amber-100 active:scale-95 transition-all shrink-0">
                         <Hourglass className="w-3 h-3" /> Review
                       </button>
                     )}
@@ -635,7 +635,7 @@ export default function OrganizerDashboard() {
             )}
             {pastEvents.map(event => (
               <div key={event.id}
-                className="bg-white border border-gray-200/80 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
+                className="card-elevated overflow-hidden transition-all">
                 <div className="px-4 pt-4 pb-1 flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
                     <Link href={`/organizer/events/${event.id}`} className="hover:text-indigo-700 transition-colors">
@@ -671,15 +671,15 @@ export default function OrganizerDashboard() {
                 </div>
                 <div className="px-4 py-2.5 border-t border-gray-100 flex gap-1.5 overflow-x-auto">
                   <button onClick={() => { setSelectedEvent(event); }}
-                    className="h-8 px-3 rounded-xl bg-gray-100 text-gray-700 text-[11px] font-medium flex items-center gap-1.5 hover:bg-gray-200 active:scale-95 transition-all shrink-0">
+                    className="h-8 px-3 rounded-[14px] bg-gray-100 text-gray-700 text-[11px] font-medium flex items-center gap-1.5 hover:bg-gray-200 active:scale-95 transition-all shrink-0">
                     <Users className="w-3 h-3" /> Applicants
                   </button>
                   <Link href={`/organizer/events/${event.id}`}
-                    className="h-8 px-4 rounded-xl bg-indigo-700 text-white text-[11px] font-semibold flex items-center gap-1.5 hover:bg-indigo-800 active:scale-95 transition-all shrink-0 shadow-sm shadow-indigo-200">
+                    className="h-8 px-4 rounded-[14px] bg-indigo-700 text-white text-[11px] font-semibold flex items-center gap-1.5 hover:bg-indigo-800 active:scale-95 transition-all shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-indigo-200">
                     Details <ChevronRight className="w-3 h-3" />
                   </Link>
                   <button onClick={() => { duplicateEvent(event); }}
-                    className="h-8 px-3 rounded-xl bg-gray-100 text-gray-700 text-[11px] font-medium flex items-center gap-1.5 hover:bg-gray-200 active:scale-95 transition-all shrink-0">
+                    className="h-8 px-3 rounded-[14px] bg-gray-100 text-gray-700 text-[11px] font-medium flex items-center gap-1.5 hover:bg-gray-200 active:scale-95 transition-all shrink-0">
                     <Copy className="w-3 h-3" /> Duplicate
                   </button>
                 </div>

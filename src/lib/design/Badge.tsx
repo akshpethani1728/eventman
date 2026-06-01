@@ -14,7 +14,7 @@ interface BadgeProps {
 
 export function Badge({ children, variant = "pending", icon, pulse = false, className = "" }: BadgeProps) {
   return (
-    <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-0.5 rounded-xl border ${BADGE[variant]} ${pulse ? "animate-pulse" : ""} ${className}`}>
+    <span className={`badge-base ${BADGE[variant]} ${pulse ? "animate-pulse" : ""} ${className}`}>
       {icon && <span className="w-3 h-3">{icon}</span>}
       {children}
     </span>

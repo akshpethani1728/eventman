@@ -77,7 +77,7 @@ export default function WorkerNotificationsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50/50 pb-24">
+    <div className="min-h-screen bg-[#f5f5f7] pb-24">
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-gray-200/60 z-10">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
           <Link href="/worker/dashboard" className="p-1 -ml-1 text-gray-500"><ArrowLeft className="w-5 h-5" /></Link>
@@ -91,14 +91,14 @@ export default function WorkerNotificationsPage() {
       <main className="max-w-lg mx-auto px-4 py-4">
         {unreadCount > 0 && (
           <button onClick={markAllRead}
-            className="w-full h-9 mb-4 rounded-lg bg-white text-gray-600 text-sm font-medium flex items-center justify-center gap-2 border border-gray-200/70 shadow-sm hover:bg-gray-50 active:scale-[0.98] transition-all">
+            className="w-full h-9 mb-4 rounded-[14px] bg-white text-gray-600 text-sm font-medium flex items-center justify-center gap-2 border border-gray-200/70 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] hover:bg-gray-50 active:scale-[0.98] transition-all">
             <CheckCheck className="w-4 h-4" /> Mark all as read
           </button>
         )}
 
         {notifications.length === 0 && (
           <div className="text-center py-20">
-            <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center mx-auto mb-3 ring-1 ring-indigo-200">
+            <div className="w-12 h-12 rounded-[14px] bg-indigo-50 flex items-center justify-center mx-auto mb-3 ring-1 ring-indigo-200">
               <Bell className="w-5 h-5 text-indigo-600" />
             </div>
             <p className="text-sm font-medium text-gray-500">No notifications yet</p>
@@ -117,10 +117,10 @@ export default function WorkerNotificationsPage() {
               </div>
               <div className="space-y-1.5">
                 {notifs.map(n => (
-                  <div key={n.id} className={`rounded-lg p-3 flex items-start gap-2.5 border shadow-sm shadow-black/[0.02] transition-all ${
+                  <div key={n.id} className={`rounded-[14px] p-3 flex items-start gap-2.5 border shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-black/[0.02] transition-all ${
                     n.read ? "border-gray-200/70 bg-white" : "border-indigo-200 bg-indigo-50"
                   }`}>
-                    <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center shrink-0 shadow-sm">
+                    <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center shrink-0 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
                       {ICONS[n.title] || <Bell className="w-3.5 h-3.5 text-gray-400" />}
                     </div>
                     <div className="min-w-0 flex-1">

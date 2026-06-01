@@ -9,7 +9,7 @@ export function LegalPageShell({ title, children }: { title: string; children: R
           <Link href="/" className="p-1 -ml-1 text-gray-500 hover:text-gray-800 transition-colors">
             <ArrowLeft className="w-4 h-4" />
           </Link>
-          <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">{title}</span>
+          <span className="label-sm">{title}</span>
         </div>
       </header>
       <main className="max-w-2xl mx-auto px-4 py-8">

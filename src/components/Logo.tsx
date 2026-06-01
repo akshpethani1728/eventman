@@ -7,7 +7,7 @@ export function Logo({ showText = true, size = "sm", muted = false }: { showText
 
   return (
     <div className="flex items-center justify-center gap-2.5">
-      <div className={`flex items-center justify-center rounded-xl bg-gradient-to-br from-slate-700 to-slate-800 text-white shadow-sm ${iconSizes[size]}`}>
+      <div className={`flex items-center justify-center rounded-[14px] bg-gradient-to-br from-slate-800 to-slate-900 text-white shadow-[0_2px_8px_rgba(0,0,0,0.1)] ${iconSizes[size]}`}>
         <Briefcase className={iconInner[size]} />
       </div>
       {showText && (

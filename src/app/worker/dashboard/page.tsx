@@ -117,34 +117,34 @@ function computePriorityScore(event: any): number {
 
 function SkeletonCard() {
   return (
-    <div className="bg-white rounded-2xl border border-gray-200/70 overflow-hidden shadow-sm">
+    <div className="card-base overflow-hidden">
       <div className="px-4 pt-3.5 pb-2 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-gray-200 animate-pulse" />
+          <div className="w-8 h-8 rounded-[14px] bg-gray-200 animate-pulse" />
           <div className="space-y-1.5">
             <div className="w-28 h-3 rounded bg-gray-200 animate-pulse" />
             <div className="w-20 h-2.5 rounded bg-gray-100 animate-pulse" />
           </div>
         </div>
-        <div className="w-14 h-5 rounded-lg bg-gray-200 animate-pulse" />
+        <div className="w-14 h-5 rounded-[14px] bg-gray-200 animate-pulse" />
       </div>
       <div className="px-4 py-2 space-y-3">
         <div className="flex gap-1.5">
-          <div className="w-16 h-5 rounded-lg bg-gray-100 animate-pulse" />
-          <div className="w-20 h-5 rounded-lg bg-gray-100 animate-pulse" />
+          <div className="w-16 h-5 rounded-[14px] bg-gray-100 animate-pulse" />
+          <div className="w-20 h-5 rounded-[14px] bg-gray-100 animate-pulse" />
         </div>
         <div className="w-3/4 h-5 rounded bg-gray-200 animate-pulse" />
-        <div className="w-32 h-7 rounded-xl bg-gray-100 animate-pulse" />
+        <div className="w-32 h-7 rounded-[14px] bg-gray-100 animate-pulse" />
         <div className="w-full h-3 rounded bg-gray-100 animate-pulse" />
         <div className="w-full h-2 rounded-full bg-gray-100 animate-pulse" />
         <div className="flex gap-1.5">
-          <div className="w-14 h-5 rounded-lg bg-gray-100 animate-pulse" />
-          <div className="w-16 h-5 rounded-lg bg-gray-100 animate-pulse" />
+          <div className="w-14 h-5 rounded-[14px] bg-gray-100 animate-pulse" />
+          <div className="w-16 h-5 rounded-[14px] bg-gray-100 animate-pulse" />
         </div>
       </div>
       <div className="h-px bg-gray-100 mx-4" />
       <div className="px-4 py-3 flex justify-end">
-        <div className="w-28 h-10 rounded-xl bg-gray-200 animate-pulse" />
+        <div className="w-28 h-10 rounded-[14px] bg-gray-200 animate-pulse" />
       </div>
     </div>
   );
@@ -360,11 +360,11 @@ function DashboardContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-indigo-50/40 to-white">
+      <div className="min-h-screen bg-[#f5f5f7]">
         <header className="sticky top-0 bg-white/80 backdrop-blur-2xl border-b border-gray-200/60 z-20">
           <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center shadow-sm">
+              <div className="w-8 h-8 rounded-[14px] bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
                 <Zap className="w-4 h-4 text-white" />
               </div>
               <div>
@@ -377,8 +377,8 @@ function DashboardContent() {
           </div>
         </header>
         <main className="max-w-lg mx-auto px-4 py-4 pb-28 space-y-4">
-          <div className="w-full h-24 rounded-2xl bg-gradient-to-br from-gray-200 to-gray-100 animate-pulse" />
-          <div className="w-full h-11 rounded-2xl bg-gray-200 animate-pulse" />
+          <div className="w-full h-24 rounded-[18px] bg-gradient-to-br from-gray-200 to-gray-100 animate-pulse" />
+          <div className="w-full h-11 rounded-[18px] bg-gray-200 animate-pulse" />
           <SkeletonCard />
           <SkeletonCard />
           <SkeletonCard />
@@ -388,14 +388,14 @@ function DashboardContent() {
 }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50/40 to-white">
+    <div className="min-h-screen bg-[#f5f5f7]">
       {/* Header */}
       <header className="sticky top-0 bg-gradient-to-r from-indigo-50/95 to-white/95 backdrop-blur-xl border-b border-indigo-100/80 z-20">
         {/* Accent bar */}
         <div className="h-0.5 bg-gradient-to-r from-indigo-600 via-indigo-500 to-indigo-400" />
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center shadow-sm shadow-indigo-200/40">
+            <div className="w-8 h-8 rounded-[14px] bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-indigo-200/40">
               <Zap className="w-4 h-4 text-white" />
             </div>
             <div>
@@ -406,16 +406,16 @@ function DashboardContent() {
           <div className="flex items-center gap-0.5">
             {profile && (
               <>
-                <Link href="/worker/notifications" className="relative p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
+                <Link href="/worker/notifications" className="btn-base relative p-2 text-gray-400 hover:text-gray-600 rounded-[14px] hover:bg-gray-100 transition-colors">
                   <Bell className="w-4 h-4" />
                   {unreadNotifCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center shadow-sm">
+                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
                       {unreadNotifCount > 9 ? "9+" : unreadNotifCount}
                     </span>
                   )}
                 </Link>
-                <Link href="/worker/profile" className="relative flex items-center gap-2 p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center text-white font-bold text-[11px] shadow-sm">
+                <Link href="/worker/profile" className="btn-base relative flex items-center gap-2 p-1.5 hover:bg-gray-100 rounded-[14px] transition-colors">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center text-white font-bold text-[11px] shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
                     {profile.full_name?.charAt(0) || "W"}
                   </div>
                   {profile.availability && AVAIL_CONFIG[profile.availability] && (
@@ -424,7 +424,7 @@ function DashboardContent() {
                 </Link>
               </>
             )}
-            <button onClick={signOut} className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors">
+            <button onClick={signOut} className="btn-base p-2 text-gray-400 hover:text-gray-600 rounded-[14px] hover:bg-gray-100 transition-colors">
               <LogOut className="w-4 h-4" />
             </button>
           </div>
@@ -434,7 +434,7 @@ function DashboardContent() {
       <main className="max-w-lg mx-auto px-4 py-4 pb-28">
         {/* Subscription status banner */}
         {profile && profile.plan_status && (
-          <div className={`mb-3 rounded-xl px-4 py-3 flex items-center justify-between ${
+          <div className={`mb-3 rounded-[14px] px-4 py-3 flex items-center justify-between ${
             profile.plan_status === "active"
               ? "bg-emerald-50 border border-emerald-200"
               : profile.plan_status === "trial"
@@ -468,7 +468,7 @@ function DashboardContent() {
               </div>
             </div>
             {profile.plan_status === "expired" && (
-              <Link href="/worker/plans" className="text-[10px] font-semibold text-amber-700 bg-amber-100 px-3 py-1 rounded-lg hover:bg-amber-200 transition-colors">
+              <Link href="/worker/plans" className="btn-base text-[10px] font-semibold text-amber-700 bg-amber-100 px-3 py-1 rounded-[14px] hover:bg-amber-200 transition-colors">
                 Renew
               </Link>
             )}
@@ -481,7 +481,7 @@ function DashboardContent() {
         )}
         {/* Welcome banner */}
         {profile && tab === "browse" && browseEvents.length > 0 && (
-          <div className="mb-3 bg-indigo-700 rounded-2xl p-4 text-white shadow-sm shadow-indigo-200/30 relative overflow-hidden">
+          <div className="mb-3 bg-indigo-700 rounded-[18px] p-4 text-white shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-indigo-200/30 relative overflow-hidden">
             <div className="absolute -top-4 -right-4 w-24 h-24 rounded-full bg-white/5" />
             <div className="absolute -bottom-4 -left-4 w-16 h-16 rounded-full bg-white/5" />
             <p className="text-sm opacity-90">Hey <span className="font-semibold">{profile.full_name?.split(" ")[0] || "there"}</span></p>
@@ -501,16 +501,16 @@ function DashboardContent() {
         )}
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-4 bg-white/95 backdrop-blur-xl rounded-xl p-1 border border-indigo-100/60 shadow-sm shadow-indigo-200/10">
+        <div className="flex gap-2 mb-4 bg-white/95 backdrop-blur-xl rounded-[14px] p-1 border border-indigo-100/60 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-indigo-200/10">
           <button onClick={() => setTab("browse")}
-            className={`flex-1 h-10 rounded-lg text-sm font-medium transition-all ${
-              tab === "browse" ? "bg-indigo-700 text-white shadow-sm" : "text-gray-500 hover:text-gray-800"
+            className={`btn-base flex-1 h-10 rounded-[14px] text-sm font-medium transition-all ${
+              tab === "browse" ? "bg-indigo-700 text-white shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]" : "text-gray-500 hover:text-gray-800"
             }`}>
             Browse {browseEvents.length > 0 && `(${browseEvents.length})`}
           </button>
           <button onClick={() => setTab("applied")}
-            className={`flex-1 h-10 rounded-lg text-sm font-medium transition-all ${
-              tab === "applied" ? "bg-indigo-700 text-white shadow-sm" : "text-gray-500 hover:text-gray-800"
+            className={`btn-base flex-1 h-10 rounded-[14px] text-sm font-medium transition-all ${
+              tab === "applied" ? "bg-indigo-700 text-white shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]" : "text-gray-500 hover:text-gray-800"
             }`}>
             Applied {appliedEvents.length > 0 && `(${appliedEvents.length})`}
           </button>
@@ -524,13 +524,13 @@ function DashboardContent() {
               <div className="mb-3 overflow-x-auto -mx-4 px-4 scrollbar-none">
                 <div className="flex gap-2 min-w-max pb-1">
                   <button onClick={() => setCategoryFilter("")}
-                    className={`h-9 px-4 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
-                      !categoryFilter ? "bg-indigo-700 text-white shadow-sm" : "bg-white text-gray-600 border border-indigo-100/50 hover:border-indigo-200 hover:bg-indigo-50/50 shadow-sm"
+                    className={`btn-base h-9 px-4 rounded-[14px] text-xs font-medium transition-all whitespace-nowrap ${
+                      !categoryFilter ? "bg-indigo-700 text-white shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]" : "bg-white text-gray-600 border border-indigo-100/50 hover:border-indigo-200 hover:bg-indigo-50/50 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]"
                     }`}>All</button>
                   {allCategories.map(cat => (
                     <button key={cat} onClick={() => setCategoryFilter(cat)}
-                      className={`h-9 px-4 rounded-lg text-xs font-medium capitalize transition-all whitespace-nowrap ${
-                        categoryFilter === cat ? "bg-indigo-700 text-white shadow-sm" : "bg-white text-gray-600 border border-indigo-100/50 hover:border-indigo-200 hover:bg-indigo-50/50 shadow-sm"
+                      className={`btn-base h-9 px-4 rounded-[14px] text-xs font-medium capitalize transition-all whitespace-nowrap ${
+                        categoryFilter === cat ? "bg-indigo-700 text-white shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]" : "bg-white text-gray-600 border border-indigo-100/50 hover:border-indigo-200 hover:bg-indigo-50/50 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]"
                       }`}>{CATEGORY_LABELS[cat] || cat.replace(/_/g, " ")}</button>
                   ))}
                 </div>
@@ -540,7 +540,7 @@ function DashboardContent() {
             {/* Empty state */}
             {browseEvents.length === 0 && (
               <div className="text-center py-16 px-4">
-                <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-50 to-indigo-100 border border-indigo-200/60 flex items-center justify-center mx-auto mb-5 shadow-sm shadow-indigo-200/20">
+                <div className="w-20 h-20 rounded-[22px] bg-gradient-to-br from-indigo-50 to-indigo-100 border border-indigo-200/60 flex items-center justify-center mx-auto mb-5 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-indigo-200/20">
                   <Gauge className="w-9 h-9 text-indigo-400" />
                 </div>
                 <p className="text-lg font-bold text-gray-900">
@@ -553,7 +553,7 @@ function DashboardContent() {
                 </p>
                 {categoryFilter && (
                   <button               onClick={() => setCategoryFilter("")}
-                    className="mt-5 h-11 px-6 rounded-lg bg-indigo-700 text-white text-sm font-semibold hover:bg-indigo-800 transition-all active:scale-[0.97]">
+                    className="btn-base mt-5 h-11 px-6 rounded-[14px] bg-indigo-700 text-white text-sm font-semibold hover:bg-indigo-800 transition-all active:scale-[0.97]">
                     Clear filter
                   </button>
                 )}
@@ -603,7 +603,7 @@ function DashboardContent() {
 
                 return (
                   <Link key={event.id} href={`/worker/events/${event.id}`}
-                    className={`block bg-white rounded-2xl border overflow-hidden shadow-sm hover:shadow-lg hover:border-indigo-200 transition-all duration-300 active:scale-[0.99] animate-slide-up ${cardAccent} ${shadowBoost}`}
+                    className={`block card-elevated overflow-hidden hover:border-indigo-200 transition-all duration-300 active:scale-[0.99] animate-slide-up ${cardAccent} ${shadowBoost}`}
                     style={{ animationDelay: `${idx * 60}ms`, animationFillMode: "both" }}>
 
                     {/* === INTELLIGENCE ACCENT BAR === */}
@@ -628,11 +628,11 @@ function DashboardContent() {
                       <div className="flex items-center gap-3 min-w-0 flex-1">
                           <div className="relative shrink-0">
                             {org?.avatar_url ? (
-                              <img src={org.avatar_url} alt="" className={`w-10 h-10 rounded-xl object-cover ring-2 shrink-0 ${
+                              <img src={org.avatar_url} alt="" className={`w-10 h-10 rounded-[14px] object-cover ring-2 shrink-0 ${
                                 isTrusted ? "ring-emerald-200" : "ring-gray-100"
                               }`} />
                             ) : (
-                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0 ${
+                            <div className={`w-10 h-10 rounded-[14px] flex items-center justify-center text-white font-bold text-sm shrink-0 ${
                               isTrusted
                                 ? "bg-gradient-to-br from-emerald-500 to-teal-600"
                                 : "bg-gradient-to-br from-indigo-500 to-indigo-700"
@@ -641,7 +641,7 @@ function DashboardContent() {
                             </div>
                           )}
                           {isTrusted && (
-                            <div className="absolute -bottom-1 -right-1 w-4.5 h-4.5 rounded-full bg-emerald-500 border-[2.5px] border-white flex items-center justify-center shadow-sm">
+                            <div className="absolute -bottom-1 -right-1 w-4.5 h-4.5 rounded-full bg-emerald-500 border-[2.5px] border-white flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
                               <BadgeCheck className="w-2.5 h-2.5 text-white" />
                             </div>
                           )}
@@ -650,13 +650,13 @@ function DashboardContent() {
                           <div className="flex items-center gap-1.5">
                             <span className="text-sm font-bold text-gray-900 truncate">{org?.full_name || "Event Organizer"}</span>
                             {isTrusted && (
-                              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.5 rounded-md shadow-sm">
+                              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.5 rounded-md shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
                                 <BadgeCheck className="w-2.5 h-2.5" />
                                 Trusted
                               </span>
                             )}
                             {!isTrusted && isProfileVerified && (
-                              <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200/60 px-1.5 py-0.5 rounded-md shadow-sm">
+                              <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200/60 px-1.5 py-0.5 rounded-md shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
                                 <ShieldCheck className="w-2.5 h-2.5" />
                                 Verified
                               </span>
@@ -845,14 +845,14 @@ function DashboardContent() {
                         )}
                       </div>
                       {deadlinePassed ? (
-                        <div className="h-9 px-4 rounded-lg bg-gray-100 text-gray-400 text-xs font-semibold flex items-center gap-1.5">
+                        <div className="btn-base h-9 px-4 rounded-[14px] bg-gray-100 text-gray-400 text-xs font-semibold flex items-center gap-1.5">
                           <Clock className="w-3.5 h-3.5" /> Applications Closed
                         </div>
                       ) : waitlisted ? (
                         <button
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); leaveWaitlist(event.application!); }}
                           disabled={applyingId === event.id}
-                          className="h-9 px-4 rounded-lg font-semibold text-xs flex items-center gap-1.5 transition-all active:scale-[0.97] shadow-sm bg-purple-50 text-purple-700 border border-purple-200/60 hover:bg-purple-100">
+                          className="btn-base h-9 px-4 rounded-[14px] font-semibold text-xs flex items-center gap-1.5 transition-all active:scale-[0.97] shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] bg-purple-50 text-purple-700 border border-purple-200/60 hover:bg-purple-100">
                           {applyingId === event.id ? (
                             <span className="w-3.5 h-3.5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
                           ) : (
@@ -862,14 +862,14 @@ function DashboardContent() {
                       ) : !canApply ? (
                         <Link href="/worker/plans"
                           onClick={(e) => { e.stopPropagation(); }}
-                          className="h-9 px-4 rounded-lg font-semibold text-xs flex items-center gap-1.5 bg-amber-600 text-white hover:bg-amber-700 transition-all active:scale-[0.97]">
+                          className="btn-base h-9 px-4 rounded-[14px] font-semibold text-xs flex items-center gap-1.5 bg-amber-600 text-white hover:bg-amber-700 transition-all active:scale-[0.97]">
                           <CreditCard className="w-3.5 h-3.5" /> Subscribe
                         </Link>
                       ) : isFull ? (
                         <button
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); joinWaitlist(event.id); }}
                           disabled={applyingId === event.id}
-                          className="h-9 px-4 rounded-lg font-semibold text-xs flex items-center gap-1.5 transition-all active:scale-[0.97] disabled:opacity-60 bg-purple-600 text-white hover:bg-purple-700">
+                          className="btn-base h-9 px-4 rounded-[14px] font-semibold text-xs flex items-center gap-1.5 transition-all active:scale-[0.97] disabled:opacity-60 bg-purple-600 text-white hover:bg-purple-700">
                           {applyingId === event.id ? (
                             <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                           ) : (
@@ -880,7 +880,7 @@ function DashboardContent() {
                         <button
                           onClick={(e) => { e.preventDefault(); e.stopPropagation(); apply(event.id); }}
                           disabled={applyingId === event.id}
-                          className={`h-9 px-4 rounded-lg font-semibold text-xs flex items-center gap-1.5 transition-all active:scale-[0.97] disabled:opacity-60 ${
+                          className={`btn-base h-9 px-4 rounded-[14px] font-semibold text-xs flex items-center gap-1.5 transition-all active:scale-[0.97] disabled:opacity-60 ${
                             isToday || hoursUntilEvent < 12
                               ? "bg-red-600 text-white hover:bg-red-700"
                               : isNearlyFull
@@ -905,7 +905,7 @@ function DashboardContent() {
         {/* ========== APPLIED TAB ========== */}
         {tab === "applied" && appliedEvents.length === 0 && (
           <div className="text-center py-16 px-4">
-            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-50 to-indigo-100 border border-indigo-200/60 flex items-center justify-center mx-auto mb-5 shadow-sm shadow-indigo-200/20">
+            <div className="w-20 h-20 rounded-[22px] bg-gradient-to-br from-indigo-50 to-indigo-100 border border-indigo-200/60 flex items-center justify-center mx-auto mb-5 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-indigo-200/20">
               <Send className="w-9 h-9 text-indigo-400" />
             </div>
             <p className="text-lg font-bold text-gray-900">No applications yet</p>
@@ -913,7 +913,7 @@ function DashboardContent() {
             You haven&apos;t applied to any events yet. Browse available opportunities and send your first application to get started.
             </p>
             <button onClick={() => setTab("browse")}
-              className="mt-6 h-11 px-6 rounded-lg bg-indigo-700 text-white text-sm font-semibold hover:bg-indigo-800 transition-all active:scale-[0.97]">
+              className="btn-base mt-6 h-11 px-6 rounded-[14px] bg-indigo-700 text-white text-sm font-semibold hover:bg-indigo-800 transition-all active:scale-[0.97]">
               Browse Events
             </button>
           </div>
@@ -934,7 +934,7 @@ function DashboardContent() {
 
               return (
                 <Link key={event.id} href={`/worker/events/${event.id}`}
-                  className={`block bg-white rounded-2xl border overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 active:scale-[0.99] animate-slide-up ${
+                  className={`block card-elevated overflow-hidden transition-all duration-300 active:scale-[0.99] animate-slide-up ${
                     isWaitlisted(app)
                       ? "border-purple-200/80 shadow-purple-500/5"
                       : app.status === "approved"
@@ -953,11 +953,11 @@ function DashboardContent() {
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="flex items-center gap-2.5 min-w-0 flex-1">
                         {org?.avatar_url ? (
-                          <img src={org.avatar_url} alt="" className={`w-10 h-10 rounded-xl object-cover ring-2 shrink-0 ${
+                          <img src={org.avatar_url} alt="" className={`w-10 h-10 rounded-[14px] object-cover ring-2 shrink-0 ${
                             app.status === "approved" ? "ring-emerald-200" : "ring-gray-100"
                           }`} />
                         ) : (
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm shrink-0 ${
+                          <div className={`w-10 h-10 rounded-[14px] flex items-center justify-center font-bold text-sm shrink-0 ${
                             app.status === "approved"
                               ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white"
                               : "bg-gradient-to-br from-indigo-500 to-indigo-700 text-white"
@@ -1048,7 +1048,7 @@ function DashboardContent() {
                       <div className="space-y-2">
                         {/* Countdown banner */}
                         {hoursUntil > 0 && (
-                          <div className={`flex items-center gap-2 px-3 py-2 rounded-xl ${
+                          <div className={`flex items-center gap-2 px-3 py-2 rounded-[14px] ${
                             isUrgent
                               ? "bg-red-50 text-red-700 border border-red-100"
                               : "bg-emerald-50 text-emerald-700 border border-emerald-100"
@@ -1066,7 +1066,7 @@ function DashboardContent() {
 
                         {/* Contact information */}
                         {org?.phone && (
-                          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white border border-emerald-100">
+                          <div className="flex items-center gap-2 px-3 py-2 rounded-[14px] bg-white border border-emerald-100">
                             <Phone className="w-4 h-4 text-emerald-500 shrink-0" />
                             <span className="text-xs font-medium text-gray-700">Contact:</span>
                             <span className="text-xs font-semibold text-gray-900">{org.phone}</span>
@@ -1075,7 +1075,7 @@ function DashboardContent() {
 
                         {/* Reporting info */}
                         {event.reporting_details && (
-                          <div className="flex items-start gap-2 px-3 py-2 rounded-xl bg-gray-50 border border-gray-100">
+                          <div className="flex items-start gap-2 px-3 py-2 rounded-[14px] bg-gray-50 border border-gray-100">
                             <Info className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
                             <div className="text-xs text-gray-600 leading-relaxed">{event.reporting_details}</div>
                           </div>
@@ -1085,7 +1085,7 @@ function DashboardContent() {
 
                     {/* --- PENDING: Status message --- */}
                     {app.status === "pending" && (
-                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-amber-50 border border-amber-100">
+                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-[14px] bg-amber-50 border border-amber-100">
                         <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0" />
                         <span className="text-xs text-amber-700 font-medium">{cfg.message}</span>
                       </div>
@@ -1094,11 +1094,11 @@ function DashboardContent() {
                     {/* --- REJECTED: Respectful message + reapply option --- */}
                     {app.status === "rejected" && (
                       <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-100">
+                        <div className="flex items-center gap-2 px-3 py-2.5 rounded-[14px] bg-gray-50 border border-gray-100">
                           <Info className="w-4 h-4 text-gray-400 shrink-0" />
                           <span className="text-xs text-gray-600">{cfg.message}</span>
                         </div>
-                        <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-indigo-50 border border-indigo-200">
+                        <div className="flex items-center gap-2 px-3 py-2 rounded-[14px] bg-indigo-50 border border-indigo-200">
                           <ArrowUpRight className="w-3.5 h-3.5 text-slate-500 shrink-0" />
                           <span className="text-xs text-indigo-700 font-medium">Browse other opportunities</span>
                         </div>
@@ -1107,7 +1107,7 @@ function DashboardContent() {
 
                     {/* --- WAITLISTED: Calm purple info --- */}
                     {isWaitlisted(app) && (
-                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-purple-50 border border-purple-100">
+                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-[14px] bg-purple-50 border border-purple-100">
                         <ListPlus className="w-4 h-4 text-purple-500 shrink-0" />
                         <span className="text-xs text-purple-700">On waitlist — may get a spot if someone drops out</span>
                       </div>
@@ -1115,7 +1115,7 @@ function DashboardContent() {
 
                     {/* --- REMOVED BY ORGANIZER --- */}
                     {isRemovedByOrganizer(app) && (
-                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-red-50 border border-red-100">
+                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-[14px] bg-red-50 border border-red-100">
                         <Info className="w-4 h-4 text-red-400 shrink-0" />
                         <span className="text-xs text-red-600">Removed by organizer — you can re-apply</span>
                       </div>
@@ -1123,7 +1123,7 @@ function DashboardContent() {
 
                     {/* --- CANCELLED: Clear neutral message --- */}
                     {app.status === "cancelled" && !isRemovedByOrganizer(app) && (
-                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-100">
+                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-[14px] bg-gray-50 border border-gray-100">
                         <Info className="w-4 h-4 text-gray-400 shrink-0" />
                         <span className="text-xs text-gray-500">{cfg.message}</span>
                       </div>

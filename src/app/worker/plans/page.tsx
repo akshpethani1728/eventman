@@ -165,7 +165,7 @@ export default function WorkerPlansPage() {
       <main className="max-w-lg mx-auto px-4 py-6 space-y-5">
         {/* ─── PAYMENT STATUS ─── */}
         {paymentStatus === "success" && (
-          <div className="rounded-2xl bg-emerald-50 border border-emerald-200 p-4 flex items-start gap-3 animate-slide-down shadow-sm">
+          <div className="rounded-[18px] bg-emerald-50 border border-emerald-200 p-4 flex items-start gap-3 animate-slide-down shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
             <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
               <CheckCircle className="w-5 h-5 text-emerald-600" />
             </div>
@@ -176,7 +176,7 @@ export default function WorkerPlansPage() {
           </div>
         )}
         {paymentStatus === "failed" && (
-          <div className="rounded-2xl bg-red-50 border border-red-200 p-4 flex items-start gap-3 animate-slide-down shadow-sm">
+          <div className="rounded-[18px] bg-red-50 border border-red-200 p-4 flex items-start gap-3 animate-slide-down shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
             <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
               <XCircle className="w-5 h-5 text-red-600" />
             </div>
@@ -187,7 +187,7 @@ export default function WorkerPlansPage() {
           </div>
         )}
         {paymentStatus === "cancelled" && (
-          <div className="rounded-2xl bg-amber-50 border border-amber-200 p-4 flex items-start gap-3 animate-slide-down shadow-sm">
+          <div className="rounded-[18px] bg-amber-50 border border-amber-200 p-4 flex items-start gap-3 animate-slide-down shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
             <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
               <AlertCircle className="w-5 h-5 text-amber-600" />
             </div>
@@ -199,7 +199,7 @@ export default function WorkerPlansPage() {
         )}
 
         {/* ─── STATUS CARD ─── */}
-        <div className="bg-white rounded-2xl border border-gray-200/80 overflow-hidden shadow-sm">
+        <div className="card-base overflow-hidden">
           {/* Gradient header */}
           <div className={`relative px-5 py-4 ${
             isActive ? "bg-gradient-to-r from-emerald-500 to-emerald-600" :
@@ -208,7 +208,7 @@ export default function WorkerPlansPage() {
           }`}>
             <div className="flex items-center justify-between relative z-10">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                <div className="w-8 h-8 rounded-[14px] bg-white/20 flex items-center justify-center backdrop-blur-sm">
                   {isActive ? <Crown className="w-4 h-4 text-white" /> :
                    isTrialing ? <Sparkles className="w-4 h-4 text-white" /> :
                    <Clock className="w-4 h-4 text-white" />}
@@ -251,7 +251,7 @@ export default function WorkerPlansPage() {
             )}
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gray-50 rounded-xl p-3 text-center">
+              <div className="bg-gray-50 rounded-[14px] p-3 text-center">
                 <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Status</p>
                 <p className={`text-sm font-bold mt-0.5 ${
                   isActive ? "text-emerald-600" : isTrialing ? "text-indigo-700" : "text-red-500"
@@ -259,7 +259,7 @@ export default function WorkerPlansPage() {
                   {isActive ? "Active" : isTrialing ? "In Trial" : "Expired"}
                 </p>
               </div>
-              <div className="bg-gray-50 rounded-xl p-3 text-center">
+              <div className="bg-gray-50 rounded-[14px] p-3 text-center">
                 <p className="text-[10px] text-gray-500 uppercase tracking-wider font-medium">Expires</p>
                 <p className="text-sm font-bold text-gray-900 mt-0.5">
                   {endDate
@@ -270,7 +270,7 @@ export default function WorkerPlansPage() {
             </div>
 
             {isExpired && (
-              <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 rounded-xl px-3 py-2.5">
+              <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 rounded-[14px] px-3 py-2.5">
                 <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                 Renew your plan to continue applying for events.
               </div>
@@ -282,15 +282,15 @@ export default function WorkerPlansPage() {
         <div className="relative">
           {/* Premium corner badge */}
           <div className="absolute -top-[1px] -right-[1px] z-10">
-            <div className="bg-gradient-to-l from-indigo-700 to-indigo-600 text-white text-[9px] font-bold px-4 py-1.5 rounded-bl-2xl rounded-tr-2xl tracking-wider shadow-sm flex items-center gap-1">
+            <div className="bg-gradient-to-l from-indigo-700 to-indigo-600 text-white text-[9px] font-bold px-4 py-1.5 rounded-bl-2xl rounded-tr-2xl tracking-wider shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] flex items-center gap-1">
               <BadgeCheck className="w-2.5 h-2.5" /> BEST VALUE
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl border-2 border-indigo-200/70 overflow-hidden shadow-sm shadow-indigo-200/20">
+          <div className="card-base border-2 border-indigo-200/70 shadow-[0_2px_8px_rgba(67,56,202,0.08)]">
             {/* Plan header */}
             <div className="px-6 pt-7 pb-2 text-center">
-              <div className="mx-auto mb-3 w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center shadow-sm ring-4 ring-indigo-50">
+              <div className="mx-auto mb-3 w-14 h-14 rounded-[18px] bg-gradient-to-br from-indigo-600 to-indigo-700 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] ring-4 ring-indigo-50">
                 <Crown className="w-7 h-7 text-white" />
               </div>
               <h2 className="text-xl font-extrabold text-gray-900 tracking-tight">Monthly Access</h2>
@@ -319,7 +319,7 @@ export default function WorkerPlansPage() {
                 { icon: Calendar, text: "Full 30-day access", sub: "No restrictions, cancel anytime" },
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-3">
-                  <div className="w-7 h-7 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-7 h-7 rounded-[14px] bg-indigo-50 flex items-center justify-center shrink-0 mt-0.5">
                     <item.icon className="w-3.5 h-3.5 text-indigo-700" />
                   </div>
                   <div>
@@ -333,14 +333,14 @@ export default function WorkerPlansPage() {
             {/* CTA */}
             <div className="px-6 pt-4 pb-6">
               {isActive ? (
-                <div className="w-full h-12 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 font-semibold text-sm gap-2">
+                <div className="w-full h-12 rounded-[14px] bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 font-semibold text-sm gap-2">
                   <CheckCircle className="w-4 h-4" /> Currently Active
                 </div>
               ) : barrier ? (
                 <button
                   onClick={handlePurchase}
                   disabled={purchasing || !razorpayLoaded}
-                  className="w-full h-13 rounded-lg bg-indigo-700 text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-indigo-800 flex items-center justify-center gap-2"
+                  className="w-full h-13 rounded-[14px] bg-indigo-700 text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-indigo-800 flex items-center justify-center gap-2"
                 >
                   {purchasing ? (
                     <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
@@ -354,7 +354,7 @@ export default function WorkerPlansPage() {
                 <button
                   onClick={handlePurchase}
                   disabled={purchasing || !razorpayLoaded}
-                  className="w-full h-13 rounded-lg bg-indigo-700 text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-indigo-800 flex items-center justify-center gap-2"
+                  className="w-full h-13 rounded-[14px] bg-indigo-700 text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-indigo-800 flex items-center justify-center gap-2"
                 >
                   {purchasing ? (
                     <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
@@ -382,7 +382,7 @@ export default function WorkerPlansPage() {
         </div>
 
         {/* ─── TRUST STRIP ─── */}
-        <div className="bg-white rounded-2xl border border-gray-200/80 p-4">
+        <div className="card-base p-4">
           <div className="flex items-center justify-center gap-4 text-[10px] text-gray-400 flex-wrap">
             <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> 256-bit SSL</span>
             <span className="w-1 h-1 rounded-full bg-gray-300" />

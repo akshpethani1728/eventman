@@ -77,7 +77,7 @@ export function CardStat({ label, value, color = "gray" }: { label: string; valu
     purple: "text-purple-600",
   };
   return (
-    <div className="bg-gray-50/80 rounded-2xl p-3.5 text-center border border-gray-100/70 shadow-sm shadow-black/[0.01]">
+    <div className="card-inner p-3.5 text-center">
       <p className="text-[11px] font-medium text-gray-500">{label}</p>
       <p className={`text-xl font-bold mt-1 ${colors[color] || colors.gray}`}>{value}</p>
     </div>

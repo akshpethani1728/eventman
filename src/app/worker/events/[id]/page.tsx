@@ -161,7 +161,7 @@ export default function EventDetailPage() {
   const waitlisted = application ? isWaitlisted(application) : false;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#f5f5f7]">
       <header className="sticky top-0 bg-white border-b border-gray-200 z-10">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
           <Link href="/worker/dashboard" className="p-1 -ml-1"><ArrowLeft className="w-5 h-5 text-gray-700" /></Link>
@@ -173,7 +173,7 @@ export default function EventDetailPage() {
 
         {/* Approval Hero */}
         {application?.status === "approved" && (
-          <div className="mb-4 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl p-5 text-white shadow-lg shadow-emerald-600/20 overflow-hidden relative">
+          <div className="mb-4 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-[18px] p-5 text-white shadow-[0_8px_24px_rgba(0,0,0,0.06),0_2px_4px_rgba(0,0,0,0.03)] shadow-emerald-600/20 overflow-hidden relative">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
             <div className="relative">
@@ -202,7 +202,7 @@ export default function EventDetailPage() {
               {hoursUntilEvent > 0 && (
                 <div className={`mt-3 flex items-center gap-2 text-xs font-semibold ${
                   isEventUrgent ? "text-amber-200" : "text-emerald-100"
-                } bg-white/10 rounded-xl px-3 py-2`}>
+                } bg-white/10 rounded-[14px] px-3 py-2`}>
                   <Timer className={`w-4 h-4 ${isEventUrgent ? "animate-pulse" : ""}`} />
                   {isEventToday
                     ? "Event starts today — get ready!"
@@ -217,7 +217,7 @@ export default function EventDetailPage() {
 
         {/* Application status summary */}
         {application && application.status !== "approved" && !isWaitlisted(application) && (
-          <div className={`mb-4 rounded-xl p-4 border ${
+          <div className={`mb-4 rounded-[14px] p-4 border ${
             application.status === "pending"
               ? "bg-amber-50 border-amber-100"
               : "bg-gray-50 border-gray-200"
@@ -251,7 +251,7 @@ export default function EventDetailPage() {
 
         {/* Waitlisted status */}
         {waitlisted && (
-          <div className="mb-4 rounded-xl p-4 border bg-purple-50 border-purple-100">
+          <div className="mb-4 rounded-[14px] p-4 border bg-purple-50 border-purple-100">
             <div className="flex items-center gap-2.5">
               <ListPlus className="w-5 h-5 text-purple-500 shrink-0" />
               <div>
@@ -262,7 +262,7 @@ export default function EventDetailPage() {
           </div>
         )}
 
-        <div className="bg-white border border-gray-200 rounded-xl p-5 mb-3">
+        <div className="card-base p-5 mb-3">
           <h2 className="text-lg font-bold mb-1">{event.title}</h2>
           <div className="flex flex-wrap gap-2 mt-2">
             {event.category && <span className="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full capitalize">{event.category.replace(/_/g, " ")}</span>}
@@ -283,7 +283,7 @@ export default function EventDetailPage() {
           )}
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-xl p-5 mb-3 space-y-4">
+        <div className="card-base p-5 mb-3 space-y-4">
           <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wide">Event Details</h3>
           <div className="space-y-3 text-sm">
             <div className="flex items-start gap-3">
@@ -320,7 +320,7 @@ export default function EventDetailPage() {
         </div>
 
         {(event.gender_requirement || event.min_age || event.max_age || event.dress_code || event.work_description || event.experience_required || event.skill_requirements || event.grooming_notes) && (
-          <div className="bg-white border border-gray-200 rounded-xl p-5 mb-3 space-y-4">
+          <div className="card-base p-5 mb-3 space-y-4">
             <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wide">Requirements</h3>
             <div className="space-y-3 text-sm">
               {event.gender_requirement && <div className="flex items-start gap-3"><User className="w-4 h-4 mt-0.5 text-gray-400 shrink-0" /><div><p className="text-gray-500 text-xs">Gender</p><p className="font-medium capitalize">{event.gender_requirement}</p></div></div>}
@@ -342,21 +342,21 @@ export default function EventDetailPage() {
         )}
 
         {event.required_documents && event.required_documents.length > 0 && (
-          <div className="bg-white border border-gray-200 rounded-xl p-5 mb-3 space-y-3">
+          <div className="card-base p-5 mb-3 space-y-3">
             <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wide">Required Documents</h3>
             <div className="flex flex-wrap gap-2">{event.required_documents.map((doc, i) => <span key={i} className="text-xs bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full">{doc}</span>)}</div>
           </div>
         )}
 
         {event.reporting_details && (
-          <div className="bg-white border border-gray-200 rounded-xl p-5 mb-3 space-y-3">
+          <div className="card-base p-5 mb-3 space-y-3">
             <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wide">Reporting Details</h3>
             <p className="text-sm whitespace-pre-wrap">{event.reporting_details}</p>
           </div>
         )}
 
         {event.instructions && (
-          <div className="bg-white border border-gray-200 rounded-xl p-5 mb-3 space-y-3">
+          <div className="card-base p-5 mb-3 space-y-3">
             <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wide">Instructions</h3>
             <p className="text-sm whitespace-pre-wrap">{event.instructions}</p>
           </div>
@@ -364,7 +364,7 @@ export default function EventDetailPage() {
 
         {/* Organizer Info — contact hidden until approved */}
         {organizer && (
-          <div className="bg-indigo-50/60 rounded-xl p-4 border border-indigo-100/50 space-y-3 mb-3">
+          <div className="bg-indigo-50/60 rounded-[14px] p-4 border border-indigo-100/50 space-y-3 mb-3">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wide">Organized by</h3>
               {showContact && (
@@ -410,7 +410,7 @@ export default function EventDetailPage() {
                 </div>
                 {/* Contact — only visible after approval */}
                 {showContact && organizer.phone && (
-                  <div className="flex items-center gap-2 mt-2 px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-100">
+                  <div className="flex items-center gap-2 mt-2 px-3 py-2 rounded-[14px] bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-100">
                     <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shrink-0">
                       <Phone className="w-3.5 h-3.5 text-white" />
                     </div>
@@ -433,10 +433,10 @@ export default function EventDetailPage() {
 
         {/* Application Status — only when not already shown as hero or waitlisted */}
         {application && !isWaitlisted(application) && application.status !== "approved" && application.status !== "pending" && !isRemovedByOrganizer(application) && (
-          <div className="bg-white border rounded-xl p-5 mb-3 border-gray-200">
+          <div className="card-base p-5 mb-3">
             <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wide mb-3">Application Status</h3>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-100 text-gray-500">
+              <div className="w-10 h-10 rounded-[14px] flex items-center justify-center bg-gray-100 text-gray-500">
                 {application.status === "rejected" ? <XCircle className="w-5 h-5" /> : <Info className="w-5 h-5" />}
               </div>
               <div>
@@ -458,10 +458,10 @@ export default function EventDetailPage() {
 
         {/* Removed by organizer — show re-apply option */}
         {application && isRemovedByOrganizer(application) && (
-          <div className="bg-white border rounded-xl p-5 mb-3 border-amber-200 bg-amber-50/30">
+          <div className="card-base p-5 mb-3 border-amber-200 bg-amber-50/30">
             <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wide mb-3">Application Status</h3>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-amber-100 text-amber-600">
+              <div className="w-10 h-10 rounded-[14px] flex items-center justify-center bg-amber-100 text-amber-600">
                 <AlertCircle className="w-5 h-5" />
               </div>
               <div>
@@ -477,9 +477,9 @@ export default function EventDetailPage() {
 
       {/* Bottom bar */}
       {!application && deadlinePassed && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-200/80 p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
-            <div className="w-full h-14 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-500 font-medium text-sm gap-2">
+            <div className="w-full h-14 rounded-[14px] bg-gray-50 backdrop-blur-xl border border-gray-200 flex items-center justify-center text-gray-500 font-medium text-sm gap-2">
               <Clock className="w-4 h-4 text-gray-400" /> Applications Closed — deadline has passed
             </div>
           </div>
@@ -487,10 +487,10 @@ export default function EventDetailPage() {
       )}
 
       {!application && !deadlinePassed && isFull && canApply && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-200/80 p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
             <button onClick={handleJoinWaitlist} disabled={applying}
-              className="w-full h-12 rounded-lg bg-purple-600 text-white font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-purple-700 flex items-center justify-center gap-2">
+              className="w-full h-12 rounded-[14px] bg-purple-600 text-white font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-purple-700 flex items-center justify-center gap-2">
               {applying ? (
                 <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
               ) : (
@@ -502,9 +502,9 @@ export default function EventDetailPage() {
       )}
 
       {!application && !deadlinePassed && isFull && !canApply && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-200/80 p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
-            <Link href="/worker/plans" className="w-full h-12 rounded-lg bg-amber-600 text-white font-medium text-base active:scale-[0.98] transition-all hover:bg-amber-700 flex items-center justify-center gap-2">
+            <Link href="/worker/plans" className="w-full h-12 rounded-[14px] bg-amber-600 text-white font-medium text-base active:scale-[0.98] transition-all hover:bg-amber-700 flex items-center justify-center gap-2">
               <CreditCard className="w-4 h-4" /> Subscribe to Join Waitlist
             </Link>
           </div>
@@ -512,10 +512,10 @@ export default function EventDetailPage() {
       )}
 
       {!application && !deadlinePassed && !isFull && (event.status === "published" || event.status === "filling") && canApply && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-200/80 p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
             <button onClick={handleApply} disabled={applying}
-              className="w-full h-12 rounded-lg bg-indigo-700 text-white font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-indigo-800 flex items-center justify-center gap-2">
+              className="w-full h-12 rounded-[14px] bg-indigo-700 text-white font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-indigo-800 flex items-center justify-center gap-2">
               {applying ? (
                 <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
               ) : (
@@ -527,9 +527,9 @@ export default function EventDetailPage() {
       )}
 
       {!application && !deadlinePassed && !isFull && (event.status === "published" || event.status === "filling") && !canApply && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-200/80 p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
-            <Link href="/worker/plans" className="w-full h-12 rounded-lg bg-amber-600 text-white font-medium text-base active:scale-[0.98] transition-all hover:bg-amber-700 flex items-center justify-center gap-2">
+            <Link href="/worker/plans" className="w-full h-12 rounded-[14px] bg-amber-600 text-white font-medium text-base active:scale-[0.98] transition-all hover:bg-amber-700 flex items-center justify-center gap-2">
               <CreditCard className="w-4 h-4" /> Subscribe to Apply
             </Link>
           </div>
@@ -537,9 +537,9 @@ export default function EventDetailPage() {
       )}
 
       {!application && !deadlinePassed && !isFull && event.status === "closed" && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-200/80 p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
-            <div className="w-full h-14 rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-600 font-medium text-sm gap-2">
+            <div className="w-full h-14 rounded-[14px] bg-gray-50 backdrop-blur-xl border border-gray-200 flex items-center justify-center text-gray-600 font-medium text-sm gap-2">
               <Info className="w-4 h-4 text-gray-400" /> This event is no longer accepting applications
             </div>
           </div>
@@ -547,9 +547,9 @@ export default function EventDetailPage() {
       )}
 
       {application && application.status === "pending" && !isWaitlisted(application) && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-200/80 p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
-            <div className="w-full h-14 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-800 font-medium text-sm gap-2">
+            <div className="w-full h-14 rounded-[14px] bg-amber-50 backdrop-blur-xl border border-amber-200 flex items-center justify-center text-amber-800 font-medium text-sm gap-2">
               <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
               Application submitted — waiting for organizer response
             </div>
@@ -558,10 +558,10 @@ export default function EventDetailPage() {
       )}
 
       {waitlisted && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-200/80 p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
             <button onClick={handleLeaveWaitlist} disabled={applying}
-              className="w-full h-12 rounded-lg border-2 border-purple-200 bg-purple-50 text-purple-700 font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+              className="w-full h-12 rounded-[14px] border-2 border-purple-200 bg-purple-50 text-purple-700 font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2">
               {applying ? (
                 <span className="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin inline-block" />
               ) : (
@@ -573,11 +573,11 @@ export default function EventDetailPage() {
       )}
 
       {application && application.status === "approved" && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-200/80 p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
-              <div className={`w-full rounded-lg flex items-center justify-between px-5 py-3 bg-emerald-50 border border-emerald-200`}>
+              <div className={`w-full rounded-[14px] flex items-center justify-between px-5 py-3 bg-emerald-50 backdrop-blur-xl border border-emerald-200`}>
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-sm">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
                   <CheckCircle className="w-5 h-5 text-white" />
                 </div>
                 <div>
@@ -598,10 +598,10 @@ export default function EventDetailPage() {
       )}
 
       {application && isRemovedByOrganizer(application) && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-200/80 p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
             <button onClick={handleReApply} disabled={applying}
-              className="w-full h-12 rounded-lg bg-indigo-700 text-white font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-indigo-800 flex items-center justify-center gap-2">
+              className="w-full h-12 rounded-[14px] bg-indigo-700 text-white font-medium text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-indigo-800 flex items-center justify-center gap-2">
               {applying ? (
                 <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
               ) : (
@@ -613,10 +613,10 @@ export default function EventDetailPage() {
       )}
 
       {application && (application.status === "rejected" || (application.status === "cancelled" && !isRemovedByOrganizer(application))) && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-200/80 p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
             <Link href="/worker/dashboard"
-              className="w-full h-12 rounded-lg bg-indigo-700 text-white font-medium text-base flex items-center justify-center gap-2 hover:bg-indigo-800">
+              className="w-full h-12 rounded-[14px] bg-indigo-700 text-white font-medium text-base flex items-center justify-center gap-2 hover:bg-indigo-800">
               <ArrowUpRight className="w-4 h-4" /> Browse More Events
             </Link>
           </div>
