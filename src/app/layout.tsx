@@ -46,7 +46,7 @@ export default function RootLayout({
       <head>
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className="min-h-screen safe-area-padding" style={{ backgroundColor: "#f5f5f7" }}>
+      <body className="min-h-screen safe-area-padding" style={{ backgroundColor: "#F8F8F6" }}>
         {children}
         <Toaster richColors position="top-center" />
         <PWARegistration />

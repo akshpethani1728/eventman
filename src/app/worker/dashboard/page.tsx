@@ -358,10 +358,11 @@ function DashboardContent() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F8F8F6]">
-        <header className="sticky top-0 bg-white backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-20">
+        <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-20">
+          <div className="h-0.5 bg-gradient-to-r from-[#0D9488]/20 via-[#0D9488] to-[#0D9488]/20" />
           <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-[14px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-sm">
+              <div className="w-8 h-8 rounded-[10px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-sm">
                 <Zap className="w-4 h-4 text-white" />
               </div>
               <div>
@@ -389,7 +390,8 @@ function DashboardContent() {
   return (
     <div className="min-h-screen bg-[#F8F8F6]">
       {/* Header */}
-      <header className="sticky top-0 bg-white backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-20">
+      <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-20">
+        <div className="h-0.5 bg-gradient-to-r from-[#0D9488]/20 via-[#0D9488] to-[#0D9488]/20" />
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-[10px] bg-[#0D9488] flex items-center justify-center shadow-sm">

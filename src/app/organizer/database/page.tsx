@@ -27,13 +27,13 @@ function computeCompletion(p: Profile): number {
 }
 
 const AVAIL_CONFIG: Record<string, { label: string; dot: string; badge: string }> = {
-  available_today: { label: "Available Today", dot: "bg-emerald-500", badge: "emerald-100 text-emerald-700 border-emerald-200" },
-  available_this_week: { label: "Available This Week", dot: "bg-indigo-600", badge: "indigo-100 text-indigo-700 border-indigo-200" },
-  available: { label: "Available", dot: "bg-emerald-500", badge: "emerald-100 text-emerald-700 border-emerald-200" },
-  weekends: { label: "Weekends", dot: "bg-amber-500", badge: "amber-100 text-amber-700 border-amber-200" },
-  evenings: { label: "Evenings", dot: "bg-purple-500", badge: "purple-100 text-purple-700 border-purple-200" },
-  busy: { label: "Busy", dot: "bg-red-500", badge: "red-100 text-red-700 border-red-200" },
-  unavailable: { label: "Unavailable", dot: "bg-gray-400", badge: "gray-100 text-gray-500 border-gray-200" },
+  available_today: { label: "Available Today", dot: "bg-emerald-500", badge: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  available_this_week: { label: "Available This Week", dot: "bg-[#0D9488]", badge: "bg-[#0D9488]/10 text-[#0D9488] border-[#0D9488]/20" },
+  available: { label: "Available", dot: "bg-emerald-500", badge: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  weekends: { label: "Weekends", dot: "bg-amber-500", badge: "bg-amber-100 text-amber-700 border-amber-200" },
+  evenings: { label: "Evenings", dot: "bg-purple-500", badge: "bg-purple-100 text-purple-700 border-purple-200" },
+  busy: { label: "Busy", dot: "bg-red-500", badge: "bg-red-100 text-red-700 border-red-200" },
+  unavailable: { label: "Unavailable", dot: "bg-gray-400", badge: "bg-gray-100 text-gray-500 border-gray-200" },
 };
 
 const AVAIL_SORT_KEY: Record<string, number> = {
@@ -82,11 +82,11 @@ export default function WorkerDatabasePage() {
   if (loading) return <PageLoader />;
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7] pb-24">
-      <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-gray-200/60 z-10">
-        <div className="h-0.5 bg-gradient-to-r from-indigo-200 via-indigo-500 to-indigo-200" />
+    <div className="min-h-screen bg-[#F8F8F6] pb-24">
+      <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10">
+        <div className="h-0.5 bg-gradient-to-r from-[#0D9488]/20 via-[#0D9488] to-[#0D9488]/20" />
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center gap-3">
-          <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-indigo-700 hover:bg-indigo-50 rounded-[18px] transition-all"><ArrowLeft className="w-5 h-5" /></Link>
+          <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-[10px] transition-all"><ArrowLeft className="w-5 h-5" /></Link>
           <h1 className="font-semibold text-sm">Worker Database</h1>
           <span className="text-xs text-gray-400 ml-auto font-medium">{workers.length} workers</span>
         </div>
@@ -95,13 +95,13 @@ export default function WorkerDatabasePage() {
       <main className="max-w-3xl mx-auto px-4 py-4">
         <form onSubmit={e => e.preventDefault()} className="flex gap-2 mb-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search by name, area, or skills..."
-              className="w-full h-11 pl-10 pr-4 rounded-[18px] border border-gray-200 bg-white text-sm form-input outline-none focus:border-indigo-300 focus:ring-2 focus:ring-indigo-50/50 transition-all" />
+              className="input-base pl-10" />
           </div>
           <button type="button" onClick={() => setShowFilters(!showFilters)}
-            className={`h-11 px-4 rounded-[18px] border text-sm flex items-center gap-1.5 transition-all ${
-              showFilters ? "bg-indigo-50 border-indigo-300 text-indigo-700 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]" : "border-gray-200 text-gray-600 bg-white hover:border-gray-300"
+            className={`btn-base rounded-[10px] h-11 px-4 text-sm gap-1.5 ${
+              showFilters ? "btn-primary" : "btn-secondary"
             }`}>
             <Filter className="w-4 h-4" /> Filters
           </button>
@@ -109,8 +109,8 @@ export default function WorkerDatabasePage() {
 
         <div className="flex items-center gap-2 mb-3">
           <button onClick={() => setAvailableOnly(!availableOnly)}
-            className={`h-8 px-3 rounded-[18px] text-[11px] font-medium transition-all flex items-center gap-1.5 ${
-              availableOnly ? "bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]" : "bg-white text-gray-500 border border-gray-200 hover:border-gray-300"
+            className={`h-8 px-3 rounded-[10px] text-[11px] font-medium transition-all flex items-center gap-1.5 ${
+              availableOnly ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-white text-gray-500 border border-[rgba(0,0,0,0.08)] hover:border-[rgba(0,0,0,0.14)]"
             }`}>
             {availableOnly && <CheckCircle className="w-3 h-3" />} Available only
           </button>
@@ -120,16 +120,16 @@ export default function WorkerDatabasePage() {
         </div>
 
         {showFilters && (
-          <form onSubmit={e => e.preventDefault()} className="bg-white border border-gray-200/80 rounded-[22px] p-5 mb-3 space-y-3 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-black/[0.03] animate-fade-in">
+          <form onSubmit={e => e.preventDefault()} className="card-base p-5 mb-3 space-y-3 animate-fade-in">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               <select value={filters.gender} onChange={e => setFilters(f => ({ ...f, gender: e.target.value }))}
-                className="h-9 px-3 rounded-[18px] border border-gray-200 text-xs bg-white">
+                className="input-base">
                 <option value="">Any gender</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
               </select>
               <select value={filters.availability} onChange={e => setFilters(f => ({ ...f, availability: e.target.value }))}
-                className="h-9 px-3 rounded-[18px] border border-gray-200 text-xs bg-white">
+                className="input-base">
                 <option value="">Any availability</option>
                 <option value="available_today">Available Today</option>
                 <option value="available_this_week">Available This Week</option>
@@ -140,13 +140,13 @@ export default function WorkerDatabasePage() {
                 <option value="unavailable">Unavailable</option>
               </select>
               <input value={filters.city} onChange={e => setFilters(f => ({ ...f, city: e.target.value }))}
-                placeholder="City" className="h-9 px-3 rounded-[18px] border border-gray-200 text-xs bg-white" />
+                placeholder="City" className="input-base" />
               <input value={filters.skills} onChange={e => setFilters(f => ({ ...f, skills: e.target.value }))}
-                placeholder="Skill" className="h-9 px-3 rounded-[18px] border border-gray-200 text-xs bg-white" />
+                placeholder="Skill" className="input-base" />
             </div>
             {(filters.gender || filters.availability || filters.city || filters.skills) && (
               <button type="button" onClick={() => setFilters({ gender: "", availability: "", city: "", skills: "" })}
-                className="text-xs text-indigo-600 flex items-center gap-1 hover:text-indigo-800 transition-colors"><X className="w-3 h-3" /> Clear filters</button>
+                className="text-xs text-[#0D9488] flex items-center gap-1 hover:text-[#0F766E] transition-colors"><X className="w-3 h-3" /> Clear filters</button>
             )}
           </form>
         )}
@@ -160,11 +160,11 @@ export default function WorkerDatabasePage() {
             const completion = computeCompletion(w);
             const avail = w.availability ? AVAIL_CONFIG[w.availability] : null;
             return (
-              <Card key={w.id} padding="md" hover className="cursor-pointer transition-all duration-200 active:scale-[0.99] group border-0 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]"
+              <Card key={w.id} padding="md" hover className="cursor-pointer transition-all duration-200 active:scale-[0.99] group"
                 onClick={() => setSelectedWorker(w)}>
                 <div className="flex items-start gap-3">
                   <div className="relative shrink-0">
-                    <div className="w-10 h-10 rounded-[14px] bg-gradient-to-br from-indigo-50 to-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-sm ring-1 ring-indigo-200/60 group-hover:ring-2 group-hover:ring-indigo-300 transition-all">
+                    <div className="w-10 h-10 rounded-[10px] bg-gradient-to-br from-[#0D9488]/10 to-[#0D9488]/20 flex items-center justify-center text-[#0D9488] font-bold text-sm group-hover:ring-2 group-hover:ring-[#0D9488]/30 transition-all">
                       {w.full_name?.charAt(0) || "W"}
                     </div>
                     {avail && <StatusDot variant={
@@ -177,11 +177,11 @@ export default function WorkerDatabasePage() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-semibold text-sm text-gray-900 group-hover:text-indigo-700 transition-colors">{w.full_name}</p>
+                      <p className="font-semibold text-sm text-gray-900 group-hover:text-[#0D9488] transition-colors">{w.full_name}</p>
                       {avail && (
-                        <span className={`inline-flex items-center gap-1 text-[9px] font-medium px-1.5 py-0.5 rounded-[14px] border ${
+                        <span className={`inline-flex items-center gap-1 text-[9px] font-medium px-1.5 py-0.5 rounded-full border ${
                           w.availability === "available_today" || w.availability === "available" ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
-                          w.availability === "available_this_week" ? "bg-indigo-50 text-indigo-700 border-indigo-200" :
+                          w.availability === "available_this_week" ? "bg-[#0D9488]/10 text-[#0D9488] border-[#0D9488]/20" :
                           w.availability === "weekends" ? "bg-amber-50 text-amber-700 border-amber-200" :
                           w.availability === "evenings" ? "bg-purple-50 text-purple-700 border-purple-200" :
                           w.availability === "busy" ? "bg-red-50 text-red-700 border-red-200" :
@@ -189,7 +189,7 @@ export default function WorkerDatabasePage() {
                         }`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${
                             w.availability === "available_today" || w.availability === "available" ? "bg-emerald-500" :
-                            w.availability === "available_this_week" ? "bg-indigo-600" :
+                            w.availability === "available_this_week" ? "bg-[#0D9488]" :
                             w.availability === "weekends" ? "bg-amber-500" :
                             w.availability === "evenings" ? "bg-purple-500" :
                             w.availability === "busy" ? "bg-red-500" :
@@ -199,10 +199,10 @@ export default function WorkerDatabasePage() {
                       )}
                     </div>
                     <p className="text-xs text-gray-500 mt-0.5">
-                      {w.age && `${w.age} yrs`}{w.gender && ` · ${w.gender}`}{w.city && ` · ${w.city}`}
+                      {w.age && `${w.age} yrs`}{w.gender && ` &middot; ${w.gender}`}{w.city && ` &middot; ${w.city}`}
                     </p>
                     <div className="flex flex-wrap gap-1 mt-1.5">
-                      {w.skills?.slice(0, 3).map((s, i) => <span key={i} className="text-[11px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-[14px]">{s}</span>)}
+                      {w.skills?.slice(0, 3).map((s, i) => <span key={i} className="text-[11px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-[10px]">{s}</span>)}
                       {(w.skills?.length || 0) > 3 && <span className="text-[10px] text-gray-400 font-medium">+{w.skills!.length - 3}</span>}
                     </div>
                     <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1.5 text-[11px] text-gray-500">
@@ -212,7 +212,7 @@ export default function WorkerDatabasePage() {
                     <div className="flex items-center gap-2 mt-2">
                       <div className="flex items-center gap-1.5 flex-1">
                         <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden max-w-[100px]">
-                          <div className={`h-full rounded-full ${completion >= 80 ? "bg-emerald-500" : completion >= 50 ? "bg-amber-500" : "bg-indigo-600"}`}
+                          <div className={`h-full rounded-full ${completion >= 80 ? "bg-emerald-500" : completion >= 50 ? "bg-amber-500" : "bg-[#0D9488]"}`}
                             style={{ width: `${completion}%` }} />
                         </div>
                         <span className={`text-[10px] font-medium ${completion >= 80 ? "text-emerald-600" : completion >= 50 ? "text-amber-600" : "text-gray-400"}`}>{completion}%</span>
@@ -240,4 +240,3 @@ export default function WorkerDatabasePage() {
     </div>
   );
 }
-

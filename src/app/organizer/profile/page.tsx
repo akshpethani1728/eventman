@@ -76,11 +76,11 @@ export default function OrganizerProfilePage() {
   if (loading) return <PageLoader />;
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7] pb-24">
-      <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-gray-200/60 z-10">
-        <div className="h-0.5 bg-gradient-to-r from-indigo-200 via-indigo-500 to-indigo-200" />
+    <div className="min-h-screen bg-[#F8F8F6] pb-24">
+      <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10">
+        <div className="h-0.5 bg-gradient-to-r from-[#0D9488]/20 via-[#0D9488] to-[#0D9488]/20" />
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
-          <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-indigo-700 hover:bg-indigo-50 rounded-[18px] transition-all"><ArrowLeft className="w-5 h-5" /></Link>
+          <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-[10px] transition-all"><ArrowLeft className="w-5 h-5" /></Link>
           <h1 className="font-semibold text-sm">My Profile</h1>
         </div>
       </header>
@@ -88,25 +88,25 @@ export default function OrganizerProfilePage() {
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
         <form onSubmit={(e) => { e.preventDefault(); saveProfile(); }}>
           <div className="card-base p-6 text-center">
-            <div className="w-20 h-20 rounded-[22px] bg-gradient-to-br from-indigo-100 to-indigo-200 flex items-center justify-center mx-auto mb-3 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] ring-2 ring-indigo-200/60">
-              <span className="text-2xl font-bold text-indigo-700">{profile?.full_name?.charAt(0)?.toUpperCase() || "O"}</span>
+            <div className="w-20 h-20 rounded-[16px] bg-gradient-to-br from-[#0D9488]/10 to-[#0D9488]/20 flex items-center justify-center mx-auto mb-3">
+              <span className="text-2xl font-bold text-[#0D9488]">{profile?.full_name?.charAt(0)?.toUpperCase() || "O"}</span>
             </div>
             <div className="flex items-center justify-center gap-2 flex-wrap">
               <p className="font-semibold text-lg text-gray-900">{profile?.full_name}</p>
               {profile?.is_trusted_organizer && (
-                <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-[14px]">
+                <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
                   <BadgeCheck className="w-3 h-3" />
                   Trusted
                 </span>
               )}
               {!profile?.is_trusted_organizer && profile?.status === "trusted" && (
-                <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200/60 px-2 py-0.5 rounded-[14px]">
+                <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-[#0D9488] bg-[#0D9488]/10 border border-[#0D9488]/20 px-2 py-0.5 rounded-full">
                   <ShieldCheck className="w-3 h-3" />
                   Verified
                 </span>
               )}
               {!profile?.is_trusted_organizer && profile?.status === "basic_verified" && (
-                <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-sky-700 bg-sky-50 border border-sky-200/60 px-2 py-0.5 rounded-[14px]">
+                <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-sky-700 bg-sky-50 border border-sky-200/60 px-2 py-0.5 rounded-full">
                   <ShieldAlert className="w-3 h-3" />
                   Basic Verified
                 </span>
@@ -128,7 +128,7 @@ export default function OrganizerProfilePage() {
               <div className="relative">
                 <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input value={form.full_name} onChange={e => update("full_name", e.target.value)}
-                  className="w-full h-11 pl-10 pr-3.5 rounded-[18px] border border-gray-200 bg-white text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-50 transition-all" />
+                  className="input-base pl-10" />
               </div>
             </div>
 
@@ -138,7 +138,7 @@ export default function OrganizerProfilePage() {
                 <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input value={form.phone} onChange={e => update("phone", e.target.value)}
                   placeholder="9876543210"
-                  className="w-full h-11 pl-10 pr-3.5 rounded-[18px] border border-gray-200 bg-white text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-50 transition-all" />
+                  className="input-base pl-10" />
               </div>
             </div>
 
@@ -148,25 +148,24 @@ export default function OrganizerProfilePage() {
                 <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input value={form.city} onChange={e => update("city", e.target.value)}
                   placeholder="Ahmedabad"
-                  className="w-full h-11 pl-10 pr-3.5 rounded-[18px] border border-gray-200 bg-white text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-50 transition-all" />
+                  className="input-base pl-10" />
               </div>
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1.5">Area</label>
                 <input value={form.area} onChange={e => update("area", e.target.value)}
                   placeholder="e.g., Navrangpura"
-                  className="w-full h-11 px-3.5 rounded-[18px] border border-gray-200 bg-white text-sm outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-50 transition-all" />
+                  className="input-base" />
             </div>
           </div>
 
-          {/* About section */}
           <div className="card-base p-5 space-y-4">
             <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">About</p>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1.5">Description</label>
               <textarea value={form.bio} onChange={e => update("bio", e.target.value)}
                 placeholder="Tell workers about your organization..."
-                className="w-full h-24 px-3.5 py-2.5 rounded-[18px] border border-gray-200 bg-white text-sm resize-none outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-50 transition-all" />
+                className="input-base h-24 resize-none pt-2.5" />
             </div>
           </div>
 
@@ -180,4 +179,3 @@ export default function OrganizerProfilePage() {
     </div>
   );
 }
-

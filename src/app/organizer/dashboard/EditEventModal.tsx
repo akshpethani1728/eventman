@@ -28,10 +28,10 @@ const STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: "cancelled", label: "Cancelled" },
 ];
 
-function SectionCard({ label, emoji, children, accentCls }: { label: string; emoji: string; children: React.ReactNode; accentCls: string }) {
+function SectionCard({ label, emoji, children }: { label: string; emoji: string; children: React.ReactNode }) {
   return (
-    <div className="card-base overflow-hidden form-section">
-      <div className={`flex items-center gap-2 px-4 py-3 ${accentCls} border-b border-gray-100/50`}>
+    <div className="card-base overflow-hidden">
+      <div className="flex items-center gap-2 px-4 py-3 bg-[#0D9488]/[0.03] border-b border-[rgba(0,0,0,0.06)]">
         <span className="text-lg">{emoji}</span>
         <span className="text-xs font-bold uppercase tracking-widest text-gray-500/80">{label}</span>
       </div>
@@ -124,43 +124,38 @@ export default function EditEventModal({ event, onClose, onUpdated }: Props) {
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-6 p-3 overflow-y-auto modal-overlay">
       <div className="w-full max-w-xl modal-body">
-        {/* Header */}
-        <div className="bg-gradient-to-br from-violet-600 via-violet-700 to-purple-800 rounded-t-[22px] px-5 py-5 text-white">
+        <div className="bg-gradient-to-br from-[#0D9488] via-[#0D9488] to-[#0F766E] rounded-t-[20px] px-5 py-5 text-white">
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-[18px] bg-white/15 flex items-center justify-center backdrop-blur-sm">
+              <div className="w-10 h-10 rounded-[10px] bg-white/15 flex items-center justify-center backdrop-blur-sm">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div>
                 <h2 className="font-bold text-lg">Edit Event</h2>
-                <p className="text-xs text-violet-200/80 mt-0.5 truncate max-w-[300px]">{event.title}</p>
+                <p className="text-xs text-white/80 mt-0.5 truncate max-w-[300px]">{event.title}</p>
               </div>
             </div>
-            <button onClick={onClose} className="p-1.5 hover:bg-white/10 rounded-[18px] transition-colors">
+            <button onClick={onClose} className="p-1.5 hover:bg-white/10 rounded-[10px] transition-colors">
               <X className="w-4 h-4" />
             </button>
           </div>
-          {/* Status selector inline */}
           <div className="mt-3 flex items-center gap-3">
-            <span className="text-xs text-violet-200 font-medium">Status:</span>
+            <span className="text-xs text-white/80 font-medium">Status:</span>
             <select value={form.status} onChange={e => update("status", e.target.value)}
-              className="h-8 px-3 rounded-[18px] bg-white/15 border border-white/20 text-white text-xs font-medium backdrop-blur-sm outline-none">
+              className="h-8 px-3 rounded-full bg-white/15 border border-white/20 text-white text-xs font-medium backdrop-blur-sm outline-none">
               {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
           </div>
         </div>
 
-        {/* Form body */}
-        <div className="bg-[#f5f5f7] px-5 py-4 space-y-4 border-x border-gray-200/80">
+        <div className="bg-[#F8F8F6] px-5 py-4 space-y-4">
           <form onSubmit={handleSubmit} className="space-y-4">
 
-            {/* A. Event Basics */}
-            <SectionCard emoji="📋" label="Event Basics" accentCls="bg-gradient-to-r from-indigo-50/80 to-indigo-100/80">
+            <SectionCard emoji="📋" label="Event Basics">
               <div>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Event Title</label>
                 <input required value={form.title} onChange={e => update("title", e.target.value)}
                   maxLength={100}
-                 
                   className="input-base" />
                 <div className="text-right mt-1">
                   <span className="text-[10px] text-gray-400">{form.title.length}/100</span>
@@ -213,8 +208,7 @@ export default function EditEventModal({ event, onClose, onUpdated }: Props) {
               </div>
             </SectionCard>
 
-            {/* B. Location */}
-            <SectionCard emoji="📍" label="Location" accentCls="bg-gradient-to-r from-teal-50/80 to-emerald-50/80">
+            <SectionCard emoji="📍" label="Location">
               <div>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Venue / Location</label>
                 <input value={form.location} onChange={e => update("location", e.target.value)}
@@ -228,13 +222,12 @@ export default function EditEventModal({ event, onClose, onUpdated }: Props) {
               </div>
             </SectionCard>
 
-            {/* C. Worker Requirements */}
-            <SectionCard emoji="👥" label="Worker Requirements" accentCls="bg-gradient-to-r from-purple-50/80 to-violet-50/80">
+            <SectionCard emoji="👥" label="Worker Requirements">
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Gender</label>
                   <select value={form.gender_requirement} onChange={e => update("gender_requirement", e.target.value)}
-                    className="input-base px-3">
+                    className="input-base">
                     <option value="">Any</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
@@ -243,19 +236,19 @@ export default function EditEventModal({ event, onClose, onUpdated }: Props) {
                 <div>
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Min Age</label>
                   <input type="number" min={0} value={form.min_age} onChange={e => update("min_age", e.target.value)}
-                    className="input-base px-3" />
+                    className="input-base" />
                 </div>
                 <div>
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Max Age</label>
                   <input type="number" min={0} value={form.max_age} onChange={e => update("max_age", e.target.value)}
-                    className="input-base px-3" />
+                    className="input-base" />
                 </div>
               </div>
 
               <div>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Work Description</label>
                 <textarea value={form.work_description} onChange={e => update("work_description", e.target.value)}
-                  placeholder="Describe what workers will actually do — be specific so they know what to expect.&#10;&#10;Example:&#10;• Greet guests at the entrance (4 hrs)&#10;• Guide attendees to their tables&#10;• Assist with food serving during dinner&#10;• Help with cleanup after the event"
+                  placeholder="Describe what workers will actually do &mdash; be specific so they know what to expect.&#10;&#10;Example:&#10;&bull; Greet guests at the entrance (4 hrs)&#10;&bull; Guide attendees to their tables&#10;&bull; Assist with food serving during dinner&#10;&bull; Help with cleanup after the event"
                   className="input-base h-36 resize-none" />
               </div>
 
@@ -266,8 +259,7 @@ export default function EditEventModal({ event, onClose, onUpdated }: Props) {
               </div>
             </SectionCard>
 
-            {/* D. Appearance & Documents */}
-            <SectionCard emoji="👔" label="Appearance & Documents" accentCls="bg-gradient-to-r from-green-50/80 to-emerald-50/80">
+            <SectionCard emoji="👔" label="Appearance & Documents">
               <InputGroup>
                 <div>
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Dress Code</label>
@@ -287,8 +279,7 @@ export default function EditEventModal({ event, onClose, onUpdated }: Props) {
               </div>
             </SectionCard>
 
-            {/* E. Payment & Perks */}
-            <SectionCard emoji="💰" label="Payment & Perks" accentCls="bg-gradient-to-r from-amber-50/80 to-yellow-50/80">
+            <SectionCard emoji="💰" label="Payment & Perks">
               <div>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Payment</label>
                 <input value={form.payment_info} onChange={e => update("payment_info", e.target.value)}
@@ -317,8 +308,7 @@ export default function EditEventModal({ event, onClose, onUpdated }: Props) {
               </div>
             </SectionCard>
 
-            {/* F. Reporting Instructions */}
-            <SectionCard emoji="📍" label="Reporting Instructions" accentCls="bg-gradient-to-r from-orange-50/80 to-red-50/80">
+            <SectionCard emoji="📍" label="Reporting Instructions">
               <div>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Where to Report</label>
                 <textarea value={form.reporting_details} onChange={e => update("reporting_details", e.target.value)}
@@ -336,10 +326,9 @@ export default function EditEventModal({ event, onClose, onUpdated }: Props) {
               </div>
             </SectionCard>
 
-            {/* Footer Action inside form */}
             <div className="pt-2">
               <button type="submit" disabled={loading}
-                className="w-full h-12 rounded-[18px] bg-gradient-to-r from-violet-600 to-purple-700 text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50 hover:from-violet-700 hover:to-purple-800 active:scale-[0.98] transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-black/[0.03]">
+                className="btn-base btn-primary w-full h-12 gap-2">
                 {loading ? (
                   <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Saving...</>
                 ) : (

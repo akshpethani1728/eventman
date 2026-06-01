@@ -57,7 +57,14 @@ export default function WorkerNotificationsPage() {
   };
 
   if (loading) {
-    return <div className="min-h-screen bg-[#F8F8F6] flex items-center justify-center"><p className="text-[#6B6B6B]">Loading...</p></div>;
+    return (
+      <div className="min-h-screen bg-[#F8F8F6] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-6 h-6 border-2 border-[#0D9488] border-t-transparent rounded-full animate-spin" />
+          <p className="text-xs text-[#A1A1AA] font-medium">Loading notifications...</p>
+        </div>
+      </div>
+    );
   }
 
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -79,6 +86,7 @@ export default function WorkerNotificationsPage() {
   return (
     <div className="min-h-screen bg-[#F8F8F6] pb-24">
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10">
+        <div className="h-0.5 bg-gradient-to-r from-[#0D9488]/20 via-[#0D9488] to-[#0D9488]/20" />
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
           <Link href="/worker/dashboard" className="p-1 -ml-1 text-gray-500"><ArrowLeft className="w-5 h-5" /></Link>
           <h1 className="font-semibold text-sm text-[#1A1A1A]">Notifications</h1>

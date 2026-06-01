@@ -33,7 +33,7 @@ function computeCompletion(p: Profile): number {
 
 const AVAIL_CONFIG: Record<string, { label: string; dot: string; badge: string }> = {
   available_today: { label: "Available Today", dot: "bg-emerald-500", badge: "bg-emerald-100 text-emerald-700 border-emerald-200" },
-  available_this_week: { label: "Available This Week", dot: "bg-indigo-600", badge: "bg-indigo-50 text-indigo-700 border-indigo-200" },
+  available_this_week: { label: "Available This Week", dot: "bg-[#0D9488]", badge: "bg-[#0D9488]/10 text-[#0D9488] border-[#0D9488]/20" },
   available: { label: "Available", dot: "bg-emerald-500", badge: "bg-emerald-100 text-emerald-700 border-emerald-200" },
   weekends: { label: "Weekends", dot: "bg-amber-500", badge: "bg-amber-100 text-amber-700 border-amber-200" },
   evenings: { label: "Evenings", dot: "bg-purple-500", badge: "bg-purple-100 text-purple-700 border-purple-200" },
@@ -42,10 +42,10 @@ const AVAIL_CONFIG: Record<string, { label: string; dot: string; badge: string }
 };
 
 const STATUS_STYLES: Record<string, string> = {
-  draft: "bg-gray-100 text-gray-600", published: "bg-indigo-50 text-indigo-700",
-  filling: "bg-green-100 text-green-700", full: "bg-purple-100 text-purple-700",
-  closed: "bg-amber-100 text-amber-700", completed: "bg-gray-100 text-gray-500",
-  cancelled: "bg-red-100 text-red-700",
+  draft: "bg-gray-100 text-gray-600", published: "bg-[#0D9488]/10 text-[#0D9488]",
+  filling: "bg-emerald-50 text-emerald-700", full: "bg-purple-50 text-purple-700",
+  closed: "bg-amber-50 text-amber-700", completed: "bg-gray-100 text-gray-500",
+  cancelled: "bg-red-50 text-red-700",
 };
 const STATUS_LABELS: Record<string, string> = {
   draft: "Draft", published: "Published", filling: "Filling", full: "Full",
@@ -148,7 +148,6 @@ export default function OrganizerEventDetailPage() {
       });
     }
 
-    // If event was full, free up a spot
     if (event.status === "full") {
       await supabase.from("events").update({ status: "filling", updated_at: new Date().toISOString() }).eq("id", event.id);
       setEvent({ ...event, status: "filling" });
@@ -213,33 +212,30 @@ export default function OrganizerEventDetailPage() {
   const filteredApplicants = filter ? applicants.filter(a => a.status === filter) : applicants;
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7] pb-20">
-      {/* Header */}
-      <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-gray-200/60 z-10">
-        <div className="h-0.5 bg-gradient-to-r from-indigo-200 via-indigo-500 to-indigo-200" />
+    <div className="min-h-screen bg-[#F8F8F6] pb-20">
+      <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10">
+        <div className="h-0.5 bg-gradient-to-r from-[#0D9488]/20 via-[#0D9488] to-[#0D9488]/20" />
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center gap-3">
-          <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-indigo-700 hover:bg-indigo-50 rounded-[18px] transition-all"><ArrowLeft className="w-5 h-5" /></Link>
+          <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-[10px] transition-all"><ArrowLeft className="w-5 h-5" /></Link>
           <h1 className="font-semibold text-sm truncate">{event.title}</h1>
           <Badge variant={event.status as any || "draft"} className="ml-auto">{STATUS_LABELS[event.status]}</Badge>
         </div>
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-4 space-y-4">
-        {/* Operational Alerts */}
         <div className="space-y-1.5 animate-fade-in">
-          {isToday && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-[18px] px-3.5 py-2.5 flex items-center gap-2 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]"><Clock3 className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Starts today</span></div>}
-          {isTomorrow && <div className="text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-[18px] px-3.5 py-2.5 flex items-center gap-2 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]"><Clock3 className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Starts tomorrow</span></div>}
-          {remaining <= 3 && remaining > 0 && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-[18px] px-3.5 py-2.5 flex items-center gap-2 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]"><AlertTriangle className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Only {remaining} seat{remaining !== 1 ? "s" : ""} left</span></div>}
-          {deadlineToday && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-[18px] px-3.5 py-2.5 flex items-center gap-2 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]"><AlertTriangle className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Application deadline is today</span></div>}
-          {deadlineSoon && !deadlineToday && <div className="text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-[18px] px-3.5 py-2.5 flex items-center gap-2 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]"><Clock3 className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Deadline closing soon</span></div>}
-          {pendingCount > 0 && <div className="text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-[18px] px-3.5 py-2.5 flex items-center gap-2 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]"><Users className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">{pendingCount} pending approval{pendingCount !== 1 ? "s" : ""}</span></div>}
+          {isToday && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-[10px] px-3.5 py-2.5 flex items-center gap-2"><Clock3 className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Starts today</span></div>}
+          {isTomorrow && <div className="text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-[10px] px-3.5 py-2.5 flex items-center gap-2"><Clock3 className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Starts tomorrow</span></div>}
+          {remaining <= 3 && remaining > 0 && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-[10px] px-3.5 py-2.5 flex items-center gap-2"><AlertTriangle className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Only {remaining} seat{remaining !== 1 ? "s" : ""} left</span></div>}
+          {deadlineToday && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-[10px] px-3.5 py-2.5 flex items-center gap-2"><AlertTriangle className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Application deadline is today</span></div>}
+          {deadlineSoon && !deadlineToday && <div className="text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-[10px] px-3.5 py-2.5 flex items-center gap-2"><Clock3 className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Deadline closing soon</span></div>}
+          {pendingCount > 0 && <div className="text-xs bg-[#0D9488]/10 text-[#0D9488] border border-[#0D9488]/20 rounded-[10px] px-3.5 py-2.5 flex items-center gap-2"><Users className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">{pendingCount} pending approval{pendingCount !== 1 ? "s" : ""}</span></div>}
         </div>
 
-        {/* Status & Quick Stats */}
         <Card>
           <CardHeader className="mb-3">
             <div className="flex items-center gap-2 flex-wrap">
-              {event.category && <span className="text-[11px] font-medium bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-[14px] capitalize">{event.category.replace(/_/g, " ")}</span>}
+              {event.category && <span className="text-[11px] font-medium bg-[#0D9488]/10 text-[#0D9488] px-2.5 py-0.5 rounded-full capitalize">{event.category.replace(/_/g, " ")}</span>}
             </div>
             <span className="text-[10px] text-gray-400 font-mono">{event.id.slice(0, 8)}</span>
           </CardHeader>
@@ -255,7 +251,7 @@ export default function OrganizerEventDetailPage() {
             <div className="flex-1 ml-4">
               <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                 <div className={`h-full rounded-full transition-all duration-500 ${
-                  approvedCount >= event.worker_count ? "bg-purple-500" : approvedCount >= Math.ceil(event.worker_count * 0.8) ? "bg-emerald-500" : "bg-indigo-600"
+                  approvedCount >= event.worker_count ? "bg-purple-500" : approvedCount >= Math.ceil(event.worker_count * 0.8) ? "bg-emerald-500" : "bg-[#0D9488]"
                 }`} style={{ width: `${Math.min(100, Math.round((approvedCount / event.worker_count) * 100))}%`}} />
               </div>
               <p className="text-[10px] text-gray-400 mt-0.5 text-right">{approvedCount}/{event.worker_count} filled</p>
@@ -263,40 +259,37 @@ export default function OrganizerEventDetailPage() {
           </div>
         </Card>
 
-        {/* Event Details */}
         <div className="card-base p-5 space-y-3">
           <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Event Details</p>
           <div className="grid grid-cols-2 gap-3 text-sm">
-            <div className="flex items-center gap-2 text-gray-600 bg-gray-50/80 rounded-[18px] px-3 py-2.5"><Calendar className="w-4 h-4 text-gray-400 shrink-0" /><span className="font-medium">{event.date_display || event.date}</span></div>
-            <div className="flex items-center gap-2 text-gray-600 bg-gray-50/80 rounded-[18px] px-3 py-2.5"><Clock className="w-4 h-4 text-gray-400 shrink-0" /><span className="font-medium">{event.time}{event.end_time ? `-${event.end_time}` : ""}</span></div>
-            <div className="col-span-2 flex items-center gap-2 text-gray-600 bg-gray-50/80 rounded-[18px] px-3 py-2.5"><MapPin className="w-4 h-4 text-gray-400 shrink-0" /><span className="font-medium truncate">{event.location}</span></div>
-            {event.payment_info && <div className="col-span-2 flex items-center gap-2 text-emerald-700 bg-emerald-50/80 rounded-[18px] px-3 py-2.5"><IndianRupee className="w-4 h-4 shrink-0" /><span className="font-medium">{event.payment_info}</span></div>}
+            <div className="flex items-center gap-2 text-gray-600 bg-gray-50/80 rounded-[10px] px-3 py-2.5"><Calendar className="w-4 h-4 text-gray-400 shrink-0" /><span className="font-medium">{event.date_display || event.date}</span></div>
+            <div className="flex items-center gap-2 text-gray-600 bg-gray-50/80 rounded-[10px] px-3 py-2.5"><Clock className="w-4 h-4 text-gray-400 shrink-0" /><span className="font-medium">{event.time}{event.end_time ? `-${event.end_time}` : ""}</span></div>
+            <div className="col-span-2 flex items-center gap-2 text-gray-600 bg-gray-50/80 rounded-[10px] px-3 py-2.5"><MapPin className="w-4 h-4 text-gray-400 shrink-0" /><span className="font-medium truncate">{event.location}</span></div>
+            {event.payment_info && <div className="col-span-2 flex items-center gap-2 text-emerald-700 bg-emerald-50/80 rounded-[10px] px-3 py-2.5"><IndianRupee className="w-4 h-4 shrink-0" /><span className="font-medium">{event.payment_info}</span></div>}
             {(event.food_included || event.travel_included) && (
               <div className="col-span-2 flex gap-3 text-xs">
-                {event.food_included && <span className="bg-green-50 text-green-700 px-2.5 py-1 rounded-[14px] font-medium">✓ Food included</span>}
-                {event.travel_included && <span className="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-[14px] font-medium">✓ Travel included</span>}
+                {event.food_included && <span className="bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-medium">✓ Food included</span>}
+                {event.travel_included && <span className="bg-[#0D9488]/10 text-[#0D9488] px-2.5 py-1 rounded-full font-medium">✓ Travel included</span>}
               </div>
             )}
           </div>
         </div>
 
-        {/* Requirements */}
         {(event.gender_requirement || event.min_age || event.max_age || event.work_description || event.experience_required || event.skill_requirements || event.dress_code) && (
           <div className="card-base p-5 space-y-3">
             <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Requirements</p>
             {event.work_description && <p className="text-sm text-gray-700 leading-relaxed">{event.work_description}</p>}
             <div className="flex flex-wrap gap-1.5 text-xs">
-              {event.gender_requirement && <span className="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-[14px] capitalize font-medium">{event.gender_requirement}</span>}
-              {(event.min_age || event.max_age) && <span className="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-[14px] font-medium">{event.min_age || 0}-{event.max_age || 99} yrs</span>}
-              {event.dress_code && <span className="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-[14px] font-medium">{event.dress_code}</span>}
-              {event.skill_requirements?.map((s, i) => <span key={i} className="bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-[14px] font-medium">{s}</span>)}
+              {event.gender_requirement && <span className="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full capitalize font-medium">{event.gender_requirement}</span>}
+              {(event.min_age || event.max_age) && <span className="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full font-medium">{event.min_age || 0}-{event.max_age || 99} yrs</span>}
+              {event.dress_code && <span className="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full font-medium">{event.dress_code}</span>}
+              {event.skill_requirements?.map((s, i) => <span key={i} className="bg-[#0D9488]/10 text-[#0D9488] px-2.5 py-1 rounded-full font-medium">{s}</span>)}
             </div>
           </div>
         )}
 
-        {/* Applicants */}
         <Card padding="none">
-          <div className="px-4 pt-4 pb-3 border-b border-gray-100">
+          <div className="px-4 pt-4 pb-3 border-b border-[rgba(0,0,0,0.06)]">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
                 Applicants ({applicants.length})
@@ -306,8 +299,8 @@ export default function OrganizerEventDetailPage() {
             <div className="flex gap-1.5">
               {([["", `All (${applicants.length})`], ["pending", `Pending (${pendingCount})`], ["approved", `Approved (${approvedCount})`], ["rejected", `Rejected (${rejectedCount})`]] as const).map(([key, label]) => (
                 <button key={key} onClick={() => setFilter(key)}
-                  className={`h-7 px-2.5 rounded-[14px] text-[11px] font-medium transition-all ${
-                    filter === key ? "bg-indigo-700 text-white shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-indigo-200" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  className={`h-7 px-2.5 rounded-[10px] text-[11px] font-medium transition-all ${
+                    filter === key ? "bg-[#0D9488] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}>{label}</button>
               ))}
             </div>
@@ -324,12 +317,12 @@ export default function OrganizerEventDetailPage() {
               const avail = app.profile.availability ? AVAIL_CONFIG[app.profile.availability] : null;
               const completion = computeCompletion(app.profile);
               return (
-              <div key={app.id} className="border border-gray-200/80 rounded-[18px] overflow-hidden hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all">
+              <div key={app.id} className="card-base overflow-hidden">
                 <div className="p-3.5">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3 min-w-0 flex-1">
                       <div className="relative shrink-0">
-                        <div className="w-10 h-10 rounded-[14px] bg-gradient-to-br from-indigo-50 to-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-sm shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
+                        <div className="w-10 h-10 rounded-[10px] bg-gradient-to-br from-[#0D9488]/10 to-[#0D9488]/20 flex items-center justify-center text-[#0D9488] font-bold text-sm">
                           {app.profile.full_name?.charAt(0) || "W"}
                         </div>
                         {avail && (
@@ -340,7 +333,7 @@ export default function OrganizerEventDetailPage() {
                         <div className="flex items-center gap-1.5">
                           <p className="font-semibold text-sm text-gray-900 truncate">{app.profile.full_name}</p>
                           {avail && (
-                            <span className={`inline-flex items-center gap-0.5 text-[8px] font-medium px-1 py-0.5 rounded-[14px] border ${avail.badge}`}>
+                            <span className={`inline-flex items-center gap-0.5 text-[8px] font-medium px-1 py-0.5 rounded-full border ${avail.badge}`}>
                               <span className={`w-1 h-1 rounded-full ${avail.dot}`} />
                               {avail.label}
                             </span>
@@ -352,7 +345,7 @@ export default function OrganizerEventDetailPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-[14px] ${
+                      <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${
                         app.status === "pending" ? "bg-amber-50 text-amber-700 border border-amber-200" :
                         app.status === "approved" ? "bg-emerald-50 text-emerald-700 border border-emerald-200" :
                         app.notes === "removed_by_organizer" ? "bg-red-50 text-red-700 border border-red-200" :
@@ -362,31 +355,31 @@ export default function OrganizerEventDetailPage() {
                       {app.status === "pending" && (
                         <>
                           <button onClick={() => handleApprove(app.id)} disabled={applying === app.id}
-                            className="h-8 w-8 rounded-[18px] bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-100 hover:text-emerald-700 disabled:opacity-50 transition-all active:scale-90">
+                            className="h-8 w-8 rounded-[10px] bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-100 hover:text-emerald-700 disabled:opacity-50 transition-all active:scale-90">
                             <Check className="w-4 h-4" />
                           </button>
                           <button onClick={() => handleReject(app.id)} disabled={applying === app.id}
-                            className="h-8 w-8 rounded-[18px] bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 hover:text-red-600 disabled:opacity-50 transition-all active:scale-90">
+                            className="h-8 w-8 rounded-[10px] bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 hover:text-red-600 disabled:opacity-50 transition-all active:scale-90">
                             <XIcon className="w-4 h-4" />
                           </button>
                         </>
                       )}
                       {app.status === "approved" && (
                         <button onClick={() => { if (confirm(`Remove ${app.profile.full_name} from this event?`)) handleRemove(app.id); }} disabled={applying === app.id}
-                          className="h-7 px-2.5 rounded-[18px] bg-red-50 text-red-600 text-[11px] font-medium flex items-center gap-1 hover:bg-red-100 disabled:opacity-50 border border-red-200 transition-all active:scale-95">
+                          className="h-7 px-2.5 rounded-[10px] bg-red-50 text-red-600 text-[11px] font-medium flex items-center gap-1 hover:bg-red-100 disabled:opacity-50 border border-red-200 transition-all active:scale-95">
                           <XCircle className="w-3 h-3" /> Remove
                         </button>
                       )}
                     </div>
                   </div>
                   <button onClick={() => setExpanded(expanded === app.id ? null : app.id)}
-                    className="mt-2 text-[11px] text-gray-400 flex items-center gap-1 hover:text-indigo-600 transition-colors">
+                    className="mt-2 text-[11px] text-gray-400 flex items-center gap-1 hover:text-[#0D9488] transition-colors">
                     {expanded === app.id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                     {expanded === app.id ? "Hide profile" : "View full profile"}
                   </button>
                   {expanded === app.id && (
-                    <div className="mt-3 pt-3 border-t border-gray-100 text-xs text-gray-600 space-y-2.5">
-                      {app.profile.bio && <p className="text-gray-700 leading-relaxed italic border-l-2 border-indigo-200 pl-3 py-0.5">{app.profile.bio}</p>}
+                    <div className="mt-3 pt-3 border-t border-[rgba(0,0,0,0.06)] text-xs text-gray-600 space-y-2.5">
+                      {app.profile.bio && <p className="text-gray-700 leading-relaxed italic border-l-2 border-[#0D9488]/30 pl-3 py-0.5">{app.profile.bio}</p>}
                       <div className="grid grid-cols-2 gap-2">
                         {app.profile.experience && <span className="flex items-center gap-1.5 text-gray-600"><Briefcase className="w-3 h-3 text-gray-400" />{app.profile.experience}</span>}
                         {app.profile.area && <span className="flex items-center gap-1.5 text-gray-600"><MapPin className="w-3 h-3 text-gray-400" />{app.profile.area}</span>}
@@ -400,11 +393,10 @@ export default function OrganizerEventDetailPage() {
                           : app.status !== "approved" && app.profile.phone && <span className="text-gray-400 italic flex items-center gap-1.5 col-span-2"><Phone className="w-3 h-3" />Contact hidden until approval</span>
                         }
                       </div>
-                      {/* Profile strength */}
                       <div className="flex items-center gap-2 pt-1">
                         <div className="flex-1 max-w-[100px] h-1.5 bg-gray-100 rounded-full overflow-hidden">
                           <div className={`h-full rounded-full ${
-                            completion >= 80 ? "bg-emerald-500" : completion >= 50 ? "bg-amber-500" : "bg-indigo-600"
+                            completion >= 80 ? "bg-emerald-500" : completion >= 50 ? "bg-amber-500" : "bg-[#0D9488]"
                           }`} style={{ width: `${completion}%` }} />
                         </div>
                         <span className={`text-[10px] font-medium ${
@@ -414,7 +406,7 @@ export default function OrganizerEventDetailPage() {
                       {app.profile.skills && app.profile.skills.length > 0 && (
                         <div className="flex flex-wrap gap-1">
                           {app.profile.skills.map((s, i) => (
-                            <span key={i} className="text-[11px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-[14px]">{s}</span>
+                            <span key={i} className="text-[11px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-[10px]">{s}</span>
                           ))}
                         </div>
                       )}
@@ -426,7 +418,6 @@ export default function OrganizerEventDetailPage() {
           </div>
         </Card>
 
-        {/* Instructions */}
         {(event.reporting_details || event.instructions || event.contact_person_notes) && (
           <Card>
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Reporting & Notes</p>
@@ -445,8 +436,7 @@ export default function OrganizerEventDetailPage() {
         />
       )}
 
-      {/* Sticky bottom actions */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-gray-200/80 z-10 pb-[env(safe-area-inset-bottom,0px)]">
+      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-[rgba(0,0,0,0.06)] z-10 pb-[env(safe-area-inset-bottom,0px)]">
         <div className="max-w-3xl mx-auto px-4 py-2.5 flex gap-2 overflow-x-auto">
           <Button variant="secondary" size="sm" onClick={() => setShowEdit(true)} disabled={!canEdit}>
             <Edit3 className="w-3.5 h-3.5" /> Edit
@@ -477,4 +467,3 @@ export default function OrganizerEventDetailPage() {
     </div>
   );
 }
-

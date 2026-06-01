@@ -45,10 +45,10 @@ const DEFAULT_FORM = {
   contact_person_notes: "",
 };
 
-function SectionCard({ label, emoji, children, accentCls }: { label: string; emoji: string; children: React.ReactNode; accentCls: string }) {
+function SectionCard({ label, emoji, children }: { label: string; emoji: string; children: React.ReactNode }) {
   return (
-    <div className="card-base overflow-hidden form-section">
-      <div className={`flex items-center gap-2 px-4 py-3 ${accentCls} border-b border-gray-100/50`}>
+    <div className="card-base overflow-hidden">
+      <div className="flex items-center gap-2 px-4 py-3 bg-[#0D9488]/[0.03] border-b border-[rgba(0,0,0,0.06)]">
         <span className="text-lg">{emoji}</span>
         <span className="text-xs font-bold uppercase tracking-widest text-gray-500/80">{label}</span>
       </div>
@@ -60,11 +60,6 @@ function SectionCard({ label, emoji, children, accentCls }: { label: string; emo
 function InputGroup({ children }: { children: React.ReactNode }) {
   return <div className="grid grid-cols-2 gap-3">{children}</div>;
 }
-
-const inputCls = "input-base";
-const dateCls = "input-base";
-const selectCls = "input-base";
-const textareaCls = "input-base h-36 resize-none";
 
 export default function CreateEventModal({ onClose, onCreated, template }: Props) {
   const { form, update } = useStableForm(template ? {
@@ -134,43 +129,39 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-6 p-3 overflow-y-auto modal-overlay">
       <div className="w-full max-w-xl modal-body">
-        {/* Header */}
-        <div className="bg-gradient-to-br from-indigo-700 via-indigo-800 to-indigo-950 rounded-t-[22px] px-5 py-5 text-white">
+        <div className="bg-gradient-to-br from-[#0D9488] via-[#0D9488] to-[#0F766E] rounded-t-[20px] px-5 py-5 text-white">
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-[18px] bg-white/15 flex items-center justify-center backdrop-blur-sm">
+              <div className="w-10 h-10 rounded-[10px] bg-white/15 flex items-center justify-center backdrop-blur-sm">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <div>
                 <h2 className="font-bold text-lg">{template ? "Create from Template" : "New Event"}</h2>
-                <p className="text-xs text-indigo-100/80 mt-0.5">Fill in the details below</p>
+                <p className="text-xs text-white/80 mt-0.5">Fill in the details below</p>
               </div>
             </div>
-            <button onClick={onClose} className="p-1.5 hover:bg-white/10 rounded-[18px] transition-colors">
+            <button onClick={onClose} className="p-1.5 hover:bg-white/10 rounded-[10px] transition-colors">
               <X className="w-4 h-4" />
             </button>
           </div>
           {template && (
-            <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[18px] bg-white/15 text-xs font-medium backdrop-blur-sm">
+            <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/15 text-xs font-medium backdrop-blur-sm">
               <Wand2 className="w-3 h-3" />
               {template.template_name || "Template"}
             </div>
           )}
         </div>
 
-        {/* Form body */}
-        <div className="bg-[#f5f5f7] px-5 py-4 space-y-4 border-x border-gray-200/80">
+        <div className="bg-[#F8F8F6] px-5 py-4 space-y-4">
           <form onSubmit={handleSubmit} className="space-y-4">
 
-            {/* A. Event Basics */}
-            <SectionCard emoji="📋" label="Event Basics" accentCls="bg-gradient-to-r from-indigo-50/80 to-indigo-100/80">
+            <SectionCard emoji="📋" label="Event Basics">
               <div>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Event Title</label>
                 <input required value={form.title} onChange={e => update("title", e.target.value)}
-                  placeholder="e.g., Wedding Staff Needed — Grand Palace"
+                  placeholder="e.g., Wedding Staff Needed &mdash; Grand Palace"
                   maxLength={100}
-                 
-                  className={inputCls} />
+                  className="input-base" />
                 <div className="text-right mt-1">
                   <span className="text-[10px] text-gray-400">{form.title.length}/100</span>
                 </div>
@@ -179,7 +170,7 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
                 <div>
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Category</label>
                   <select value={form.category} onChange={e => update("category", e.target.value)}
-                    className={selectCls}>
+                    className="input-base">
                     <option value="">Select category</option>
                     {CATEGORIES.map(c => <option key={c} value={c}>{c.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}</option>)}
                   </select>
@@ -188,7 +179,6 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Workers Needed</label>
                   <input type="number" min={1} value={form.worker_count} onChange={e => update("worker_count", e.target.value)}
                     placeholder="Number of workers" required
-                   
                     className="input-base" />
                 </div>
               </InputGroup>
@@ -224,8 +214,7 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
               </div>
             </SectionCard>
 
-            {/* B. Location */}
-            <SectionCard emoji="📍" label="Location" accentCls="bg-gradient-to-r from-teal-50/80 to-emerald-50/80">
+            <SectionCard emoji="📍" label="Location">
               <div>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Venue / Location</label>
                 <div className="relative">
@@ -239,19 +228,16 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Google Maps Link <span className="text-gray-400 normal-case font-normal">(optional)</span></label>
                 <input value={form.google_maps_link} onChange={e => update("google_maps_link", e.target.value)}
                   placeholder="https://maps.google.com/..."
-                 
                   className="input-base" />
               </div>
             </SectionCard>
 
-            {/* C. Worker Requirements */}
-            <SectionCard emoji="👥" label="Worker Requirements" accentCls="bg-gradient-to-r from-purple-50/80 to-violet-50/80">
+            <SectionCard emoji="👥" label="Worker Requirements">
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Gender</label>
                   <select value={form.gender_requirement} onChange={e => update("gender_requirement", e.target.value)}
-                   
-                  className="input-base px-3">
+                  className="input-base">
                     <option value="">Any</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
@@ -261,20 +247,20 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Min Age</label>
                   <input type="number" min={0} value={form.min_age} onChange={e => update("min_age", e.target.value)}
                     placeholder="18"
-                    className="input-base px-3" />
+                    className="input-base" />
                 </div>
                 <div>
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Max Age</label>
                   <input type="number" min={0} value={form.max_age} onChange={e => update("max_age", e.target.value)}
                     placeholder="45"
-                    className="input-base px-3" />
+                    className="input-base" />
                 </div>
               </div>
 
               <div>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Work Description</label>
                 <textarea value={form.work_description} onChange={e => update("work_description", e.target.value)}
-                  placeholder="Describe what workers will actually do — be specific so they know what to expect.&#10;&#10;Example:&#10;• Greet guests at the entrance (4 hrs)&#10;• Guide attendees to their tables&#10;• Assist with food serving during dinner&#10;• Help with cleanup after the event"
+                  placeholder="Describe what workers will actually do &mdash; be specific so they know what to expect.&#10;&#10;Example:&#10;&bull; Greet guests at the entrance (4 hrs)&#10;&bull; Guide attendees to their tables&#10;&bull; Assist with food serving during dinner&#10;&bull; Help with cleanup after the event"
                   className="input-base h-36 resize-none" />
                 <p className="text-[10px] text-gray-400 mt-1.5 flex items-center gap-1">
                   <ClipboardList className="w-3 h-3" />
@@ -290,8 +276,7 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
               </div>
             </SectionCard>
 
-            {/* D. Appearance & Documents */}
-            <SectionCard emoji="👔" label="Appearance & Documents" accentCls="bg-gradient-to-r from-green-50/80 to-emerald-50/80">
+            <SectionCard emoji="👔" label="Appearance & Documents">
               <InputGroup>
                 <div>
                   <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Dress Code</label>
@@ -314,14 +299,13 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
               </div>
             </SectionCard>
 
-            {/* E. Payment & Perks */}
-            <SectionCard emoji="💰" label="Payment & Perks" accentCls="bg-gradient-to-r from-amber-50/80 to-yellow-50/80">
+            <SectionCard emoji="💰" label="Payment & Perks">
               <div>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Payment</label>
                 <div className="relative">
                   <IndianRupee className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input value={form.payment_info} onChange={e => update("payment_info", e.target.value)}
-                    placeholder="e.g., ₹500 per event, paid at venue"
+                    placeholder="e.g., &#8377;500 per event, paid at venue"
                     className="input-base pl-10" />
                 </div>
               </div>
@@ -344,13 +328,12 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
               <div>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Overtime Info <span className="text-gray-400 normal-case font-normal">(optional)</span></label>
                 <input value={form.overtime_info} onChange={e => update("overtime_info", e.target.value)}
-                  placeholder="e.g., ₹100 per extra hour"
+                  placeholder="e.g., &#8377;100 per extra hour"
                   className="input-base" />
               </div>
             </SectionCard>
 
-            {/* F. Reporting Instructions */}
-            <SectionCard emoji="📍" label="Reporting Instructions" accentCls="bg-gradient-to-r from-orange-50/80 to-red-50/80">
+            <SectionCard emoji="📍" label="Reporting Instructions">
               <div>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Where to Report</label>
                 <textarea value={form.reporting_details} onChange={e => update("reporting_details", e.target.value)}
@@ -366,15 +349,14 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
               <div>
                 <label className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Contact Person <span className="text-gray-400 normal-case font-normal">(on-site)</span></label>
                 <input value={form.contact_person_notes} onChange={e => update("contact_person_notes", e.target.value)}
-                  placeholder="e.g., Rajesh — 98765 43210"
+                  placeholder="e.g., Rajesh &mdash; 98765 43210"
                   className="input-base" />
               </div>
             </SectionCard>
 
-            {/* Footer Actions inside form */}
             <div className="flex gap-3 pt-2">
               <button type="submit" onClick={() => setPublishAfter(true)} disabled={loading}
-                className="flex-1 h-12 rounded-[18px] bg-indigo-700 text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50 hover:bg-indigo-800 active:scale-[0.98] transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-indigo-200">
+                className="btn-base btn-primary flex-1 h-12 gap-2">
                 {loading ? (
                   <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Publishing...</>
                 ) : (
@@ -382,7 +364,7 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
                 )}
               </button>
               <button type="submit" onClick={() => setPublishAfter(false)} disabled={loading}
-                className="h-12 px-6 rounded-[18px] border-2 border-gray-200 text-gray-700 font-semibold text-sm flex items-center gap-2 disabled:opacity-50 hover:bg-gray-50 active:scale-[0.98] transition-all">
+                className="btn-base btn-secondary h-12 px-6 gap-2">
                 <ArrowRight className="w-4 h-4" />
                 Draft
               </button>

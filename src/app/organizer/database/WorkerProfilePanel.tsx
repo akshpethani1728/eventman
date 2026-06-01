@@ -84,27 +84,25 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
     <div className="fixed inset-0 z-50 flex justify-end">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" onClick={handleOverlayClick} />
       <div className="relative w-full max-w-md bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] animate-slide-right overflow-y-auto overscroll-behavior-contain">
-        {/* Close button */}
-        <button onClick={onClose} className="absolute top-4 right-4 z-10 w-8 h-8 rounded-[18px] bg-white/90 backdrop-blur-sm shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] flex items-center justify-center text-gray-500 hover:text-gray-800 hover:bg-white transition-all">
+        <button onClick={onClose} className="absolute top-4 right-4 z-10 w-8 h-8 rounded-[10px] bg-white/90 backdrop-blur-sm shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] flex items-center justify-center text-gray-500 hover:text-gray-800 hover:bg-white transition-all">
           <X className="w-4 h-4" />
         </button>
 
-        {/* Hero section */}
-        <div className="bg-gradient-to-br from-indigo-700 via-indigo-800 to-indigo-950 px-5 pt-10 pb-6">
+        <div className="bg-gradient-to-br from-[#0D9488] via-[#0D9488] to-[#0F766E] px-5 pt-10 pb-6">
           <div className="flex items-end gap-4">
             <div className="relative shrink-0">
-              <div className="w-16 h-16 rounded-[22px] bg-white/20 backdrop-blur-sm flex items-center justify-center text-white text-2xl font-bold ring-2 ring-white/30 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-black/[0.03]">
+              <div className="w-16 h-16 rounded-[16px] bg-white/20 backdrop-blur-sm flex items-center justify-center text-white text-2xl font-bold ring-2 ring-white/30">
                 {worker.avatar_url ? (
-                  <img src={worker.avatar_url} alt="" className="w-16 h-16 rounded-[22px] object-cover" />
+                  <img src={worker.avatar_url} alt="" className="w-16 h-16 rounded-[16px] object-cover" />
                 ) : (
                   worker.full_name?.charAt(0) || "W"
                 )}
               </div>
-              {avail && <StatusDot variant={avail.dotColor} className="absolute -bottom-1 -right-1 border-2 border-indigo-700" />}
+              {avail && <StatusDot variant={avail.dotColor} className="absolute -bottom-1 -right-1 border-2 border-[#0D9488]" />}
             </div>
             <div className="min-w-0 flex-1">
               <h2 className="text-white font-bold text-lg leading-tight truncate">{worker.full_name}</h2>
-              <p className="text-indigo-100/80 text-xs mt-0.5">Worker · {worker.city || "Location not set"}</p>
+              <p className="text-white/80 text-xs mt-0.5">Worker &middot; {worker.city || "Location not set"}</p>
               <div className="flex items-center gap-2 mt-2">
                 <Badge variant={statusVariant}>
                   {worker.status === "trusted" ? <ShieldCheck className="w-3 h-3" /> : worker.status === "basic_verified" ? <ShieldAlert className="w-3 h-3" /> : null}
@@ -121,20 +119,19 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
         </div>
 
         <div className="p-5 space-y-5">
-          {/* Profile Strength */}
           <div className="card-base p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Profile Strength</span>
               <span className={`text-sm font-bold ${completion.percent >= 80 ? "text-emerald-600" : completion.percent >= 50 ? "text-amber-600" : "text-gray-500"}`}>{completion.percent}%</span>
             </div>
             <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div className={`h-full rounded-full transition-all duration-700 ${completion.percent >= 80 ? "bg-emerald-500" : completion.percent >= 50 ? "bg-amber-500" : "bg-indigo-600"}`}
+              <div className={`h-full rounded-full transition-all duration-700 ${completion.percent >= 80 ? "bg-emerald-500" : completion.percent >= 50 ? "bg-amber-500" : "bg-[#0D9488]"}`}
                 style={{ width: `${completion.percent}%` }} />
             </div>
             {completion.missing.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1">
                 {completion.missing.map(m => (
-                  <span key={m} className="text-[10px] bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-[14px] flex items-center gap-1">
+                  <span key={m} className="text-[10px] bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full flex items-center gap-1">
                     <AlertCircle className="w-3 h-3" /> {m}
                   </span>
                 ))}
@@ -145,9 +142,8 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
             )}
           </div>
 
-          {/* Personal Info */}
           <div className="card-base overflow-hidden">
-            <div className="px-4 py-2.5 bg-gray-50/80 border-b border-gray-100">
+            <div className="px-4 py-2.5 bg-[#0D9488]/[0.03] border-b border-[rgba(0,0,0,0.06)]">
               <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest">Personal Info</span>
             </div>
             <div className="p-4 space-y-2.5">
@@ -170,9 +166,8 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
             </div>
           </div>
 
-          {/* Skills & Experience */}
           <div className="card-base overflow-hidden">
-            <div className="px-4 py-2.5 bg-gray-50/80 border-b border-gray-100">
+            <div className="px-4 py-2.5 bg-[#0D9488]/[0.03] border-b border-[rgba(0,0,0,0.06)]">
               <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest">Skills & Experience</span>
             </div>
             <div className="p-4 space-y-3">
@@ -180,7 +175,7 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
                 <div>
                   <div className="flex flex-wrap gap-1.5">
                     {worker.skills.map((s, i) => (
-                      <span key={i} className="text-[11px] bg-indigo-50 text-indigo-700 border border-indigo-200 px-2.5 py-1 rounded-[14px] font-medium">{s}</span>
+                      <span key={i} className="text-[11px] bg-[#0D9488]/10 text-[#0D9488] border border-[#0D9488]/20 px-2.5 py-1 rounded-[10px] font-medium">{s}</span>
                     ))}
                   </div>
                 </div>
@@ -197,10 +192,9 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
             </div>
           </div>
 
-          {/* Bio */}
           {worker.bio && (
             <div className="card-base overflow-hidden">
-              <div className="px-4 py-2.5 bg-gray-50/80 border-b border-gray-100">
+              <div className="px-4 py-2.5 bg-[#0D9488]/[0.03] border-b border-[rgba(0,0,0,0.06)]">
                 <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest">About</span>
               </div>
               <div className="p-4">
@@ -209,13 +203,12 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
             </div>
           )}
 
-          {/* Contact (conditional) */}
           {canViewContact && (
-            <div className="bg-white rounded-[18px] border border-emerald-200/80 overflow-hidden">
+            <div className="card-base overflow-hidden ring-1 ring-emerald-200/60">
               <div className="px-4 py-2.5 bg-emerald-50/80 border-b border-emerald-100 flex items-center gap-2">
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
                 <span className="text-[10px] font-semibold text-emerald-700 uppercase tracking-widest">Contact Details</span>
-                <span className="text-[9px] text-emerald-500 ml-auto">Approved worker · visible</span>
+                <span className="text-[9px] text-emerald-500 ml-auto">Approved worker &middot; visible</span>
               </div>
               <div className="p-4 space-y-2.5">
                 {worker.phone && (
@@ -239,7 +232,7 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
 
           {!canViewContact && !checkingContact && (
             <div className="card-base overflow-hidden">
-              <div className="px-4 py-2.5 bg-gray-50/80 border-b border-gray-100">
+              <div className="px-4 py-2.5 bg-[#0D9488]/[0.03] border-b border-[rgba(0,0,0,0.06)]">
                 <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest">Contact</span>
               </div>
               <div className="p-4">

@@ -104,6 +104,7 @@ export default function WorkerProfilePage() {
   return (
     <div className="min-h-screen bg-[#F8F8F6] pb-24">
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10">
+        <div className="h-0.5 bg-gradient-to-r from-[#0D9488]/20 via-[#0D9488] to-[#0D9488]/20" />
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
           <Link href="/worker/dashboard" className="p-1 -ml-1 text-gray-500"><ArrowLeft className="w-5 h-5" /></Link>
           <h1 className="font-semibold text-sm text-[#1A1A1A]">My Profile</h1>
