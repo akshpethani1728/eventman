@@ -481,14 +481,14 @@ export default function OrganizerDashboard() {
                           <p className={`font-bold leading-none transition-colors ${
                             needsApproval ? "text-amber-600 text-xl" : remaining <= 3 && remaining > 0 ? "text-gray-900 text-base" : "text-gray-900 text-2xl"
                           }`}>{event.approvedCount}</p>
-                          <p className="text-[9px] text-gray-400 mt-0.5 uppercase tracking-wider font-medium">Approved</p>
+                          <p className="text-[11px] text-gray-400 mt-0.5 uppercase tracking-wider font-medium">Approved</p>
                         </div>
                         <div className="w-px h-8 bg-[rgba(0,0,0,0.06)]" />
                         <div className="text-center min-w-[48px]">
                           <p className={`font-bold leading-none transition-colors ${
                             needsApproval ? "text-amber-600 text-2xl" : "text-gray-900 text-base"
                           }`}>{event.pendingCount}</p>
-                          <p className="text-[9px] text-gray-400 mt-0.5 uppercase tracking-wider font-medium">Pending</p>
+                          <p className="text-[11px] text-gray-400 mt-0.5 uppercase tracking-wider font-medium">Pending</p>
                         </div>
                         <div className="w-px h-8 bg-[rgba(0,0,0,0.06)]" />
                         <div className="text-center min-w-[48px]">
@@ -497,7 +497,7 @@ export default function OrganizerDashboard() {
                           }`}>
                             {remaining <= 0 ? "Full" : remaining}
                           </p>
-                          <p className="text-[9px] text-gray-400 mt-0.5 uppercase tracking-wider font-medium">Seats left</p>
+                          <p className="text-[11px] text-gray-400 mt-0.5 uppercase tracking-wider font-medium">Seats left</p>
                         </div>
                       </div>
                       <div className="flex-1 min-w-[80px]">

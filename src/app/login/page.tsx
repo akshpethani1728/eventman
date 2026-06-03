@@ -27,21 +27,27 @@ function useTilt(ref: React.RefObject<HTMLDivElement | null>) {
     const isTouch = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
     if (isTouch) return;
 
+    let rafId: number | null = null;
     const move = (e: MouseEvent) => {
-      const rect = el.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width;
-      const y = (e.clientY - rect.top) / rect.height;
-      style.current = {
-        rotateX: (y - 0.5) * -8,
-        rotateY: (x - 0.5) * 8,
-        glowX: x * 100,
-        glowY: y * 100,
-        isHovered: true,
-      };
-      setRender({ ...style.current });
+      if (rafId !== null) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        const rect = el.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width;
+        const y = (e.clientY - rect.top) / rect.height;
+        style.current = {
+          rotateX: (y - 0.5) * -8,
+          rotateY: (x - 0.5) * 8,
+          glowX: x * 100,
+          glowY: y * 100,
+          isHovered: true,
+        };
+        setRender({ ...style.current });
+      });
     };
 
     const leave = () => {
+      if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
       style.current = { rotateX: 0, rotateY: 0, glowX: 50, glowY: 50, isHovered: false };
       setRender({ ...style.current });
     };
@@ -49,6 +55,7 @@ function useTilt(ref: React.RefObject<HTMLDivElement | null>) {
     el.addEventListener("mousemove", move);
     el.addEventListener("mouseleave", leave);
     return () => {
+      if (rafId !== null) cancelAnimationFrame(rafId);
       el.removeEventListener("mousemove", move);
       el.removeEventListener("mouseleave", leave);
     };
@@ -120,18 +127,20 @@ function FadeSection({ children, className = "" }: { children: React.ReactNode; 
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
     const obs = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect(); } },
-      { threshold: 0.08 }
+      { threshold: 0.15 }
     );
-    if (ref.current) obs.observe(ref.current);
+    obs.observe(el);
     return () => obs.disconnect();
   }, []);
 
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"} ${className}`}
+      className={`transition-[opacity,transform] duration-700 ease-out will-change-[opacity,transform] ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"} ${className}`}
     >
       {children}
     </div>
@@ -720,8 +729,8 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
       <div className="mx-auto max-w-md px-4 sm:px-6">
         <FadeSection>
           {step === "auth" && (
-            <div className="relative card-base overflow-hidden">
-              <div className="h-1 bg-gradient-to-r from-teal-600 to-teal-700" />
+            <div className="relative card-base">
+              <div className="overflow-hidden rounded-[16px]"><div className="h-1 bg-gradient-to-r from-teal-600 to-teal-700" /></div>
               <div className="p-6 sm:p-8">
                 {/* Back button */}
                 <button
@@ -753,7 +762,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <div className="h-px flex-1 bg-gray-100" />
-                    <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Sign In</span>
+                    <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Sign In</span>
                     <div className="h-px flex-1 bg-gray-100" />
                   </div>
 
@@ -838,7 +847,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <div className="h-px flex-1 bg-gray-100" />
-                    <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Create Account</span>
+                    <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Create Account</span>
                     <div className="h-px flex-1 bg-gray-100" />
                   </div>
 
@@ -867,8 +876,8 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
           )}
 
           {step === "otp" && (
-            <div className="relative card-base overflow-hidden">
-              <div className="h-1 bg-gradient-to-r from-teal-600 to-teal-700" />
+            <div className="relative card-base">
+              <div className="overflow-hidden rounded-[16px]"><div className="h-1 bg-gradient-to-r from-teal-600 to-teal-700" /></div>
               <div className="p-6 sm:p-8">
                 <button
                   type="button"
@@ -952,8 +961,8 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
           )}
 
           {step === "profile" && (
-            <div className="relative card-base overflow-hidden">
-              <div className="h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
+            <div className="relative card-base">
+              <div className="overflow-hidden rounded-[16px]"><div className="h-1 bg-gradient-to-r from-emerald-500 to-teal-500" /></div>
               <div className="p-6 sm:p-8">
                 <button
                   type="button"

@@ -122,7 +122,7 @@ export default function OrganizerProfilePage() {
           </div>
 
           <div className="card-base p-5 space-y-4">
-            <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Personal Information</p>
+            <p className="text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-wider">Personal Information</p>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1.5">Full Name</label>
               <div className="relative">
@@ -160,7 +160,7 @@ export default function OrganizerProfilePage() {
           </div>
 
           <div className="card-base p-5 space-y-4">
-            <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">About</p>
+            <p className="text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-wider">About</p>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1.5">Description</label>
               <textarea value={form.bio} onChange={e => update("bio", e.target.value)}

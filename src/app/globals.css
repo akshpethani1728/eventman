@@ -183,7 +183,7 @@ input, textarea, select {
 }
 
 .animate-slide-up { animation: slide-up 0.35s ease-out; }
-.animate-fade-in { animation: fade-in 0.2s ease-out; }
+.animate-fade-in { animation: fade-in 0.2s ease-out forwards; opacity: 0; }
 .animate-scale-in { animation: scale-in 0.25s ease-out; }
 .animate-slide-down { animation: slide-down 0.2s ease-out; }
 .animate-slide-up-lg { animation: slide-up-lg 0.5s ease-out; }
@@ -194,7 +194,7 @@ input, textarea, select {
 .animate-gradient { animation: gradient-shift 6s ease infinite; background-size: 200% 200%; }
 .animate-card-float { animation: card-float 4s ease-in-out infinite; }
 .animate-spin-slow { animation: spin-slow 3s linear infinite; }
-.animate-slide-right { animation: slide-right 0.3s ease-out; }
+.animate-slide-right { animation: slide-right 0.25s ease-out; }
 .animate-expand-in { animation: expand-in 0.25s ease-out; }
 
 @media (display-mode: standalone) {

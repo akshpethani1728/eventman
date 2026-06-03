@@ -285,7 +285,7 @@ export default function EventDetailPage() {
         </div>
 
         <div className="card-base p-5 mb-3 rounded-[16px] space-y-4">
-          <h3 className="font-semibold text-sm text-[#6B6B6B] uppercase tracking-wide">Event Details</h3>
+          <h3 className="font-semibold text-[11px] text-[#6B6B6B] uppercase tracking-wider">Event Details</h3>
           <div className="space-y-3 text-sm">
             <div className="flex items-start gap-3">
               <MapPin className="w-4 h-4 mt-0.5 text-[#0D9488] shrink-0" />
@@ -322,7 +322,7 @@ export default function EventDetailPage() {
 
         {(event.gender_requirement || event.min_age || event.max_age || event.dress_code || event.work_description || event.experience_required || event.skill_requirements || event.grooming_notes) && (
           <div className="card-base p-5 mb-3 rounded-[16px] space-y-4">
-            <h3 className="font-semibold text-sm text-[#6B6B6B] uppercase tracking-wide">Requirements</h3>
+            <h3 className="font-semibold text-[11px] text-[#6B6B6B] uppercase tracking-wider">Requirements</h3>
             <div className="space-y-3 text-sm">
               {event.gender_requirement && <div className="flex items-start gap-3"><User className="w-4 h-4 mt-0.5 text-[#0D9488] shrink-0" /><div><p className="text-[#A1A1AA] text-xs">Gender</p><p className="font-medium text-[#1A1A1A] capitalize">{event.gender_requirement}</p></div></div>}
               {(event.min_age || event.max_age) && <div className="flex items-start gap-3"><AlertCircle className="w-4 h-4 mt-0.5 text-[#0D9488] shrink-0" /><div><p className="text-[#A1A1AA] text-xs">Age Range</p><p className="font-medium text-[#1A1A1A]">{event.min_age || 0} - {event.max_age || 99} years</p></div></div>}
@@ -344,21 +344,21 @@ export default function EventDetailPage() {
 
         {event.required_documents && event.required_documents.length > 0 && (
           <div className="card-base p-5 mb-3 rounded-[16px] space-y-3">
-            <h3 className="font-semibold text-sm text-[#6B6B6B] uppercase tracking-wide">Required Documents</h3>
+            <h3 className="font-semibold text-[11px] text-[#6B6B6B] uppercase tracking-wider">Required Documents</h3>
             <div className="flex flex-wrap gap-2">{event.required_documents.map((doc, i) => <span key={i} className="text-xs bg-teal-50 text-[#0D9488] px-2.5 py-1 rounded-full">{doc}</span>)}</div>
           </div>
         )}
 
         {event.reporting_details && (
           <div className="card-base p-5 mb-3 rounded-[16px] space-y-3">
-            <h3 className="font-semibold text-sm text-[#6B6B6B] uppercase tracking-wide">Reporting Details</h3>
+            <h3 className="font-semibold text-[11px] text-[#6B6B6B] uppercase tracking-wider">Reporting Details</h3>
             <p className="text-sm text-[#1A1A1A] whitespace-pre-wrap">{event.reporting_details}</p>
           </div>
         )}
 
         {event.instructions && (
           <div className="card-base p-5 mb-3 rounded-[16px] space-y-3">
-            <h3 className="font-semibold text-sm text-[#6B6B6B] uppercase tracking-wide">Instructions</h3>
+            <h3 className="font-semibold text-[11px] text-[#6B6B6B] uppercase tracking-wider">Instructions</h3>
             <p className="text-sm text-[#1A1A1A] whitespace-pre-wrap">{event.instructions}</p>
           </div>
         )}
@@ -367,7 +367,7 @@ export default function EventDetailPage() {
         {organizer && (
           <div className="rounded-[16px] p-4 bg-teal-50/40 space-y-3 mb-3 card-base">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-sm text-[#6B6B6B] uppercase tracking-wide">Organized by</h3>
+              <h3 className="font-semibold text-[11px] text-[#6B6B6B] uppercase tracking-wider">Organized by</h3>
               {showContact && (
                 <span className="text-[10px] font-medium text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-lg">Contact Available</span>
               )}
@@ -435,7 +435,7 @@ export default function EventDetailPage() {
         {/* Application Status — only when not already shown as hero or waitlisted */}
         {application && !isWaitlisted(application) && application.status !== "approved" && application.status !== "pending" && !isRemovedByOrganizer(application) && (
           <div className="card-base p-5 mb-3 rounded-[16px]">
-            <h3 className="font-semibold text-sm text-[#6B6B6B] uppercase tracking-wide mb-3">Application Status</h3>
+            <h3 className="font-semibold text-[11px] text-[#6B6B6B] uppercase tracking-wider mb-3">Application Status</h3>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-[14px] flex items-center justify-center bg-gray-100 text-[#6B6B6B]">
                 {application.status === "rejected" ? <XCircle className="w-5 h-5" /> : <Info className="w-5 h-5" />}
@@ -460,7 +460,7 @@ export default function EventDetailPage() {
         {/* Removed by organizer — show re-apply option */}
         {application && isRemovedByOrganizer(application) && (
           <div className="card-base p-5 mb-3 rounded-[16px] bg-amber-50/30">
-            <h3 className="font-semibold text-sm text-[#6B6B6B] uppercase tracking-wide mb-3">Application Status</h3>
+            <h3 className="font-semibold text-[11px] text-[#6B6B6B] uppercase tracking-wider mb-3">Application Status</h3>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-[14px] flex items-center justify-center bg-amber-100 text-amber-600">
                 <AlertCircle className="w-5 h-5" />

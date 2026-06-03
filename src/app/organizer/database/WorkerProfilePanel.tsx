@@ -72,8 +72,9 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
   const statusVariant = worker.status === "trusted" ? "trusted" as const : worker.status === "basic_verified" ? "basicVerified" as const : "unverified" as const;
 
   useEffect(() => {
+    const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = ""; };
+    return () => { document.body.style.overflow = prev; };
   }, []);
 
   const handleOverlayClick = useCallback((e: React.MouseEvent) => {
@@ -246,15 +247,6 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
         </div>
       </div>
 
-      <style jsx>{`
-        .animate-slide-right {
-          animation: slide-right 0.25s ease-out;
-        }
-        @keyframes slide-right {
-          from { transform: translateX(100%); }
-          to { transform: translateX(0); }
-        }
-      `}</style>
     </div>
   );
 }

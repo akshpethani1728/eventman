@@ -260,7 +260,7 @@ export default function OrganizerEventDetailPage() {
         </Card>
 
         <div className="card-base p-5 space-y-3">
-          <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Event Details</p>
+          <p className="text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-wider">Event Details</p>
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div className="flex items-center gap-2 text-gray-600 bg-gray-50/80 rounded-[10px] px-3 py-2.5"><Calendar className="w-4 h-4 text-gray-400 shrink-0" /><span className="font-medium">{event.date_display || event.date}</span></div>
             <div className="flex items-center gap-2 text-gray-600 bg-gray-50/80 rounded-[10px] px-3 py-2.5"><Clock className="w-4 h-4 text-gray-400 shrink-0" /><span className="font-medium">{event.time}{event.end_time ? `-${event.end_time}` : ""}</span></div>
@@ -277,7 +277,7 @@ export default function OrganizerEventDetailPage() {
 
         {(event.gender_requirement || event.min_age || event.max_age || event.work_description || event.experience_required || event.skill_requirements || event.dress_code) && (
           <div className="card-base p-5 space-y-3">
-            <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Requirements</p>
+            <p className="text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-wider">Requirements</p>
             {event.work_description && <p className="text-sm text-gray-700 leading-relaxed">{event.work_description}</p>}
             <div className="flex flex-wrap gap-1.5 text-xs">
               {event.gender_requirement && <span className="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full capitalize font-medium">{event.gender_requirement}</span>}
@@ -291,7 +291,7 @@ export default function OrganizerEventDetailPage() {
         <Card padding="none">
           <div className="px-4 pt-4 pb-3 border-b border-[rgba(0,0,0,0.06)]">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
+              <h3 className="text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-wider">
                 Applicants ({applicants.length})
               </h3>
               <span className="text-[10px] text-gray-400">{approvedCount} approved · {pendingCount} pending</span>
@@ -420,7 +420,7 @@ export default function OrganizerEventDetailPage() {
 
         {(event.reporting_details || event.instructions || event.contact_person_notes) && (
           <Card>
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Reporting & Notes</p>
+            <p className="text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-wider mb-3">Reporting & Notes</p>
             {event.reporting_details && <p className="text-sm text-gray-700 mb-2">{event.reporting_details}</p>}
             {event.instructions && <p className="text-sm text-gray-700 mb-2">{event.instructions}</p>}
             {event.contact_person_notes && <p className="text-sm text-gray-700">{event.contact_person_notes}</p>}
