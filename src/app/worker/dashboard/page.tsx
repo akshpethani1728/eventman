@@ -401,6 +401,9 @@ function DashboardContent() {
                 </span>
               )}
             </Link>
+            <button onClick={signOut} className="w-9 h-9 rounded-[10px] flex items-center justify-center text-[#6B6B6B] hover:text-red-500 hover:bg-red-50 transition-all active:scale-90">
+              <LogOut className="w-[18px] h-[18px]" />
+            </button>
           </div>
         </div>
       </header>
