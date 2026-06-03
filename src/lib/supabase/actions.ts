@@ -34,8 +34,13 @@ export async function createProfile(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
 
+  const now = new Date();
+  const trialEnd = new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000).toISOString();
   const profileData: Record<string, any> = {
     user_id: userId, full_name: fullName.trim(), role, email: user.email || "", status: "unverified",
+    plan_status: "trial",
+    trial_start_date: now.toISOString(),
+    trial_end_date: trialEnd,
   };
 
   const { error } = await supabase.from("profiles").insert(profileData);

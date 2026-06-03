@@ -43,10 +43,14 @@ export async function POST(request: NextRequest) {
     );
 
     const now = new Date();
+    const subEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
     const { error: updateError } = await adminClient
       .from("profiles")
       .update({
+        plan_status: "active",
+        subscription_start_date: now.toISOString(),
+        subscription_end_date: subEnd,
         razorpay_payment_id: paymentId,
         razorpay_order_id: orderId,
         razorpay_signature: signature,
