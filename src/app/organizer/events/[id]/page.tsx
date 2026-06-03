@@ -1,71 +1,40 @@
 ﻿"use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import {
   ArrowLeft, Users, Edit3, Copy, XCircle, CheckCircle, Trash2, MapPin, Calendar, Clock,
-  Clock3, IndianRupee, BookTemplate, AlertTriangle, Check, X as XIcon,
+  Clock3, IndianRupee, AlertTriangle, Check, X as XIcon,
   ChevronDown, ChevronUp, Phone, Mail, Award, Briefcase, Filter, Sparkles,
   MoreHorizontal, Ban, UserCheck, UserX, Eye, Star, Target,
 } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/lib/design/Button";
 import { PageLoader } from "@/lib/design/Loading";
+import { ConfirmDialog } from "@/lib/design/Modal";
 import type { Event, Profile, Application } from "@/lib/supabase/types";
+import { AVAIL_CONFIG, computeCompletion, STATUS_STYLES, STATUS_LABELS, formatDate } from "@/lib/organizer/constants";
+import { loadApplicantsForEvent, updateApplicantStatus, removeApplicant } from "@/lib/organizer/applicantUtils";
+import type { ApplicantWithProfile } from "@/lib/organizer/applicantUtils";
 import EditEventModal from "@/app/organizer/dashboard/EditEventModal";
-
-function computeCompletion(p: Profile): number {
-  const checks: [keyof Profile, number][] = [
-    ["avatar_url", 15], ["phone", 15], ["age", 10], ["gender", 10],
-    ["city", 10], ["area", 10], ["skills", 15], ["experience", 10], ["bio", 10],
-  ];
-  let percent = 0;
-  for (const [key, weight] of checks) {
-    const val = p[key];
-    if (key === "skills") { if (Array.isArray(val) && val.length > 0) percent += weight; }
-    else if (val !== null && val !== undefined && val !== "") percent += weight;
-  }
-  return percent;
-}
-
-const AVAIL_CONFIG: Record<string, { label: string; dot: string; badge: string }> = {
-  available_today: { label: "Available Today", dot: "bg-emerald-500", badge: "bg-emerald-100 text-emerald-700 border-emerald-200" },
-  available_this_week: { label: "Available This Week", dot: "bg-[#0D9488]", badge: "bg-[#0D9488]/10 text-[#0D9488] border-[#0D9488]/20" },
-  available: { label: "Available", dot: "bg-emerald-500", badge: "bg-emerald-100 text-emerald-700 border-emerald-200" },
-  weekends: { label: "Weekends", dot: "bg-amber-500", badge: "bg-amber-100 text-amber-700 border-amber-200" },
-  evenings: { label: "Evenings", dot: "bg-purple-500", badge: "bg-purple-100 text-purple-700 border-purple-200" },
-  busy: { label: "Busy", dot: "bg-red-500", badge: "bg-red-100 text-red-700 border-red-200" },
-  unavailable: { label: "Unavailable", dot: "bg-gray-400", badge: "bg-gray-100 text-gray-500 border-gray-200" },
-};
-
-const STATUS_STYLES: Record<string, string> = {
-  draft: "bg-gray-100 text-gray-600", published: "bg-emerald-50 text-emerald-700",
-  filling: "bg-blue-50 text-blue-700", full: "bg-purple-50 text-purple-700",
-  closed: "bg-amber-50 text-amber-700", completed: "bg-gray-100 text-gray-500",
-  cancelled: "bg-red-50 text-red-700",
-};
-const STATUS_LABELS: Record<string, string> = {
-  draft: "Draft", published: "Published", filling: "Filling", full: "Full",
-  closed: "Closed", completed: "Completed", cancelled: "Cancelled",
-};
 
 export default function OrganizerEventDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const supabase = createClient();
   const [event, setEvent] = useState<Event | null>(null);
-  const [applicants, setApplicants] = useState<(Application & { profile: Profile })[]>([]);
+  const [applicants, setApplicants] = useState<ApplicantWithProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [filter, setFilter] = useState<"" | "pending" | "approved" | "rejected">("");
-  const [applying, setApplying] = useState<string | null>(null);
   const [showEdit, setShowEdit] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<{ type: "delete" | "complete" } | null>(null);
+  const [applying, setApplying] = useState<string | null>(null);
 
   useEffect(() => { loadData(); }, [id]);
 
-  const loadData = async () => { try { const { data: { user } } = await supabase.auth.getUser();
+  const loadData = useCallback(async () => { try { const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.push("/login"); return; }
 
     const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
@@ -75,85 +44,36 @@ export default function OrganizerEventDetailPage() {
     if (!evt || evt.organizer_id !== user.id) { router.push("/organizer/dashboard"); return; }
     setEvent(evt);
 
-    const { data: apps } = await supabase
-      .from("applications").select("*").eq("event_id", id).order("created_at", { ascending: false });
-
-    const withProfiles = await Promise.all(
-      (apps || []).map(async (app) => {
-        const { data: p } = await supabase.from("profiles").select("*").eq("user_id", app.worker_id).maybeSingle();
-        return { ...app, profile: p! } as Application & { profile: Profile };
-      })
-    );
-    setApplicants(withProfiles.filter(a => a.profile));
-     } catch (err) { console.error("[OrganizerEventDetailPage] error:", err); } finally { setLoading(false); } };
+    const result = await loadApplicantsForEvent(id);
+    setApplicants(result);
+     } catch (err) { console.error("[OrganizerEventDetailPage] error:", err); } finally { setLoading(false); } }, [id]);
 
   const handleApprove = async (applicationId: string) => {
     if (!event) return;
     setApplying(applicationId);
-    const { error } = await supabase
-      .from("applications").update({ status: "approved", updated_at: new Date().toISOString() }).eq("id", applicationId);
-    if (error) { toast.error(error.message); setApplying(null); return; }
-
-    const app = applicants.find(a => a.id === applicationId);
-    if (app) {
-      await supabase.from("notifications").insert({
-        user_id: app.worker_id, title: "Application Approved",
-        message: `Your application for "${event.title}" has been approved.`,
-      });
-    }
-
-    const newApproved = applicants.filter(a => a.status === "approved" || a.id === applicationId).length;
-    if (newApproved >= event.worker_count && event.status !== "full") {
-      await supabase.from("events").update({ status: "full", updated_at: new Date().toISOString() }).eq("id", event.id);
-      setEvent({ ...event, status: "full" });
-      toast.success("Event is now full!");
-    }
-
+    await updateApplicantStatus(applicationId, "approved", event, applicants, loadData);
     setApplying(null);
-    loadData();
+    if (event) {
+      const newApproved = applicants.filter(a => a.status === "approved" || a.id === applicationId).length;
+      if (newApproved >= event.worker_count && event.status !== "full") {
+        setEvent({ ...event, status: "full" });
+      }
+    }
   };
 
   const handleReject = async (applicationId: string) => {
     if (!event) return;
     setApplying(applicationId);
-    const { error } = await supabase
-      .from("applications").update({ status: "rejected", updated_at: new Date().toISOString() }).eq("id", applicationId);
-    if (error) { toast.error(error.message); setApplying(null); return; }
-
-    const app = applicants.find(a => a.id === applicationId);
-    if (app) {
-      await supabase.from("notifications").insert({
-        user_id: app.worker_id, title: "Application Rejected",
-        message: `Your application for "${event.title}" has been rejected.`,
-      });
-    }
+    await updateApplicantStatus(applicationId, "rejected", event, applicants, loadData);
     setApplying(null);
-    loadData();
   };
 
   const handleRemove = async (applicationId: string) => {
     if (!event) return;
     setApplying(applicationId);
-    const { error } = await supabase
-      .from("applications").update({ status: "cancelled", notes: "removed_by_organizer", updated_at: new Date().toISOString() }).eq("id", applicationId);
-    if (error) { toast.error(error.message); setApplying(null); return; }
-
-    const app = applicants.find(a => a.id === applicationId);
-    if (app) {
-      await supabase.from("notifications").insert({
-        user_id: app.worker_id,
-        title: "Removed from Event",
-        message: `You have been removed from "${event.title}". The organizer cancelled your selection. You can re-apply if the event is still accepting applications.`,
-      });
-    }
-
-    if (event.status === "full") {
-      await supabase.from("events").update({ status: "filling", updated_at: new Date().toISOString() }).eq("id", event.id);
-      setEvent({ ...event, status: "filling" });
-    }
-
+    await removeApplicant(applicationId, event, applicants, loadData);
+    if (event.status === "full") setEvent({ ...event, status: "filling" });
     setApplying(null);
-    loadData();
   };
 
   const updateStatus = async (status: string) => {
@@ -188,7 +108,6 @@ export default function OrganizerEventDetailPage() {
   };
 
   const deleteEvent = async () => {
-    if (!confirm("Delete permanently?")) return;
     if (!event) return;
     await supabase.from("events").delete().eq("id", event.id);
     toast.success("Event deleted");
@@ -213,10 +132,9 @@ export default function OrganizerEventDetailPage() {
 
   return (
     <div className="min-h-screen bg-[#F8F8F6] pb-24">
-      {/* ===== HEADER ===== */}
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
-          <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-[10px] transition-all"><ArrowLeft className="w-5 h-5" /></Link>
+          <Link href="/organizer/dashboard" aria-label="Back to dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-[10px] transition-all"><ArrowLeft className="w-5 h-5" /></Link>
           <div className="min-w-0 flex-1">
             <h1 className="font-semibold text-sm truncate">{event.title}</h1>
             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${STATUS_STYLES[event.status]}`}>
@@ -227,7 +145,6 @@ export default function OrganizerEventDetailPage() {
       </header>
 
       <main className="max-w-lg mx-auto px-4 pt-4 space-y-4">
-        {/* ===== ALERT BANNERS ===== */}
         <div className="space-y-1.5 animate-fade-in">
           {isToday && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-[10px] px-3.5 py-2.5 flex items-center gap-2"><Clock3 className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Starts today</span></div>}
           {isTomorrow && <div className="text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-[10px] px-3.5 py-2.5 flex items-center gap-2"><Clock3 className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Starts tomorrow</span></div>}
@@ -237,7 +154,6 @@ export default function OrganizerEventDetailPage() {
           {pendingCount > 0 && <div className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-[10px] px-3.5 py-2.5 flex items-center gap-2"><Users className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">{pendingCount} pending approval{pendingCount !== 1 ? "s" : ""}</span></div>}
         </div>
 
-        {/* ===== HERO SECTION ===== */}
         <div className="bg-gradient-to-br from-[#0D9488] via-[#0D9488] to-[#0F766E] rounded-[20px] p-5 shadow-[0_8px_32px_rgba(13,148,136,0.2)]">
           <div className="flex items-start justify-between mb-4">
             <div className="min-w-0 flex-1">
@@ -259,7 +175,7 @@ export default function OrganizerEventDetailPage() {
           <div className="grid grid-cols-2 gap-2 text-[11px] text-white/80">
             <div className="flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5 text-white/60" />
-              <span>{event.date_display || new Date(event.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span>
+              <span>{formatDate(event.date, event.date_display)}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5 text-white/60" />
@@ -272,7 +188,6 @@ export default function OrganizerEventDetailPage() {
           </div>
         </div>
 
-        {/* ===== OPERATION METRICS ===== */}
         <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
           <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Operation Metrics</p>
           <div className="grid grid-cols-5 gap-2">
@@ -305,13 +220,12 @@ export default function OrganizerEventDetailPage() {
           <p className="text-[10px] text-gray-400 mt-1 text-right">{approvedCount}/{event.worker_count} filled ({remaining > 0 ? `${remaining} open` : "full"})</p>
         </div>
 
-        {/* ===== EVENT DETAILS ===== */}
         <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
           <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Event Schedule</p>
           <div className="grid grid-cols-2 gap-2 text-sm">
             <div className="flex items-center gap-2 text-gray-600 bg-gray-50 rounded-[10px] px-3 py-2.5">
               <Calendar className="w-4 h-4 text-gray-400 shrink-0" />
-              <span className="font-medium">{event.date_display || event.date}</span>
+              <span className="font-medium">{formatDate(event.date, event.date_display)}</span>
             </div>
             <div className="flex items-center gap-2 text-gray-600 bg-gray-50 rounded-[10px] px-3 py-2.5">
               <Clock className="w-4 h-4 text-gray-400 shrink-0" />
@@ -330,7 +244,6 @@ export default function OrganizerEventDetailPage() {
           )}
         </div>
 
-        {/* ===== REQUIREMENTS ===== */}
         {(event.gender_requirement || event.min_age || event.max_age || event.work_description || event.experience_required || event.skill_requirements || event.dress_code) && (
           <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
             <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Worker Requirements</p>
@@ -352,7 +265,6 @@ export default function OrganizerEventDetailPage() {
           </div>
         )}
 
-        {/* ===== APPLICANT PIPELINE ===== */}
         <div className="bg-white rounded-[16px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
           <div className="px-4 pt-4 pb-3 border-b border-[rgba(0,0,0,0.06)]">
             <div className="flex items-center justify-between mb-3">
@@ -421,17 +333,17 @@ export default function OrganizerEventDetailPage() {
                       {app.status === "pending" && (
                         <>
                           <button onClick={() => handleApprove(app.id)} disabled={applying === app.id}
-                            className="h-8 w-8 rounded-[10px] bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-100 hover:text-emerald-700 disabled:opacity-50 transition-all active:scale-90">
+                            className="h-8 w-8 rounded-[10px] bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-100 hover:text-emerald-700 disabled:opacity-50 transition-all active:scale-90" aria-label="Approve">
                             <Check className="w-4 h-4" />
                           </button>
                           <button onClick={() => handleReject(app.id)} disabled={applying === app.id}
-                            className="h-8 w-8 rounded-[10px] bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 hover:text-red-600 disabled:opacity-50 transition-all active:scale-90">
+                            className="h-8 w-8 rounded-[10px] bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 hover:text-red-600 disabled:opacity-50 transition-all active:scale-90" aria-label="Reject">
                             <XIcon className="w-4 h-4" />
                           </button>
                         </>
                       )}
                       {app.status === "approved" && (
-                        <button onClick={() => { if (confirm(`Remove ${app.profile.full_name} from this event?`)) handleRemove(app.id); }} disabled={applying === app.id}
+                        <button onClick={() => handleRemove(app.id)} disabled={applying === app.id}
                           className="h-7 px-2.5 rounded-[10px] bg-red-50 text-red-600 text-[10px] font-medium flex items-center gap-1 hover:bg-red-100 disabled:opacity-50 border border-red-200 transition-all active:scale-95">
                           <XCircle className="w-3 h-3" /> Remove
                         </button>
@@ -452,7 +364,7 @@ export default function OrganizerEventDetailPage() {
                         {app.status === "approved" && app.profile.phone
                           ? <span className="flex items-center gap-1.5 text-emerald-700 col-span-2"><Phone className="w-3 h-3" />{app.profile.phone}
                               <button onClick={() => { navigator.clipboard.writeText(app.profile.phone!); toast.success("Phone copied"); }}
-                                className="p-0.5 rounded hover:bg-emerald-100 text-emerald-500 hover:text-emerald-700 transition-colors">
+                                className="p-0.5 rounded hover:bg-emerald-100 text-emerald-500 hover:text-emerald-700 transition-colors" aria-label="Copy phone">
                                 <Copy className="w-3 h-3" />
                               </button>
                             </span>
@@ -489,7 +401,6 @@ export default function OrganizerEventDetailPage() {
           </div>
         </div>
 
-        {/* ===== REPORTING & NOTES ===== */}
         {(event.reporting_details || event.instructions || event.contact_person_notes) && (
           <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
             <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Reporting & Instructions</p>
@@ -515,7 +426,6 @@ export default function OrganizerEventDetailPage() {
         />
       )}
 
-      {/* ===== BOTTOM ACTION BAR ===== */}
       <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-[rgba(0,0,0,0.06)] z-10 pb-[env(safe-area-inset-bottom,0px)] shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
         <div className="max-w-lg mx-auto px-4 py-2.5 flex gap-2 overflow-x-auto">
           <button onClick={() => setShowEdit(true)} disabled={!canEdit}
@@ -539,17 +449,36 @@ export default function OrganizerEventDetailPage() {
             </button>
           )}
           {event.status !== "completed" && event.status !== "cancelled" && event.status !== "draft" && (
-            <button onClick={() => { if (confirm("Mark as completed?")) updateStatus("completed"); }}
+            <button onClick={() => setConfirmAction({ type: "complete" })}
               className="h-9 px-4 rounded-[10px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
               <CheckCircle className="w-3.5 h-3.5" /> Complete
             </button>
           )}
-          <button onClick={deleteEvent}
+          <button onClick={() => setConfirmAction({ type: "delete" })}
             className="h-9 px-4 rounded-[10px] bg-red-50 text-red-600 text-xs font-semibold hover:bg-red-100 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
             <Trash2 className="w-3.5 h-3.5" /> Delete
           </button>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={confirmAction?.type === "delete" || false}
+        onClose={() => setConfirmAction(null)}
+        onConfirm={deleteEvent}
+        title="Delete Event"
+        message="Are you sure you want to delete this event? This action cannot be undone."
+        confirmLabel="Delete"
+        variant="danger"
+      />
+      <ConfirmDialog
+        open={confirmAction?.type === "complete" || false}
+        onClose={() => setConfirmAction(null)}
+        onConfirm={() => { updateStatus("completed"); setConfirmAction(null); }}
+        title="Mark as Completed"
+        message="Mark this event as completed? This will notify workers and move the event to past events."
+        confirmLabel="Complete"
+        variant="warning"
+      />
     </div>
   );
 }

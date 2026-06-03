@@ -38,14 +38,16 @@ export default function OrganizerProfilePage() {
       .from("events").select("*", { count: "exact", head: true }).eq("organizer_id", user.id).in("status", ["completed", "cancelled"]);
     setPastEventCount(pc || 0);
 
-    const { data: allEvents } = await supabase
-      .from("events").select("id").eq("organizer_id", user.id).in("status", ["published", "filling", "full"]);
+    const { data: allEvents } = (await supabase
+      .from("events").select("id").eq("organizer_id", user.id).in("status", ["published", "filling", "full"])) || { data: [] };
     setActiveEventsCount(allEvents?.length || 0);
 
-    const { data: allApps } = await supabase
-      .from("applications").select("event_id, status").in("event_id", (allEvents || []).map(e => e.id));
-    setTotalWorkersHired(allApps?.filter(a => a.status === "approved").length || 0);
-
+    const eventIds = allEvents?.map(e => e.id) || [];
+    if (eventIds.length > 0) {
+      const { data: allApps } = await supabase
+        .from("applications").select("event_id, status").in("event_id", eventIds);
+      setTotalWorkersHired(allApps?.filter(a => a.status === "approved").length || 0);
+    }
      } catch (err) { console.error("[OrganizerProfile] error:", err); } finally { setLoading(false); } };
 
   const saveProfile = async () => {
@@ -72,7 +74,7 @@ export default function OrganizerProfilePage() {
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/organizer/dashboard" className="p-1 -ml-1 text-gray-500 hover:text-[#0D9488] transition-colors active:scale-90"><ArrowLeft className="w-5 h-5" /></Link>
+            <Link href="/organizer/dashboard" aria-label="Back to dashboard" className="p-1 -ml-1 text-gray-500 hover:text-[#0D9488] transition-colors active:scale-90"><ArrowLeft className="w-5 h-5" /></Link>
             <h1 className="font-semibold text-sm">Organization Profile</h1>
           </div>
           <div className="flex items-center gap-1">
@@ -82,7 +84,7 @@ export default function OrganizerProfilePage() {
                 <Edit3 className="w-3.5 h-3.5" /> Edit
               </button>
             )}
-            <button onClick={signOut}
+            <button onClick={signOut} aria-label="Sign out"
               className="h-9 w-9 rounded-[10px] text-gray-400 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-all active:scale-90">
               <LogOut className="w-4 h-4" />
             </button>
@@ -91,9 +93,8 @@ export default function OrganizerProfilePage() {
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
-        {/* ===== PROFILE HERO ===== */}
         <div className="bg-gradient-to-br from-[#0D9488] via-[#0D9488] to-[#0F766E] rounded-[20px] p-6 text-center shadow-[0_8px_32px_rgba(13,148,136,0.2)]">
-          <div className="w-20 h-20 rounded-[16px] bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto ring-2 ring-white/30 shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+          <div className="w-20 h-20 rounded-[16px] bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto ring-2 ring-white/30 shadow-[0_4px_12px_rgba(0,0,0,0.1)]" aria-hidden="true">
             <span className="text-3xl font-bold text-white">{profile?.full_name?.charAt(0)?.toUpperCase() || "O"}</span>
           </div>
           <h2 className="text-white text-xl font-bold mt-4">{profile?.full_name}</h2>
@@ -117,7 +118,6 @@ export default function OrganizerProfilePage() {
           </div>
         </div>
 
-        {/* ===== PERFORMANCE METRICS ===== */}
         <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
           <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
             <TrendingUp className="w-3.5 h-3.5" /> Performance Overview
@@ -138,7 +138,6 @@ export default function OrganizerProfilePage() {
           </div>
         </div>
 
-        {/* ===== BUSINESS INFO ===== */}
         {!editing && (
           <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
             <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Business Information</p>
@@ -192,45 +191,44 @@ export default function OrganizerProfilePage() {
           </div>
         )}
 
-        {/* ===== EDIT FORM ===== */}
         {editing && (
           <form onSubmit={(e) => { e.preventDefault(); saveProfile(); }}>
             <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] space-y-4">
               <div className="flex items-center justify-between">
                 <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Edit Information</p>
                 <button type="button" onClick={() => setEditing(false)}
-                  className="text-gray-400 hover:text-gray-600 active:scale-90">
+                  className="text-gray-400 hover:text-gray-600 active:scale-90" aria-label="Cancel editing">
                   <X className="w-4 h-4" />
                 </button>
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">Organization Name</label>
-                <input value={form.full_name} onChange={e => setForm(p => ({ ...p, full_name: e.target.value }))}
+                <label htmlFor="profile-name" className="block text-xs font-medium text-gray-600 mb-1.5">Organization Name</label>
+                <input id="profile-name" value={form.full_name} onChange={e => setForm(p => ({ ...p, full_name: e.target.value }))}
                   className="w-full h-11 px-3.5 rounded-[10px] border border-[rgba(0,0,0,0.08)] bg-white text-sm outline-none transition-all focus:border-[#0D9488] focus:shadow-[0_0_0_3px_rgba(13,148,136,0.08)]" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">Phone</label>
-                <input value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
+                <label htmlFor="profile-phone" className="block text-xs font-medium text-gray-600 mb-1.5">Phone</label>
+                <input id="profile-phone" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
                   placeholder="9876543210"
                   className="w-full h-11 px-3.5 rounded-[10px] border border-[rgba(0,0,0,0.08)] bg-white text-sm outline-none transition-all focus:border-[#0D9488] focus:shadow-[0_0_0_3px_rgba(13,148,136,0.08)]" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1.5">City</label>
-                  <input value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))}
+                  <label htmlFor="profile-city" className="block text-xs font-medium text-gray-600 mb-1.5">City</label>
+                  <input id="profile-city" value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))}
                     placeholder="Ahmedabad"
                     className="w-full h-11 px-3.5 rounded-[10px] border border-[rgba(0,0,0,0.08)] bg-white text-sm outline-none transition-all focus:border-[#0D9488] focus:shadow-[0_0_0_3px_rgba(13,148,136,0.08)]" />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1.5">Area</label>
-                  <input value={form.area} onChange={e => setForm(p => ({ ...p, area: e.target.value }))}
+                  <label htmlFor="profile-area" className="block text-xs font-medium text-gray-600 mb-1.5">Area</label>
+                  <input id="profile-area" value={form.area} onChange={e => setForm(p => ({ ...p, area: e.target.value }))}
                     placeholder="e.g., Navrangpura"
                     className="w-full h-11 px-3.5 rounded-[10px] border border-[rgba(0,0,0,0.08)] bg-white text-sm outline-none transition-all focus:border-[#0D9488] focus:shadow-[0_0_0_3px_rgba(13,148,136,0.08)]" />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">About Organization</label>
-                <textarea value={form.bio} onChange={e => setForm(p => ({ ...p, bio: e.target.value }))}
+                <label htmlFor="profile-bio" className="block text-xs font-medium text-gray-600 mb-1.5">About Organization</label>
+                <textarea id="profile-bio" value={form.bio} onChange={e => setForm(p => ({ ...p, bio: e.target.value }))}
                   placeholder="Tell workers about your organization..."
                   className="w-full h-24 px-3.5 py-2.5 rounded-[10px] border border-[rgba(0,0,0,0.08)] bg-white text-sm outline-none transition-all focus:border-[#0D9488] focus:shadow-[0_0_0_3px_rgba(13,148,136,0.08)] resize-none" />
               </div>

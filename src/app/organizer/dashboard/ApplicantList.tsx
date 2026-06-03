@@ -6,9 +6,15 @@ import { toast } from "sonner";
 import {
   X, Check, ChevronDown, ChevronUp, Phone, MapPin,
   User, Award, Briefcase, Clock, Mail, Filter, XCircle, Copy,
-  Star, BadgeCheck, ShieldCheck, Search,
+  Star, BadgeCheck, Search,
 } from "lucide-react";
-import type { Event, Application, Profile } from "@/lib/supabase/types";
+import { useBodyScrollLock } from "@/lib/useStableForm";
+import { useFocusTrap } from "@/lib/useFocusTrap";
+import { ConfirmDialog } from "@/lib/design/Modal";
+import { APPLICANT_STATUS_STYLES, APPLICANT_STATUS_LABELS } from "@/lib/organizer/constants";
+import { loadApplicantsForEvent, updateApplicantStatus, removeApplicant } from "@/lib/organizer/applicantUtils";
+import type { ApplicantWithProfile } from "@/lib/organizer/applicantUtils";
+import type { Event } from "@/lib/supabase/types";
 
 interface Props {
   event: Event;
@@ -16,106 +22,57 @@ interface Props {
   onUpdate: () => void;
 }
 
-interface ApplicantWithProfile extends Application {
-  profile: Profile;
-}
-
-const STATUS_STYLES: Record<string, string> = {
-  pending: "bg-amber-50 text-amber-700 border border-amber-200",
-  approved: "bg-emerald-50 text-emerald-700 border border-emerald-200",
-  rejected: "bg-gray-50 text-gray-500 border border-gray-200",
-  cancelled: "bg-gray-50 text-gray-400 border border-gray-200",
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  pending: "Applied", approved: "Approved", rejected: "Rejected", cancelled: "Cancelled",
-};
-
 export default function ApplicantList({ event, onClose, onUpdate }: Props) {
   const [applicants, setApplicants] = useState<ApplicantWithProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [removeTarget, setRemoveTarget] = useState<string | null>(null);
   const [filterTab, setFilterTab] = useState<"all" | "pending" | "approved" | "rejected">("all");
   const [filters, setFilters] = useState({
     gender: "", ageMin: "", ageMax: "", area: "", skills: "", availability: "", verifiedOnly: false,
   });
   const supabase = createClient();
+  useBodyScrollLock(true);
+  const modalRef = useFocusTrap(true);
 
   useEffect(() => { loadApplicants(); }, [event.id]);
 
-  const loadApplicants = async () => { try { const { data: apps } = await supabase
-      .from("applications").select("*").eq("event_id", event.id).order("created_at", { ascending: false });
-
-    if (!apps) { setLoading(false); return; }
-
-    const withProfiles = await Promise.all(
-      apps.map(async (app) => {
-        const { data: prof } = await supabase
-          .from("profiles").select("*").eq("user_id", app.worker_id).maybeSingle();
-        return { ...app, profile: prof! } as ApplicantWithProfile;
-      })
-    );
-
-    setApplicants(withProfiles.filter(a => a.profile));
-     } catch (err) { console.error("[ApplicantList] error:", err); } finally { setLoading(false); } };
-
-  const updateStatus = async (applicationId: string, status: "approved" | "rejected") => {
-    const { error } = await supabase
-      .from("applications").update({ status, updated_at: new Date().toISOString() }).eq("id", applicationId);
-    if (error) { toast.error(error.message); return; }
-
-    const app = applicants.find(a => a.id === applicationId);
-    if (app) {
-      await supabase.from("notifications").insert({
-        user_id: app.worker_id,
-        title: status === "approved" ? "Application Approved" : "Application Rejected",
-        message: status === "approved"
-          ? `Your application for "${event.title}" has been approved.`
-          : `Your application for "${event.title}" has been rejected.`,
-      });
-    }
-
-    if (status === "approved") {
-      const newApprovedCount = applicants.filter(a => a.status === "approved" || a.id === applicationId).length;
-      if (newApprovedCount >= event.worker_count) {
-        await supabase.from("events").update({ status: "full", updated_at: new Date().toISOString() }).eq("id", event.id);
-        toast.success("Event is now full!");
-      }
-    }
-
-    toast.success(`Worker ${status === "approved" ? "approved" : "rejected"}!`);
-    loadApplicants();
-    onUpdate();
+  const loadApplicants = async () => {
+    setLoading(true);
+    const result = await loadApplicantsForEvent(event.id);
+    setApplicants(result);
+    setLoading(false);
   };
 
-  const handleRemove = async (applicationId: string) => {
-    const { error } = await supabase
-      .from("applications").update({ status: "cancelled", notes: "removed_by_organizer", updated_at: new Date().toISOString() }).eq("id", applicationId);
-    if (error) { toast.error(error.message); return; }
+  const handleUpdateStatus = (applicationId: string, status: "approved" | "rejected") => {
+    updateApplicantStatus(applicationId, status, event, applicants, () => {
+      loadApplicants();
+      onUpdate();
+    });
+  };
 
-    const app = applicants.find(a => a.id === applicationId);
-    if (app) {
-      await supabase.from("notifications").insert({
-        user_id: app.worker_id,
-        title: "Removed from Event",
-        message: `You have been removed from "${event.title}". The organizer cancelled your selection. You can re-apply if the event is still accepting applications.`,
-      });
-    }
-
-    if (event.status === "full") {
-      await supabase.from("events").update({ status: "filling", updated_at: new Date().toISOString() }).eq("id", event.id);
-    }
-
-    toast.success("Worker removed");
-    loadApplicants();
-    onUpdate();
+  const handleRemove = (applicationId: string) => {
+    removeApplicant(applicationId, event, applicants, () => {
+      loadApplicants();
+      onUpdate();
+    });
+    setRemoveTarget(null);
   };
 
   const filtered = useMemo(() => {
     return applicants.filter(a => {
       if (filterTab !== "all" && a.status !== filterTab) return false;
       const p = a.profile;
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        const name = p.full_name?.toLowerCase() || "";
+        const city = p.city?.toLowerCase() || "";
+        const area = p.area?.toLowerCase() || "";
+        const skills = p.skills?.some(s => s.toLowerCase().includes(q)) || false;
+        if (!name.includes(q) && !city.includes(q) && !area.includes(q) && !skills) return false;
+      }
       if (filters.gender && p.gender !== filters.gender) return false;
       if (filters.ageMin && (!p.age || p.age < parseInt(filters.ageMin))) return false;
       if (filters.ageMax && (!p.age || p.age > parseInt(filters.ageMax))) return false;
@@ -125,15 +82,14 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
       if (filters.verifiedOnly && p.status === "unverified") return false;
       return true;
     });
-  }, [applicants, filters, filterTab]);
+  }, [applicants, filters, filterTab, searchQuery]);
 
   const pendingCount = applicants.filter(a => a.status === "pending").length;
   const approvedCount = applicants.filter(a => a.status === "approved").length;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-6 p-3 overflow-y-auto modal-overlay">
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-6 p-3 overflow-y-auto modal-overlay" ref={modalRef} role="dialog" aria-modal="true" aria-label="Applicants for event">
       <div className="w-full max-w-xl bg-white rounded-[20px] shadow-[0_24px_64px_rgba(0,0,0,0.15),0_8px_20px_rgba(0,0,0,0.08)]">
-        {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-[rgba(0,0,0,0.06)] sticky top-0 bg-white z-10 rounded-t-[20px]">
           <div className="min-w-0 flex-1 mr-3">
             <h2 className="font-semibold text-base text-gray-900 truncate">{event.title}</h2>
@@ -145,21 +101,27 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
           </div>
           <div className="flex items-center gap-1">
             <button onClick={() => setShowFilters(!showFilters)}
-              className={`p-2 rounded-[10px] ${showFilters ? "bg-[#0D9488]/10 text-[#0D9488]" : "hover:bg-gray-100 text-gray-500"}`}>
+              className={`p-2 rounded-[10px] ${showFilters ? "bg-[#0D9488]/10 text-[#0D9488]" : "hover:bg-gray-100 text-gray-500"}`} aria-label="Toggle filters">
               <Filter className="w-4 h-4" />
             </button>
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-[10px]">
+            <button onClick={onClose} data-close-modal className="p-2 hover:bg-gray-100 rounded-[10px]" aria-label="Close">
               <X className="w-4 h-4 text-gray-500" />
             </button>
           </div>
         </div>
 
-        {/* Filter tabs */}
-        <div className="px-4 py-2.5 border-b border-[rgba(0,0,0,0.06)] bg-gray-50/50">
-          <div className="flex gap-1.5">
+        <div className="px-4 py-2.5 border-b border-[rgba(0,0,0,0.06)] bg-gray-50/50 space-y-2">
+          {/* Search */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+            <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Search by name, area, skills..."
+              className="w-full h-9 pl-9 pr-3 rounded-[10px] border border-[rgba(0,0,0,0.08)] bg-white text-xs outline-none transition-all focus:border-[#0D9488]" />
+          </div>
+          <div className="flex gap-1.5 overflow-x-auto pb-1">
             {(["all", "pending", "approved", "rejected"] as const).map(tab => (
               <button key={tab} onClick={() => setFilterTab(tab)}
-                className={`h-8 px-3 rounded-[10px] text-[11px] font-semibold transition-all capitalize ${
+                className={`h-8 px-3 rounded-[10px] text-[11px] font-semibold transition-all capitalize shrink-0 ${
                   filterTab === tab
                     ? "bg-[#0D9488] text-white shadow-[0_2px_8px_rgba(13,148,136,0.2)]"
                     : "bg-white text-gray-600 hover:bg-gray-100"
@@ -170,26 +132,25 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
           </div>
         </div>
 
-        {/* Filters panel */}
         {showFilters && (
           <div className="px-4 py-3 border-b border-[rgba(0,0,0,0.06)] bg-[#F8F8F6] space-y-2">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               <select value={filters.gender} onChange={e => setFilters(f => ({ ...f, gender: e.target.value }))}
-                className="input-base h-9 text-xs">
+                className="input-base h-9 text-xs" aria-label="Gender filter">
                 <option value="">Any gender</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
               </select>
               <input type="number" value={filters.ageMin} onChange={e => setFilters(f => ({ ...f, ageMin: e.target.value }))}
-                placeholder="Min age" className="input-base h-9 text-xs" />
+                placeholder="Min age" className="input-base h-9 text-xs" aria-label="Minimum age" />
               <input type="number" value={filters.ageMax} onChange={e => setFilters(f => ({ ...f, ageMax: e.target.value }))}
-                placeholder="Max age" className="input-base h-9 text-xs" />
+                placeholder="Max age" className="input-base h-9 text-xs" aria-label="Maximum age" />
               <input value={filters.area} onChange={e => setFilters(f => ({ ...f, area: e.target.value }))}
-                placeholder="Area" className="input-base h-9 text-xs" />
+                placeholder="Area" className="input-base h-9 text-xs" aria-label="Area filter" />
               <input value={filters.skills} onChange={e => setFilters(f => ({ ...f, skills: e.target.value }))}
-                placeholder="Skills" className="input-base h-9 text-xs" />
+                placeholder="Skills" className="input-base h-9 text-xs" aria-label="Skills filter" />
               <select value={filters.availability} onChange={e => setFilters(f => ({ ...f, availability: e.target.value }))}
-                className="input-base h-9 text-xs">
+                className="input-base h-9 text-xs" aria-label="Availability filter">
                 <option value="">Any availability</option>
                 <option value="available">Available</option>
                 <option value="weekends">Weekends</option>
@@ -208,8 +169,7 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
           </div>
         )}
 
-        {/* Applicant list */}
-        <div className="p-3 space-y-2 max-h-[55vh] overflow-y-auto">
+        <div className="p-3 space-y-2 max-h-[50vh] overflow-y-auto">
           {loading && (
             <div className="space-y-2">
               {[1,2,3].map(i => (
@@ -230,7 +190,8 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
             <div className="text-center py-10">
               <User className="w-10 h-10 text-gray-300 mx-auto mb-3" />
               <p className="text-sm text-gray-500 font-medium">
-                {filterTab === "all" ? "No applicants yet" : `No ${filterTab} applicants`}
+                {searchQuery || Object.values(filters).some(v => v) ? "No matching applicants" :
+                 filterTab === "all" ? "No applicants yet" : `No ${filterTab} applicants`}
               </p>
               <p className="text-xs text-gray-400 mt-1">Applications will show up here as workers apply</p>
             </div>
@@ -241,7 +202,7 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
               <div className="p-3.5">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <div className="w-10 h-10 rounded-[12px] bg-gradient-to-br from-[#0D9488]/10 to-[#0D9488]/20 flex items-center justify-center text-[#0D9488] font-semibold text-sm shrink-0">
+                    <div className="w-10 h-10 rounded-[12px] bg-gradient-to-br from-[#0D9488]/10 to-[#0D9488]/20 flex items-center justify-center text-[#0D9488] font-semibold text-sm shrink-0" aria-hidden="true">
                       {app.profile.full_name?.charAt(0) || "W"}
                     </div>
                     <div className="min-w-0">
@@ -256,24 +217,24 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
                     <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                      app.notes === "removed_by_organizer" ? "bg-red-50 text-red-700 border border-red-200" : STATUS_STYLES[app.status]
+                      app.notes === "removed_by_organizer" ? "bg-red-50 text-red-700 border border-red-200" : APPLICANT_STATUS_STYLES[app.status]
                     }`}>
-                      {app.notes === "removed_by_organizer" ? "Removed" : STATUS_LABELS[app.status]}
+                      {app.notes === "removed_by_organizer" ? "Removed" : APPLICANT_STATUS_LABELS[app.status]}
                     </span>
                     {app.status === "pending" && (
                       <>
-                        <button onClick={() => updateStatus(app.id, "approved")}
-                          className="h-8 w-8 rounded-[10px] bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-100 hover:text-emerald-700 transition-all active:scale-90">
+                        <button onClick={() => handleUpdateStatus(app.id, "approved")}
+                          className="h-8 w-8 rounded-[10px] bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-100 hover:text-emerald-700 transition-all active:scale-90" aria-label="Approve">
                           <Check className="w-4 h-4" />
                         </button>
-                        <button onClick={() => updateStatus(app.id, "rejected")}
-                          className="h-8 w-8 rounded-[10px] bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 hover:text-red-600 transition-all active:scale-90">
+                        <button onClick={() => handleUpdateStatus(app.id, "rejected")}
+                          className="h-8 w-8 rounded-[10px] bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 hover:text-red-600 transition-all active:scale-90" aria-label="Reject">
                           <X className="w-4 h-4" />
                         </button>
                       </>
                     )}
                     {app.status === "approved" && (
-                      <button onClick={() => { if (confirm(`Remove ${app.profile.full_name} from this event?`)) handleRemove(app.id); }}
+                      <button onClick={() => setRemoveTarget(app.id)}
                         className="h-7 px-2.5 rounded-[10px] bg-red-50 text-red-600 text-[10px] font-medium flex items-center gap-1 hover:bg-red-100 border border-red-200 transition-all active:scale-95">
                         <XCircle className="w-3 h-3" /> Remove
                       </button>
@@ -317,7 +278,7 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
                             <span className="flex items-center gap-1.5 text-emerald-700 col-span-2">
                               <Phone className="w-3 h-3" />{app.profile.phone}
                               <button onClick={() => { navigator.clipboard.writeText(app.profile.phone!); toast.success("Phone copied"); }}
-                                className="p-0.5 rounded hover:bg-emerald-100 text-emerald-500 hover:text-emerald-700 transition-colors">
+                                className="p-0.5 rounded hover:bg-emerald-100 text-emerald-500 hover:text-emerald-700 transition-colors" aria-label="Copy phone">
                                 <Copy className="w-3 h-3" />
                               </button>
                             </span>
@@ -344,6 +305,16 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
           ))}
         </div>
       </div>
+
+      <ConfirmDialog
+        open={removeTarget !== null}
+        onClose={() => setRemoveTarget(null)}
+        onConfirm={() => { if (removeTarget) handleRemove(removeTarget); }}
+        title="Remove Worker"
+        message={removeTarget ? `Remove ${applicants.find(a => a.id === removeTarget)?.profile.full_name} from this event? This will notify them.` : ""}
+        confirmLabel="Remove"
+        variant="danger"
+      />
     </div>
   );
 }

@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
-import { X, Save, Sparkles } from "lucide-react";
+import { X, Save } from "lucide-react";
 import { useBodyScrollLock } from "@/lib/useStableForm";
+import { useFocusTrap } from "@/lib/useFocusTrap";
+import { CATEGORIES, STATUS_OPTIONS, INPUT_CLASS, LABEL_CLASS, SELECT_CLASS, parseCommaList } from "@/lib/organizer/constants";
 import type { Event } from "@/lib/supabase/types";
 
 interface Props {
@@ -12,18 +14,6 @@ interface Props {
   onClose: () => void;
   onUpdated: () => void;
 }
-
-const CATEGORIES = [
-  "promotion", "event_setup", "crowd_management", "registration",
-  "hospitality", "cleaning", "security", "other"
-];
-
-const STATUS_OPTIONS: { value: string; label: string }[] = [
-  { value: "draft", label: "Draft" }, { value: "published", label: "Published" },
-  { value: "filling", label: "Filling" }, { value: "full", label: "Full" },
-  { value: "closed", label: "Closed" }, { value: "completed", label: "Completed" },
-  { value: "cancelled", label: "Cancelled" },
-];
 
 function InputGroup({ children }: { children: React.ReactNode }) {
   return <div className="grid grid-cols-2 gap-3">{children}</div>;
@@ -57,6 +47,7 @@ export default function EditEventModal({ event, onClose, onUpdated }: Props) {
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
   useBodyScrollLock(true);
+  const modalRef = useFocusTrap(true);
 
   const update = (key: string, value: any) => setForm(p => ({ ...p, [key]: value }));
 
@@ -75,9 +66,9 @@ export default function EditEventModal({ event, onClose, onUpdated }: Props) {
       min_age: form.min_age ? parseInt(form.min_age) : null,
       max_age: form.max_age ? parseInt(form.max_age) : null,
       experience_required: form.work_description || null,
-      skill_requirements: form.skill_requirements ? form.skill_requirements.split(",").map(s => s.trim()).filter(Boolean) : null,
+      skill_requirements: parseCommaList(form.skill_requirements).length > 0 ? parseCommaList(form.skill_requirements) : null,
       dress_code: form.dress_code || null,
-      required_documents: form.required_documents ? form.required_documents.split(",").map(s => s.trim()).filter(Boolean) : null,
+      required_documents: parseCommaList(form.required_documents).length > 0 ? parseCommaList(form.required_documents) : null,
       grooming_notes: form.grooming_notes || null,
       payment_info: form.payment_info || null,
       food_included: form.food_included || false,
@@ -96,27 +87,22 @@ export default function EditEventModal({ event, onClose, onUpdated }: Props) {
     onUpdated();
   };
 
-  const inputClass = "w-full h-11 px-3.5 rounded-[10px] border border-[rgba(0,0,0,0.08)] bg-white text-sm outline-none transition-all focus:border-[#0D9488] focus:shadow-[0_0_0_3px_rgba(13,148,136,0.08)]";
-  const labelClass = "block text-xs font-medium text-gray-600 mb-1.5";
-  const selectClass = inputClass;
-
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-6 p-3 overflow-y-auto modal-overlay">
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-6 p-3 overflow-y-auto modal-overlay" ref={modalRef} role="dialog" aria-modal="true" aria-label="Edit event">
       <div className="w-full max-w-xl bg-white rounded-[20px] shadow-[0_24px_64px_rgba(0,0,0,0.15),0_8px_20px_rgba(0,0,0,0.08)]">
-        {/* Header */}
         <div className="px-5 pt-5 pb-3 border-b border-[rgba(0,0,0,0.06)]">
           <div className="flex items-center justify-between mb-1">
             <div>
               <h2 className="font-bold text-lg text-gray-900">Edit Event</h2>
               <p className="text-xs text-gray-500 mt-0.5 truncate max-w-[350px]">{event.title}</p>
             </div>
-            <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-[10px] transition-colors">
+            <button onClick={onClose} data-close-modal className="p-1.5 hover:bg-gray-100 rounded-[10px] transition-colors" aria-label="Close">
               <X className="w-4 h-4 text-gray-500" />
             </button>
           </div>
           <div className="mt-3 flex items-center gap-2">
-            <span className="text-xs text-gray-500 font-medium">Status:</span>
-            <select value={form.status} onChange={e => update("status", e.target.value)}
+            <label htmlFor="edit-status" className="text-xs text-gray-500 font-medium">Status:</label>
+            <select id="edit-status" value={form.status} onChange={e => update("status", e.target.value)}
               className="h-8 px-3 rounded-[10px] border border-[rgba(0,0,0,0.08)] bg-white text-xs font-medium outline-none focus:border-[#0D9488]">
               {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
@@ -125,125 +111,121 @@ export default function EditEventModal({ event, onClose, onUpdated }: Props) {
 
         <form onSubmit={handleSubmit}>
           <div className="px-5 py-4 max-h-[60vh] overflow-y-auto space-y-5">
-            {/* Event Basics */}
             <div>
               <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Event Basics</p>
               <div className="space-y-3">
                 <div>
-                  <label className={labelClass}>Event Title</label>
-                  <input required value={form.title} onChange={e => update("title", e.target.value)} maxLength={100} className={inputClass} />
+                  <label htmlFor="edit-title" className={LABEL_CLASS}>Event Title</label>
+                  <input id="edit-title" required value={form.title} onChange={e => update("title", e.target.value)} maxLength={100} className={INPUT_CLASS} />
                   <span className="text-[10px] text-gray-400 mt-1 block text-right">{form.title.length}/100</span>
                 </div>
                 <InputGroup>
                   <div>
-                    <label className={labelClass}>Category</label>
-                    <select value={form.category} onChange={e => update("category", e.target.value)} className={selectClass}>
+                    <label htmlFor="edit-category" className={LABEL_CLASS}>Category</label>
+                    <select id="edit-category" value={form.category} onChange={e => update("category", e.target.value)} className={SELECT_CLASS}>
                       <option value="">Select</option>
                       {CATEGORIES.map(c => <option key={c} value={c}>{c.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className={labelClass}>Workers Needed</label>
-                    <input type="number" min={1} value={form.worker_count} onChange={e => update("worker_count", e.target.value)} required className={inputClass} />
+                    <label htmlFor="edit-workers" className={LABEL_CLASS}>Workers Needed</label>
+                    <input id="edit-workers" type="number" min={1} value={form.worker_count} onChange={e => update("worker_count", e.target.value)} required className={INPUT_CLASS} />
                   </div>
                 </InputGroup>
                 <InputGroup>
                   <div>
-                    <label className={labelClass}>Event Date</label>
-                    <input required type="date" value={form.date} onChange={e => update("date", e.target.value)} className={inputClass} />
+                    <label htmlFor="edit-date" className={LABEL_CLASS}>Event Date</label>
+                    <input id="edit-date" required type="date" value={form.date} onChange={e => update("date", e.target.value)} className={INPUT_CLASS} />
                   </div>
                   <div>
-                    <label className={labelClass}>Start Time</label>
-                    <input required type="time" value={form.time} onChange={e => update("time", e.target.value)} className={inputClass} />
+                    <label htmlFor="edit-time" className={LABEL_CLASS}>Start Time</label>
+                    <input id="edit-time" required type="time" value={form.time} onChange={e => update("time", e.target.value)} className={INPUT_CLASS} />
                   </div>
                 </InputGroup>
                 <InputGroup>
                   <div>
-                    <label className={labelClass}>Display Date <span className="text-gray-400 font-normal">(optional)</span></label>
-                    <input value={form.date_display} onChange={e => update("date_display", e.target.value)} className={inputClass} />
+                    <label htmlFor="edit-date-display" className={LABEL_CLASS}>Display Date <span className="text-gray-400 font-normal">(optional)</span></label>
+                    <input id="edit-date-display" value={form.date_display} onChange={e => update("date_display", e.target.value)} className={INPUT_CLASS} />
                   </div>
                   <div>
-                    <label className={labelClass}>End Time <span className="text-gray-400 font-normal">(optional)</span></label>
-                    <input type="time" value={form.end_time} onChange={e => update("end_time", e.target.value)} className={inputClass} />
+                    <label htmlFor="edit-end-time" className={LABEL_CLASS}>End Time <span className="text-gray-400 font-normal">(optional)</span></label>
+                    <input id="edit-end-time" type="time" value={form.end_time} onChange={e => update("end_time", e.target.value)} className={INPUT_CLASS} />
                   </div>
                 </InputGroup>
                 <div>
-                  <label className={labelClass}>Application Deadline <span className="text-gray-400 font-normal">(optional)</span></label>
-                  <input type="date" value={form.application_deadline} onChange={e => update("application_deadline", e.target.value)} className={inputClass} />
+                  <label htmlFor="edit-deadline" className={LABEL_CLASS}>Application Deadline <span className="text-gray-400 font-normal">(optional)</span></label>
+                  <input id="edit-deadline" type="date" value={form.application_deadline} onChange={e => update("application_deadline", e.target.value)} className={INPUT_CLASS} />
                 </div>
               </div>
             </div>
 
-            {/* Location */}
             <div>
               <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Location</p>
               <div className="space-y-3">
                 <div>
-                  <label className={labelClass}>Venue / Location</label>
-                  <input value={form.location} onChange={e => update("location", e.target.value)} required className={inputClass} />
+                  <label htmlFor="edit-location" className={LABEL_CLASS}>Venue / Location</label>
+                  <input id="edit-location" value={form.location} onChange={e => update("location", e.target.value)} required className={INPUT_CLASS} />
                 </div>
                 <div>
-                  <label className={labelClass}>Google Maps Link <span className="text-gray-400 font-normal">(optional)</span></label>
-                  <input value={form.google_maps_link} onChange={e => update("google_maps_link", e.target.value)} className={inputClass} />
+                  <label htmlFor="edit-maps" className={LABEL_CLASS}>Google Maps Link <span className="text-gray-400 font-normal">(optional)</span></label>
+                  <input id="edit-maps" value={form.google_maps_link} onChange={e => update("google_maps_link", e.target.value)} className={INPUT_CLASS} />
                 </div>
               </div>
             </div>
 
-            {/* Requirements */}
             <div>
               <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Worker Requirements</p>
               <div className="space-y-3">
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className={labelClass}>Gender</label>
-                    <select value={form.gender_requirement} onChange={e => update("gender_requirement", e.target.value)} className={selectClass}>
+                    <label htmlFor="edit-gender" className={LABEL_CLASS}>Gender</label>
+                    <select id="edit-gender" value={form.gender_requirement} onChange={e => update("gender_requirement", e.target.value)} className={SELECT_CLASS}>
                       <option value="">Any</option>
                       <option value="male">Male</option>
                       <option value="female">Female</option>
                     </select>
                   </div>
                   <div>
-                    <label className={labelClass}>Min Age</label>
-                    <input type="number" min={0} value={form.min_age} onChange={e => update("min_age", e.target.value)} className={inputClass} />
+                    <label htmlFor="edit-min-age" className={LABEL_CLASS}>Min Age</label>
+                    <input id="edit-min-age" type="number" min={0} value={form.min_age} onChange={e => update("min_age", e.target.value)} className={INPUT_CLASS} />
                   </div>
                   <div>
-                    <label className={labelClass}>Max Age</label>
-                    <input type="number" min={0} value={form.max_age} onChange={e => update("max_age", e.target.value)} className={inputClass} />
+                    <label htmlFor="edit-max-age" className={LABEL_CLASS}>Max Age</label>
+                    <input id="edit-max-age" type="number" min={0} value={form.max_age} onChange={e => update("max_age", e.target.value)} className={INPUT_CLASS} />
                   </div>
                 </div>
                 <div>
-                  <label className={labelClass}>Work Description</label>
-                  <textarea value={form.work_description} onChange={e => update("work_description", e.target.value)}
-                    className={`${inputClass} h-32 resize-none pt-2.5`} />
+                  <label htmlFor="edit-desc" className={LABEL_CLASS}>Work Description</label>
+                  <textarea id="edit-desc" value={form.work_description} onChange={e => update("work_description", e.target.value)}
+                    className={`${INPUT_CLASS} h-32 resize-none pt-2.5`} />
                 </div>
                 <div>
-                  <label className={labelClass}>Skills Required <span className="text-gray-400 font-normal">(comma separated)</span></label>
-                  <input value={form.skill_requirements} onChange={e => update("skill_requirements", e.target.value)} className={inputClass} />
+                  <label htmlFor="edit-skills" className={LABEL_CLASS}>Skills Required <span className="text-gray-400 font-normal">(comma separated)</span></label>
+                  <input id="edit-skills" value={form.skill_requirements} onChange={e => update("skill_requirements", e.target.value)} className={INPUT_CLASS} />
                 </div>
                 <InputGroup>
                   <div>
-                    <label className={labelClass}>Dress Code</label>
-                    <input value={form.dress_code} onChange={e => update("dress_code", e.target.value)} className={inputClass} />
+                    <label htmlFor="edit-dress" className={LABEL_CLASS}>Dress Code</label>
+                    <input id="edit-dress" value={form.dress_code} onChange={e => update("dress_code", e.target.value)} className={INPUT_CLASS} />
                   </div>
                   <div>
-                    <label className={labelClass}>Required Documents</label>
-                    <input value={form.required_documents} onChange={e => update("required_documents", e.target.value)} className={inputClass} />
+                    <label htmlFor="edit-docs" className={LABEL_CLASS}>Required Documents</label>
+                    <input id="edit-docs" value={form.required_documents} onChange={e => update("required_documents", e.target.value)} className={INPUT_CLASS} />
                   </div>
                 </InputGroup>
                 <div>
-                  <label className={labelClass}>Grooming Notes <span className="text-gray-400 font-normal">(optional)</span></label>
-                  <input value={form.grooming_notes} onChange={e => update("grooming_notes", e.target.value)} className={inputClass} />
+                  <label htmlFor="edit-grooming" className={LABEL_CLASS}>Grooming Notes <span className="text-gray-400 font-normal">(optional)</span></label>
+                  <input id="edit-grooming" value={form.grooming_notes} onChange={e => update("grooming_notes", e.target.value)} className={INPUT_CLASS} />
                 </div>
               </div>
             </div>
 
-            {/* Payment */}
             <div>
               <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Payment & Perks</p>
               <div className="space-y-3">
                 <div>
-                  <label className={labelClass}>Payment</label>
-                  <input value={form.payment_info} onChange={e => update("payment_info", e.target.value)} className={inputClass} />
+                  <label htmlFor="edit-payment" className={LABEL_CLASS}>Payment</label>
+                  <input id="edit-payment" value={form.payment_info} onChange={e => update("payment_info", e.target.value)} className={INPUT_CLASS} />
                 </div>
                 <div className="flex items-center gap-6">
                   <label className="flex items-center gap-2.5 cursor-pointer select-none">
@@ -262,35 +244,33 @@ export default function EditEventModal({ event, onClose, onUpdated }: Props) {
                   </label>
                 </div>
                 <div>
-                  <label className={labelClass}>Overtime Info <span className="text-gray-400 font-normal">(optional)</span></label>
-                  <input value={form.overtime_info} onChange={e => update("overtime_info", e.target.value)} className={inputClass} />
+                  <label htmlFor="edit-overtime" className={LABEL_CLASS}>Overtime Info <span className="text-gray-400 font-normal">(optional)</span></label>
+                  <input id="edit-overtime" value={form.overtime_info} onChange={e => update("overtime_info", e.target.value)} className={INPUT_CLASS} />
                 </div>
               </div>
             </div>
 
-            {/* Instructions */}
             <div>
               <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Reporting Instructions</p>
               <div className="space-y-3">
                 <div>
-                  <label className={labelClass}>Where to Report</label>
-                  <textarea value={form.reporting_details} onChange={e => update("reporting_details", e.target.value)}
-                    className={`${inputClass} h-20 resize-none pt-2.5`} />
+                  <label htmlFor="edit-reporting" className={LABEL_CLASS}>Where to Report</label>
+                  <textarea id="edit-reporting" value={form.reporting_details} onChange={e => update("reporting_details", e.target.value)}
+                    className={`${INPUT_CLASS} h-20 resize-none pt-2.5`} />
                 </div>
                 <div>
-                  <label className={labelClass}>Special Instructions</label>
-                  <textarea value={form.instructions} onChange={e => update("instructions", e.target.value)}
-                    className={`${inputClass} h-20 resize-none pt-2.5`} />
+                  <label htmlFor="edit-instructions" className={LABEL_CLASS}>Special Instructions</label>
+                  <textarea id="edit-instructions" value={form.instructions} onChange={e => update("instructions", e.target.value)}
+                    className={`${INPUT_CLASS} h-20 resize-none pt-2.5`} />
                 </div>
                 <div>
-                  <label className={labelClass}>Contact Person <span className="text-gray-400 font-normal">(on-site)</span></label>
-                  <input value={form.contact_person_notes} onChange={e => update("contact_person_notes", e.target.value)} className={inputClass} />
+                  <label htmlFor="edit-contact" className={LABEL_CLASS}>Contact Person <span className="text-gray-400 font-normal">(on-site)</span></label>
+                  <input id="edit-contact" value={form.contact_person_notes} onChange={e => update("contact_person_notes", e.target.value)} className={INPUT_CLASS} />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Footer */}
           <div className="px-5 py-3 border-t border-[rgba(0,0,0,0.06)] bg-gray-50/50 rounded-b-[20px]">
             <div className="flex gap-2">
               <button type="button" onClick={onClose}

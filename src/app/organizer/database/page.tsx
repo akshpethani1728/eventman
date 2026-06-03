@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -8,35 +8,9 @@ import { ArrowLeft, Search, User, MapPin, Briefcase, Clock, Award, Filter, X, Ch
 import { PageLoader } from "@/lib/design/Loading";
 import WorkerProfilePanel from "./WorkerProfilePanel";
 import type { Profile } from "@/lib/supabase/types";
+import { computeCompletion, AVAIL_CONFIG, AVAIL_SORT_KEY } from "@/lib/organizer/constants";
 
-function computeCompletion(p: Profile): number {
-  const checks: [keyof Profile, number][] = [
-    ["avatar_url", 15], ["phone", 15], ["age", 10], ["gender", 10],
-    ["city", 10], ["area", 10], ["skills", 15], ["experience", 10], ["bio", 10],
-  ];
-  let percent = 0;
-  for (const [key, weight] of checks) {
-    const val = p[key];
-    if (key === "skills") { if (Array.isArray(val) && val.length > 0) percent += weight; }
-    else if (val !== null && val !== undefined && val !== "") percent += weight;
-  }
-  return percent;
-}
-
-const AVAIL_CONFIG: Record<string, { label: string; dot: string }> = {
-  available_today: { label: "Available Today", dot: "bg-emerald-500" },
-  available_this_week: { label: "Available This Week", dot: "bg-blue-500" },
-  available: { label: "Available", dot: "bg-emerald-500" },
-  weekends: { label: "Weekends", dot: "bg-amber-500" },
-  evenings: { label: "Evenings", dot: "bg-purple-500" },
-  busy: { label: "Busy", dot: "bg-red-500" },
-  unavailable: { label: "Unavailable", dot: "bg-gray-400" },
-};
-
-const AVAIL_SORT_KEY: Record<string, number> = {
-  available_today: 0, available_this_week: 1, available: 2,
-  weekends: 3, evenings: 4, busy: 5, unavailable: 6,
-};
+const PAGE_SIZE = 20;
 
 function SkeletonWorkerCard() {
   return (
@@ -66,6 +40,7 @@ export default function WorkerDatabasePage() {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedWorker, setSelectedWorker] = useState<Profile | null>(null);
   const [organizerId, setOrganizerId] = useState("");
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const router = useRouter();
   const supabase = createClient();
 
@@ -96,6 +71,9 @@ export default function WorkerDatabasePage() {
     return aK - bK;
   });
 
+  const visibleWorkers = filtered.slice(0, visibleCount);
+  const hasMore = visibleCount < filtered.length;
+
   if (loading) return (
     <div className="min-h-screen bg-[#F8F8F6] pb-24">
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10">
@@ -116,27 +94,26 @@ export default function WorkerDatabasePage() {
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
           <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-[10px] transition-all"><ArrowLeft className="w-5 h-5" /></Link>
           <h1 className="font-semibold text-sm">Talent Discovery</h1>
-          <span className="text-xs text-gray-400 ml-auto font-medium">{workers.length} workers</span>
+          <span className="text-xs text-gray-400 ml-auto font-medium" aria-live="polite">{workers.length} workers</span>
         </div>
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-4">
-        {/* Search */}
         <div className="flex gap-2 mb-4">
           <div className="relative flex-1">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search talent by name, area, skills..."
-              className="w-full h-11 pl-10 pr-3 rounded-[12px] border border-[rgba(0,0,0,0.08)] bg-white text-sm outline-none transition-all focus:border-[#0D9488] focus:shadow-[0_0_0_3px_rgba(13,148,136,0.08)]" />
+              className="w-full h-11 pl-10 pr-3 rounded-[12px] border border-[rgba(0,0,0,0.08)] bg-white text-sm outline-none transition-all focus:border-[#0D9488] focus:shadow-[0_0_0_3px_rgba(13,148,136,0.08)]"
+              aria-label="Search workers" />
           </div>
           <button onClick={() => setShowFilters(!showFilters)}
             className={`h-11 px-4 rounded-[12px] text-sm font-semibold transition-all flex items-center gap-1.5 ${
               showFilters ? "bg-[#0D9488] text-white shadow-[0_2px_8px_rgba(13,148,136,0.2)]" : "bg-white text-gray-600 border border-[rgba(0,0,0,0.08)] hover:border-[rgba(0,0,0,0.14)]"
-            }`}>
+            }`} aria-label="Toggle filters" aria-expanded={showFilters}>
             <Filter className="w-4 h-4" /> Filters
           </button>
         </div>
 
-        {/* Quick filter chips */}
         <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-1">
           <button onClick={() => setAvailableOnly(!availableOnly)}
             className={`h-8 px-3.5 rounded-full text-[11px] font-semibold transition-all whitespace-nowrap shrink-0 ${
@@ -159,19 +136,18 @@ export default function WorkerDatabasePage() {
           )}
         </div>
 
-        {/* Advanced filters */}
         {showFilters && (
           <div className="bg-white rounded-[14px] p-4 mb-4 space-y-3 shadow-[0_2px_8px_rgba(0,0,0,0.04)] animate-fade-in border border-[rgba(0,0,0,0.06)]">
             <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Advanced Filters</p>
             <div className="grid grid-cols-2 gap-2.5">
               <select value={filters.gender} onChange={e => setFilters(f => ({ ...f, gender: e.target.value }))}
-                className="input-base text-xs">
+                className="input-base text-xs" aria-label="Gender filter">
                 <option value="">Any gender</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
               </select>
               <select value={filters.availability} onChange={e => setFilters(f => ({ ...f, availability: e.target.value }))}
-                className="input-base text-xs">
+                className="input-base text-xs" aria-label="Availability filter">
                 <option value="">Any availability</option>
                 <option value="available_today">Available Today</option>
                 <option value="available_this_week">Available This Week</option>
@@ -182,9 +158,9 @@ export default function WorkerDatabasePage() {
                 <option value="unavailable">Unavailable</option>
               </select>
               <input value={filters.city} onChange={e => setFilters(f => ({ ...f, city: e.target.value }))}
-                placeholder="City" className="input-base text-xs" />
+                placeholder="City" className="input-base text-xs" aria-label="City filter" />
               <input value={filters.skills} onChange={e => setFilters(f => ({ ...f, skills: e.target.value }))}
-                placeholder="Skill" className="input-base text-xs" />
+                placeholder="Skill" className="input-base text-xs" aria-label="Skills filter" />
             </div>
             {(filters.gender || filters.availability || filters.city || filters.skills) && (
               <button onClick={() => setFilters({ gender: "", availability: "", city: "", skills: "" })}
@@ -193,7 +169,6 @@ export default function WorkerDatabasePage() {
           </div>
         )}
 
-        {/* Results */}
         {filtered.length === 0 && (
           <div className="text-center py-16">
             <div className="w-16 h-16 rounded-[20px] bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center mx-auto mb-4">
@@ -207,16 +182,17 @@ export default function WorkerDatabasePage() {
         )}
 
         <div className="space-y-2.5">
-          {filtered.map(w => {
+          {visibleWorkers.map(w => {
             const completion = computeCompletion(w);
             const avail = w.availability ? AVAIL_CONFIG[w.availability] : null;
             return (
               <div key={w.id}
                 className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all duration-200 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] cursor-pointer active:scale-[0.99]"
-                onClick={() => setSelectedWorker(w)}>
+                onClick={() => setSelectedWorker(w)} role="button" tabIndex={0}
+                onKeyDown={e => { if (e.key === "Enter") setSelectedWorker(w); }}>
                 <div className="flex items-start gap-3">
                   <div className="relative shrink-0">
-                    <div className="w-11 h-11 rounded-[12px] bg-gradient-to-br from-[#0D9488]/10 to-[#0D9488]/20 flex items-center justify-center text-[#0D9488] font-bold text-base">
+                    <div className="w-11 h-11 rounded-[12px] bg-gradient-to-br from-[#0D9488]/10 to-[#0D9488]/20 flex items-center justify-center text-[#0D9488] font-bold text-base" aria-hidden="true">
                       {w.full_name?.charAt(0) || "W"}
                     </div>
                     {avail && <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-[2px] border-white ${avail.dot}`} />}
@@ -271,6 +247,13 @@ export default function WorkerDatabasePage() {
               </div>
             );
           })}
+
+          {hasMore && (
+            <button onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
+              className="w-full h-12 rounded-[14px] bg-white border border-[rgba(0,0,0,0.08)] text-gray-500 text-sm font-semibold hover:bg-gray-50 transition-all active:scale-[0.98]">
+              Show {Math.min(PAGE_SIZE, filtered.length - visibleCount)} more workers
+            </button>
+          )}
         </div>
       </main>
 

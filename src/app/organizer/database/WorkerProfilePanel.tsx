@@ -3,34 +3,10 @@
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { X, Lock, ShieldCheck, ShieldAlert, Phone, Mail, Briefcase, AlertCircle, CheckCircle, Award, MapPin, Clock, Star } from "lucide-react";
+import { useBodyScrollLock } from "@/lib/useStableForm";
+import { useFocusTrap } from "@/lib/useFocusTrap";
+import { computeCompletion, AVAIL_CONFIG } from "@/lib/organizer/constants";
 import type { Profile } from "@/lib/supabase/types";
-
-function computeCompletion(p: Profile): { percent: number; missing: string[] } {
-  const checks: [keyof Profile, string, number][] = [
-    ["avatar_url", "Photo", 15], ["phone", "Phone", 15],
-    ["age", "Age", 10], ["gender", "Gender", 10],
-    ["city", "City", 10], ["area", "Area", 10],
-    ["skills", "Skills", 15], ["experience", "Experience", 10], ["bio", "Bio", 10],
-  ];
-  let percent = 0;
-  const missing: string[] = [];
-  for (const [key, label, weight] of checks) {
-    const val = p[key];
-    if (key === "skills") { if (Array.isArray(val) && val.length > 0) percent += weight; else missing.push(label); }
-    else if (val !== null && val !== undefined && val !== "") percent += weight; else missing.push(label);
-  }
-  return { percent, missing };
-}
-
-const AVAIL_CONFIG: Record<string, { label: string; dot: string }> = {
-  available_today: { label: "Available Today", dot: "bg-emerald-500" },
-  available_this_week: { label: "Available This Week", dot: "bg-blue-500" },
-  available: { label: "Available", dot: "bg-emerald-500" },
-  weekends: { label: "Weekends", dot: "bg-amber-500" },
-  evenings: { label: "Evenings", dot: "bg-purple-500" },
-  busy: { label: "Busy", dot: "bg-red-500" },
-  unavailable: { label: "Unavailable", dot: "bg-gray-400" },
-};
 
 interface Props {
   worker: Profile;
@@ -42,6 +18,8 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
   const [canViewContact, setCanViewContact] = useState(false);
   const [checkingContact, setCheckingContact] = useState(true);
   const supabase = createClient();
+  useBodyScrollLock(true);
+  const panelRef = useFocusTrap(true);
 
   useEffect(() => {
     const checkContactAccess = async () => {
@@ -61,35 +39,28 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
     checkContactAccess();
   }, [worker.user_id, organizerId]);
 
-  const completion = computeCompletion(worker);
+  const completion = computeCompletion(worker, true);
   const avail = worker.availability ? AVAIL_CONFIG[worker.availability] : null;
-
-  useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = prev; };
-  }, []);
 
   const handleOverlayClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget) onClose();
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
+    <div className="fixed inset-0 z-50 flex justify-end" ref={panelRef} role="dialog" aria-modal="true" aria-label={`${worker.full_name}'s profile`}>
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" onClick={handleOverlayClick} />
       <div className="relative w-full max-w-md bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] animate-slide-right overflow-y-auto overscroll-behavior-contain">
-        <button onClick={onClose}
-          className="absolute top-4 right-4 z-10 w-8 h-8 rounded-[10px] bg-white/90 backdrop-blur-sm shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center justify-center text-gray-500 hover:text-gray-800 hover:bg-white transition-all">
+        <button onClick={onClose} data-close-modal
+          className="absolute top-4 right-4 z-10 w-8 h-8 rounded-[10px] bg-white/90 backdrop-blur-sm shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center justify-center text-gray-500 hover:text-gray-800 hover:bg-white transition-all" aria-label="Close">
           <X className="w-4 h-4" />
         </button>
 
-        {/* Hero section */}
         <div className="bg-gradient-to-br from-[#0D9488] via-[#0D9488] to-[#0F766E] px-5 pt-10 pb-6">
           <div className="flex items-end gap-4">
             <div className="relative shrink-0">
               <div className="w-16 h-16 rounded-[16px] bg-white/20 backdrop-blur-sm flex items-center justify-center text-white text-2xl font-bold ring-2 ring-white/30 shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
                 {worker.avatar_url ? (
-                  <img src={worker.avatar_url} alt="" className="w-16 h-16 rounded-[16px] object-cover" />
+                  <img src={worker.avatar_url} alt={worker.full_name || "Worker avatar"} className="w-16 h-16 rounded-[16px] object-cover" />
                 ) : (
                   worker.full_name?.charAt(0) || "W"
                 )}
@@ -120,7 +91,6 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
         </div>
 
         <div className="p-5 space-y-5">
-          {/* Profile Strength */}
           <div className="bg-white rounded-[14px] p-4 border border-[rgba(0,0,0,0.06)]">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Profile Strength</span>
@@ -144,7 +114,6 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
             )}
           </div>
 
-          {/* Personal Info */}
           <div className="bg-white rounded-[14px] border border-[rgba(0,0,0,0.06)] overflow-hidden">
             <div className="px-4 py-2.5 bg-gray-50/80 border-b border-[rgba(0,0,0,0.04)]">
               <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest">Personal Info</span>
@@ -172,7 +141,6 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
             </div>
           </div>
 
-          {/* Skills */}
           <div className="bg-white rounded-[14px] border border-[rgba(0,0,0,0.06)] overflow-hidden">
             <div className="px-4 py-2.5 bg-gray-50/80 border-b border-[rgba(0,0,0,0.04)]">
               <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest">Skills & Experience</span>
@@ -197,7 +165,6 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
             </div>
           </div>
 
-          {/* Bio */}
           {worker.bio && (
             <div className="bg-white rounded-[14px] border border-[rgba(0,0,0,0.06)] overflow-hidden">
               <div className="px-4 py-2.5 bg-gray-50/80 border-b border-[rgba(0,0,0,0.04)]">
@@ -209,7 +176,6 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
             </div>
           )}
 
-          {/* Contact */}
           {canViewContact && (
             <div className="bg-white rounded-[14px] border border-emerald-200/60 overflow-hidden">
               <div className="px-4 py-2.5 bg-emerald-50/80 border-b border-emerald-100 flex items-center gap-2">

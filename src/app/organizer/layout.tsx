@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { LayoutDashboard, Users, Bell, User } from "lucide-react";
+import { ErrorBoundary } from "@/lib/design/ErrorBoundary";
 
 const NAV = [
   { href: "/organizer/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -13,13 +14,11 @@ const NAV = [
 
 export default function OrganizerLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-
   const isActive = (href: string) => pathname === href;
-
   const hideNav = pathname.startsWith("/organizer/events/");
 
   return (
-    <>
+    <ErrorBoundary>
       {children}
       {!hideNav && (
         <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/90 backdrop-blur-xl border-t border-[rgba(0,0,0,0.06)] shadow-[0_-2px_20px_rgba(0,0,0,0.05)] pb-[env(safe-area-inset-bottom,0px)]">
@@ -51,6 +50,6 @@ export default function OrganizerLayout({ children }: { children: React.ReactNod
           </div>
         </nav>
       )}
-    </>
+    </ErrorBoundary>
   );
 }

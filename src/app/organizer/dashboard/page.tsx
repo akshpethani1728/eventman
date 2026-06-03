@@ -1,44 +1,22 @@
 ﻿"use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import {
   LogOut, Plus, Copy, Edit3, Trash2, XCircle, Users, MapPin, Calendar,
   Clock, LayoutDashboard, User, AlertTriangle, CheckCircle, Clock3,
-  BookTemplate, Bell, Search, IndianRupee, ChevronRight, ArrowUpRight,
-  Hourglass, Sparkles, Eye, MoreVertical, Ban, Target, Zap,
-  TrendingUp, BarChart3, Activity, Filter,
+  BookTemplate, Bell, Search, IndianRupee, ChevronRight,
+  Sparkles, Eye, MoreVertical, Target, TrendingUp, Activity,
 } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/lib/design/Button";
-import { EmptyState } from "@/lib/design/Loading";
-import type { Profile, Event, Application } from "@/lib/supabase/types";
+import type { Profile, Event } from "@/lib/supabase/types";
+import { ConfirmDialog } from "@/lib/design/Modal";
+import { STATUS_STYLES, STATUS_LABELS, CATEGORY_LABELS, formatDate } from "@/lib/organizer/constants";
 import CreateEventModal from "./CreateEventModal";
 import EditEventModal from "./EditEventModal";
 import ApplicantList from "./ApplicantList";
-
-const STATUS_STYLES: Record<string, string> = {
-  draft: "bg-gray-100 text-gray-600",
-  published: "bg-emerald-50 text-emerald-700",
-  filling: "bg-blue-50 text-blue-700",
-  full: "bg-purple-50 text-purple-700",
-  closed: "bg-amber-50 text-amber-700",
-  completed: "bg-gray-100 text-gray-500",
-  cancelled: "bg-red-50 text-red-700",
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  draft: "Draft", published: "Published", filling: "Filling",
-  full: "Full", closed: "Closed", completed: "Completed", cancelled: "Cancelled",
-};
-
-const CATEGORY_LABELS: Record<string, string> = {
-  promotion: "Promotion", event_setup: "Setup", crowd_management: "Crowd Mgmt",
-  registration: "Registration", hospitality: "Hospitality", cleaning: "Cleaning",
-  security: "Security", other: "Other",
-};
 
 function SkeletonDashboard() {
   return (
@@ -90,6 +68,8 @@ function StatCard({ icon: Icon, value, label, color, attention }: {
   );
 }
 
+const PAGE_SIZE = 20;
+
 export default function OrganizerDashboard() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [events, setEvents] = useState<(Event & {
@@ -103,12 +83,14 @@ export default function OrganizerDashboard() {
   const [createFromTemplate, setCreateFromTemplate] = useState<any>(null);
   const [tab, setTab] = useState<"active" | "past" | "templates">("active");
   const [actionMenu, setActionMenu] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const router = useRouter();
   const supabase = createClient();
 
   useEffect(() => { loadData(); }, []);
 
-  const loadData = async () => { try { const { data: { user } } = await supabase.auth.getUser();
+  const loadData = useCallback(async () => { try { const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.push("/login"); return; }
 
     const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
@@ -149,7 +131,7 @@ export default function OrganizerDashboard() {
     );
 
     setEvents(eventsWithCounts);
-     } catch (err) { console.error("[OrganizerDashboard] error:", err); } finally { setLoading(false); } };
+     } catch (err) { console.error("[OrganizerDashboard] error:", err); } finally { setLoading(false); } }, []);
 
   const updateEventStatus = async (eventId: string, status: string) => {
     const { error } = await supabase.from("events").update({ status, updated_at: new Date().toISOString() }).eq("id", eventId);
@@ -205,11 +187,11 @@ export default function OrganizerDashboard() {
   };
 
   const deleteEvent = async (eventId: string) => {
-    if (!confirm("Delete permanently?")) return;
     const { error } = await supabase.from("events").delete().eq("id", eventId);
     if (error) { toast.error(error.message); return; }
     toast.success("Event deleted");
     setActionMenu(null);
+    setDeleteConfirm(null);
     loadData();
   };
 
@@ -243,19 +225,18 @@ export default function OrganizerDashboard() {
   };
 
   const sortedActive = [...activeEvents].sort((a, b) => getUrgencyScore(b) - getUrgencyScore(a));
-
   const needsAttention = sortedActive.filter(e => {
     const remaining = e.worker_count - (e.approvedCount || 0);
     return (e.pendingCount || 0) > 0 || remaining <= 3 || e.date === todayStr || e.application_deadline === todayStr;
   });
-
   const formatCount = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
+  const visibleEvents = sortedActive.slice(0, visibleCount);
+  const hasMore = visibleCount < sortedActive.length;
 
   if (loading) return <SkeletonDashboard />;
 
   return (
     <div className="min-h-screen bg-[#F8F8F6] pb-28">
-      {/* ===== PREMIUM HEADER ===== */}
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-20">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -268,10 +249,10 @@ export default function OrganizerDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-0.5">
-            <Link href="/organizer/notifications" className="relative w-9 h-9 rounded-[10px] flex items-center justify-center text-gray-400 hover:text-[#0D9488] hover:bg-[#0D9488]/10 transition-all">
+            <Link href="/organizer/notifications" aria-label="Notifications" className="relative w-9 h-9 rounded-[10px] flex items-center justify-center text-gray-400 hover:text-[#0D9488] hover:bg-[#0D9488]/10 transition-all">
               <Bell className="w-[18px] h-[18px]" />
             </Link>
-            <Link href="/organizer/database" className="w-9 h-9 rounded-[10px] flex items-center justify-center text-gray-400 hover:text-[#0D9488] hover:bg-[#0D9488]/10 transition-all">
+            <Link href="/organizer/database" aria-label="Search talent" className="w-9 h-9 rounded-[10px] flex items-center justify-center text-gray-400 hover:text-[#0D9488] hover:bg-[#0D9488]/10 transition-all">
               <Search className="w-[18px] h-[18px]" />
             </Link>
             <Link href="/organizer/profile" className="ml-1">
@@ -279,7 +260,7 @@ export default function OrganizerDashboard() {
                 {profile?.full_name?.charAt(0) || "O"}
               </div>
             </Link>
-            <button onClick={signOut} className="w-9 h-9 rounded-[10px] flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all">
+            <button onClick={signOut} aria-label="Sign out" className="w-9 h-9 rounded-[10px] flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all">
               <LogOut className="w-[18px] h-[18px]" />
             </button>
           </div>
@@ -287,7 +268,6 @@ export default function OrganizerDashboard() {
       </header>
 
       <main className="max-w-lg mx-auto px-4 pt-4">
-        {/* ===== COMMAND CENTER HERO ===== */}
         <div className="bg-gradient-to-br from-[#0D9488] via-[#0D9488] to-[#0F766E] rounded-[20px] p-5 mb-5 shadow-[0_8px_32px_rgba(13,148,136,0.2)]">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -339,18 +319,11 @@ export default function OrganizerDashboard() {
           </div>
         </div>
 
-        {/* ===== ALERT CENTER ===== */}
-        {sortedActive.filter(e => {
-          const r = e.worker_count - (e.approvedCount || 0);
-          return (e.pendingCount || 0) > 0 || r <= 3 || e.date === todayStr || e.application_deadline === todayStr;
-        }).length > 0 && (
+        {needsAttention.length > 0 && (
           <div className="mb-5 space-y-2">
             <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-1">Action Center</p>
             <div className="space-y-2">
-              {sortedActive.filter(e => {
-                const r = e.worker_count - (e.approvedCount || 0);
-                return (e.pendingCount || 0) > 0 || r <= 3 || e.date === todayStr || e.application_deadline === todayStr;
-              }).slice(0, 3).map(e => {
+              {needsAttention.slice(0, 3).map(e => {
                 const r = e.worker_count - (e.approvedCount || 0);
                 const isUrgent = e.date === todayStr || r <= 1;
                 const items: { icon: any; label: string; color: string }[] = [];
@@ -391,16 +364,14 @@ export default function OrganizerDashboard() {
           </div>
         )}
 
-        {/* ===== CREATE EVENT CTA ===== */}
         <button onClick={() => { setCreateFromTemplate(null); setShowCreate(true); }}
           className="w-full h-14 mb-5 rounded-[16px] bg-gradient-to-r from-[#0D9488] to-[#0F766E] text-white font-bold text-base flex items-center justify-center gap-2.5 shadow-[0_4px_16px_rgba(13,148,136,0.3)] transition-all duration-200 hover:shadow-[0_8px_24px_rgba(13,148,136,0.4)] active:scale-[0.98]">
           <Plus className="w-5 h-5" /> Create New Event
         </button>
 
-        {/* ===== SEGMENTED TABS ===== */}
         <div className="flex gap-2 mb-5">
           {(["active", "past"] as const).map(t => (
-            <button key={t} onClick={() => setTab(t)}
+            <button key={t} onClick={() => { setTab(t); setVisibleCount(PAGE_SIZE); }}
               className={`flex-1 h-10 rounded-[12px] text-sm font-semibold transition-all active:scale-[0.97] ${
                 tab === t
                   ? "bg-[#0D9488] text-white shadow-[0_4px_12px_rgba(13,148,136,0.25)]"
@@ -421,7 +392,6 @@ export default function OrganizerDashboard() {
           )}
         </div>
 
-        {/* ===== TEMPLATES TAB ===== */}
         {tab === "templates" && (
           <div className="space-y-2 animate-fade-in">
             <p className="text-xs text-gray-500 mb-3">Click a template to create a new event instantly.</p>
@@ -437,7 +407,7 @@ export default function OrganizerDashboard() {
                 <div className="flex gap-1.5 shrink-0">
                   <button onClick={() => { setCreateFromTemplate(tmpl); setShowCreate(true); }}
                     className="h-8 px-4 rounded-[10px] bg-[#0D9488] text-white text-xs font-semibold hover:bg-teal-700 transition-all active:scale-95">Use</button>
-                  <button onClick={() => deleteEvent(tmpl.id)}
+                  <button onClick={() => setDeleteConfirm(tmpl.id)}
                     className="h-8 w-8 rounded-[10px] bg-red-50 text-red-600 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90"><Trash2 className="w-3.5 h-3.5" /></button>
                 </div>
               </div>
@@ -446,7 +416,6 @@ export default function OrganizerDashboard() {
           </div>
         )}
 
-        {/* ===== ACTIVE EVENTS ===== */}
         {tab === "active" && (
           <div className="space-y-3">
             {sortedActive.length === 0 && (
@@ -465,7 +434,7 @@ export default function OrganizerDashboard() {
               </div>
             )}
 
-            {sortedActive.map(event => {
+            {visibleEvents.map(event => {
               const remaining = event.worker_count - (event.approvedCount || 0);
               const fillPercent = Math.min(100, Math.round(((event.approvedCount || 0) / event.worker_count) * 100));
               const daysUntil = Math.ceil((new Date(event.date).getTime() - Date.now()) / 86400000);
@@ -481,7 +450,6 @@ export default function OrganizerDashboard() {
                 <div key={event.id}
                   className="bg-white rounded-[16px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all duration-200 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] active:scale-[0.99]">
                   
-                  {/* Top bar */}
                   <div className="px-4 pt-4 pb-2 flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <Link href={`/organizer/events/${event.id}`} className="block">
@@ -503,53 +471,53 @@ export default function OrganizerDashboard() {
                     </div>
                     <div className="relative shrink-0">
                       <button onClick={() => setActionMenu(actionMenu === event.id ? null : event.id)}
-                        className="w-8 h-8 rounded-[10px] hover:bg-gray-100 flex items-center justify-center text-gray-400 transition-colors">
+                        className="w-8 h-8 rounded-[10px] hover:bg-gray-100 flex items-center justify-center text-gray-400 transition-colors" aria-label="Event actions" aria-haspopup="true">
                         <MoreVertical className="w-4 h-4" />
                       </button>
                       {actionMenu === event.id && (
                         <>
                           <div className="fixed inset-0 z-10" onClick={() => setActionMenu(null)} />
-                          <div className="absolute right-0 top-9 w-48 bg-white rounded-[12px] shadow-[0_12px_48px_rgba(0,0,0,0.12),0_4px_12px_rgba(0,0,0,0.06)] z-20 py-1.5 overflow-hidden animate-scale-in">
+                          <div className="absolute right-0 top-9 w-48 bg-white rounded-[12px] shadow-[0_12px_48px_rgba(0,0,0,0.12),0_4px_12px_rgba(0,0,0,0.06)] z-20 py-1.5 overflow-hidden animate-scale-in" role="menu">
                             <div className="px-3 pb-1.5 mb-1 border-b border-[rgba(0,0,0,0.06)]">
                               <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Actions</p>
                             </div>
                             {["draft", "published", "filling"].includes(event.status) && (
-                              <button onClick={() => { setEditingEvent(event); setActionMenu(null); }}
+                              <button onClick={() => { setEditingEvent(event); setActionMenu(null); }} role="menuitem"
                                 className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors rounded-[10px]">
                                 <Edit3 className="w-3.5 h-3.5" /> Edit Event
                               </button>
                             )}
-                            <button onClick={() => { setSelectedEvent(event); setActionMenu(null); }}
+                            <button onClick={() => { setSelectedEvent(event); setActionMenu(null); }} role="menuitem"
                               className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors rounded-[10px]">
                               <Users className="w-3.5 h-3.5" /> View Applicants
                             </button>
-                            <Link href={`/organizer/events/${event.id}`} onClick={() => setActionMenu(null)}
+                            <Link href={`/organizer/events/${event.id}`} onClick={() => setActionMenu(null)} role="menuitem"
                               className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors rounded-[10px]">
                               <Eye className="w-3.5 h-3.5" /> Open Detail
                             </Link>
                             <div className="h-px bg-[rgba(0,0,0,0.06)] my-1 mx-3" />
-                            <button onClick={() => { duplicateEvent(event); setActionMenu(null); }}
+                            <button onClick={() => { duplicateEvent(event); setActionMenu(null); }} role="menuitem"
                               className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors rounded-[10px]">
                               <Copy className="w-3.5 h-3.5" /> Duplicate
                             </button>
-                            <button onClick={() => { saveAsTemplate(event); setActionMenu(null); }}
+                            <button onClick={() => { saveAsTemplate(event); setActionMenu(null); }} role="menuitem"
                               className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors rounded-[10px]">
                               <BookTemplate className="w-3.5 h-3.5" /> Save as Template
                             </button>
                             <div className="h-px bg-[rgba(0,0,0,0.06)] my-1 mx-3" />
                             {["draft", "published", "filling"].includes(event.status) && (
-                              <button onClick={() => { updateEventStatus(event.id, "closed"); }}
+                              <button onClick={() => { updateEventStatus(event.id, "closed"); }} role="menuitem"
                                 className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-amber-700 hover:bg-amber-50 transition-colors rounded-[10px]">
                                 <XCircle className="w-3.5 h-3.5" /> Close Event
                               </button>
                             )}
                             {["draft", "published", "filling"].includes(event.status) && (
-                              <button onClick={() => { updateEventStatus(event.id, "completed"); }}
+                              <button onClick={() => { updateEventStatus(event.id, "completed"); }} role="menuitem"
                                 className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-gray-50 transition-colors rounded-[10px]">
                                 <CheckCircle className="w-3.5 h-3.5" /> Mark Completed
                               </button>
                             )}
-                            <button onClick={() => { deleteEvent(event.id); }}
+                            <button onClick={() => { setActionMenu(null); setDeleteConfirm(event.id); }} role="menuitem"
                               className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-red-600 hover:bg-red-50 transition-colors rounded-[10px]">
                               <Trash2 className="w-3.5 h-3.5" /> Delete
                             </button>
@@ -559,7 +527,6 @@ export default function OrganizerDashboard() {
                     </div>
                   </div>
 
-                  {/* Payment + Schedule row */}
                   <div className="px-4 flex items-center gap-3 text-[13px]">
                     {event.payment_info && (
                       <div className="flex items-center gap-1 text-emerald-700 font-bold">
@@ -569,7 +536,7 @@ export default function OrganizerDashboard() {
                     )}
                     <div className="flex items-center gap-1 text-gray-500 text-[11px] ml-auto">
                       <Calendar className="w-3 h-3 text-gray-400" />
-                      <span>{event.date_display || new Date(event.date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</span>
+                      <span>{formatDate(event.date, event.date_display)}</span>
                     </div>
                     <div className="flex items-center gap-1 text-gray-500 text-[11px]">
                       <Clock className="w-3 h-3 text-gray-400" />
@@ -577,7 +544,6 @@ export default function OrganizerDashboard() {
                     </div>
                   </div>
 
-                  {/* Metrics grid */}
                   <div className="px-4 mt-3 grid grid-cols-4 gap-2">
                     <div className="bg-emerald-50 rounded-[10px] p-2.5 text-center">
                       <p className="text-sm font-bold text-emerald-700 leading-none">{event.approvedCount || 0}</p>
@@ -599,7 +565,6 @@ export default function OrganizerDashboard() {
                     </div>
                   </div>
 
-                  {/* Progress bar */}
                   <div className="px-4 mt-3">
                     <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                       <div className={`h-full rounded-full transition-all duration-500 ${
@@ -614,7 +579,6 @@ export default function OrganizerDashboard() {
                     </div>
                   </div>
 
-                  {/* Action bar */}
                   <div className="px-4 py-3 mt-3 border-t border-[rgba(0,0,0,0.06)] flex gap-2">
                     <button onClick={() => { setEditingEvent(event); }}
                       className="flex-1 h-9 rounded-[10px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center justify-center gap-1.5">
@@ -632,10 +596,16 @@ export default function OrganizerDashboard() {
                 </div>
               );
             })}
+
+            {hasMore && (
+              <button onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
+                className="w-full h-12 rounded-[14px] bg-white border border-[rgba(0,0,0,0.08)] text-gray-500 text-sm font-semibold hover:bg-gray-50 transition-all active:scale-[0.98]">
+                Show {Math.min(PAGE_SIZE, sortedActive.length - visibleCount)} more events
+              </button>
+            )}
           </div>
         )}
 
-        {/* ===== PAST EVENTS ===== */}
         {tab === "past" && (
           <div className="space-y-3 animate-fade-in">
             {pastEvents.length === 0 && (
@@ -666,7 +636,7 @@ export default function OrganizerDashboard() {
                       )}
                     </div>
                     <div className="flex items-center gap-x-3 gap-y-1 text-[10px] text-gray-500 mt-1.5">
-                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3 text-gray-400" />{event.date_display || event.date}</span>
+                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3 text-gray-400" />{formatDate(event.date, event.date_display)}</span>
                       <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-gray-400" />{event.time}{event.end_time ? `-${event.end_time}` : ""}</span>
                     </div>
                   </div>
@@ -718,6 +688,15 @@ export default function OrganizerDashboard() {
           onUpdate={loadData}
         />
       )}
+      <ConfirmDialog
+        open={deleteConfirm !== null}
+        onClose={() => setDeleteConfirm(null)}
+        onConfirm={() => { if (deleteConfirm) deleteEvent(deleteConfirm); }}
+        title="Delete Event"
+        message="Are you sure you want to delete this event? This action cannot be undone. All associated applications will also be removed."
+        confirmLabel="Delete"
+        variant="danger"
+      />
     </div>
   );
 }
