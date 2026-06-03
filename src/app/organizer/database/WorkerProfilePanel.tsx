@@ -2,12 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { X, Lock, ShieldCheck, ShieldAlert, Phone, Mail, Briefcase, AlertCircle, CheckCircle } from "lucide-react";
-import { Badge, StatusDot } from "@/lib/design/Badge";
+import { X, Lock, ShieldCheck, ShieldAlert, Phone, Mail, Briefcase, AlertCircle, CheckCircle, Award, MapPin, Clock, Star } from "lucide-react";
 import type { Profile } from "@/lib/supabase/types";
-
-type DotVariant = "green" | "amber" | "red" | "blue" | "purple" | "gray";
-type BadgeVariant = "published" | "pending" | "closed" | "soon" | "trusted" | "basicVerified" | "unverified";
 
 function computeCompletion(p: Profile): { percent: number; missing: string[] } {
   const checks: [keyof Profile, string, number][] = [
@@ -26,14 +22,14 @@ function computeCompletion(p: Profile): { percent: number; missing: string[] } {
   return { percent, missing };
 }
 
-const AVAIL_CONFIG: Record<string, { label: string; dotColor: DotVariant; badgeVariant: BadgeVariant }> = {
-  available_today: { label: "Available Today", dotColor: "green", badgeVariant: "published" },
-  available_this_week: { label: "Available This Week", dotColor: "blue", badgeVariant: "pending" },
-  available: { label: "Available", dotColor: "green", badgeVariant: "published" },
-  weekends: { label: "Weekends", dotColor: "amber", badgeVariant: "soon" },
-  evenings: { label: "Evenings", dotColor: "purple", badgeVariant: "pending" },
-  busy: { label: "Busy", dotColor: "red", badgeVariant: "closed" },
-  unavailable: { label: "Unavailable", dotColor: "gray", badgeVariant: "closed" },
+const AVAIL_CONFIG: Record<string, { label: string; dot: string }> = {
+  available_today: { label: "Available Today", dot: "bg-emerald-500" },
+  available_this_week: { label: "Available This Week", dot: "bg-blue-500" },
+  available: { label: "Available", dot: "bg-emerald-500" },
+  weekends: { label: "Weekends", dot: "bg-amber-500" },
+  evenings: { label: "Evenings", dot: "bg-purple-500" },
+  busy: { label: "Busy", dot: "bg-red-500" },
+  unavailable: { label: "Unavailable", dot: "bg-gray-400" },
 };
 
 interface Props {
@@ -50,9 +46,7 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
   useEffect(() => {
     const checkContactAccess = async () => {
       const { data: orgEvents } = await supabase
-        .from("events")
-        .select("id")
-        .eq("organizer_id", organizerId);
+        .from("events").select("id").eq("organizer_id", organizerId);
       const eventIds = orgEvents?.map(e => e.id) || [];
       if (eventIds.length === 0) { setCheckingContact(false); return; }
       const { count } = await supabase
@@ -69,7 +63,6 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
 
   const completion = computeCompletion(worker);
   const avail = worker.availability ? AVAIL_CONFIG[worker.availability] : null;
-  const statusVariant = worker.status === "trusted" ? "trusted" as const : worker.status === "basic_verified" ? "basicVerified" as const : "unverified" as const;
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -85,34 +78,41 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
     <div className="fixed inset-0 z-50 flex justify-end">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" onClick={handleOverlayClick} />
       <div className="relative w-full max-w-md bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] animate-slide-right overflow-y-auto overscroll-behavior-contain">
-        <button onClick={onClose} className="absolute top-4 right-4 z-10 w-8 h-8 rounded-[10px] bg-white/90 backdrop-blur-sm shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] flex items-center justify-center text-gray-500 hover:text-gray-800 hover:bg-white transition-all">
+        <button onClick={onClose}
+          className="absolute top-4 right-4 z-10 w-8 h-8 rounded-[10px] bg-white/90 backdrop-blur-sm shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center justify-center text-gray-500 hover:text-gray-800 hover:bg-white transition-all">
           <X className="w-4 h-4" />
         </button>
 
+        {/* Hero section */}
         <div className="bg-gradient-to-br from-[#0D9488] via-[#0D9488] to-[#0F766E] px-5 pt-10 pb-6">
           <div className="flex items-end gap-4">
             <div className="relative shrink-0">
-              <div className="w-16 h-16 rounded-[16px] bg-white/20 backdrop-blur-sm flex items-center justify-center text-white text-2xl font-bold ring-2 ring-white/30">
+              <div className="w-16 h-16 rounded-[16px] bg-white/20 backdrop-blur-sm flex items-center justify-center text-white text-2xl font-bold ring-2 ring-white/30 shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
                 {worker.avatar_url ? (
                   <img src={worker.avatar_url} alt="" className="w-16 h-16 rounded-[16px] object-cover" />
                 ) : (
                   worker.full_name?.charAt(0) || "W"
                 )}
               </div>
-              {avail && <StatusDot variant={avail.dotColor} className="absolute -bottom-1 -right-1 border-2 border-[#0D9488]" />}
+              {avail && <div className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-[2px] border-[#0D9488] ${avail.dot}`} />}
             </div>
             <div className="min-w-0 flex-1">
               <h2 className="text-white font-bold text-lg leading-tight truncate">{worker.full_name}</h2>
-              <p className="text-white/80 text-xs mt-0.5">Worker &middot; {worker.city || "Location not set"}</p>
-              <div className="flex items-center gap-2 mt-2">
-                <Badge variant={statusVariant}>
-                  {worker.status === "trusted" ? <ShieldCheck className="w-3 h-3" /> : worker.status === "basic_verified" ? <ShieldAlert className="w-3 h-3" /> : null}
+              <p className="text-white/80 text-xs mt-0.5">{worker.city || "Location not set"}{worker.age ? ` · ${worker.age} yrs` : ""}</p>
+              <div className="flex items-center gap-2 mt-2 flex-wrap">
+                <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full backdrop-blur-sm ${
+                  worker.status === "trusted" ? "bg-emerald-500/20 text-white" :
+                  worker.status === "basic_verified" ? "bg-blue-500/20 text-white" :
+                  "bg-white/10 text-white/70"
+                }`}>
+                  {worker.status === "trusted" ? <ShieldCheck className="w-3 h-3" /> :
+                   worker.status === "basic_verified" ? <ShieldAlert className="w-3 h-3" /> : null}
                   {worker.status.replace(/_/g, " ")}
-                </Badge>
+                </span>
                 {avail && (
-                  <Badge variant={avail.badgeVariant}>
-                    <StatusDot variant={avail.dotColor} className="!w-1.5 !h-1.5" /> {avail.label}
-                  </Badge>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold bg-white/15 text-white px-2 py-0.5 rounded-full backdrop-blur-sm">
+                    <span className={`w-1.5 h-1.5 rounded-full ${avail.dot}`} /> {avail.label}
+                  </span>
                 )}
               </div>
             </div>
@@ -120,9 +120,10 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
         </div>
 
         <div className="p-5 space-y-5">
-          <div className="card-base p-4">
+          {/* Profile Strength */}
+          <div className="bg-white rounded-[14px] p-4 border border-[rgba(0,0,0,0.06)]">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Profile Strength</span>
+              <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Profile Strength</span>
               <span className={`text-sm font-bold ${completion.percent >= 80 ? "text-emerald-600" : completion.percent >= 50 ? "text-amber-600" : "text-gray-500"}`}>{completion.percent}%</span>
             </div>
             <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -132,8 +133,8 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
             {completion.missing.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1">
                 {completion.missing.map(m => (
-                  <span key={m} className="text-[10px] bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" /> {m}
+                  <span key={m} className="text-[9px] bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <AlertCircle className="w-2.5 h-2.5" /> {m}
                   </span>
                 ))}
               </div>
@@ -143,42 +144,45 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
             )}
           </div>
 
-          <div className="card-base overflow-hidden">
-            <div className="px-4 py-2.5 bg-[#0D9488]/[0.03] border-b border-[rgba(0,0,0,0.06)]">
+          {/* Personal Info */}
+          <div className="bg-white rounded-[14px] border border-[rgba(0,0,0,0.06)] overflow-hidden">
+            <div className="px-4 py-2.5 bg-gray-50/80 border-b border-[rgba(0,0,0,0.04)]">
               <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest">Personal Info</span>
             </div>
-            <div className="p-4 space-y-2.5">
-              <div className="flex items-center gap-3 text-sm">
-                <span className="text-gray-400 w-20 shrink-0 text-xs">Age</span>
+            <div className="p-4 space-y-3 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-400 text-xs">Age</span>
                 <span className="text-gray-800 font-medium">{worker.age || "Not set"}</span>
               </div>
-              <div className="flex items-center gap-3 text-sm">
-                <span className="text-gray-400 w-20 shrink-0 text-xs">Gender</span>
+              <div className="border-t border-[rgba(0,0,0,0.04)]" />
+              <div className="flex items-center justify-between">
+                <span className="text-gray-400 text-xs">Gender</span>
                 <span className="text-gray-800 font-medium capitalize">{worker.gender || "Not set"}</span>
               </div>
-              <div className="flex items-center gap-3 text-sm">
-                <span className="text-gray-400 w-20 shrink-0 text-xs">City</span>
+              <div className="border-t border-[rgba(0,0,0,0.04)]" />
+              <div className="flex items-center justify-between">
+                <span className="text-gray-400 text-xs">City</span>
                 <span className="text-gray-800 font-medium">{worker.city || "Not set"}</span>
               </div>
-              <div className="flex items-center gap-3 text-sm">
-                <span className="text-gray-400 w-20 shrink-0 text-xs">Area</span>
+              <div className="border-t border-[rgba(0,0,0,0.04)]" />
+              <div className="flex items-center justify-between">
+                <span className="text-gray-400 text-xs">Area</span>
                 <span className="text-gray-800 font-medium">{worker.area || "Not set"}</span>
               </div>
             </div>
           </div>
 
-          <div className="card-base overflow-hidden">
-            <div className="px-4 py-2.5 bg-[#0D9488]/[0.03] border-b border-[rgba(0,0,0,0.06)]">
+          {/* Skills */}
+          <div className="bg-white rounded-[14px] border border-[rgba(0,0,0,0.06)] overflow-hidden">
+            <div className="px-4 py-2.5 bg-gray-50/80 border-b border-[rgba(0,0,0,0.04)]">
               <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest">Skills & Experience</span>
             </div>
             <div className="p-4 space-y-3">
               {worker.skills && worker.skills.length > 0 && (
-                <div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {worker.skills.map((s, i) => (
-                      <span key={i} className="text-[11px] bg-[#0D9488]/10 text-[#0D9488] border border-[#0D9488]/20 px-2.5 py-1 rounded-[10px] font-medium">{s}</span>
-                    ))}
-                  </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {worker.skills.map((s, i) => (
+                    <span key={i} className="text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-[10px] font-medium">{s}</span>
+                  ))}
                 </div>
               )}
               {worker.experience && (
@@ -193,9 +197,10 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
             </div>
           </div>
 
+          {/* Bio */}
           {worker.bio && (
-            <div className="card-base overflow-hidden">
-              <div className="px-4 py-2.5 bg-[#0D9488]/[0.03] border-b border-[rgba(0,0,0,0.06)]">
+            <div className="bg-white rounded-[14px] border border-[rgba(0,0,0,0.06)] overflow-hidden">
+              <div className="px-4 py-2.5 bg-gray-50/80 border-b border-[rgba(0,0,0,0.04)]">
                 <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest">About</span>
               </div>
               <div className="p-4">
@@ -204,14 +209,15 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
             </div>
           )}
 
+          {/* Contact */}
           {canViewContact && (
-            <div className="card-base overflow-hidden ring-1 ring-emerald-200/60">
+            <div className="bg-white rounded-[14px] border border-emerald-200/60 overflow-hidden">
               <div className="px-4 py-2.5 bg-emerald-50/80 border-b border-emerald-100 flex items-center gap-2">
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
                 <span className="text-[10px] font-semibold text-emerald-700 uppercase tracking-widest">Contact Details</span>
-                <span className="text-[9px] text-emerald-500 ml-auto">Approved worker &middot; visible</span>
+                <span className="text-[9px] text-emerald-500 ml-auto">Visible</span>
               </div>
-              <div className="p-4 space-y-2.5">
+              <div className="p-4 space-y-3">
                 {worker.phone && (
                   <div className="flex items-center gap-3 text-sm">
                     <Phone className="w-4 h-4 text-gray-400 shrink-0" />
@@ -221,7 +227,7 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
                 {worker.email && (
                   <div className="flex items-center gap-3 text-sm">
                     <Mail className="w-4 h-4 text-gray-400 shrink-0" />
-                    <span className="text-gray-800 font-medium">{worker.email}</span>
+                    <span className="text-gray-800 font-medium truncate">{worker.email}</span>
                   </div>
                 )}
                 {!worker.phone && !worker.email && (
@@ -232,8 +238,8 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
           )}
 
           {!canViewContact && !checkingContact && (
-            <div className="card-base overflow-hidden">
-              <div className="px-4 py-2.5 bg-[#0D9488]/[0.03] border-b border-[rgba(0,0,0,0.06)]">
+            <div className="bg-white rounded-[14px] border border-[rgba(0,0,0,0.06)] overflow-hidden">
+              <div className="px-4 py-2.5 bg-gray-50/80 border-b border-[rgba(0,0,0,0.04)]">
                 <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest">Contact</span>
               </div>
               <div className="p-4">
@@ -246,7 +252,6 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
           )}
         </div>
       </div>
-
     </div>
   );
 }

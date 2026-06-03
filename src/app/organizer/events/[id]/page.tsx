@@ -7,12 +7,11 @@ import { createClient } from "@/lib/supabase/client";
 import {
   ArrowLeft, Users, Edit3, Copy, XCircle, CheckCircle, Trash2, MapPin, Calendar, Clock,
   Clock3, IndianRupee, BookTemplate, AlertTriangle, Check, X as XIcon,
-  ChevronDown, ChevronUp, Phone, Mail, Award, Briefcase, Filter, Sparkles
+  ChevronDown, ChevronUp, Phone, Mail, Award, Briefcase, Filter, Sparkles,
+  MoreHorizontal, Ban, UserCheck, UserX, Eye, Star, Target,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/lib/design/Button";
-import { Card, CardHeader, CardTitle, CardStats, CardStat } from "@/lib/design/Card";
-import { Badge, StatusDot, Divider } from "@/lib/design/Badge";
 import { PageLoader } from "@/lib/design/Loading";
 import type { Event, Profile, Application } from "@/lib/supabase/types";
 import EditEventModal from "@/app/organizer/dashboard/EditEventModal";
@@ -42,8 +41,8 @@ const AVAIL_CONFIG: Record<string, { label: string; dot: string; badge: string }
 };
 
 const STATUS_STYLES: Record<string, string> = {
-  draft: "bg-gray-100 text-gray-600", published: "bg-[#0D9488]/10 text-[#0D9488]",
-  filling: "bg-emerald-50 text-emerald-700", full: "bg-purple-50 text-purple-700",
+  draft: "bg-gray-100 text-gray-600", published: "bg-emerald-50 text-emerald-700",
+  filling: "bg-blue-50 text-blue-700", full: "bg-purple-50 text-purple-700",
   closed: "bg-amber-50 text-amber-700", completed: "bg-gray-100 text-gray-500",
   cancelled: "bg-red-50 text-red-700",
 };
@@ -210,97 +209,163 @@ export default function OrganizerEventDetailPage() {
   const approvedCount = applicants.filter(a => a.status === "approved").length;
   const rejectedCount = applicants.filter(a => a.status === "rejected").length;
   const filteredApplicants = filter ? applicants.filter(a => a.status === filter) : applicants;
+  const fillPercent = Math.min(100, Math.round((approvedCount / event.worker_count) * 100));
 
   return (
-    <div className="min-h-screen bg-[#F8F8F6] pb-20">
+    <div className="min-h-screen bg-[#F8F8F6] pb-24">
+      {/* ===== HEADER ===== */}
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10">
-        <div className="h-0.5 bg-gradient-to-r from-[#0D9488]/20 via-[#0D9488] to-[#0D9488]/20" />
-        <div className="max-w-3xl mx-auto px-4 h-14 flex items-center gap-3">
+        <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
           <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-[10px] transition-all"><ArrowLeft className="w-5 h-5" /></Link>
-          <h1 className="font-semibold text-sm truncate">{event.title}</h1>
-          <Badge variant={event.status as any || "draft"} className="ml-auto">{STATUS_LABELS[event.status]}</Badge>
+          <div className="min-w-0 flex-1">
+            <h1 className="font-semibold text-sm truncate">{event.title}</h1>
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${STATUS_STYLES[event.status]}`}>
+              {STATUS_LABELS[event.status]}
+            </span>
+          </div>
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-4 space-y-4">
+      <main className="max-w-lg mx-auto px-4 pt-4 space-y-4">
+        {/* ===== ALERT BANNERS ===== */}
         <div className="space-y-1.5 animate-fade-in">
           {isToday && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-[10px] px-3.5 py-2.5 flex items-center gap-2"><Clock3 className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Starts today</span></div>}
           {isTomorrow && <div className="text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-[10px] px-3.5 py-2.5 flex items-center gap-2"><Clock3 className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Starts tomorrow</span></div>}
           {remaining <= 3 && remaining > 0 && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-[10px] px-3.5 py-2.5 flex items-center gap-2"><AlertTriangle className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Only {remaining} seat{remaining !== 1 ? "s" : ""} left</span></div>}
           {deadlineToday && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-[10px] px-3.5 py-2.5 flex items-center gap-2"><AlertTriangle className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Application deadline is today</span></div>}
           {deadlineSoon && !deadlineToday && <div className="text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-[10px] px-3.5 py-2.5 flex items-center gap-2"><Clock3 className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Deadline closing soon</span></div>}
-          {pendingCount > 0 && <div className="text-xs bg-[#0D9488]/10 text-[#0D9488] border border-[#0D9488]/20 rounded-[10px] px-3.5 py-2.5 flex items-center gap-2"><Users className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">{pendingCount} pending approval{pendingCount !== 1 ? "s" : ""}</span></div>}
+          {pendingCount > 0 && <div className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-[10px] px-3.5 py-2.5 flex items-center gap-2"><Users className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">{pendingCount} pending approval{pendingCount !== 1 ? "s" : ""}</span></div>}
         </div>
 
-        <Card>
-          <CardHeader className="mb-3">
-            <div className="flex items-center gap-2 flex-wrap">
-              {event.category && <span className="text-[11px] font-medium bg-[#0D9488]/10 text-[#0D9488] px-2.5 py-0.5 rounded-full capitalize">{event.category.replace(/_/g, " ")}</span>}
-            </div>
-            <span className="text-[10px] text-gray-400 font-mono">{event.id.slice(0, 8)}</span>
-          </CardHeader>
-          <CardStats columns={3}>
-            <CardStat label="Seats open" value={remaining} />
-            <CardStat label="Approved" value={approvedCount} color="blue" />
-            <CardStat label="Pending" value={pendingCount} color="amber" />
-          </CardStats>
-          <div className="mt-3 flex items-center justify-between">
-            {(event.application_deadline) && (
-              <p className="text-[11px] text-gray-400 flex items-center gap-1"><Clock className="w-3 h-3" />Apply by {new Date(event.application_deadline).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</p>
-            )}
-            <div className="flex-1 ml-4">
-              <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                <div className={`h-full rounded-full transition-all duration-500 ${
-                  approvedCount >= event.worker_count ? "bg-purple-500" : approvedCount >= Math.ceil(event.worker_count * 0.8) ? "bg-emerald-500" : "bg-[#0D9488]"
-                }`} style={{ width: `${Math.min(100, Math.round((approvedCount / event.worker_count) * 100))}%`}} />
+        {/* ===== HERO SECTION ===== */}
+        <div className="bg-gradient-to-br from-[#0D9488] via-[#0D9488] to-[#0F766E] rounded-[20px] p-5 shadow-[0_8px_32px_rgba(13,148,136,0.2)]">
+          <div className="flex items-start justify-between mb-4">
+            <div className="min-w-0 flex-1">
+              <h2 className="text-white text-lg font-bold leading-tight">{event.title}</h2>
+              <div className="flex items-center gap-2 mt-2 flex-wrap">
+                {event.category && (
+                  <span className="text-[10px] font-medium bg-white/20 text-white px-2.5 py-0.5 rounded-full capitalize backdrop-blur-sm">
+                    {event.category.replace(/_/g, " ")}
+                  </span>
+                )}
+                {event.payment_info && (
+                  <span className="text-[10px] font-bold bg-white/20 text-white px-2.5 py-0.5 rounded-full flex items-center gap-1 backdrop-blur-sm">
+                    <IndianRupee className="w-3 h-3" />{event.payment_info}
+                  </span>
+                )}
               </div>
-              <p className="text-[10px] text-gray-400 mt-0.5 text-right">{approvedCount}/{event.worker_count} filled</p>
             </div>
           </div>
-        </Card>
-
-        <div className="card-base p-5 space-y-3">
-          <p className="text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-wider">Event Details</p>
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <div className="flex items-center gap-2 text-gray-600 bg-gray-50/80 rounded-[10px] px-3 py-2.5"><Calendar className="w-4 h-4 text-gray-400 shrink-0" /><span className="font-medium">{event.date_display || event.date}</span></div>
-            <div className="flex items-center gap-2 text-gray-600 bg-gray-50/80 rounded-[10px] px-3 py-2.5"><Clock className="w-4 h-4 text-gray-400 shrink-0" /><span className="font-medium">{event.time}{event.end_time ? `-${event.end_time}` : ""}</span></div>
-            <div className="col-span-2 flex items-center gap-2 text-gray-600 bg-gray-50/80 rounded-[10px] px-3 py-2.5"><MapPin className="w-4 h-4 text-gray-400 shrink-0" /><span className="font-medium truncate">{event.location}</span></div>
-            {event.payment_info && <div className="col-span-2 flex items-center gap-2 text-emerald-700 bg-emerald-50/80 rounded-[10px] px-3 py-2.5"><IndianRupee className="w-4 h-4 shrink-0" /><span className="font-medium">{event.payment_info}</span></div>}
-            {(event.food_included || event.travel_included) && (
-              <div className="col-span-2 flex gap-3 text-xs">
-                {event.food_included && <span className="bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-medium">✓ Food included</span>}
-                {event.travel_included && <span className="bg-[#0D9488]/10 text-[#0D9488] px-2.5 py-1 rounded-full font-medium">✓ Travel included</span>}
-              </div>
-            )}
+          <div className="grid grid-cols-2 gap-2 text-[11px] text-white/80">
+            <div className="flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5 text-white/60" />
+              <span>{event.date_display || new Date(event.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5 text-white/60" />
+              <span>{event.time}{event.end_time ? `-${event.end_time}` : ""}</span>
+            </div>
+            <div className="col-span-2 flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-white/60 shrink-0" />
+              <span className="truncate">{event.location}</span>
+            </div>
           </div>
         </div>
 
+        {/* ===== OPERATION METRICS ===== */}
+        <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+          <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Operation Metrics</p>
+          <div className="grid grid-cols-5 gap-2">
+            <div className="text-center">
+              <p className="text-lg font-bold text-emerald-700">{approvedCount}</p>
+              <p className="text-[9px] text-gray-400 font-medium mt-0.5">Approved</p>
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-bold text-amber-700">{pendingCount}</p>
+              <p className="text-[9px] text-gray-400 font-medium mt-0.5">Pending</p>
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-bold text-red-600">{rejectedCount}</p>
+              <p className="text-[9px] text-gray-400 font-medium mt-0.5">Rejected</p>
+            </div>
+            <div className="text-center">
+              <p className={`text-lg font-bold ${remaining <= 0 ? "text-purple-700" : "text-gray-900"}`}>{remaining <= 0 ? "—" : remaining}</p>
+              <p className="text-[9px] text-gray-400 font-medium mt-0.5">Open</p>
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-bold text-blue-700">{fillPercent}%</p>
+              <p className="text-[9px] text-gray-400 font-medium mt-0.5">Fill Rate</p>
+            </div>
+          </div>
+          <div className="mt-3 h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div className={`h-full rounded-full transition-all duration-500 ${
+              fillPercent >= 100 ? "bg-purple-500" : fillPercent >= 80 ? "bg-emerald-500" : fillPercent >= 50 ? "bg-[#0D9488]" : "bg-amber-500"
+            }`} style={{ width: `${Math.max(2, fillPercent)}%` }} />
+          </div>
+          <p className="text-[10px] text-gray-400 mt-1 text-right">{approvedCount}/{event.worker_count} filled ({remaining > 0 ? `${remaining} open` : "full"})</p>
+        </div>
+
+        {/* ===== EVENT DETAILS ===== */}
+        <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+          <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Event Schedule</p>
+          <div className="grid grid-cols-2 gap-2 text-sm">
+            <div className="flex items-center gap-2 text-gray-600 bg-gray-50 rounded-[10px] px-3 py-2.5">
+              <Calendar className="w-4 h-4 text-gray-400 shrink-0" />
+              <span className="font-medium">{event.date_display || event.date}</span>
+            </div>
+            <div className="flex items-center gap-2 text-gray-600 bg-gray-50 rounded-[10px] px-3 py-2.5">
+              <Clock className="w-4 h-4 text-gray-400 shrink-0" />
+              <span className="font-medium">{event.time}{event.end_time ? `-${event.end_time}` : ""}</span>
+            </div>
+            <div className="col-span-2 flex items-center gap-2 text-gray-600 bg-gray-50 rounded-[10px] px-3 py-2.5">
+              <MapPin className="w-4 h-4 text-gray-400 shrink-0" />
+              <span className="font-medium truncate">{event.location}</span>
+            </div>
+          </div>
+          {event.application_deadline && (
+            <div className="mt-2 flex items-center gap-1.5 text-[11px] text-gray-500 bg-amber-50 rounded-[10px] px-3 py-2">
+              <Clock3 className="w-3.5 h-3.5 text-amber-600" />
+              <span className="font-medium">Apply by {new Date(event.application_deadline).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</span>
+            </div>
+          )}
+        </div>
+
+        {/* ===== REQUIREMENTS ===== */}
         {(event.gender_requirement || event.min_age || event.max_age || event.work_description || event.experience_required || event.skill_requirements || event.dress_code) && (
-          <div className="card-base p-5 space-y-3">
-            <p className="text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-wider">Requirements</p>
-            {event.work_description && <p className="text-sm text-gray-700 leading-relaxed">{event.work_description}</p>}
-            <div className="flex flex-wrap gap-1.5 text-xs">
-              {event.gender_requirement && <span className="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full capitalize font-medium">{event.gender_requirement}</span>}
-              {(event.min_age || event.max_age) && <span className="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full font-medium">{event.min_age || 0}-{event.max_age || 99} yrs</span>}
-              {event.dress_code && <span className="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full font-medium">{event.dress_code}</span>}
-              {event.skill_requirements?.map((s, i) => <span key={i} className="bg-[#0D9488]/10 text-[#0D9488] px-2.5 py-1 rounded-full font-medium">{s}</span>)}
+          <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+            <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Worker Requirements</p>
+            {event.work_description && (
+              <p className="text-sm text-gray-700 leading-relaxed mb-3 bg-gray-50 rounded-[10px] px-3 py-2.5">{event.work_description}</p>
+            )}
+            <div className="flex flex-wrap gap-1.5">
+              {event.gender_requirement && <span className="text-[11px] bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full font-medium capitalize">{event.gender_requirement}</span>}
+              {(event.min_age || event.max_age) && <span className="text-[11px] bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full font-medium">{event.min_age || 0}-{event.max_age || 99} yrs</span>}
+              {event.dress_code && <span className="text-[11px] bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full font-medium">{event.dress_code}</span>}
+              {event.skill_requirements?.map((s, i) => <span key={i} className="text-[11px] bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-medium">{s}</span>)}
             </div>
+            {(event.food_included || event.travel_included) && (
+              <div className="flex gap-2 mt-3">
+                {event.food_included && <span className="text-[11px] bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-medium">✓ Food</span>}
+                {event.travel_included && <span className="text-[11px] bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full font-medium">✓ Travel</span>}
+              </div>
+            )}
           </div>
         )}
 
-        <Card padding="none">
+        {/* ===== APPLICANT PIPELINE ===== */}
+        <div className="bg-white rounded-[16px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
           <div className="px-4 pt-4 pb-3 border-b border-[rgba(0,0,0,0.06)]">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-wider">
-                Applicants ({applicants.length})
+              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Talent Pipeline ({applicants.length})
               </h3>
-              <span className="text-[10px] text-gray-400">{approvedCount} approved · {pendingCount} pending</span>
+              <span className="text-[10px] text-gray-400">{approvedCount} selected · {pendingCount} to review</span>
             </div>
-            <div className="flex gap-1.5">
-              {([["", `All (${applicants.length})`], ["pending", `Pending (${pendingCount})`], ["approved", `Approved (${approvedCount})`], ["rejected", `Rejected (${rejectedCount})`]] as const).map(([key, label]) => (
+            <div className="flex gap-1.5 overflow-x-auto pb-1">
+              {([["", `All`], ["pending", `Pending (${pendingCount})`], ["approved", `Selected (${approvedCount})`], ["rejected", `Declined (${rejectedCount})`]] as const).map(([key, label]) => (
                 <button key={key} onClick={() => setFilter(key)}
-                  className={`h-7 px-2.5 rounded-[10px] text-[11px] font-medium transition-all ${
-                    filter === key ? "bg-[#0D9488] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  className={`h-8 px-3 rounded-[10px] text-[11px] font-semibold transition-all whitespace-nowrap shrink-0 ${
+                    filter === key ? "bg-[#0D9488] text-white shadow-[0_2px_8px_rgba(13,148,136,0.2)]" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}>{label}</button>
               ))}
             </div>
@@ -308,21 +373,22 @@ export default function OrganizerEventDetailPage() {
 
           <div className="p-3 space-y-2 max-h-96 overflow-y-auto">
             {filteredApplicants.length === 0 && (
-              <div className="text-center py-8">
+              <div className="text-center py-10">
                 <Users className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                <p className="text-sm text-gray-400">No applicants</p>
+                <p className="text-sm text-gray-400 font-medium">No applicants in this stage</p>
+                <p className="text-xs text-gray-300 mt-1">Applications will appear here as workers apply</p>
               </div>
             )}
             {filteredApplicants.map(app => {
               const avail = app.profile.availability ? AVAIL_CONFIG[app.profile.availability] : null;
               const completion = computeCompletion(app.profile);
               return (
-              <div key={app.id} className="card-base overflow-hidden">
+              <div key={app.id} className="bg-white rounded-[14px] border border-[rgba(0,0,0,0.06)] overflow-hidden transition-all hover:border-[rgba(0,0,0,0.12)]">
                 <div className="p-3.5">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3 min-w-0 flex-1">
                       <div className="relative shrink-0">
-                        <div className="w-10 h-10 rounded-[10px] bg-gradient-to-br from-[#0D9488]/10 to-[#0D9488]/20 flex items-center justify-center text-[#0D9488] font-bold text-sm">
+                        <div className="w-10 h-10 rounded-[12px] bg-gradient-to-br from-[#0D9488]/10 to-[#0D9488]/20 flex items-center justify-center text-[#0D9488] font-bold text-sm">
                           {app.profile.full_name?.charAt(0) || "W"}
                         </div>
                         {avail && (
@@ -339,13 +405,13 @@ export default function OrganizerEventDetailPage() {
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-gray-500 truncate">
-                          {app.profile.age && `${app.profile.age} yrs`}{app.profile.gender && ` · ${app.profile.gender}`}{app.profile.city && ` · ${app.profile.city}`}
+                        <p className="text-xs text-gray-500">
+                          {[app.profile.age && `${app.profile.age}y`, app.profile.gender, app.profile.city].filter(Boolean).join(" · ")}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${
+                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
                         app.status === "pending" ? "bg-amber-50 text-amber-700 border border-amber-200" :
                         app.status === "approved" ? "bg-emerald-50 text-emerald-700 border border-emerald-200" :
                         app.notes === "removed_by_organizer" ? "bg-red-50 text-red-700 border border-red-200" :
@@ -366,7 +432,7 @@ export default function OrganizerEventDetailPage() {
                       )}
                       {app.status === "approved" && (
                         <button onClick={() => { if (confirm(`Remove ${app.profile.full_name} from this event?`)) handleRemove(app.id); }} disabled={applying === app.id}
-                          className="h-7 px-2.5 rounded-[10px] bg-red-50 text-red-600 text-[11px] font-medium flex items-center gap-1 hover:bg-red-100 disabled:opacity-50 border border-red-200 transition-all active:scale-95">
+                          className="h-7 px-2.5 rounded-[10px] bg-red-50 text-red-600 text-[10px] font-medium flex items-center gap-1 hover:bg-red-100 disabled:opacity-50 border border-red-200 transition-all active:scale-95">
                           <XCircle className="w-3 h-3" /> Remove
                         </button>
                       )}
@@ -393,7 +459,7 @@ export default function OrganizerEventDetailPage() {
                           : app.status !== "approved" && app.profile.phone && <span className="text-gray-400 italic flex items-center gap-1.5 col-span-2"><Phone className="w-3 h-3" />Contact hidden until approval</span>
                         }
                       </div>
-                      <div className="flex items-center gap-2 pt-1">
+                      <div className="flex items-center gap-2">
                         <div className="flex-1 max-w-[100px] h-1.5 bg-gray-100 rounded-full overflow-hidden">
                           <div className={`h-full rounded-full ${
                             completion >= 80 ? "bg-emerald-500" : completion >= 50 ? "bg-amber-500" : "bg-[#0D9488]"
@@ -402,6 +468,11 @@ export default function OrganizerEventDetailPage() {
                         <span className={`text-[10px] font-medium ${
                           completion >= 80 ? "text-emerald-600" : completion >= 50 ? "text-amber-600" : "text-gray-400"
                         }`}>{completion}% profile</span>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                          app.profile.status === "trusted" ? "bg-emerald-50 text-emerald-700" :
+                          app.profile.status === "basic_verified" ? "bg-blue-50 text-blue-700" :
+                          "bg-gray-100 text-gray-500"
+                        }`}>{app.profile.status.replace(/_/g, " ")}</span>
                       </div>
                       {app.profile.skills && app.profile.skills.length > 0 && (
                         <div className="flex flex-wrap gap-1">
@@ -416,15 +487,23 @@ export default function OrganizerEventDetailPage() {
               </div>
             )})}
           </div>
-        </Card>
+        </div>
 
+        {/* ===== REPORTING & NOTES ===== */}
         {(event.reporting_details || event.instructions || event.contact_person_notes) && (
-          <Card>
-            <p className="text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-wider mb-3">Reporting & Notes</p>
-            {event.reporting_details && <p className="text-sm text-gray-700 mb-2">{event.reporting_details}</p>}
-            {event.instructions && <p className="text-sm text-gray-700 mb-2">{event.instructions}</p>}
-            {event.contact_person_notes && <p className="text-sm text-gray-700">{event.contact_person_notes}</p>}
-          </Card>
+          <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+            <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Reporting & Instructions</p>
+            <div className="space-y-2.5">
+              {event.reporting_details && <p className="text-sm text-gray-700 bg-gray-50 rounded-[10px] px-3 py-2.5 leading-relaxed">{event.reporting_details}</p>}
+              {event.instructions && <p className="text-sm text-gray-700 bg-gray-50 rounded-[10px] px-3 py-2.5 leading-relaxed">{event.instructions}</p>}
+              {event.contact_person_notes && (
+                <p className="text-sm text-gray-700 bg-amber-50 rounded-[10px] px-3 py-2.5 flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>{event.contact_person_notes}</span>
+                </p>
+              )}
+            </div>
+          </div>
         )}
       </main>
 
@@ -436,32 +515,39 @@ export default function OrganizerEventDetailPage() {
         />
       )}
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-[rgba(0,0,0,0.06)] z-10 pb-[env(safe-area-inset-bottom,0px)]">
-        <div className="max-w-3xl mx-auto px-4 py-2.5 flex gap-2 overflow-x-auto">
-          <Button variant="secondary" size="sm" onClick={() => setShowEdit(true)} disabled={!canEdit}>
+      {/* ===== BOTTOM ACTION BAR ===== */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-[rgba(0,0,0,0.06)] z-10 pb-[env(safe-area-inset-bottom,0px)] shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+        <div className="max-w-lg mx-auto px-4 py-2.5 flex gap-2 overflow-x-auto">
+          <button onClick={() => setShowEdit(true)} disabled={!canEdit}
+            className="h-9 px-4 rounded-[10px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
             <Edit3 className="w-3.5 h-3.5" /> Edit
-          </Button>
-          <Button variant="secondary" size="sm" onClick={duplicate}>
+          </button>
+          <button onClick={duplicate}
+            className="h-9 px-4 rounded-[10px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
             <Copy className="w-3.5 h-3.5" /> Duplicate
-          </Button>
+          </button>
           {(event.status === "published" || event.status === "filling") && (
-            <Button variant="warning" size="sm" onClick={() => updateStatus("closed")}>
+            <button onClick={() => updateStatus("closed")}
+              className="h-9 px-4 rounded-[10px] bg-amber-50 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
               <XCircle className="w-3.5 h-3.5" /> Close
-            </Button>
+            </button>
           )}
           {event.status === "draft" && (
-            <Button variant="success" size="sm" onClick={() => updateStatus("published")}>
-              Publish
-            </Button>
+            <button onClick={() => updateStatus("published")}
+              className="h-9 px-4 rounded-[10px] bg-[#0D9488] text-white text-xs font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0 shadow-[0_2px_8px_rgba(13,148,136,0.2)]">
+              <Sparkles className="w-3.5 h-3.5" /> Publish
+            </button>
           )}
           {event.status !== "completed" && event.status !== "cancelled" && event.status !== "draft" && (
-            <Button variant="secondary" size="sm" onClick={() => { if (confirm("Mark as completed?")) updateStatus("completed"); }}>
+            <button onClick={() => { if (confirm("Mark as completed?")) updateStatus("completed"); }}
+              className="h-9 px-4 rounded-[10px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
               <CheckCircle className="w-3.5 h-3.5" /> Complete
-            </Button>
+            </button>
           )}
-          <Button variant="danger" size="sm" onClick={deleteEvent}>
+          <button onClick={deleteEvent}
+            className="h-9 px-4 rounded-[10px] bg-red-50 text-red-600 text-xs font-semibold hover:bg-red-100 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
             <Trash2 className="w-3.5 h-3.5" /> Delete
-          </Button>
+          </button>
         </div>
       </div>
     </div>
