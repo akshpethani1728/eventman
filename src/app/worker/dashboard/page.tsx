@@ -8,7 +8,8 @@ import {
   LogOut, MapPin, Calendar, Clock, Users, IndianRupee, ShieldCheck,
   UtensilsCrossed, Car, Timer, TrendingUp, Zap, CheckCircle, BadgeCheck,
   XCircle, Hourglass, ArrowUpRight, Clock3, Send, AlertCircle,
-  Heart, Flame, Gauge, Bell, Phone, Info, ListChecks, ListPlus, ListMinus, CreditCard
+  Heart, Flame, Gauge, Bell, Phone, Info, ListChecks, ListPlus, ListMinus, CreditCard,
+  Search, ChevronRight, Sparkles, Target, Star, Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Profile, Event, Application } from "@/lib/supabase/types";
@@ -117,51 +118,29 @@ function computePriorityScore(event: any): number {
 
 function SkeletonCard() {
   return (
-    <div className="card-base rounded-[16px] overflow-hidden">
-      <div className="px-4 pt-3.5 pb-2 flex items-center gap-3">
-        <div className="w-8 h-8 rounded-[10px] bg-gray-200 animate-pulse shrink-0" />
-        <div className="flex-1 space-y-1.5">
-          <div className="w-28 h-3 rounded bg-gray-200 animate-pulse" />
-          <div className="w-20 h-2.5 rounded bg-gray-100 animate-pulse" />
+    <div className="bg-white rounded-[16px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+      <div className="h-1 bg-gray-100" />
+      <div className="p-4 space-y-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-[12px] bg-gray-100 animate-pulse shrink-0" />
+          <div className="flex-1 space-y-1.5">
+            <div className="w-32 h-3 rounded-full bg-gray-100 animate-pulse" />
+            <div className="w-20 h-2.5 rounded-full bg-gray-50 animate-pulse" />
+          </div>
+          <div className="w-16 h-6 rounded-full bg-gray-100 animate-pulse" />
         </div>
-        <div className="w-16 h-5 rounded-[10px] bg-gray-200 animate-pulse" />
-      </div>
-      <div className="px-4 py-1">
-        <div className="flex gap-1.5 mb-3">
-          <div className="w-16 h-5 rounded-[10px] bg-gray-100 animate-pulse" />
-          <div className="w-20 h-5 rounded-[10px] bg-gray-100 animate-pulse" />
+        <div className="space-y-1.5">
+          <div className="w-3/4 h-5 rounded bg-gray-100 animate-pulse" />
+          <div className="w-1/3 h-7 rounded bg-gray-50 animate-pulse" />
         </div>
-        <div className="w-3/4 h-5 rounded bg-gray-200 animate-pulse mb-3" />
-        <div className="w-32 h-7 rounded bg-gray-100 animate-pulse mb-3" />
-        <div className="w-full h-3 rounded bg-gray-100 animate-pulse mb-2" />
-        <div className="flex gap-1.5 mb-3">
-          <div className="w-14 h-5 rounded-[10px] bg-gray-100 animate-pulse" />
-          <div className="w-16 h-5 rounded-[10px] bg-gray-100 animate-pulse" />
+        <div className="flex gap-2">
+          <div className="w-14 h-6 rounded-full bg-gray-50 animate-pulse" />
+          <div className="w-20 h-6 rounded-full bg-gray-50 animate-pulse" />
+          <div className="w-16 h-6 rounded-full bg-gray-50 animate-pulse" />
         </div>
-        <div className="w-full h-1.5 rounded-full bg-gray-100 animate-pulse" />
-      </div>
-      <div className="px-4 py-3">
-        <div className="w-full h-10 rounded-[10px] bg-gray-200 animate-pulse" />
+        <div className="w-full h-10 rounded-[12px] bg-gray-100 animate-pulse" />
       </div>
     </div>
-  );
-}
-
-function EventBadge({ children, variant, pulse }: { children: React.ReactNode; variant: "red" | "amber" | "blue" | "purple" | "green" | "orange" | "slate" | "emerald"; pulse?: boolean }) {
-  const styles: Record<string, string> = {
-    red: "bg-red-50 text-red-700 border-red-200/60",
-    amber: "bg-amber-50 text-amber-700 border-amber-200/60",
-    blue: "bg-indigo-50 text-indigo-700 border-indigo-200/60",
-    purple: "bg-purple-50 text-purple-700 border-purple-200/60",
-    green: "bg-emerald-50 text-emerald-700 border-emerald-200/60",
-    orange: "bg-orange-50 text-orange-700 border-orange-200/60",
-    slate: "bg-gray-50 text-gray-600 border-gray-200/60",
-    emerald: "bg-emerald-50 text-emerald-700 border-emerald-200/60",
-  };
-  return (
-    <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-lg border ${styles[variant]} ${pulse ? "animate-pulse" : ""}`}>
-      {children}
-    </span>
   );
 }
 
@@ -331,7 +310,6 @@ function DashboardContent() {
 
   const allCategories = [...new Set(events.map(e => e.category).filter(Boolean))] as string[];
 
-  // Browse: events the worker has not actively applied to (no app, cancelled, or waitlisted)
   let browseEvents = events.filter(e => {
     const app = e.application;
     if (!app) return true;
@@ -341,7 +319,6 @@ function DashboardContent() {
   });
   if (categoryFilter) browseEvents = browseEvents.filter(e => e.category === categoryFilter);
 
-  // Applied: events the worker has a non-cancelled, non-waitlisted application for
   const appliedEvents = events.filter(e => {
     const app = e.application;
     if (!app) return false;
@@ -355,149 +332,172 @@ function DashboardContent() {
 
   const formatCount = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
 
+  const getGreeting = () => {
+    const h = new Date().getHours();
+    if (h < 12) return "Good Morning";
+    if (h < 17) return "Good Afternoon";
+    return "Good Evening";
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F8F8F6]">
         <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-20">
           <div className="h-0.5 bg-gradient-to-r from-[#0D9488]/20 via-[#0D9488] to-[#0D9488]/20" />
-          <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-[10px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-sm">
-                <Zap className="w-4 h-4 text-white" />
-              </div>
-              <div>
-                <div className="text-sm font-bold text-[#1A1A1A]">EventMan</div>
+          <div className="max-w-lg mx-auto px-4 h-16 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-gray-100 animate-pulse" />
+              <div className="space-y-1.5">
+                <div className="w-28 h-3 rounded-full bg-gray-100 animate-pulse" />
+                <div className="w-20 h-2.5 rounded-full bg-gray-50 animate-pulse" />
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-full bg-gray-200 animate-pulse" />
-              <div className="w-7 h-7 rounded-full bg-gray-200 animate-pulse" />
-              <div className="w-7 h-7 rounded-full bg-gray-200 animate-pulse" />
+              <div className="w-9 h-9 rounded-[10px] bg-gray-100 animate-pulse" />
             </div>
           </div>
         </header>
-        <main className="max-w-lg mx-auto px-4 py-4 pb-28 space-y-4">
-          <div className="w-full h-24 rounded-[16px] bg-gradient-to-br from-teal-200 to-teal-100 animate-pulse" />
-          <div className="w-full h-11 rounded-[10px] bg-gray-200 animate-pulse" />
+        <main className="max-w-lg mx-auto px-4 pt-4 pb-28 space-y-4">
+          <div className="w-full h-[132px] rounded-[20px] bg-gradient-to-br from-teal-100 to-teal-50 animate-pulse" />
+          <div className="w-full h-10 rounded-[12px] bg-gray-100 animate-pulse" />
           <SkeletonCard />
           <SkeletonCard />
           <SkeletonCard />
         </main>
-    </div>
-  );
-}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F8F8F6]">
-      {/* Header */}
+      {/* === HEADER === */}
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-20">
         <div className="h-0.5 bg-gradient-to-r from-[#0D9488]/20 via-[#0D9488] to-[#0D9488]/20" />
-        <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-[10px] bg-[#0D9488] flex items-center justify-center shadow-sm">
-              <Zap className="w-4 h-4 text-white" />
-            </div>
-            <div className="text-[#1A1A1A] font-bold text-sm">EventMan</div>
-          </div>
-          <div className="flex items-center gap-1.5">
+        <div className="max-w-lg mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
             {profile && (
               <>
-                <Link href="/worker/notifications" className="btn-base relative p-2 text-[#6B6B6B] hover:text-[#1A1A1A] rounded-[10px] hover:bg-gray-100 transition-colors">
-                  <Bell className="w-4 h-4" />
-                  {unreadNotifCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center shadow-sm">
-                      {unreadNotifCount > 9 ? "9+" : unreadNotifCount}
-                    </span>
-                  )}
-                </Link>
-                <Link href="/worker/profile" className="btn-base relative flex items-center gap-2 p-1 hover:bg-gray-100 rounded-[10px] transition-colors">
-                  <div className="w-7 h-7 rounded-full bg-[#0D9488] flex items-center justify-center text-white font-bold text-[11px] shadow-sm">
-                    {profile.full_name?.charAt(0) || "W"}
+                <Link href="/worker/profile" className="relative shrink-0">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#0D9488] to-teal-700 flex items-center justify-center text-white font-bold text-sm shadow-[0_2px_8px_rgba(13,148,136,0.25)]">
+                    {profile.full_name?.charAt(0)?.toUpperCase() || "W"}
                   </div>
                   {profile.availability && AVAIL_CONFIG[profile.availability] && (
-                    <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-[1.5px] border-white ${AVAIL_CONFIG[profile.availability].dot}`} />
+                    <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${AVAIL_CONFIG[profile.availability].dot}`} />
                   )}
                 </Link>
-                <button onClick={signOut} className="btn-base p-2 text-[#6B6B6B] hover:text-[#1A1A1A] rounded-[10px] hover:bg-gray-100 transition-colors">
-                  <LogOut className="w-4 h-4" />
-                </button>
+                <div>
+                  <p className="text-sm font-bold text-[#1A1A1A] leading-tight">{getGreeting()}, {profile.full_name?.split(" ")[0] || "there"}</p>
+                  <p className="text-[11px] text-[#6B6B6B] mt-0.5">Ready for your next event?</p>
+                </div>
               </>
             )}
+          </div>
+          <div className="flex items-center gap-1">
+            <Link href="/worker/notifications" className="relative w-9 h-9 rounded-[10px] flex items-center justify-center text-[#6B6B6B] hover:text-[#1A1A1A] hover:bg-gray-100 transition-all active:scale-90">
+              <Bell className="w-[18px] h-[18px]" />
+              {unreadNotifCount > 0 && (
+                <span className="absolute top-1 right-1 w-[14px] h-[14px] rounded-full bg-red-500 text-white text-[8px] font-bold flex items-center justify-center shadow-[0_2px_4px_rgba(239,68,68,0.3)]">
+                  {unreadNotifCount > 9 ? "9+" : unreadNotifCount}
+                </span>
+              )}
+            </Link>
           </div>
         </div>
       </header>
 
-      <main className="max-w-lg mx-auto px-4 py-4 pb-28">
-        {/* Subscription status banner */}
-          {profile && profile.plan_status && (
-            <div className={`mb-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-semibold ${
+      <main className="max-w-lg mx-auto px-4 pt-4 pb-28">
+        {/* === PLAN STATUS CHIP === */}
+        {profile && profile.plan_status && (
+          <div className="mb-3 flex items-center justify-between">
+            <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold ${
               profile.plan_status === "active"
                 ? "bg-emerald-100 text-emerald-700"
                 : profile.plan_status === "trial"
                   ? "bg-teal-100 text-teal-700"
-                : "bg-amber-100 text-amber-700"
+                  : "bg-amber-100 text-amber-700"
             }`}>
               {profile.plan_status === "active" ? (
-                <><CreditCard className="w-3 h-3" /> Active Plan</>
+                <><Sparkles className="w-3 h-3" /> Active Plan</>
               ) : profile.plan_status === "trial" ? (
-                <><Clock className="w-3 h-3" /> Free Trial {profile.trial_end_date ? `· ${Math.ceil((new Date(profile.trial_end_date).getTime() - Date.now()) / 86400000)}d left` : ""}</>
+                <><Clock className="w-3 h-3" /> Trial · {profile.trial_end_date ? `${Math.ceil((new Date(profile.trial_end_date).getTime() - Date.now()) / 86400000)}d left` : ""}</>
               ) : (
-                <><AlertCircle className="w-3 h-3" /> Plan Expired <Link href="/worker/plans" className="underline ml-1">Renew</Link></>
+                <><AlertCircle className="w-3 h-3" /> Expired <Link href="/worker/plans" className="underline ml-1">Renew</Link></>
               )}
             </div>
-          )}
-        {/* Welcome banner */}
-          {profile && tab === "browse" && browseEvents.length > 0 && (
-            <div className="mb-3 bg-gradient-to-br from-[#0D9488] to-teal-800 rounded-[16px] p-5 text-white shadow-lg relative overflow-hidden">
-              <div className="absolute -top-6 -right-6 w-32 h-32 rounded-full bg-white/5" />
-              <div className="absolute -bottom-6 -left-6 w-20 h-20 rounded-full bg-white/5" />
-              <p className="text-sm opacity-90">Hey <span className="font-semibold">{profile.full_name?.split(" ")[0] || "there"}</span></p>
-              <p className="text-xl font-bold mt-0.5">{browseEvents.length} event{browseEvents.length !== 1 ? "s" : ""} available</p>
-              <div className="flex items-center gap-2 mt-2">
-                {profile.availability && AVAIL_CONFIG[profile.availability] ? (
-                  <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2.5 py-1 rounded-[10px] bg-white/20 text-white`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${AVAIL_CONFIG[profile.availability].dot}`} />
-                    {AVAIL_CONFIG[profile.availability].label}
-                  </span>
-                ) : (
-                  <Link href="/worker/profile" className="text-[10px] opacity-75 underline">Set your availability</Link>
-                )}
-                {profile.availability === "busy" && <span className="text-[10px] opacity-75">— you&apos;re marked as unavailable</span>}
-              </div>
-            </div>
-          )}
+            <Link href="/worker/plans" className="text-[11px] font-medium text-[#0D9488] flex items-center gap-0.5">
+              Details <ChevronRight className="w-3 h-3" />
+            </Link>
+          </div>
+        )}
 
-        {/* Tabs */}
-        <div className="flex gap-1.5 mb-4 bg-gray-100/80 rounded-[10px] p-1">
+        {/* === OVERVIEW STATUS CARD === */}
+        <div className="mb-5 bg-white rounded-[20px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+          <div className="grid grid-cols-3 gap-3">
+            <div className="text-center">
+              <div className="w-10 h-10 rounded-[12px] bg-teal-50 flex items-center justify-center mx-auto mb-2">
+                <Target className="w-5 h-5 text-[#0D9488]" />
+              </div>
+              <p className="text-[22px] font-bold text-[#1A1A1A] leading-none">{browseEvents.length}</p>
+              <p className="text-[10px] text-[#6B6B6B] mt-1 font-medium">Available</p>
+            </div>
+            <div className="text-center">
+              <div className="w-10 h-10 rounded-[12px] bg-emerald-50 flex items-center justify-center mx-auto mb-2">
+                <Send className="w-5 h-5 text-emerald-600" />
+              </div>
+              <p className="text-[22px] font-bold text-[#1A1A1A] leading-none">{appliedEvents.length}</p>
+              <p className="text-[10px] text-[#6B6B6B] mt-1 font-medium">Applied</p>
+            </div>
+            <div className="text-center">
+              <div className="w-10 h-10 rounded-[12px] bg-amber-50 flex items-center justify-center mx-auto mb-2">
+                <Wallet className="w-5 h-5 text-amber-600" />
+              </div>
+              <p className="text-[22px] font-bold text-[#1A1A1A] leading-none">
+                {planCheck?.isActive ? "Active" : planCheck?.isTrialing ? "Trial" : "Expired"}
+              </p>
+              <p className="text-[10px] text-[#6B6B6B] mt-1 font-medium">Plan</p>
+            </div>
+          </div>
+        </div>
+
+        {/* === TABS === */}
+        <div className="flex gap-2 mb-4">
           <button onClick={() => setTab("browse")}
-            className={`btn-base flex-1 h-9 rounded-[10px] text-sm font-medium transition-all ${
-              tab === "browse" ? "bg-white text-[#0D9488] shadow-sm" : "text-[#6B6B6B] hover:text-[#1A1A1A]"
+            className={`flex-1 h-10 rounded-[12px] text-sm font-semibold transition-all active:scale-[0.97] ${
+              tab === "browse"
+                ? "bg-[#0D9488] text-white shadow-[0_4px_12px_rgba(13,148,136,0.25)]"
+                : "bg-white text-[#6B6B6B] shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:text-[#1A1A1A]"
             }`}>
             Browse {browseEvents.length > 0 && `(${browseEvents.length})`}
           </button>
           <button onClick={() => setTab("applied")}
-            className={`btn-base flex-1 h-9 rounded-[10px] text-sm font-medium transition-all ${
-              tab === "applied" ? "bg-white text-[#0D9488] shadow-sm" : "text-[#6B6B6B] hover:text-[#1A1A1A]"
+            className={`flex-1 h-10 rounded-[12px] text-sm font-semibold transition-all active:scale-[0.97] ${
+              tab === "applied"
+                ? "bg-[#0D9488] text-white shadow-[0_4px_12px_rgba(13,148,136,0.25)]"
+                : "bg-white text-[#6B6B6B] shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:text-[#1A1A1A]"
             }`}>
             Applied {appliedEvents.length > 0 && `(${appliedEvents.length})`}
           </button>
         </div>
 
-        {/* ========== BROWSE TAB ========== */}
+        {/* ===== BROWSE TAB ===== */}
         {tab === "browse" && (
           <>
             {/* Category filter */}
             {allCategories.length > 0 && (
-              <div className="mb-3 overflow-x-auto -mx-4 px-4 scrollbar-none">
+              <div className="mb-4 overflow-x-auto -mx-4 px-4 scrollbar-none">
                 <div className="flex gap-2 min-w-max pb-1">
                   <button onClick={() => setCategoryFilter("")}
-                    className={`btn-base h-8 px-3.5 rounded-[10px] text-xs font-medium transition-all whitespace-nowrap ${
-                      !categoryFilter ? "bg-[#0D9488] text-white shadow-sm" : "bg-white text-[#6B6B6B] border border-gray-200 hover:border-gray-300"
+                    className={`h-8 px-4 rounded-full text-xs font-semibold transition-all whitespace-nowrap ${
+                      !categoryFilter
+                        ? "bg-[#0D9488] text-white shadow-[0_2px_8px_rgba(13,148,136,0.2)]"
+                        : "bg-white text-[#6B6B6B] border border-gray-200/60 hover:border-gray-300"
                     }`}>All</button>
                   {allCategories.map(cat => (
                     <button key={cat} onClick={() => setCategoryFilter(cat)}
-                      className={`btn-base h-8 px-3.5 rounded-[10px] text-xs font-medium capitalize transition-all whitespace-nowrap ${
-                        categoryFilter === cat ? "bg-[#0D9488] text-white shadow-sm" : "bg-white text-[#6B6B6B] border border-gray-200 hover:border-gray-300"
+                      className={`h-8 px-4 rounded-full text-xs font-semibold capitalize transition-all whitespace-nowrap ${
+                        categoryFilter === cat
+                          ? "bg-[#0D9488] text-white shadow-[0_2px_8px_rgba(13,148,136,0.2)]"
+                          : "bg-white text-[#6B6B6B] border border-gray-200/60 hover:border-gray-300"
                       }`}>{CATEGORY_LABELS[cat] || cat.replace(/_/g, " ")}</button>
                   ))}
                 </div>
@@ -507,21 +507,21 @@ function DashboardContent() {
             {/* Empty state */}
             {browseEvents.length === 0 && (
               <div className="text-center py-16 px-4">
-                <div className="w-20 h-20 rounded-[16px] bg-gradient-to-br from-teal-50 to-teal-100 flex items-center justify-center mx-auto mb-5">
-                  <Gauge className="w-9 h-9 text-[#0D9488]" />
+                <div className="w-20 h-20 rounded-[20px] bg-gradient-to-br from-teal-50 to-teal-100 flex items-center justify-center mx-auto mb-5">
+                  <Search className="w-9 h-9 text-[#0D9488]" />
                 </div>
                 <p className="text-lg font-bold text-[#1A1A1A]">
-                  {categoryFilter ? "No events match this category" : "No events available"}
+                  {categoryFilter ? "No events in this category" : "No events right now"}
                 </p>
                 <p className="text-sm text-[#6B6B6B] mt-1.5 leading-relaxed max-w-xs mx-auto">
                   {categoryFilter
-                    ? "Try a different category or clear the filter to see all opportunities"
-                    : "New opportunities are added daily. Check back soon or adjust your preferences."}
+                    ? "Try a different category to find opportunities"
+                    : "New events are added daily. Check back soon."}
                 </p>
                 {categoryFilter && (
                   <button onClick={() => setCategoryFilter("")}
-                    className="btn-base mt-5 h-11 px-6 rounded-[10px] bg-[#0D9488] text-white text-sm font-semibold hover:bg-teal-700 transition-all active:scale-[0.97]">
-                    Clear filter
+                    className="mt-6 h-11 px-6 rounded-[14px] bg-[#0D9488] text-white text-sm font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
+                    Browse All Events
                   </button>
                 )}
               </div>
@@ -552,219 +552,139 @@ function DashboardContent() {
                 const isTrusted = org?.is_trusted_organizer;
                 const orgStatus = org?.status;
                 const isProfileVerified = orgStatus === "trusted" || orgStatus === "basic_verified";
-                const isVerified = isTrusted || isProfileVerified;
-                const score = computePriorityScore(event);
-
-                let cardAccent = "border-gray-200/70";
-                let shadowBoost = "";
-                if (isToday || hoursUntilEvent < 12) {
-                  cardAccent = "border-red-200/80";
-                  shadowBoost = "shadow-red-500/5";
-                } else if (isNearlyFull || isFillingFast) {
-                  cardAccent = "border-amber-200/80";
-                  shadowBoost = "shadow-amber-500/5";
-                } else if (isTrusted) {
-                  cardAccent = "border-indigo-200/80";
-                  shadowBoost = "shadow-indigo-500/5";
-                }
 
                 return (
                   <Link key={event.id} href={`/worker/events/${event.id}`}
-                    className="block card-elevated overflow-hidden transition-all duration-300 active:scale-[0.99] animate-slide-up"
+                    className="block bg-white rounded-[16px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all duration-300 active:scale-[0.98] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] animate-slide-up"
                     style={{ animationDelay: `${idx * 60}ms`, animationFillMode: "both" }}>
 
-                    {/* === ACCENT BAR === */}
-                    <div className={`h-1 ${
-                      isToday || hoursUntilEvent < 12
-                        ? "bg-red-500"
-                        : isNearlyFull
-                          ? "bg-amber-500"
-                          : isFillingFast
-                            ? "bg-amber-400"
-                            : isTrusted
-                              ? "bg-[#0D9488]"
-                              : isNew
-                                ? "bg-[#0D9488]"
-                                : "bg-gray-200"
-                    }`} />
-
-                    {/* === ORGANIZER ROW === */}
-                    <div className="px-4 pt-3.5 pb-2 flex items-center gap-3">
-                      <div className="relative shrink-0">
+                    {/* Preview bar */}
+                    <div className={`px-4 pt-3.5 pb-1 flex items-center justify-between`}>
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
                         {org?.avatar_url ? (
-                          <img src={org.avatar_url} alt="" className="w-8 h-8 rounded-[10px] object-cover ring-2 shrink-0 ring-gray-100" />
+                          <img src={org.avatar_url} alt="" className="w-9 h-9 rounded-[12px] object-cover shrink-0" />
                         ) : (
-                          <div className={`w-8 h-8 rounded-[10px] flex items-center justify-center text-white font-bold text-sm shrink-0 ${
+                          <div className={`w-9 h-9 rounded-[12px] flex items-center justify-center text-white font-bold text-sm shrink-0 ${
                             isTrusted
-                              ? "bg-gradient-to-br from-emerald-500 to-[#0D9488]"
+                              ? "bg-gradient-to-br from-teal-600 to-teal-700"
                               : "bg-gradient-to-br from-[#0D9488] to-teal-700"
                           }`}>
                             {org?.full_name?.charAt(0) || "O"}
                           </div>
                         )}
-                        {isTrusted && (
-                          <div className="absolute -bottom-1 -right-1 w-4.5 h-4.5 rounded-full bg-[#0D9488] border-[2.5px] border-white flex items-center justify-center shadow-sm">
-                            <BadgeCheck className="w-2.5 h-2.5 text-white" />
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-sm font-semibold text-[#1A1A1A] truncate">{org?.full_name || "Organizer"}</span>
+                            {isTrusted && <BadgeCheck className="w-3.5 h-3.5 text-[#0D9488] shrink-0" />}
+                          </div>
+                          {event.category && (
+                            <span className={`text-[10px] font-semibold capitalize ${CATEGORY_COLORS[event.category]?.split(" ")[1] || "text-[#6B6B6B]"}`}>
+                              {CATEGORY_LABELS[event.category] || event.category}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {event.payment_info && (
+                          <div className="flex items-center gap-0.5 text-emerald-700 font-bold text-sm">
+                            <IndianRupee className="w-3.5 h-3.5" />
+                            {event.payment_info}
                           </div>
                         )}
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-sm font-bold text-[#1A1A1A] truncate">{org?.full_name || "Event Organizer"}</span>
-                          {isTrusted && (
-                            <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-[#0D9488] bg-teal-50 px-1.5 py-0.5 rounded-[10px]">
-                              <BadgeCheck className="w-2.5 h-2.5" />
-                              Trusted
-                            </span>
-                          )}
-                          {!isTrusted && isProfileVerified && (
-                            <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold text-[#0D9488] bg-teal-50 px-1.5 py-0.5 rounded-[10px]">
-                              <ShieldCheck className="w-2.5 h-2.5" />
-                              Verified
-                            </span>
-                          )}
-                        </div>
-                        {(event.organizer_past_events ?? 0) > 0 && (
-                          <span className="text-[10px] text-[#6B6B6B] flex items-center gap-0.5">
-                            <CheckCircle className="w-2.5 h-2.5 text-[#A1A1AA]" />
-                            {event.organizer_past_events} event{event.organizer_past_events !== 1 ? "s" : ""}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {event.category && (
-                          <span className={`text-[10px] font-semibold px-2.5 py-0.5 rounded-[10px] capitalize ${CATEGORY_COLORS[event.category] || "bg-gray-50 text-[#6B6B6B]"}`}>
-                            {CATEGORY_LABELS[event.category] || event.category}
-                          </span>
-                        )}
-                        {isNewlyPosted && (
-                          <span className="text-[10px] font-semibold bg-[#0D9488] text-white px-2.5 py-0.5 rounded-[10px] animate-pulse">
-                            New
-                          </span>
-                        )}
-                        {!isNewlyPosted && isNew && !deadlinePassed && (
-                          <span className="text-[10px] font-semibold bg-[#0D9488] text-white px-2.5 py-0.5 rounded-[10px]">
-                            New
-                          </span>
-                        )}
-                        {deadlinePassed && (
-                          <span className="text-[10px] font-semibold bg-gray-100 text-[#A1A1AA] px-2.5 py-0.5 rounded-[10px]">
-                            Deadline Passed
-                          </span>
-                        )}
-                        {!deadlinePassed && isFull && (
-                          <span className="text-[10px] font-semibold bg-purple-50 text-purple-700 px-2.5 py-0.5 rounded-[10px]">
-                            Full
-                          </span>
-                        )}
-                        {waitlisted && (
-                          <span className="text-[10px] font-semibold bg-purple-50 text-purple-700 px-2.5 py-0.5 rounded-[10px]">
-                            Waitlisted
-                          </span>
-                        )}
-                      </div>
                     </div>
 
-                    {/* === INTELLIGENCE BADGES ROW === */}
-                    <div className="px-4 py-1 flex flex-wrap gap-1.5">
+                    {/* Intelligence badges row */}
+                    <div className="px-4 py-1.5 flex flex-wrap gap-1.5">
                       {isToday && (
-                        <EventBadge variant="red" pulse><Flame className="w-3 h-3" /> Starts Today</EventBadge>
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200/60 animate-pulse">
+                          <Flame className="w-3 h-3" /> Today
+                        </span>
                       )}
                       {daysUntil === 1 && !isToday && (
-                        <EventBadge variant="amber"><Clock3 className="w-3 h-3" /> Starts Tomorrow</EventBadge>
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200/60">
+                          <Clock3 className="w-3 h-3" /> Tomorrow
+                        </span>
                       )}
                       {isUrgent && !isToday && daysUntil !== 1 && (
-                        <EventBadge variant="amber"><Clock3 className="w-3 h-3" /> {daysUntil} days away</EventBadge>
-                      )}
-                      {isFillingFast && !isNearlyFull && (
-                        <EventBadge variant="orange"><TrendingUp className="w-3 h-3" /> Filling Fast</EventBadge>
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200/60">
+                          <Clock3 className="w-3 h-3" /> {daysUntil}d away
+                        </span>
                       )}
                       {isNearlyFull && (
-                        <EventBadge variant="red" pulse><Users className="w-3 h-3" /> Only {remaining} Left</EventBadge>
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200/60 animate-pulse">
+                          <Users className="w-3 h-3" /> {remaining} left
+                        </span>
                       )}
-                      {deadlineToday && (
-                        <EventBadge variant="red" pulse><AlertCircle className="w-3 h-3" /> Deadline Today</EventBadge>
-                      )}
-                      {deadlineSoon && !deadlineToday && (
-                        <EventBadge variant="amber"><Clock className="w-3 h-3" /> Deadline Soon</EventBadge>
+                      {isNewlyPosted && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-teal-500 text-white border border-teal-600">
+                          <Sparkles className="w-3 h-3" /> New
+                        </span>
                       )}
                       {isHighDemand && (
-                        <EventBadge variant="purple"><Flame className="w-3 h-3" /> High Demand</EventBadge>
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200/60">
+                          <Flame className="w-3 h-3" /> High Demand
+                        </span>
                       )}
-                      {isPopular && !isHighDemand && (
-                        <EventBadge variant="purple"><TrendingUp className="w-3 h-3" /> Popular</EventBadge>
+                      {deadlineToday && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200/60 animate-pulse">
+                          <AlertCircle className="w-3 h-3" /> Deadline Today
+                        </span>
                       )}
                     </div>
 
-                    {/* === EVENT TITLE === */}
-                    <div className="px-4 mt-1">
-                      <h3 className="font-bold text-[16px] leading-snug text-[#1A1A1A]">{event.title}</h3>
+                    {/* Title */}
+                    <div className="px-4">
+                      <h3 className="text-[16px] font-bold leading-snug text-[#1A1A1A]">{event.title}</h3>
                     </div>
 
-                    {/* === PAYMENT === */}
-                    {event.payment_info && (
-                      <div className="px-4 mt-1.5">
-                        <div className="inline-flex items-center gap-1">
-                          <IndianRupee className="w-5 h-5 text-emerald-600" />
-                          <span className="text-lg font-bold text-emerald-700">{event.payment_info}</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* === DATE / TIME / LOCATION === */}
-                    <div className="px-4 mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#6B6B6B]">
+                    {/* Info row */}
+                    <div className="px-4 mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-[#6B6B6B]">
                       <div className="flex items-center gap-1.5">
                         <Calendar className="w-3.5 h-3.5 shrink-0 text-[#A1A1AA]" />
-                        <span>{event.date_display || new Date(event.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span>
+                        <span>{event.date_display || new Date(event.date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <Clock className="w-3.5 h-3.5 shrink-0 text-[#A1A1AA]" />
                         <span>{event.time}{event.end_time ? `-${event.end_time}` : ""}</span>
                       </div>
-                      <div className="flex items-center gap-1.5 truncate max-w-[200px]">
+                      <div className="flex items-center gap-1.5 truncate max-w-[160px]">
                         <MapPin className="w-3.5 h-3.5 shrink-0 text-[#A1A1AA]" />
                         <span className="truncate">{event.location}</span>
                       </div>
                     </div>
 
-                    {/* === REQUIREMENTS CHIPS === */}
+                    {/* Requirements chips */}
                     <div className="px-4 mt-3 flex flex-wrap gap-1.5">
                       {event.gender_requirement && (
-                        <span className="text-[10px] font-medium bg-gray-50 text-[#6B6B6B] px-2.5 py-0.5 rounded-[10px] capitalize">{event.gender_requirement}</span>
+                        <span className="text-[10px] font-medium bg-gray-50 text-[#6B6B6B] px-2.5 py-0.5 rounded-full capitalize">{event.gender_requirement}</span>
                       )}
                       {(event.min_age || event.max_age) && (
-                        <span className="text-[10px] font-medium bg-gray-50 text-[#6B6B6B] px-2.5 py-0.5 rounded-[10px]">{event.min_age || 0}-{event.max_age || 99} yrs</span>
-                      )}
-                      {event.food_included && (
-                        <span className="text-[10px] font-medium bg-green-50 text-green-700 px-2.5 py-0.5 rounded-[10px] flex items-center gap-1">
-                          <UtensilsCrossed className="w-3 h-3" /> Food
-                        </span>
-                      )}
-                      {event.travel_included && (
-                        <span className="text-[10px] font-medium bg-teal-50 text-[#0D9488] px-2.5 py-0.5 rounded-[10px] flex items-center gap-1">
-                          <Car className="w-3 h-3" /> Travel
-                        </span>
+                        <span className="text-[10px] font-medium bg-gray-50 text-[#6B6B6B] px-2.5 py-0.5 rounded-full">{event.min_age || 0}-{event.max_age || 99} yrs</span>
                       )}
                       {event.dress_code && (
-                        <span className="text-[10px] font-medium bg-gray-50 text-[#6B6B6B] px-2.5 py-0.5 rounded-[10px]">{event.dress_code}</span>
+                        <span className="text-[10px] font-medium bg-gray-50 text-[#6B6B6B] px-2.5 py-0.5 rounded-full">{event.dress_code}</span>
+                      )}
+                      {event.food_included && (
+                        <span className="text-[10px] font-medium bg-green-50 text-green-700 px-2.5 py-0.5 rounded-full">Food</span>
+                      )}
+                      {event.travel_included && (
+                        <span className="text-[10px] font-medium bg-teal-50 text-teal-700 px-2.5 py-0.5 rounded-full">Travel</span>
                       )}
                       {event.skill_requirements && event.skill_requirements.length > 0 && (
-                        <span className="text-[10px] font-medium bg-violet-50 text-violet-700 px-2.5 py-0.5 rounded-[10px]">
+                        <span className="text-[10px] font-medium bg-violet-50 text-violet-700 px-2.5 py-0.5 rounded-full">
                           {event.skill_requirements.slice(0, 2).join(", ")}{event.skill_requirements.length > 2 ? ` +${event.skill_requirements.length - 2}` : ""}
                         </span>
                       )}
                     </div>
 
-                    {/* === STAFFING PROGRESS === */}
+                    {/* Progress + Deadline */}
                     <div className="px-4 mt-3">
-                      <div className="flex items-center justify-between text-xs mb-1.5">
-                        <div className="flex items-center gap-1.5">
-                          <Users className="w-3.5 h-3.5 text-[#A1A1AA]" />
-                          <span className={`font-medium ${remaining === 0 ? "text-red-600" : remaining <= 3 ? "text-amber-600" : "text-[#6B6B6B]"}`}>
-                            {remaining} of {event.worker_count} remaining
-                          </span>
-                        </div>
-                        <span className="text-[#A1A1AA]">{fillPercent}% filled</span>
+                      <div className="flex items-center justify-between text-[11px] mb-1.5">
+                        <span className={`font-medium ${remaining === 0 ? "text-red-600" : remaining <= 3 ? "text-amber-600" : "text-[#6B6B6B]"}`}>
+                          {remaining} of {event.worker_count} spots
+                        </span>
+                        <span className="text-[#A1A1AA]">{fillPercent}%</span>
                       </div>
                       <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                         <div
@@ -776,83 +696,64 @@ function DashboardContent() {
                       </div>
                     </div>
 
-                    {/* === DEADLINE COUNTDOWN === */}
-                    {event.application_deadline && (
-                      <div className="px-4 mt-2 flex items-center gap-1 text-[10px] text-[#A1A1AA]">
-                        <Clock className="w-3 h-3" />
-                        Apply by {new Date(event.application_deadline).toLocaleDateString("en-IN", { day: "numeric", month: "short" })} ·
-                        <CountdownTimer targetDate={event.application_deadline} />
-                      </div>
-                    )}
-
-                    {/* === CTA SECTION === */}
-                    <div className="px-4 py-3 flex flex-col gap-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 min-w-0">
-                          {event.total_applications && event.total_applications > 0 && (
-                            <span className="text-[10px] text-[#A1A1AA] flex items-center gap-1">
-                              <Users className="w-3 h-3" />
-                              {formatCount(event.total_applications)} applicant{event.total_applications !== 1 ? "s" : ""}
-                            </span>
-                          )}
-                          {hoursUntilEvent > 0 && hoursUntilEvent < 48 && !isToday && (
-                            <span className="text-[10px] text-[#A1A1AA] flex items-center gap-1">
-                              <Clock3 className="w-3 h-3" />
-                              In {hoursUntilEvent}h
-                            </span>
-                          )}
+                    {/* Bottom: deadline + CTA */}
+                    <div className="px-4 py-3.5 flex items-center gap-3 border-t border-[rgba(0,0,0,0.04)] mt-3">
+                      {event.application_deadline && !deadlinePassed && (
+                        <div className="flex items-center gap-1 text-[10px] text-[#A1A1AA]">
+                          <Clock className="w-3 h-3" />
+                          <CountdownTimer targetDate={event.application_deadline} />
                         </div>
-                      </div>
-                      {deadlinePassed ? (
-                        <div className="btn-base w-full h-10 rounded-[10px] bg-gray-100 text-[#A1A1AA] text-xs font-semibold flex items-center justify-center gap-1.5">
-                          <Clock className="w-3.5 h-3.5" /> Applications Closed
-                        </div>
-                      ) : waitlisted ? (
-                        <button
-                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); leaveWaitlist(event.application!); }}
-                          disabled={applyingId === event.id}
-                          className="btn-base w-full h-10 rounded-[10px] font-semibold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-[0.97] bg-purple-50 text-purple-700 border border-purple-200/60 hover:bg-purple-100">
-                          {applyingId === event.id ? (
-                            <span className="w-3.5 h-3.5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            <><ListMinus className="w-3.5 h-3.5" /> Leave Waitlist</>
-                          )}
-                        </button>
-                      ) : !canApply ? (
-                        <Link href="/worker/plans"
-                          onClick={(e) => { e.stopPropagation(); }}
-                          className="btn-base w-full h-10 rounded-[10px] font-semibold text-xs flex items-center justify-center gap-1.5 bg-amber-600 text-white hover:bg-amber-700 transition-all active:scale-[0.97]">
-                          <CreditCard className="w-3.5 h-3.5" /> Subscribe
-                        </Link>
-                      ) : isFull ? (
-                        <button
-                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); joinWaitlist(event.id); }}
-                          disabled={applyingId === event.id}
-                          className="btn-base w-full h-10 rounded-[10px] font-semibold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-[0.97] disabled:opacity-60 bg-purple-600 text-white hover:bg-purple-700">
-                          {applyingId === event.id ? (
-                            <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            <><ListPlus className="w-3.5 h-3.5" /> Join Waitlist</>
-                          )}
-                        </button>
-                      ) : (
-                        <button
-                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); apply(event.id); }}
-                          disabled={applyingId === event.id}
-                          className={`btn-base w-full h-10 rounded-[10px] font-semibold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-[0.97] disabled:opacity-60 ${
-                            isToday || hoursUntilEvent < 12
-                              ? "bg-red-600 text-white hover:bg-red-700"
-                              : isNearlyFull
-                                ? "bg-amber-600 text-white hover:bg-amber-700"
-                                : "bg-[#0D9488] text-white hover:bg-teal-700"
-                          }`}>
-                          {applyingId === event.id ? (
-                            <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            <><ArrowUpRight className="w-3.5 h-3.5" /> {(event.application && (event.application.status === "cancelled" || event.application.status === "rejected")) ? "Re-apply" : "Apply"}</>
-                          )}
-                        </button>
                       )}
+                      <div className="ml-auto">
+                        {deadlinePassed ? (
+                          <div className="h-9 px-4 rounded-[10px] bg-gray-50 text-[#A1A1AA] text-[11px] font-semibold flex items-center gap-1.5">
+                            <Clock className="w-3.5 h-3.5" /> Closed
+                          </div>
+                        ) : waitlisted ? (
+                          <button
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); leaveWaitlist(event.application!); }}
+                            disabled={applyingId === event.id}
+                            className="h-9 px-4 rounded-[10px] font-semibold text-[11px] transition-all active:scale-[0.97] bg-purple-50 text-purple-700 border border-purple-200/60 hover:bg-purple-100 flex items-center gap-1.5">
+                            {applyingId === event.id ? (
+                              <span className="w-3.5 h-3.5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                              <><ListMinus className="w-3.5 h-3.5" /> Leave</>
+                            )}
+                          </button>
+                        ) : !canApply ? (
+                          <Link href="/worker/plans"
+                            onClick={(e) => { e.stopPropagation(); }}
+                            className="h-9 px-4 rounded-[10px] font-semibold text-[11px] bg-amber-600 text-white hover:bg-amber-700 transition-all active:scale-[0.97] flex items-center gap-1.5">
+                            <CreditCard className="w-3.5 h-3.5" /> Subscribe
+                          </Link>
+                        ) : isFull ? (
+                          <button
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); joinWaitlist(event.id); }}
+                            disabled={applyingId === event.id}
+                            className="h-9 px-4 rounded-[10px] font-semibold text-[11px] transition-all active:scale-[0.97] disabled:opacity-60 bg-purple-600 text-white hover:bg-purple-700 flex items-center gap-1.5">
+                            {applyingId === event.id ? (
+                              <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                              <><ListPlus className="w-3.5 h-3.5" /> Waitlist</>
+                            )}
+                          </button>
+                        ) : (
+                          <button
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); apply(event.id); }}
+                            disabled={applyingId === event.id}
+                            className={`h-9 px-4 rounded-[10px] font-semibold text-[11px] transition-all active:scale-[0.97] disabled:opacity-60 flex items-center gap-1.5 ${
+                              isToday || hoursUntilEvent < 12
+                                ? "bg-red-600 text-white hover:bg-red-700"
+                                : "bg-[#0D9488] text-white hover:bg-teal-700"
+                            }`}>
+                            {applyingId === event.id ? (
+                              <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                              <><ArrowUpRight className="w-3.5 h-3.5" /> {(event.application && (event.application.status === "cancelled" || event.application.status === "rejected")) ? "Re-apply" : "Apply"}</>
+                            )}
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </Link>
                 );
@@ -861,18 +762,18 @@ function DashboardContent() {
           </>
         )}
 
-        {/* ========== APPLIED TAB ========== */}
+        {/* ===== APPLIED TAB ===== */}
         {tab === "applied" && appliedEvents.length === 0 && (
           <div className="text-center py-16 px-4">
-            <div className="w-20 h-20 rounded-[16px] bg-gradient-to-br from-teal-50 to-teal-100 flex items-center justify-center mx-auto mb-5">
+            <div className="w-20 h-20 rounded-[20px] bg-gradient-to-br from-teal-50 to-teal-100 flex items-center justify-center mx-auto mb-5">
               <Send className="w-9 h-9 text-[#0D9488]" />
             </div>
             <p className="text-lg font-bold text-[#1A1A1A]">No applications yet</p>
-            <p className="text-sm text-[#6B6B6B] mt-2 leading-relaxed max-w-xs mx-auto">
-            You haven&apos;t applied to any events yet. Browse available opportunities and send your first application to get started.
+            <p className="text-sm text-[#6B6B6B] mt-1.5 leading-relaxed max-w-xs mx-auto">
+              Browse available events and send your first application to get started.
             </p>
             <button onClick={() => setTab("browse")}
-              className="btn-base mt-6 h-11 px-6 rounded-[10px] bg-[#0D9488] text-white text-sm font-semibold hover:bg-teal-700 transition-all active:scale-[0.97]">
+              className="mt-6 h-11 px-6 rounded-[14px] bg-[#0D9488] text-white text-sm font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
               Browse Events
             </button>
           </div>
@@ -887,16 +788,14 @@ function DashboardContent() {
               const StatusIcon = cfg.icon;
               const org = event.organizer;
               const hoursUntil = (new Date(event.date).getTime() - Date.now()) / 3600000;
-              const fillPercent = event.worker_count ? Math.min(100, Math.round(((event.approved_count || 0) / event.worker_count) * 100)) : 0;
               const daysUntil = Math.ceil(hoursUntil / 24);
               const isUrgent = hoursUntil > 0 && hoursUntil < 24;
 
               return (
                 <Link key={event.id} href={`/worker/events/${event.id}`}
-                  className="block card-elevated overflow-hidden transition-all duration-300 active:scale-[0.99] animate-slide-up"
+                  className="block bg-white rounded-[16px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all duration-300 active:scale-[0.98] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] animate-slide-up"
                   style={{ animationDelay: `${idx * 50}ms`, animationFillMode: "both" }}>
 
-                  {/* Accent bar — distinct per status */}
                   <div className={`h-1 ${isWaitlisted(app) ? "bg-purple-400" : cfg.accent}`} />
 
                   <div className="p-4">
@@ -904,9 +803,9 @@ function DashboardContent() {
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="flex items-center gap-2.5 min-w-0 flex-1">
                         {org?.avatar_url ? (
-                          <img src={org.avatar_url} alt="" className="w-9 h-9 rounded-[10px] object-cover ring-2 shrink-0 ring-gray-100" />
+                          <img src={org.avatar_url} alt="" className="w-9 h-9 rounded-[12px] object-cover ring-2 shrink-0 ring-gray-100" />
                         ) : (
-                          <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center font-bold text-sm shrink-0 ${
+                          <div className={`w-9 h-9 rounded-[12px] flex items-center justify-center font-bold text-sm shrink-0 ${
                             app.status === "approved"
                               ? "bg-gradient-to-br from-emerald-500 to-[#0D9488] text-white"
                               : "bg-gradient-to-br from-[#0D9488] to-teal-700 text-white"
@@ -973,34 +872,12 @@ function DashboardContent() {
                       )}
                     </div>
 
-                    {/* Progress bar */}
-                    {event.worker_count > 0 && (app.status === "pending" || app.status === "approved") && (
-                      <div className="mb-3">
-                        <div className="flex items-center justify-between text-xs mb-1">
-                          <span className="text-[#A1A1AA]">Staffing</span>
-                          <span className="font-medium text-[#6B6B6B]">{event.approved_count || 0}/{event.worker_count}</span>
-                        </div>
-                        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                          <div className={`h-full rounded-full transition-all duration-500 ${
-                            app.status === "approved" && fillPercent >= 80
-                              ? "bg-emerald-500"
-                              : "bg-amber-400"
-                          }`} style={{ width: `${fillPercent}%` }} />
-                        </div>
-                      </div>
-                    )}
-
                     {/* Status-specific sections */}
-
-                    {/* --- APPROVED: Readiness section --- */}
                     {app.status === "approved" && (
                       <div className="space-y-2">
-                        {/* Countdown banner */}
                         {hoursUntil > 0 && (
-                          <div className={`flex items-center gap-2 px-3 py-2 rounded-[10px] ${
-                            isUrgent
-                              ? "bg-red-50 text-red-700"
-                              : "bg-emerald-50 text-emerald-700"
+                          <div className={`flex items-center gap-2 px-3 py-2 rounded-[12px] ${
+                            isUrgent ? "bg-red-50 text-red-700" : "bg-emerald-50 text-emerald-700"
                           }`}>
                             <Timer className={`w-4 h-4 ${isUrgent ? "animate-pulse" : ""}`} />
                             <span className="text-xs font-semibold">
@@ -1012,19 +889,15 @@ function DashboardContent() {
                             </span>
                           </div>
                         )}
-
-                        {/* Contact information */}
                         {org?.phone && (
-                          <div className="flex items-center gap-2 px-3 py-2 rounded-[10px] bg-white border border-emerald-100">
+                          <div className="flex items-center gap-2 px-3 py-2 rounded-[12px] bg-white border border-emerald-100">
                             <Phone className="w-4 h-4 text-emerald-500 shrink-0" />
                             <span className="text-xs font-medium text-[#6B6B6B]">Contact:</span>
                             <span className="text-xs font-semibold text-[#1A1A1A]">{org.phone}</span>
                           </div>
                         )}
-
-                        {/* Reporting info */}
                         {event.reporting_details && (
-                          <div className="flex items-start gap-2 px-3 py-2 rounded-[10px] bg-gray-50 border border-gray-100">
+                          <div className="flex items-start gap-2 px-3 py-2 rounded-[12px] bg-gray-50 border border-gray-100">
                             <Info className="w-4 h-4 text-[#A1A1AA] shrink-0 mt-0.5" />
                             <div className="text-xs text-[#6B6B6B] leading-relaxed">{event.reporting_details}</div>
                           </div>
@@ -1032,53 +905,47 @@ function DashboardContent() {
                       </div>
                     )}
 
-                    {/* --- PENDING: Status message --- */}
                     {app.status === "pending" && (
-                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-[10px] bg-amber-50">
+                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-[12px] bg-amber-50">
                         <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0" />
                         <span className="text-xs text-amber-700 font-medium">{cfg.message}</span>
                       </div>
                     )}
 
-                    {/* --- REJECTED: Respectful message + reapply option --- */}
                     {app.status === "rejected" && (
                       <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2 px-3 py-2.5 rounded-[10px] bg-gray-50">
+                        <div className="flex items-center gap-2 px-3 py-2.5 rounded-[12px] bg-gray-50">
                           <Info className="w-4 h-4 text-[#A1A1AA] shrink-0" />
                           <span className="text-xs text-[#6B6B6B]">{cfg.message}</span>
                         </div>
-                        <div className="flex items-center gap-2 px-3 py-2 rounded-[10px] bg-teal-50">
+                        <div className="flex items-center gap-2 px-3 py-2 rounded-[12px] bg-teal-50">
                           <ArrowUpRight className="w-3.5 h-3.5 text-[#0D9488] shrink-0" />
                           <span className="text-xs text-[#0D9488] font-medium">Browse other opportunities</span>
                         </div>
                       </div>
                     )}
 
-                    {/* --- WAITLISTED: Calm purple info --- */}
                     {isWaitlisted(app) && (
-                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-[10px] bg-purple-50">
+                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-[12px] bg-purple-50">
                         <ListPlus className="w-4 h-4 text-purple-500 shrink-0" />
                         <span className="text-xs text-purple-700">On waitlist — may get a spot if someone drops out</span>
                       </div>
                     )}
 
-                    {/* --- REMOVED BY ORGANIZER --- */}
                     {isRemovedByOrganizer(app) && (
-                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-[10px] bg-red-50">
+                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-[12px] bg-red-50">
                         <Info className="w-4 h-4 text-red-400 shrink-0" />
                         <span className="text-xs text-red-600">Removed by organizer — you can re-apply</span>
                       </div>
                     )}
 
-                    {/* --- CANCELLED: Clear neutral message --- */}
                     {app.status === "cancelled" && !isRemovedByOrganizer(app) && (
-                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-[10px] bg-gray-50">
+                      <div className="flex items-center gap-2 px-3 py-2.5 rounded-[12px] bg-gray-50">
                         <Info className="w-4 h-4 text-[#A1A1AA] shrink-0" />
                         <span className="text-xs text-[#6B6B6B]">{cfg.message}</span>
                       </div>
                     )}
 
-                    {/* Organizer info row */}
                     {org && !isWaitlisted(app) && app.status !== "cancelled" && app.status !== "rejected" && (
                       <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
                         <span className="text-[10px] text-[#A1A1AA]">by</span>
@@ -1093,8 +960,6 @@ function DashboardContent() {
           </div>
         )}
       </main>
-
-
     </div>
   );
 }

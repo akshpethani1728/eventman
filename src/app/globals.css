@@ -197,6 +197,57 @@ input, textarea, select {
 .animate-slide-right { animation: slide-right 0.25s ease-out; }
 .animate-expand-in { animation: expand-in 0.25s ease-out; }
 
+@keyframes press {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+
+@keyframes bounce-in {
+  0% { opacity: 0; transform: scale(0.8); }
+  50% { transform: scale(1.03); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slide-up-bounce {
+  0% { opacity: 0; transform: translateY(20px); }
+  60% { transform: translateY(-2px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes badge-pop {
+  0% { transform: scale(0); opacity: 0; }
+  70% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes shimmer-subtle {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-press { animation: press 0.2s ease-out; }
+.animate-bounce-in { animation: bounce-in 0.4s ease-out; }
+.animate-slide-up-bounce { animation: slide-up-bounce 0.5s ease-out; }
+.animate-badge-pop { animation: badge-pop 0.3s ease-out forwards; }
+
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.card-hover:active {
+  transform: scale(0.98);
+}
+
+.tap-highlight {
+  -webkit-tap-highlight-color: rgba(13, 148, 136, 0.1);
+}
+
 @media (display-mode: standalone) {
   body { padding-top: env(safe-area-inset-top); }
 }
