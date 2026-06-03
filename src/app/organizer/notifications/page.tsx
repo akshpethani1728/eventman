@@ -64,7 +64,7 @@ export default function NotificationsPage() {
       <div className="min-h-screen bg-[#F8F8F6] pb-24">
         <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10">
           <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
-            <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500"><ArrowLeft className="w-5 h-5" /></Link>
+            <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500 active:scale-90"><ArrowLeft className="w-5 h-5" /></Link>
             <h1 className="font-semibold text-sm">Activity Feed</h1>
           </div>
         </header>
@@ -95,7 +95,7 @@ export default function NotificationsPage() {
     <div className="min-h-screen bg-[#F8F8F6] pb-24">
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
-          <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-[10px] transition-all"><ArrowLeft className="w-5 h-5" /></Link>
+          <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-[10px] transition-all active:scale-90"><ArrowLeft className="w-5 h-5" /></Link>
           <h1 className="font-semibold text-sm">Activity Feed</h1>
           {unreadCount > 0 && (
             <span className="text-xs bg-[#0D9488]/10 text-[#0D9488] px-2.5 py-0.5 rounded-full ml-auto font-semibold">{unreadCount} new</span>

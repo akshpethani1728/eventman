@@ -134,7 +134,7 @@ export default function OrganizerEventDetailPage() {
     <div className="min-h-screen bg-[#F8F8F6] pb-24">
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
-          <Link href="/organizer/dashboard" aria-label="Back to dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-[10px] transition-all"><ArrowLeft className="w-5 h-5" /></Link>
+          <Link href="/organizer/dashboard" aria-label="Back to dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-[10px] transition-all active:scale-90"><ArrowLeft className="w-5 h-5" /></Link>
           <div className="min-w-0 flex-1">
             <h1 className="font-semibold text-sm truncate">{event.title}</h1>
             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${STATUS_STYLES[event.status]}`}>
@@ -276,7 +276,7 @@ export default function OrganizerEventDetailPage() {
             <div className="flex gap-1.5 overflow-x-auto pb-1">
               {([["", `All`], ["pending", `Pending (${pendingCount})`], ["approved", `Selected (${approvedCount})`], ["rejected", `Declined (${rejectedCount})`]] as const).map(([key, label]) => (
                 <button key={key} onClick={() => setFilter(key)}
-                  className={`h-8 px-3 rounded-[10px] text-[11px] font-semibold transition-all whitespace-nowrap shrink-0 ${
+                  className={`h-8 px-3 rounded-[10px] text-[11px] font-semibold transition-all active:scale-[0.97] whitespace-nowrap shrink-0 ${
                     filter === key ? "bg-[#0D9488] text-white shadow-[0_2px_8px_rgba(13,148,136,0.2)]" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}>{label}</button>
               ))}
@@ -351,7 +351,7 @@ export default function OrganizerEventDetailPage() {
                     </div>
                   </div>
                   <button onClick={() => setExpanded(expanded === app.id ? null : app.id)}
-                    className="mt-2 text-[11px] text-gray-400 flex items-center gap-1 hover:text-[#0D9488] transition-colors">
+                    className="mt-2 text-[11px] text-gray-400 flex items-center gap-1 hover:text-[#0D9488] transition-all active:scale-[0.97]">
                     {expanded === app.id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                     {expanded === app.id ? "Hide profile" : "View full profile"}
                   </button>
@@ -364,7 +364,7 @@ export default function OrganizerEventDetailPage() {
                         {app.status === "approved" && app.profile.phone
                           ? <span className="flex items-center gap-1.5 text-emerald-700 col-span-2"><Phone className="w-3 h-3" />{app.profile.phone}
                               <button onClick={() => { navigator.clipboard.writeText(app.profile.phone!); toast.success("Phone copied"); }}
-                                className="p-0.5 rounded hover:bg-emerald-100 text-emerald-500 hover:text-emerald-700 transition-colors" aria-label="Copy phone">
+                                className="p-0.5 rounded hover:bg-emerald-100 text-emerald-500 hover:text-emerald-700 transition-all active:scale-90" aria-label="Copy phone">
                                 <Copy className="w-3 h-3" />
                               </button>
                             </span>

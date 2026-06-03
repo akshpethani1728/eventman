@@ -249,10 +249,10 @@ export default function OrganizerDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-0.5">
-            <Link href="/organizer/notifications" aria-label="Notifications" className="relative w-9 h-9 rounded-[10px] flex items-center justify-center text-gray-400 hover:text-[#0D9488] hover:bg-[#0D9488]/10 transition-all">
+            <Link href="/organizer/notifications" aria-label="Notifications" className="relative w-9 h-9 rounded-[10px] flex items-center justify-center text-gray-400 hover:text-[#0D9488] hover:bg-[#0D9488]/10 transition-all active:scale-90">
               <Bell className="w-[18px] h-[18px]" />
             </Link>
-            <Link href="/organizer/database" aria-label="Search talent" className="w-9 h-9 rounded-[10px] flex items-center justify-center text-gray-400 hover:text-[#0D9488] hover:bg-[#0D9488]/10 transition-all">
+            <Link href="/organizer/database" aria-label="Search talent" className="w-9 h-9 rounded-[10px] flex items-center justify-center text-gray-400 hover:text-[#0D9488] hover:bg-[#0D9488]/10 transition-all active:scale-90">
               <Search className="w-[18px] h-[18px]" />
             </Link>
             <Link href="/organizer/profile" className="ml-1">
@@ -260,7 +260,7 @@ export default function OrganizerDashboard() {
                 {profile?.full_name?.charAt(0) || "O"}
               </div>
             </Link>
-            <button onClick={signOut} aria-label="Sign out" className="w-9 h-9 rounded-[10px] flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all">
+            <button onClick={signOut} aria-label="Sign out" className="w-9 h-9 rounded-[10px] flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all active:scale-90">
               <LogOut className="w-[18px] h-[18px]" />
             </button>
           </div>
@@ -396,7 +396,13 @@ export default function OrganizerDashboard() {
           <div className="space-y-2 animate-fade-in">
             <p className="text-xs text-gray-500 mb-3">Click a template to create a new event instantly.</p>
             {templates.length === 0 && (
-              <div className="text-center py-12 text-gray-400 text-sm">No templates yet. Save an event as a template from the action menu.</div>
+              <div className="text-center py-16">
+                <div className="w-16 h-16 rounded-[20px] bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center mx-auto mb-4">
+                  <BookTemplate className="w-8 h-8 text-gray-300" />
+                </div>
+                <p className="text-lg font-bold text-gray-900">No templates</p>
+                <p className="text-sm text-gray-500 mt-1.5 max-w-xs mx-auto leading-relaxed">Save an event as a template from the action menu to reuse it later.</p>
+              </div>
             )}
             {templates.map(tmpl => (
               <div key={tmpl.id} className="bg-white rounded-[14px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center justify-between gap-3 transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
@@ -412,7 +418,7 @@ export default function OrganizerDashboard() {
                 </div>
               </div>
             ))}
-            <button onClick={() => setTab("active")} className="text-xs text-[#0D9488] font-medium hover:text-[#0F766E] transition-colors">← Back to active</button>
+            <button onClick={() => setTab("active")} className="text-xs text-[#0D9488] font-medium hover:text-[#0F766E] transition-colors active:scale-[0.97]">← Back to active</button>
           </div>
         )}
 
@@ -452,7 +458,7 @@ export default function OrganizerDashboard() {
                   
                   <div className="px-4 pt-4 pb-2 flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
-                      <Link href={`/organizer/events/${event.id}`} className="block">
+                      <Link href={`/organizer/events/${event.id}`} className="block active:scale-[0.99] transition-all">
                         <h3 className="font-bold text-[15px] text-gray-900 leading-snug hover:text-[#0D9488] transition-colors">{event.title}</h3>
                       </Link>
                       <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
@@ -471,7 +477,7 @@ export default function OrganizerDashboard() {
                     </div>
                     <div className="relative shrink-0">
                       <button onClick={() => setActionMenu(actionMenu === event.id ? null : event.id)}
-                        className="w-8 h-8 rounded-[10px] hover:bg-gray-100 flex items-center justify-center text-gray-400 transition-colors" aria-label="Event actions" aria-haspopup="true">
+                        className="w-8 h-8 rounded-[10px] hover:bg-gray-100 flex items-center justify-center text-gray-400 transition-all active:scale-90" aria-label="Event actions" aria-haspopup="true">
                         <MoreVertical className="w-4 h-4" />
                       </button>
                       {actionMenu === event.id && (
@@ -483,42 +489,42 @@ export default function OrganizerDashboard() {
                             </div>
                             {["draft", "published", "filling"].includes(event.status) && (
                               <button onClick={() => { setEditingEvent(event); setActionMenu(null); }} role="menuitem"
-                                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors rounded-[10px]">
+                                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-all rounded-[10px] active:scale-[0.97]">
                                 <Edit3 className="w-3.5 h-3.5" /> Edit Event
                               </button>
                             )}
                             <button onClick={() => { setSelectedEvent(event); setActionMenu(null); }} role="menuitem"
-                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors rounded-[10px]">
+                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-all rounded-[10px] active:scale-[0.97]">
                               <Users className="w-3.5 h-3.5" /> View Applicants
                             </button>
                             <Link href={`/organizer/events/${event.id}`} onClick={() => setActionMenu(null)} role="menuitem"
-                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors rounded-[10px]">
+                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-all rounded-[10px] active:scale-[0.97]">
                               <Eye className="w-3.5 h-3.5" /> Open Detail
                             </Link>
                             <div className="h-px bg-[rgba(0,0,0,0.06)] my-1 mx-3" />
                             <button onClick={() => { duplicateEvent(event); setActionMenu(null); }} role="menuitem"
-                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors rounded-[10px]">
+                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-all rounded-[10px] active:scale-[0.97]">
                               <Copy className="w-3.5 h-3.5" /> Duplicate
                             </button>
                             <button onClick={() => { saveAsTemplate(event); setActionMenu(null); }} role="menuitem"
-                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors rounded-[10px]">
+                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-all rounded-[10px] active:scale-[0.97]">
                               <BookTemplate className="w-3.5 h-3.5" /> Save as Template
                             </button>
                             <div className="h-px bg-[rgba(0,0,0,0.06)] my-1 mx-3" />
                             {["draft", "published", "filling"].includes(event.status) && (
                               <button onClick={() => { updateEventStatus(event.id, "closed"); }} role="menuitem"
-                                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-amber-700 hover:bg-amber-50 transition-colors rounded-[10px]">
+                                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-amber-700 hover:bg-amber-50 transition-all rounded-[10px] active:scale-[0.97]">
                                 <XCircle className="w-3.5 h-3.5" /> Close Event
                               </button>
                             )}
                             {["draft", "published", "filling"].includes(event.status) && (
                               <button onClick={() => { updateEventStatus(event.id, "completed"); }} role="menuitem"
-                                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-gray-50 transition-colors rounded-[10px]">
+                                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-gray-50 transition-all rounded-[10px] active:scale-[0.97]">
                                 <CheckCircle className="w-3.5 h-3.5" /> Mark Completed
                               </button>
                             )}
                             <button onClick={() => { setActionMenu(null); setDeleteConfirm(event.id); }} role="menuitem"
-                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-red-600 hover:bg-red-50 transition-colors rounded-[10px]">
+                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-red-600 hover:bg-red-50 transition-all rounded-[10px] active:scale-[0.97]">
                               <Trash2 className="w-3.5 h-3.5" /> Delete
                             </button>
                           </div>
@@ -622,7 +628,7 @@ export default function OrganizerDashboard() {
                 className="bg-white rounded-[14px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
                 <div className="px-4 pt-4 pb-1 flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
-                    <Link href={`/organizer/events/${event.id}`} className="hover:text-[#0D9488] transition-colors">
+                    <Link href={`/organizer/events/${event.id}`} className="hover:text-[#0D9488] transition-colors active:scale-[0.99]">
                       <h3 className="font-semibold text-sm text-gray-900 truncate">{event.title}</h3>
                     </Link>
                     <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">

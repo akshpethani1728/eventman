@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { useDebounce } from "@/lib/useDebounce";
 import { ArrowLeft, Search, User, MapPin, Briefcase, Clock, Award, Filter, X, CheckCircle, ChevronRight, Star, Sparkles, Zap, BadgeCheck, ShieldCheck } from "lucide-react";
 import { PageLoader } from "@/lib/design/Loading";
 import WorkerProfilePanel from "./WorkerProfilePanel";
@@ -34,6 +35,7 @@ export default function WorkerDatabasePage() {
   const [workers, setWorkers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
+  const debouncedQuery = useDebounce(query, 250);
   const [filters, setFilters] = useState({ gender: "", availability: "", city: "", skills: "" });
   const [availableOnly, setAvailableOnly] = useState(false);
   const [verifiedOnly, setVerifiedOnly] = useState(false);
@@ -56,7 +58,7 @@ export default function WorkerDatabasePage() {
      } catch (err) { console.error("[WorkerDatabasePage] error:", err); } finally { setLoading(false); } };
 
   const filtered = workers.filter(w => {
-    const q = query.toLowerCase();
+    const q = debouncedQuery.toLowerCase();
     if (q && !w.full_name?.toLowerCase().includes(q) && !w.area?.toLowerCase().includes(q) && !w.city?.toLowerCase().includes(q) && !w.skills?.some(s => s.toLowerCase().includes(q))) return false;
     if (filters.gender && w.gender !== filters.gender) return false;
     if (filters.availability && w.availability !== filters.availability) return false;
@@ -78,7 +80,7 @@ export default function WorkerDatabasePage() {
     <div className="min-h-screen bg-[#F8F8F6] pb-24">
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
-          <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500"><ArrowLeft className="w-5 h-5" /></Link>
+          <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500 active:scale-90"><ArrowLeft className="w-5 h-5" /></Link>
           <h1 className="font-semibold text-sm">Talent Discovery</h1>
         </div>
       </header>
@@ -92,7 +94,7 @@ export default function WorkerDatabasePage() {
     <div className="min-h-screen bg-[#F8F8F6] pb-24">
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
-          <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-[10px] transition-all"><ArrowLeft className="w-5 h-5" /></Link>
+          <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-[10px] transition-all active:scale-90"><ArrowLeft className="w-5 h-5" /></Link>
           <h1 className="font-semibold text-sm">Talent Discovery</h1>
           <span className="text-xs text-gray-400 ml-auto font-medium" aria-live="polite">{workers.length} workers</span>
         </div>
@@ -107,7 +109,7 @@ export default function WorkerDatabasePage() {
               aria-label="Search workers" />
           </div>
           <button onClick={() => setShowFilters(!showFilters)}
-            className={`h-11 px-4 rounded-[12px] text-sm font-semibold transition-all flex items-center gap-1.5 ${
+            className={`h-11 px-4 rounded-[12px] text-sm font-semibold transition-all active:scale-[0.97] flex items-center gap-1.5 ${
               showFilters ? "bg-[#0D9488] text-white shadow-[0_2px_8px_rgba(13,148,136,0.2)]" : "bg-white text-gray-600 border border-[rgba(0,0,0,0.08)] hover:border-[rgba(0,0,0,0.14)]"
             }`} aria-label="Toggle filters" aria-expanded={showFilters}>
             <Filter className="w-4 h-4" /> Filters
@@ -116,21 +118,21 @@ export default function WorkerDatabasePage() {
 
         <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-1">
           <button onClick={() => setAvailableOnly(!availableOnly)}
-            className={`h-8 px-3.5 rounded-full text-[11px] font-semibold transition-all whitespace-nowrap shrink-0 ${
+            className={`h-8 px-3.5 rounded-full text-[11px] font-semibold transition-all active:scale-[0.97] whitespace-nowrap shrink-0 ${
               availableOnly ? "bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm" : "bg-white text-gray-500 border border-[rgba(0,0,0,0.08)] hover:border-gray-300"
             }`}>
             <Zap className={`w-3 h-3 inline mr-1 ${availableOnly ? "text-emerald-600" : ""}`} /> Available
           </button>
           <button onClick={() => setVerifiedOnly(!verifiedOnly)}
-            className={`h-8 px-3.5 rounded-full text-[11px] font-semibold transition-all whitespace-nowrap shrink-0 ${
+            className={`h-8 px-3.5 rounded-full text-[11px] font-semibold transition-all active:scale-[0.97] whitespace-nowrap shrink-0 ${
               verifiedOnly ? "bg-blue-50 text-blue-700 border border-blue-200 shadow-sm" : "bg-white text-gray-500 border border-[rgba(0,0,0,0.08)] hover:border-gray-300"
             }`}>
             <ShieldCheck className={`w-3 h-3 inline mr-1 ${verifiedOnly ? "text-blue-600" : ""}`} /> Verified
           </button>
-          <button onClick={() => setQuery("")}
-            className="h-8 px-3.5 rounded-full text-[11px] font-semibold bg-white text-gray-500 border border-[rgba(0,0,0,0.08)] hover:border-gray-300 transition-all whitespace-nowrap shrink-0">
-            <Star className="w-3 h-3 inline mr-1" /> Top Rated
-          </button>
+            <button onClick={() => setQuery("")}
+              className="h-8 px-3.5 rounded-full text-[11px] font-semibold bg-white text-gray-500 border border-[rgba(0,0,0,0.08)] hover:border-gray-300 transition-all active:scale-[0.97] whitespace-nowrap shrink-0">
+              <Star className="w-3 h-3 inline mr-1" /> Clear Search
+            </button>
           {filtered.length < workers.length && (
             <span className="text-[10px] text-gray-400 font-medium shrink-0 ml-1">{filtered.length} match{filtered.length !== 1 ? "es" : ""}</span>
           )}
@@ -164,7 +166,7 @@ export default function WorkerDatabasePage() {
             </div>
             {(filters.gender || filters.availability || filters.city || filters.skills) && (
               <button onClick={() => setFilters({ gender: "", availability: "", city: "", skills: "" })}
-                className="text-xs text-[#0D9488] flex items-center gap-1 hover:text-[#0F766E] transition-colors"><X className="w-3 h-3" /> Clear filters</button>
+                className="text-xs text-[#0D9488] flex items-center gap-1 hover:text-[#0F766E] transition-colors active:scale-[0.97]"><X className="w-3 h-3" /> Clear filters</button>
             )}
           </div>
         )}

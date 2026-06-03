@@ -252,6 +252,29 @@ input, textarea, select {
   body { padding-top: env(safe-area-inset-top); }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-scale-in,
+  .animate-slide-down,
+  .animate-slide-up-lg,
+  .animate-slide-up-bounce,
+  .animate-bounce-in,
+  .animate-badge-pop,
+  .animate-expand-in,
+  .animate-slide-right {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+}
+
 .card-base {
   background: var(--card-bg);
   border-radius: var(--radius-md);
