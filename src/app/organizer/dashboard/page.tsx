@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import {
-  LogOut, Plus, Copy, Edit3, Trash2, XCircle, Users, MapPin, Calendar,
-  Clock, LayoutDashboard, User, AlertTriangle, CheckCircle, Clock3,
+  LogOut, Plus, Copy, Edit3, Trash2, XCircle, Users, Calendar,
+  Clock, CheckCircle,
   BookTemplate, Bell, Search, IndianRupee, ChevronRight,
-  Sparkles, Eye, MoreVertical, Target, TrendingUp, Activity,
+  Sparkles, Eye, MoreVertical,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Profile, Event } from "@/lib/supabase/types";
@@ -237,31 +237,28 @@ export default function OrganizerDashboard() {
 
   return (
     <div className="min-h-screen bg-[#F8F8F6] pb-28">
-      <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-20">
-        <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-[10px] bg-gradient-to-br from-[#0D9488] to-[#0F766E] flex items-center justify-center shadow-[0_2px_8px_rgba(13,148,136,0.2)]">
-              <LayoutDashboard className="w-4 h-4 text-white" />
+      <header className="sticky top-0 bg-white/90 backdrop-blur-xl border-b border-[rgba(0,0,0,0.04)] z-20">
+        <div className="max-w-lg mx-auto px-4 h-12 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-[8px] bg-gradient-to-br from-[#0D9488] to-[#0F766E] flex items-center justify-center shadow-[0_2px_6px_rgba(13,148,136,0.2)]">
+              <span className="text-white text-[11px] font-black tracking-tight">E</span>
             </div>
-            <div>
-              <p className="text-[11px] text-gray-400 font-medium leading-tight">{profile?.full_name?.split(" ")[0] || "Organizer"}</p>
-              <p className="text-[10px] text-gray-300 -mt-0.5">Operations Console</p>
-            </div>
+            <span className="text-[13px] font-bold text-gray-900 tracking-tight">EventMan</span>
           </div>
-          <div className="flex items-center gap-0.5">
-            <Link href="/organizer/notifications" aria-label="Notifications" className="relative w-9 h-9 rounded-[10px] flex items-center justify-center text-gray-400 hover:text-[#0D9488] hover:bg-[#0D9488]/10 transition-all active:scale-90">
-              <Bell className="w-[18px] h-[18px]" />
+          <div className="flex items-center gap-1">
+            <Link href="/organizer/database" aria-label="Search talent" className="w-8 h-8 rounded-[10px] flex items-center justify-center text-gray-400 hover:text-[#0D9488] hover:bg-[#0D9488]/10 transition-all active:scale-90">
+              <Search className="w-[16px] h-[16px]" />
             </Link>
-            <Link href="/organizer/database" aria-label="Search talent" className="w-9 h-9 rounded-[10px] flex items-center justify-center text-gray-400 hover:text-[#0D9488] hover:bg-[#0D9488]/10 transition-all active:scale-90">
-              <Search className="w-[18px] h-[18px]" />
+            <Link href="/organizer/notifications" aria-label="Notifications" className="relative w-8 h-8 rounded-[10px] flex items-center justify-center text-gray-400 hover:text-[#0D9488] hover:bg-[#0D9488]/10 transition-all active:scale-90">
+              <Bell className="w-[16px] h-[16px]" />
             </Link>
-            <Link href="/organizer/profile" className="ml-1">
-              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#0D9488] to-[#0F766E] flex items-center justify-center text-white font-bold text-[11px] shadow-[0_2px_8px_rgba(13,148,136,0.2)]">
+            <Link href="/organizer/profile" className="ml-0.5">
+              <div className="w-7 h-7 rounded-[8px] bg-gradient-to-br from-[#0D9488] to-[#0F766E] flex items-center justify-center text-white font-bold text-[10px] shadow-[0_2px_6px_rgba(13,148,136,0.2)]">
                 {profile?.full_name?.charAt(0) || "O"}
               </div>
             </Link>
-            <button onClick={signOut} aria-label="Sign out" className="w-9 h-9 rounded-[10px] flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all active:scale-90">
-              <LogOut className="w-[18px] h-[18px]" />
+            <button onClick={signOut} aria-label="Sign out" className="w-8 h-8 rounded-[10px] flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all active:scale-90">
+              <LogOut className="w-[16px] h-[16px]" />
             </button>
           </div>
         </div>
@@ -299,51 +296,6 @@ export default function OrganizerDashboard() {
             </div>
           </div>
         </div>
-
-        {needsAttention.length > 0 && (
-          <div className="mb-5 space-y-2">
-            <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider px-1">Action Center</p>
-            <div className="space-y-2">
-              {needsAttention.slice(0, 3).map(e => {
-                const r = e.worker_count - (e.approvedCount || 0);
-                const isUrgent = e.date === todayStr || r <= 1;
-                const items: { icon: any; label: string; color: string }[] = [];
-                if (e.date === todayStr) items.push({ icon: Clock, label: "Starts Today", color: "red" });
-                else if (new Date(e.date).getTime() - Date.now() < 86400000 * 2) items.push({ icon: Clock, label: "Tomorrow", color: "amber" });
-                if ((e.pendingCount || 0) > 0) items.push({ icon: Users, label: `${e.pendingCount} pending`, color: "teal" });
-                if (r <= 3 && r > 0) items.push({ icon: AlertTriangle, label: `${r} seats left`, color: "red" });
-                if (e.application_deadline === todayStr) items.push({ icon: Clock3, label: "Deadline Today", color: "red" });
-                return (
-                  <div key={e.id} className={`bg-white rounded-[14px] p-3.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all active:scale-[0.98] ${isUrgent ? "ring-1 ring-red-200" : ""}`}>
-                    <div className="flex items-center justify-between">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-semibold text-gray-900 truncate">{e.title}</p>
-                        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                          {items.slice(0, 2).map((item, i) => (
-                            <span key={i} className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                              item.color === "red" ? "bg-red-50 text-red-700 border border-red-200" :
-                              item.color === "amber" ? "bg-amber-50 text-amber-700 border border-amber-200" :
-                              "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                            }`}>
-                              <item.icon className="w-3 h-3" />{item.label}
-                            </span>
-                          ))}
-                          {items.length > 2 && <span className="text-[10px] text-gray-400">+{items.length - 2}</span>}
-                        </div>
-                      </div>
-                      {((e.pendingCount || 0) > 0) && (
-                        <button onClick={() => setSelectedEvent(e)}
-                          className="ml-3 h-8 px-3 rounded-[10px] bg-[#0D9488] text-white text-xs font-semibold hover:bg-teal-700 transition-all active:scale-95 shrink-0">
-                          Review
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
 
         <button onClick={() => { setCreateFromTemplate(null); setShowCreate(true); }}
           className="w-full h-14 mb-5 rounded-[16px] bg-gradient-to-r from-[#0D9488] to-[#0F766E] text-white font-bold text-base flex items-center justify-center gap-2.5 shadow-[0_4px_16px_rgba(13,148,136,0.3)] transition-all duration-200 hover:shadow-[0_8px_24px_rgba(13,148,136,0.4)] active:scale-[0.98]">
