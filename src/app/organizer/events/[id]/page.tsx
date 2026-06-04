@@ -8,7 +8,7 @@ import {
   ArrowLeft, Users, Edit3, Copy, XCircle, CheckCircle, Trash2, MapPin, Calendar, Clock,
   Clock3, IndianRupee, AlertTriangle, Check, X as XIcon,
   ChevronDown, ChevronUp, Phone, Mail, Award, Briefcase, Filter, Sparkles,
-  MoreHorizontal, Ban, UserCheck, UserX, Eye, Star, Target,
+  MoreHorizontal, Ban, UserCheck, UserX, Eye, Star, Target, QrCode,
 } from "lucide-react";
 import { toast } from "sonner";
 import { PageLoader } from "@/lib/design/Loading";
@@ -127,6 +127,7 @@ export default function OrganizerEventDetailPage() {
   const pendingCount = applicants.filter(a => a.status === "pending").length;
   const approvedCount = applicants.filter(a => a.status === "approved").length;
   const rejectedCount = applicants.filter(a => a.status === "rejected").length;
+  const checkedInCount = applicants.filter(a => a.status === "approved" && a.notes?.includes("checked_in")).length;
   const filteredApplicants = filter ? applicants.filter(a => a.status === filter) : applicants;
   const fillPercent = Math.min(100, Math.round((approvedCount / event.worker_count) * 100));
 
@@ -219,6 +220,26 @@ export default function OrganizerEventDetailPage() {
           </div>
           <p className="text-[10px] text-gray-400 mt-1 text-right">{approvedCount}/{event.worker_count} filled ({remaining > 0 ? `${remaining} open` : "full"})</p>
         </div>
+
+        {approvedCount > 0 && (
+          <Link href={`/organizer/events/${id}/check-in`} className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center justify-between transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] active:scale-[0.99]">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-[12px] bg-emerald-50 flex items-center justify-center">
+                <QrCode className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-900">Check-in</p>
+                <p className="text-[11px] text-gray-500">{checkedInCount}/{approvedCount} checked in</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-1.5 w-16 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-full rounded-full bg-emerald-500" style={{ width: `${checkedInCount > 0 ? Math.round((checkedInCount / approvedCount) * 100) : 0}%` }} />
+              </div>
+              <span className="text-[10px] font-semibold text-emerald-700">{approvedCount > 0 ? Math.round((checkedInCount / approvedCount) * 100) : 0}%</span>
+            </div>
+          </Link>
+        )}
 
         <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
           <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Event Schedule</p>
@@ -432,11 +453,17 @@ export default function OrganizerEventDetailPage() {
             className="h-9 px-4 rounded-[10px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
             <Edit3 className="w-3.5 h-3.5" /> Edit
           </button>
-          <button onClick={duplicate}
-            className="h-9 px-4 rounded-[10px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
-            <Copy className="w-3.5 h-3.5" /> Duplicate
-          </button>
-          {(event.status === "published" || event.status === "filling") && (
+            <button onClick={duplicate}
+              className="h-9 px-4 rounded-[10px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
+              <Copy className="w-3.5 h-3.5" /> Duplicate
+            </button>
+            {approvedCount > 0 && (
+              <Link href={`/organizer/events/${id}/check-in`}
+                className="h-9 px-4 rounded-[10px] bg-emerald-50 text-emerald-700 text-xs font-semibold hover:bg-emerald-100 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
+                <QrCode className="w-3.5 h-3.5" /> Check-in
+              </Link>
+            )}
+            {(event.status === "published" || event.status === "filling") && (
             <button onClick={() => updateStatus("closed")}
               className="h-9 px-4 rounded-[10px] bg-amber-50 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
               <XCircle className="w-3.5 h-3.5" /> Close
