@@ -7,7 +7,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import {
   ArrowLeft, Search, Filter, SlidersHorizontal, Check, X as XIcon, XCircle, ChevronDown, ChevronUp,
-  Phone, Mail, MapPin, Briefcase, Clock, Star, BadgeCheck, Copy, User,
+  Phone, Mail, MapPin, Briefcase, Clock, Star, BadgeCheck, Copy, User, Download,
 } from "lucide-react";
 import { toast } from "sonner";
 import { PageLoader } from "@/lib/design/Loading";
@@ -78,6 +78,51 @@ export default function ApplicantManagementPage() {
     toast.success("Applicant restored to pending");
     setApplying(null);
     loadData();
+  };
+
+  const escapeCSV = (val: string | number | null | undefined) => {
+    const s = String(val ?? "");
+    return s.includes(",") || s.includes('"') || s.includes("\n") ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+
+  const downloadCSV = () => {
+    if (!event) return;
+    const approvedList = applicants.filter(a => a.status === "approved");
+    if (approvedList.length === 0) { toast.error("No approved workers to export"); return; }
+
+    const header = [
+      `Event: ${event.title}`,
+      `Date: ${formatDate(event.date, event.date_display)}`,
+      `Time: ${event.time}${event.end_time ? ` - ${event.end_time}` : ""}`,
+      `Location: ${event.location || "—"}`,
+      `Workers Required: ${event.worker_count}`,
+      "",
+      "Name,Phone,Age,City,Area,Skills,Experience,Availability",
+    ].join("\n");
+
+    const rows = approvedList.map(a => {
+      const p = a.profile;
+      return [
+        escapeCSV(p.full_name),
+        escapeCSV(p.phone),
+        escapeCSV(p.age),
+        escapeCSV(p.city),
+        escapeCSV(p.area),
+        escapeCSV(p.skills?.join("; ")),
+        escapeCSV(p.experience),
+        escapeCSV(p.availability?.replace(/_/g, " ")),
+      ].join(",");
+    }).join("\n");
+
+    const csv = "\uFEFF" + header + "\n" + rows;
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const el = document.createElement("a");
+    el.href = url;
+    el.download = `${event.title.replace(/[^a-zA-Z0-9]/g, "_")}_workers.csv`;
+    el.click();
+    URL.revokeObjectURL(url);
+    toast.success("CSV downloaded");
   };
 
   const filtered = useMemo(() => {
@@ -164,6 +209,10 @@ export default function ApplicantManagementPage() {
                 showFilters ? "bg-[#0D9488] text-white shadow-[0_2px_8px_rgba(13,148,136,0.2)]" : "bg-white text-gray-600 border border-[rgba(0,0,0,0.08)] hover:border-[rgba(0,0,0,0.14)]"
               }`} aria-label="Toggle filters" aria-expanded={showFilters}>
               <Filter className="w-4 h-4" /> Filters
+            </button>
+            <button onClick={downloadCSV}
+              className="h-11 px-4 rounded-[12px] text-sm font-semibold transition-all active:scale-[0.97] bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 flex items-center gap-1.5" aria-label="Download CSV">
+              <Download className="w-4 h-4" /> CSV
             </button>
           </div>
 
