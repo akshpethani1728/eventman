@@ -536,7 +536,7 @@ function OtpInput({ value, onChange, onComplete }: {
           onChange={(e) => handleChange(i, e.target.value)}
           onKeyDown={(e) => handleKeyDown(i, e)}
           onPaste={i === 0 ? handlePaste : undefined}
-          className={`h-12 w-10 rounded-[18px] border-2 text-center text-lg font-bold tracking-wider outline-none transition-all sm:h-14 sm:w-12 sm:text-xl ${
+          className={`h-12 w-[38px] sm:w-12 rounded-[18px] border-2 text-center text-lg font-bold tracking-wider outline-none transition-all sm:h-14 sm:text-xl ${
             d ? "border-teal-700 bg-teal-50 text-teal-700" : "border-gray-200 bg-gray-50 text-gray-900"
           } focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20`}
         />
@@ -1099,7 +1099,7 @@ function HeroSection({ onCta }: { onCta: () => void }) {
 
         {/* Trust bump */}
         <FadeSection className="mt-12">
-          <div className="flex items-center justify-center gap-8 text-teal-100/70">
+          <div className="flex items-center justify-center gap-4 sm:gap-8 text-teal-100/70">
             <div className="flex items-center gap-2 text-xs">
               <Shield className="h-3.5 w-3.5" />
               Verified

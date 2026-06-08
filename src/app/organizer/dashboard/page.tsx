@@ -22,14 +22,14 @@ function SkeletonDashboard() {
   return (
     <div className="min-h-screen bg-[#F8F8F6]">
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-20">
-        <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
+        <div className="max-w-lg mx-auto px-4 h-12 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-[10px] bg-gray-100 animate-pulse" />
-            <div className="space-y-1.5"><div className="w-28 h-3 bg-gray-100 rounded-full animate-pulse" /><div className="w-20 h-2 bg-gray-50 rounded-full animate-pulse" /></div>
+            <div className="w-7 h-7 rounded-[10px] bg-gray-100 animate-pulse" />
+            <div className="w-20 h-3 bg-gray-100 rounded-full animate-pulse" />
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-gray-100 animate-pulse" />
-            <div className="w-8 h-8 rounded-[10px] bg-gray-100 animate-pulse" />
+          <div className="flex items-center gap-1">
+            <div className="w-7 h-7 rounded-[10px] bg-gray-100 animate-pulse" />
+            <div className="w-7 h-7 rounded-[10px] bg-gray-100 animate-pulse" />
           </div>
         </div>
       </header>
@@ -466,7 +466,7 @@ export default function OrganizerDashboard() {
                     </div>
                   </div>
 
-                  <div className="px-4 flex items-center gap-3 text-[13px]">
+                  <div className="px-4 flex items-center gap-3 text-[13px] flex-wrap">
                     {event.payment_info && (
                       <div className="flex items-center gap-1 text-emerald-700 font-bold">
                         <IndianRupee className="w-4 h-4" />
@@ -518,17 +518,17 @@ export default function OrganizerDashboard() {
                     </div>
                   </div>
 
-                  <div className="px-4 py-3 mt-3 border-t border-[rgba(0,0,0,0.06)] flex gap-2">
+                  <div className="px-4 py-3 mt-3 border-t border-[rgba(0,0,0,0.06)] flex gap-2 flex-wrap">
                     <button onClick={() => { setEditingEvent(event); }}
-                      className="flex-1 h-9 rounded-[10px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center justify-center gap-1.5">
+                      className="flex-1 min-w-[90px] h-9 rounded-[10px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center justify-center gap-1.5">
                       <Edit3 className="w-3.5 h-3.5" /> Edit
                     </button>
                     <button onClick={() => { setSelectedEvent(event); }}
-                      className="flex-1 h-9 rounded-[10px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center justify-center gap-1.5">
+                      className="flex-1 min-w-[90px] h-9 rounded-[10px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center justify-center gap-1.5">
                       <Users className="w-3.5 h-3.5" /> Applicants
                     </button>
                     <Link href={`/organizer/events/${event.id}`}
-                      className="flex-1 h-9 rounded-[10px] bg-[#0D9488] text-white text-xs font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] flex items-center justify-center gap-1.5 shadow-[0_2px_8px_rgba(13,148,136,0.2)]">
+                      className="flex-1 min-w-[90px] h-9 rounded-[10px] bg-[#0D9488] text-white text-xs font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] flex items-center justify-center gap-1.5 shadow-[0_2px_8px_rgba(13,148,136,0.2)]">
                       Manage <ChevronRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>

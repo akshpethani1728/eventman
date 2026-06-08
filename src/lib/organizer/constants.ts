@@ -4,10 +4,9 @@ export function computeCompletion(p: Profile): number;
 export function computeCompletion(p: Profile, detailed: true): { percent: number; missing: string[] };
 export function computeCompletion(p: Profile, detailed?: true): number | { percent: number; missing: string[] } {
   const checks: [keyof Profile, string, number][] = [
-    ["avatar_url", "Photo", 15], ["phone", "Phone", 15],
-    ["age", "Age", 10], ["gender", "Gender", 10],
+    ["phone", "Phone", 20], ["age", "Age", 10], ["gender", "Gender", 10],
     ["city", "City", 10], ["area", "Area", 10],
-    ["skills", "Skills", 15], ["experience", "Experience", 10], ["bio", "Bio", 10],
+    ["skills", "Skills", 20], ["experience", "Experience", 10], ["bio", "Bio", 10],
   ];
   let percent = 0;
   const missing: string[] = [];

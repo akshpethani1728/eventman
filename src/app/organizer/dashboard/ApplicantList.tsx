@@ -86,6 +86,7 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
 
   const pendingCount = applicants.filter(a => a.status === "pending").length;
   const approvedCount = applicants.filter(a => a.status === "approved").length;
+  const isPast = ["completed", "cancelled"].includes(event.status) || (event.date && event.date < new Date().toISOString().split("T")[0]);
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-6 p-3 overflow-y-auto modal-overlay" ref={modalRef} role="dialog" aria-modal="true" aria-label="Applicants for event">
@@ -272,7 +273,7 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
                       {app.profile.area && (
                         <span className="flex items-center gap-1.5"><MapPin className="w-3 h-3 text-gray-400" />{app.profile.area}</span>
                       )}
-                      {app.status === "approved" && (app.profile.phone || app.profile.email) ? (
+                      {app.status === "approved" && !isPast && (app.profile.phone || app.profile.email) ? (
                         <>
                           {app.profile.phone && (
                             <span className="flex items-center gap-1.5 text-emerald-700 col-span-2">
@@ -288,7 +289,7 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
                           )}
                         </>
                       ) : (app.profile.phone || app.profile.email) && (
-                        <span className="flex items-center gap-1.5 text-gray-400 italic col-span-2"><Phone className="w-3 h-3" />Contact hidden until approval</span>
+                        <span className="flex items-center gap-1.5 text-gray-400 italic col-span-2"><Phone className="w-3 h-3" />Contact hidden{isPast ? " after event completion" : " until approval"}</span>
                       )}
                     </div>
                     <span className={`inline-block text-[10px] px-2 py-0.5 rounded-full font-medium ${

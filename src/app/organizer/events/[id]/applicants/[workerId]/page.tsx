@@ -140,7 +140,8 @@ export default function WorkerProfilePage() {
   const p = applicant.profile;
   const avail = p.availability ? AVAIL_CONFIG[p.availability] : null;
   const completion = computeCompletion(p, true);
-  const canViewContact = applicant.status === "approved";
+  const isPast = ["completed", "cancelled"].includes(event.status) || (event.date && event.date < new Date().toISOString().split("T")[0]);
+  const canViewContact = applicant.status === "approved" && !isPast;
 
   return (
     <div className="min-h-screen bg-[#F8F8F6] pb-8">
@@ -281,7 +282,7 @@ export default function WorkerProfilePage() {
             <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Contact</p>
             <p className="text-xs text-gray-400 flex items-center gap-1.5">
               <AlertCircle className="w-3.5 h-3.5" />
-              Contact details visible after approving this worker
+              {isPast ? "Contact hidden — event has ended" : "Contact details visible after approving this worker"}
             </p>
           </div>
         )}

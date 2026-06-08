@@ -129,6 +129,7 @@ export default function OrganizerEventDetailPage() {
   const rejectedCount = applicants.filter(a => a.status === "rejected").length;
   const filteredApplicants = filter ? applicants.filter(a => a.status === filter) : applicants;
   const fillPercent = Math.min(100, Math.round((approvedCount / event.worker_count) * 100));
+  const isPast = ["completed", "cancelled"].includes(event.status) || (event.date && event.date < todayStr);
 
   return (
     <div className="min-h-screen bg-[#F8F8F6] pb-24">
@@ -188,9 +189,9 @@ export default function OrganizerEventDetailPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+          <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
           <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Operation Metrics</p>
-          <div className="grid grid-cols-5 gap-2">
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
             <div className="text-center">
               <p className="text-lg font-bold text-emerald-700">{approvedCount}</p>
               <p className="text-[9px] text-gray-400 font-medium mt-0.5">Approved</p>
@@ -361,14 +362,14 @@ export default function OrganizerEventDetailPage() {
                       <div className="grid grid-cols-2 gap-2">
                         {app.profile.experience && <span className="flex items-center gap-1.5 text-gray-600"><Briefcase className="w-3 h-3 text-gray-400" />{app.profile.experience}</span>}
                         {app.profile.area && <span className="flex items-center gap-1.5 text-gray-600"><MapPin className="w-3 h-3 text-gray-400" />{app.profile.area}</span>}
-                        {app.status === "approved" && app.profile.phone
+                        {app.status === "approved" && !isPast && app.profile.phone
                           ? <span className="flex items-center gap-1.5 text-emerald-700 col-span-2"><Phone className="w-3 h-3" />{app.profile.phone}
                               <button onClick={() => { navigator.clipboard.writeText(app.profile.phone!); toast.success("Phone copied"); }}
                                 className="p-0.5 rounded hover:bg-emerald-100 text-emerald-500 hover:text-emerald-700 transition-all active:scale-90" aria-label="Copy phone">
                                 <Copy className="w-3 h-3" />
                               </button>
                             </span>
-                          : app.status !== "approved" && app.profile.phone && <span className="text-gray-400 italic flex items-center gap-1.5 col-span-2"><Phone className="w-3 h-3" />Contact hidden until approval</span>
+                          : app.profile.phone && <span className="text-gray-400 italic flex items-center gap-1.5 col-span-2"><Phone className="w-3 h-3" />Contact hidden{isPast ? " after event completion" : " until approval"}</span>
                         }
                       </div>
                       <div className="flex items-center gap-2">

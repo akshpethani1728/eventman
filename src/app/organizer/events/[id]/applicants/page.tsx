@@ -7,7 +7,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import {
   ArrowLeft, Search, Filter, SlidersHorizontal, Check, X as XIcon, XCircle, ChevronDown, ChevronUp,
-  Phone, Mail, MapPin, Briefcase, Clock, Star, BadgeCheck, Copy, User, Download,
+  Phone, Mail, MapPin, Briefcase, Clock, Star, BadgeCheck, Copy, User, Download, AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { PageLoader } from "@/lib/design/Loading";
@@ -148,6 +148,7 @@ export default function ApplicantManagementPage() {
   const approvedCount = applicants.filter(a => a.status === "approved").length;
   const rejectedCount = applicants.filter(a => a.status === "rejected").length;
   const selectionRate = applicants.length > 0 ? Math.round((approvedCount / applicants.length) * 100) : 0;
+  const isPast = ["completed", "cancelled"].includes(event?.status ?? "") || (!!event?.date && event.date < new Date().toISOString().split("T")[0]);
 
   if (loading) return <PageLoader />;
   if (!event) return null;
@@ -166,27 +167,27 @@ export default function ApplicantManagementPage() {
               <p className="text-xs text-gray-500 mt-0.5">{formatDate(event.date, event.date_display)} · {event.time}{event.end_time ? `-${event.end_time}` : ""}</p>
             </div>
           </div>
-          <div className="flex items-center gap-4 flex-wrap">
+          <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
             <div className="flex items-center gap-1.5">
               <span className="text-2xl font-bold text-gray-900">{applicants.length}</span>
-              <span className="text-xs text-gray-500 font-medium">Total Applicants</span>
+              <span className="text-xs text-gray-500 font-medium">Applicants</span>
             </div>
-            <div className="h-6 w-px bg-[rgba(0,0,0,0.08)]" />
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-amber-500" />
-                <span className="text-xs text-gray-700 font-medium">{pendingCount} Pending</span>
+            <div className="hidden sm:block h-6 w-px bg-[rgba(0,0,0,0.08)]" />
+            <div className="flex items-center gap-1.5 sm:gap-3 flex-wrap">
+              <div className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                <span className="text-[11px] sm:text-xs text-gray-700 font-medium">{pendingCount} Pending</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                <span className="text-xs text-gray-700 font-medium">{approvedCount} Approved</span>
+              <div className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span className="text-[11px] sm:text-xs text-gray-700 font-medium">{approvedCount} Approved</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-gray-400" />
-                <span className="text-xs text-gray-700 font-medium">{rejectedCount} Rejected</span>
+              <div className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
+                <span className="text-[11px] sm:text-xs text-gray-700 font-medium">{rejectedCount} Rejected</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-semibold text-[#0D9488]">{selectionRate}% Selection Rate</span>
+              <div className="flex items-center gap-1">
+                <span className="text-[11px] sm:text-xs font-semibold text-[#0D9488]">{selectionRate}%</span>
               </div>
             </div>
           </div>
@@ -220,12 +221,12 @@ export default function ApplicantManagementPage() {
           <div className="flex gap-2">
             {(["all", "pending", "approved", "rejected"] as const).map(t => (
               <button key={t} onClick={() => setTab(t)}
-                className={`flex-1 h-10 rounded-[12px] text-sm font-semibold transition-all active:scale-[0.97] capitalize ${
+                className={`flex-1 h-10 rounded-[12px] text-xs sm:text-sm font-semibold transition-all active:scale-[0.97] capitalize ${
                   tab === t
                     ? "bg-[#0D9488] text-white shadow-[0_4px_12px_rgba(13,148,136,0.25)]"
                     : "bg-white text-gray-500 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:text-gray-800"
                 }`}>
-                {t} ({t === "all" ? applicants.length : t === "pending" ? pendingCount : t === "approved" ? approvedCount : rejectedCount})
+                {t === "all" ? "All" : t} ({t === "all" ? applicants.length : t === "pending" ? pendingCount : t === "approved" ? approvedCount : rejectedCount})
               </button>
             ))}
           </div>
@@ -371,8 +372,8 @@ export default function ApplicantManagementPage() {
 
                   {/* Row 6: Actions + Contact */}
                   <div className="pt-3 border-t border-[rgba(0,0,0,0.06)]">
-                    {/* Contact for approved */}
-                    {app.status === "approved" && (
+                    {/* Contact for approved (hidden for past events) */}
+                    {app.status === "approved" && !isPast && (
                       <div className="mb-3 bg-emerald-50/80 rounded-[12px] p-3 border border-emerald-100">
                         <div className="flex items-center gap-2 mb-2">
                           <span className="text-[10px] font-semibold text-emerald-700 uppercase tracking-wider">Contact</span>
@@ -396,25 +397,45 @@ export default function ApplicantManagementPage() {
                         </div>
                       </div>
                     )}
+                    {app.status === "approved" && isPast && (
+                      <div className="mb-3 bg-gray-50 rounded-[12px] p-3 border border-gray-100">
+                        <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Contact</p>
+                        <p className="text-xs text-gray-400 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" /> Contact hidden — event has ended
+                        </p>
+                      </div>
+                    )}
 
                     {/* Action buttons */}
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                       <Link href={`/organizer/events/${id}/applicants/${app.worker_id}`}
-                        className="flex-1 h-9 rounded-[10px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center justify-center gap-1.5">
+                        className="flex-1 min-w-[100px] h-9 rounded-[10px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center justify-center gap-1.5">
                         View Profile
                       </Link>
 
                       {app.status === "pending" && (
                         <>
                           <button onClick={() => handleApprove(app.id)} disabled={applying === app.id}
-                            className="flex-1 h-9 rounded-[10px] bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-600 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-[0_2px_8px_rgba(16,185,129,0.2)]">
+                            className="flex-1 min-w-[90px] h-9 rounded-[10px] bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-600 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-[0_2px_8px_rgba(16,185,129,0.2)]">
                             <Check className="w-3.5 h-3.5" /> Approve
                           </button>
                           <button onClick={() => handleReject(app.id)} disabled={applying === app.id}
-                            className="flex-1 h-9 rounded-[10px] bg-red-50 text-red-600 text-xs font-semibold hover:bg-red-100 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-1.5">
+                            className="flex-1 min-w-[90px] h-9 rounded-[10px] bg-red-50 text-red-600 text-xs font-semibold hover:bg-red-100 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-1.5">
                             <XIcon className="w-3.5 h-3.5" /> Reject
                           </button>
                         </>
+                      )}
+                      {app.status === "approved" && (
+                        <button onClick={() => setRemoveTarget(app.id)}
+                          className="h-9 px-4 rounded-[10px] bg-red-50 text-red-600 text-xs font-semibold hover:bg-red-100 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
+                          <XCircle className="w-3.5 h-3.5" /> Remove
+                        </button>
+                      )}
+                      {app.status === "rejected" && (
+                        <button onClick={() => handleRestore(app.id)} disabled={applying === app.id}
+                          className="h-9 px-4 rounded-[10px] bg-amber-50 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center gap-1.5 shrink-0">
+                          <ChevronUp className="w-3.5 h-3.5" /> Restore
+                        </button>
                       )}
 
                       {app.status === "approved" && (

@@ -156,7 +156,8 @@ export default function EventDetailPage() {
   if (loading) return <PageLoader />;
   if (!event) return null;
 
-  const showContact = application?.status === "approved";
+  const isEventPast = ["completed", "cancelled"].includes(event.status) || (event.date && event.date < new Date().toISOString().split("T")[0]);
+  const showContact = application?.status === "approved" && !isEventPast;
   const planCheck = workerProfile ? checkPlanStatus(workerProfile) : null;
   const canApply = planCheck?.canApply ?? true;
   const hoursUntilEvent = event ? (new Date(event.date).getTime() - timeNow) / 3600000 : 0;
@@ -582,7 +583,7 @@ export default function EventDetailPage() {
                   {!showContact && (
                     <div className="flex items-center gap-2 mt-3 px-3 py-2 rounded-[12px] bg-gray-50 border border-gray-100">
                       <Info className="w-3.5 h-3.5 text-[#A1A1AA]" />
-                      <p className="text-xs text-[#A1A1AA]">Contact revealed after approval</p>
+                      <p className="text-xs text-[#A1A1AA]">{isEventPast && application?.status === "approved" ? "Contact hidden — event has ended" : "Contact revealed after approval"}</p>
                     </div>
                   )}
                 </div>

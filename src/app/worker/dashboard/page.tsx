@@ -344,15 +344,15 @@ function DashboardContent() {
       <div className="min-h-screen bg-[#F8F8F6]">
         <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-20">
           <div className="h-0.5 bg-gradient-to-r from-[#0D9488]/20 via-[#0D9488] to-[#0D9488]/20" />
-          <div className="max-w-lg mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-gray-100 animate-pulse" />
+              <div className="w-9 h-9 rounded-full bg-gray-100 animate-pulse shrink-0" />
               <div className="space-y-1.5">
                 <div className="w-28 h-3 rounded-full bg-gray-100 animate-pulse" />
                 <div className="w-20 h-2.5 rounded-full bg-gray-50 animate-pulse" />
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 shrink-0">
               <div className="w-9 h-9 rounded-[10px] bg-gray-100 animate-pulse" />
             </div>
           </div>
