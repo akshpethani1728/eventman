@@ -12,9 +12,11 @@ export async function createServerSupabase() {
       getAll() {
         return cookieStore.getAll();
       },
-      setAll(cookiesToSet: any[]) {
-        cookiesToSet.forEach(({ name, value, options }) =>
-          cookieStore.set(name, value, options)
+      async setAll(cookiesToSet) {
+        await Promise.all(
+          cookiesToSet.map(async ({ name, value, options }) => {
+            await cookieStore.set(name, value, options);
+          })
         );
       },
     },
