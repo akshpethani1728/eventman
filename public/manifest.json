@@ -1,0 +1,22 @@
+{
+  "name": "EventMan - Event Manpower Management",
+  "short_name": "EventMan",
+  "description": "Local event manpower management platform for Ahmedabad",
+  "start_url": "/login",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F8F8F6",
+  "theme_color": "#0D9488",
+  "scope": "/",
+  "categories": ["business", "productivity", "events"],
+  "lang": "gu",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
