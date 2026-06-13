@@ -153,39 +153,52 @@ const previewCards = [
     id: "feed",
     label: "Worker Feed",
     icon: Search,
-    color: "from-teal-500 to-teal-600",
     content: (
-      <div className="space-y-2.5 p-4">
-        <div className="flex items-center gap-2 rounded-[18px] bg-gray-100 px-3 py-2 text-xs text-gray-400">
-          <Search className="h-3.5 w-3.5" />
-          Search events near you...
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between px-4 pt-4 pb-1">
+          <span className="text-[11px] font-bold text-gray-700">Available Near You</span>
+          <span className="text-[9px] font-medium text-teal-600">See all</span>
         </div>
-        {[
-          { title: "Wedding Photography", date: "May 30", pay: "â‚¹1,500 - 2,500", status: "filling" },
-          { title: "Corporate Gala", date: "Jun 2", pay: "â‚¹2,000 - 3,500", status: "new" },
-          { title: "Concert Setup", date: "Jun 5", pay: "â‚¹1,800 - 2,800", status: "filling" },
-        ].map((ev, i) => (
-          <div key={i} className="rounded-[18px] border border-gray-100 bg-white p-3 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs font-semibold text-gray-900">{ev.title}</p>
-                <div className="mt-1 flex items-center gap-2 text-[10px] text-gray-400">
-                  <Calendar className="h-3 w-3" />
-                  {ev.date}
-                  <MapPin className="ml-1 h-3 w-3" />
-                  Ahmedabad
+        <div className="relative mx-4 mb-2">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-gray-300" />
+          <input readOnly placeholder="Search events..." className="w-full h-8 rounded-[14px] border border-gray-200/60 bg-gray-50/50 pl-8 pr-3 text-[10px] text-gray-400 outline-none placeholder:text-gray-300" />
+        </div>
+        <div className="space-y-2 px-4 pb-4">
+          {[
+            { title: "Wedding Photography", org: "DreamCatcher Events", date: "Sat, May 30", pay: "₹1,500 - 2,500", spots: 8, urgent: false },
+            { title: "Corporate Gala Night", org: "Prime Occasions", date: "Tue, Jun 2", pay: "₹2,000 - 3,500", spots: 3, urgent: true },
+            { title: "Concert Setup & Support", org: "LiveNation India", date: "Fri, Jun 5", pay: "₹1,800 - 2,800", spots: 12, urgent: false },
+          ].map((ev, i) => (
+            <div key={i} className="rounded-[16px] bg-white border border-gray-100/80 overflow-hidden shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+              <div className="p-3">
+                <div className="flex items-start justify-between mb-1.5">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-[12px] font-bold text-gray-900 truncate">{ev.title}</p>
+                      {ev.urgent && <span className="shrink-0 px-1.5 py-0.5 rounded-full bg-red-50 text-[8px] font-bold text-red-600 border border-red-200/60">URGENT</span>}
+                    </div>
+                    <p className="text-[9px] text-gray-400 mt-0.5">{ev.org}</p>
+                  </div>
+                  <div className="shrink-0 ml-2">
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-[10px] bg-gradient-to-br from-teal-500 to-teal-700 text-white text-[9px] font-bold shadow-[0_2px_6px_rgba(13,148,136,0.25)]">
+                      {ev.pay}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 text-[9px] text-gray-400">
+                  <div className="flex items-center gap-1"><Calendar className="h-2.5 w-2.5" />{ev.date}</div>
+                  <div className="flex items-center gap-1"><Users className="h-2.5 w-2.5" />{ev.spots} spots</div>
                 </div>
               </div>
-              <span className={`rounded-full px-2 py-0.5 text-[9px] font-medium ${
-                ev.status === "new" ? "bg-green-100 text-green-700" : "bg-teal-50 text-teal-700"
-              }`}>{ev.status === "new" ? "NEW" : "Filling"}</span>
+              <div className="flex gap-1.5 px-3 pb-3">
+                <div className="flex-1 h-[3px] rounded-full bg-gray-100 overflow-hidden">
+                  <div className={`h-full rounded-full ${ev.urgent ? "bg-amber-500" : "bg-teal-500"}`} style={{ width: `${Math.min(100, (ev.spots > 5 ? 30 : 80))}%` }} />
+                </div>
+                <button className="px-3 py-1 rounded-[10px] bg-teal-700 text-white text-[8px] font-bold hover:bg-teal-800 transition-colors">Apply</button>
+              </div>
             </div>
-            <div className="mt-1.5 flex items-center justify-between">
-              <span className="text-[10px] font-semibold text-gray-700">{ev.pay}</span>
-              <button className="rounded-[18px] bg-teal-700 px-3 py-1 text-[9px] font-medium text-white">Apply</button>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     ),
   },
@@ -193,31 +206,50 @@ const previewCards = [
     id: "dashboard",
     label: "Organizer Dashboard",
     icon: LayoutDashboard,
-    color: "from-teal-500 to-teal-600",
     content: (
-      <div className="space-y-2.5 p-4">
+      <div className="space-y-3 px-4 pt-4 pb-4">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-semibold text-gray-900">Your Events (4)</p>
-          <span className="text-[9px] text-teal-600">View All</span>
+          <span className="text-[11px] font-bold text-gray-700">Management Hub</span>
+          <span className="text-[8px] font-medium text-teal-600">Last 30 days</span>
         </div>
-        {[
-          { title: "Wedding", filled: 12, total: 20, color: "bg-emerald-500" },
-          { title: "Conference", filled: 5, total: 15, color: "bg-amber-500" },
-          { title: "Concert", filled: 24, total: 30, color: "bg-teal-500" },
-        ].map((ev, i) => (
-          <div key={i} className="rounded-[18px] border border-gray-100 bg-white p-2.5 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
-            <div className="flex items-center justify-between">
-              <p className="text-[10px] font-medium text-gray-700">{ev.title}</p>
-              <span className="text-[9px] text-gray-400">{ev.filled}/{ev.total} filled</span>
+        <div className="grid grid-cols-3 gap-2">
+          {[
+            { label: "Active", value: "4", color: "text-teal-700", bg: "bg-teal-50" },
+            { label: "Filling", value: "7", color: "text-amber-700", bg: "bg-amber-50" },
+            { label: "Hired", value: "43", color: "text-emerald-700", bg: "bg-emerald-50" },
+          ].map((s, i) => (
+            <div key={i} className={`${s.bg} rounded-[14px] p-2.5 text-center`}>
+              <p className={`text-base font-black ${s.color}`}>{s.value}</p>
+              <p className="text-[8px] text-gray-500 font-medium mt-0.5">{s.label}</p>
             </div>
-            <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-gray-100">
-              <div className={`h-full rounded-full ${ev.color} transition-all`} style={{ width: `${(ev.filled / ev.total) * 100}%` }} />
-            </div>
+          ))}
+        </div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[9px] font-semibold text-gray-600">Event Fill Progress</span>
           </div>
-        ))}
-        <div className="flex items-center justify-between rounded-[18px] bg-teal-50 p-2">
-          <span className="text-[9px] font-medium text-teal-700">12 pending approvals</span>
-          <ChevronRight className="h-3 w-3 text-slate-500" />
+          {[
+            { title: "Wedding at The Grand", filled: 18, total: 20, color: "bg-emerald-500" },
+            { title: "Tech Conference 2026", filled: 9, total: 15, color: "bg-amber-500" },
+            { title: "Music Festival Prep", filled: 28, total: 30, color: "bg-teal-500" },
+          ].map((ev, i) => (
+            <div key={i} className="rounded-[14px] bg-white border border-gray-100/80 p-2.5 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+              <div className="flex items-center justify-between mb-1.5">
+                <p className="text-[9px] font-semibold text-gray-700 truncate mr-2">{ev.title}</p>
+                <span className="text-[8px] font-bold text-gray-400 shrink-0">{ev.filled}/{ev.total}</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                <div className={`h-full rounded-full ${ev.color} transition-all`} style={{ width: `${(ev.filled / ev.total) * 100}%` }} />
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center justify-between rounded-[14px] bg-gradient-to-r from-teal-600 to-teal-700 p-2.5 shadow-[0_2px_8px_rgba(13,148,136,0.2)]">
+          <div className="flex items-center gap-2">
+            <Bell className="h-3 w-3 text-white/80" />
+            <span className="text-[9px] font-semibold text-white">12 pending approvals</span>
+          </div>
+          <ChevronRight className="h-3 w-3 text-white/60" />
         </div>
       </div>
     ),
@@ -226,26 +258,41 @@ const previewCards = [
     id: "profile",
     label: "Worker Profile",
     icon: UserCheck,
-    color: "from-emerald-500 to-emerald-600",
     content: (
-      <div className="space-y-2.5 p-4">
+      <div className="px-4 pt-4 pb-4">
+        <div className="bg-gradient-to-br from-teal-600 to-teal-700 rounded-[16px] p-4 shadow-[0_4px_16px_rgba(13,148,136,0.2)]">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-700 text-sm font-bold text-white">RS</div>
-            <div>
-              <p className="text-sm font-semibold text-gray-900">Rahul Sharma</p>
-              <div className="flex items-center gap-1 text-[10px] text-gray-500">
-                <CheckCircle className="h-3 w-3 text-emerald-500" /> 12 Events
+            <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white font-bold text-lg ring-2 ring-white/30">RS</div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-white">Rahul Sharma</p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <div className="flex items-center gap-1 text-[9px] text-white/70"><MapPin className="h-2.5 w-2.5" />Ahmedabad</div>
+                <span className="w-1 h-1 rounded-full bg-white/30" />
+                <div className="flex items-center gap-1 text-[9px] text-white/70"><Star className="h-2.5 w-2.5 text-amber-300" />4.8</div>
               </div>
             </div>
           </div>
-        <div className="flex flex-wrap gap-1.5">
-          {["Photography", "Videography", "Editing"].map((s, i) => (
-            <span key={i} className="rounded-full bg-teal-50 px-2 py-0.5 text-[9px] font-medium text-teal-700">{s}</span>
-          ))}
         </div>
-        <div className="flex items-center gap-3 text-[10px] text-gray-500">
-          <div className="flex items-center gap-1"><MapPin className="h-3 w-3" /> Ahmedabad</div>
-          <div className="flex items-center gap-1"><CheckCircle className="h-3 w-3 text-emerald-500" /> 12 Events</div>
+        <div className="flex items-center justify-around mt-3 py-2 bg-gray-50/80 rounded-[14px]">
+          {[
+            { label: "Events", value: "24", icon: Calendar },
+            { label: "Rating", value: "4.8", icon: Star },
+            { label: "Hired", value: "92%", icon: TrendingUp },
+          ].map((s, i) => {
+            const Icon = s.icon;
+            return (
+              <div key={i} className="text-center">
+                <Icon className="h-3 w-3 text-teal-600 mx-auto mb-0.5" />
+                <p className="text-xs font-black text-gray-900">{s.value}</p>
+                <p className="text-[7px] text-gray-400 font-medium uppercase tracking-wider">{s.label}</p>
+              </div>
+            );
+          })}
+        </div>
+        <div className="flex flex-wrap gap-1.5 mt-3">
+          {["Photography", "Videography", "Editing", "Lighting"].map((s, i) => (
+            <span key={i} className="rounded-full bg-teal-50 border border-teal-200/50 px-2.5 py-1 text-[8px] font-semibold text-teal-700">{s}</span>
+          ))}
         </div>
       </div>
     ),
@@ -254,22 +301,29 @@ const previewCards = [
     id: "notifications",
     label: "Live Updates",
     icon: Bell,
-    color: "from-amber-500 to-orange-500",
     content: (
-      <div className="space-y-2.5 p-4">
+      <div className="space-y-1 px-4 pt-4 pb-4">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-[11px] font-bold text-gray-700">Recent Activity</span>
+          <span className="flex items-center gap-1 text-[8px] font-medium text-teal-600"><span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />Live</span>
+        </div>
         {[
-          { text: "You're approved for Wedding Photography", time: "2 min ago", color: "text-emerald-600", icon: CheckCircle },
-          { text: "New: Corporate Gala accepting applications", time: "15 min ago", color: "text-teal-700", icon: Sparkles },
-          { text: "Concert Setup needs more workers", time: "1 hour ago", color: "text-amber-600", icon: Users },
+          { icon: CheckCircle, text: "Approved for Wedding Photography at The Grand", time: "2 min ago", color: "text-emerald-600", bg: "bg-emerald-50" },
+          { icon: Sparkles, text: "New match: Corporate Gala Night in your area", time: "15 min ago", color: "text-teal-600", bg: "bg-teal-50" },
+          { icon: Users, text: "Concert Setup needs 5 more workers urgently", time: "1 hour ago", color: "text-amber-600", bg: "bg-amber-50" },
+          { icon: Bell, text: "Organizer sent you a message about Saturday", time: "2 hours ago", color: "text-violet-600", bg: "bg-violet-50" },
         ].map((n, i) => {
           const Icon = n.icon;
           return (
-            <div key={i} className="flex items-start gap-2.5 rounded-[18px] border border-gray-100 bg-white p-2.5 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
-              <div className={`mt-0.5 ${n.color}`}><Icon className="h-3.5 w-3.5" /></div>
-              <div className="flex-1">
-                <p className="text-[10px] text-gray-700">{n.text}</p>
-                <p className="mt-0.5 text-[9px] text-gray-400">{n.time}</p>
+            <div key={i} className="flex items-start gap-2.5 rounded-[14px] bg-white border border-gray-100/80 p-2.5 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+              <div className={`mt-0.5 w-7 h-7 rounded-[10px] ${n.bg} flex items-center justify-center shrink-0`}>
+                <Icon className={`h-3 w-3 ${n.color}`} />
               </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[9px] font-medium text-gray-700 leading-relaxed">{n.text}</p>
+                <p className="mt-0.5 text-[8px] text-gray-400">{n.time}</p>
+              </div>
+              {i === 0 && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 mt-1" />}
             </div>
           );
         })}
@@ -308,27 +362,24 @@ function EcosystemPreview() {
         <FadeSection className="mt-12">
           <div
             ref={scrollRef}
-            className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-6 md:overflow-visible md:pb-0"
+            className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 scroll-smooth scrollbar-none md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-6 md:overflow-visible md:pb-0"
           >
-            {previewCards.map((card) => {
-              const Icon = card.icon;
-              return (
-                <TiltCard key={card.id} className="w-[85vw] shrink-0 snap-center md:w-auto">
-                  <div className={`bg-gradient-to-r ${card.color} px-4 py-3`}>
-                    <div className="flex items-center gap-2">
-                      <Icon className="h-4 w-4 text-white" />
-                      <span className="text-xs font-semibold text-white">{card.label}</span>
-                    </div>
-                  </div>
-                  <div className="bg-gray-50/50 pb-1">{card.content}</div>
-                </TiltCard>
-              );
-            })}
+            {previewCards.map((card) => (
+              <TiltCard key={card.id} className="w-[78vw] shrink-0 snap-center md:w-auto">
+                {card.content}
+              </TiltCard>
+            ))}
           </div>
         </FadeSection>
 
         {/* Mobile hint */}
-        <p className="mt-6 text-center text-[10px] text-gray-400 md:hidden">Swipe to explore all cards</p>
+        <div className="mt-5 flex items-center justify-center gap-1.5 md:hidden">
+          <span className="w-5 h-0.5 rounded-full bg-teal-700" />
+          <span className="w-1.5 h-1.5 rounded-full bg-teal-300" />
+          <span className="w-1.5 h-1.5 rounded-full bg-teal-300" />
+          <span className="w-1.5 h-1.5 rounded-full bg-teal-300" />
+        </div>
+        <p className="mt-2 text-center text-[10px] text-gray-400 md:hidden">Swipe through previews</p>
       </div>
     </section>
   );
