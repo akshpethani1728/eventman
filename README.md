@@ -169,15 +169,14 @@ eventman/
 Create a `.env.local` file in the project root:
 
 ```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=https://tydebbbpsehrfjcvzdoy.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+# Supabase (replace with your own project values from https://supabase.com/dashboard)
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
 
-# Razorpay
-RAZORPAY_KEY_ID=rzp_live_...
-RAZORPAY_KEY_SECRET=...
-RAZORPAY_WEBHOOK_SECRET=...
+# Razorpay (replace with your own keys from https://dashboard.razorpay.com)
+RAZORPAY_KEY_ID=rzp_live_xxxxxxxxxxxxxx
+RAZORPAY_KEY_SECRET=your-key-secret
+RAZORPAY_WEBHOOK_SECRET=your-webhook-secret
 ```
 
 ## Getting Started
