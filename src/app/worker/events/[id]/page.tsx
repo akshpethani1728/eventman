@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { getApprovedCount } from "@/lib/supabase/actions";
 import {
   ArrowLeft, ArrowUpRight, MapPin, Calendar, Clock, Users, IndianRupee, Shirt,
   AlertCircle, User, Briefcase, Award, ShieldCheck, CheckCircle, Hourglass,
@@ -53,8 +54,8 @@ export default function EventDetailPage() {
       if (!evt) { router.push("/worker/dashboard"); return; }
       setEvent(evt);
 
-      const { count } = await supabase.from("applications").select("id", { count: "exact", head: true }).eq("event_id", id).eq("status", "approved");
-      setApprovedCount(count || 0);
+      const count = await getApprovedCount(id);
+      setApprovedCount(count);
 
       const { data: org } = await supabase.from("profiles").select("*").eq("user_id", evt.organizer_id).maybeSingle();
       if (org) {
