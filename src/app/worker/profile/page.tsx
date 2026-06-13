@@ -306,107 +306,164 @@ export default function WorkerProfilePage() {
 
             {/* === EDIT FORM === */}
             {editing && (
-              <form onSubmit={(e) => { e.preventDefault(); saveProfile(); }}>
-                <div className="bg-white rounded-[20px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] space-y-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-[11px] font-bold text-[#6B6B6B] uppercase tracking-[0.04em]">Edit Profile</h3>
+              <form onSubmit={(e) => { e.preventDefault(); saveProfile(); }}
+                className="space-y-3">
+                {/* Section: Basic Info */}
+                <div className="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden">
+                  <div className="px-5 pt-5 pb-3 flex items-center justify-between border-b border-[rgba(0,0,0,0.04)]">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-[10px] bg-teal-50 flex items-center justify-center">
+                        <User className="w-4 h-4 text-[#0D9488]" />
+                      </div>
+                      <span className="text-sm font-bold text-[#1A1A1A]">Basic Info</span>
+                    </div>
                     <button type="button" onClick={() => setEditing(false)}
-                      className="text-[#A1A1AA] hover:text-[#6B6B6B] transition-colors active:scale-90">
+                      className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-[#A1A1AA] hover:text-[#6B6B6B] transition-all active:scale-90">
                       <X className="w-4 h-4" />
                     </button>
                   </div>
-                  <div>
-                    <label className="block text-xs font-medium text-[#6B6B6B] mb-1">Full Name</label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A1A1AA]" />
-                      <input value={form.full_name} onChange={e => update("full_name", e.target.value)}
-                        className="w-full h-10 pl-9 pr-3 input-base focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488]/20" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-[#6B6B6B] mb-1">Phone</label>
-                    <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A1A1AA]" />
-                      <input value={form.phone} onChange={e => update("phone", e.target.value)} placeholder="9876543210"
-                        className="w-full h-10 pl-9 pr-3 input-base focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488]/20" />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="px-5 py-4 space-y-4">
                     <div>
-                      <label className="block text-xs font-medium text-[#6B6B6B] mb-1">Age</label>
-                      <input type="number" value={form.age} onChange={e => update("age", e.target.value)}
-                        className="w-full h-10 px-3 input-base focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488]/20" />
+                      <label className="block text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-[0.04em] mb-1.5">Full Name</label>
+                      <div className="relative group">
+                        <div className="absolute left-0 top-0 bottom-0 w-10 flex items-center justify-center pointer-events-none">
+                          <User className="w-4 h-4 text-[#A1A1AA] group-focus-within:text-[#0D9488] transition-colors" />
+                        </div>
+                        <input value={form.full_name} onChange={e => update("full_name", e.target.value)}
+                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[12px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
+                      </div>
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-[#6B6B6B] mb-1">Gender</label>
-                      <select value={form.gender} onChange={e => update("gender", e.target.value)}
-                        className="w-full h-10 px-3 input-base focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488]/20">
-                        <option value="">Select</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                      </select>
+                      <label className="block text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-[0.04em] mb-1.5">Phone</label>
+                      <div className="relative group">
+                        <div className="absolute left-0 top-0 bottom-0 w-10 flex items-center justify-center pointer-events-none">
+                          <Phone className="w-4 h-4 text-[#A1A1AA] group-focus-within:text-[#0D9488] transition-colors" />
+                        </div>
+                        <input value={form.phone} onChange={e => update("phone", e.target.value)} placeholder="9876543210"
+                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[12px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-[#6B6B6B] mb-1">City</label>
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A1A1AA]" />
-                      <input value={form.city} onChange={e => update("city", e.target.value)} placeholder="Ahmedabad"
-                        className="w-full h-10 pl-9 pr-3 input-base focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488]/20" />
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-[0.04em] mb-1.5">Age</label>
+                        <input type="number" value={form.age} onChange={e => update("age", e.target.value)} placeholder="25"
+                          className="w-full h-11 px-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[12px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-[0.04em] mb-1.5">Gender</label>
+                        <div className="flex gap-2 h-11">
+                          {["male", "female"].map(g => (
+                            <button type="button" key={g}
+                              onClick={() => update("gender", form.gender === g ? "" : g)}
+                              className={`flex-1 rounded-[12px] text-sm font-semibold transition-all active:scale-[0.97] ${
+                                form.gender === g
+                                  ? "bg-[#0D9488] text-white shadow-[0_2px_8px_rgba(13,148,136,0.25)]"
+                                  : "bg-[#F8F8F6] text-[#6B6B6B] hover:bg-gray-200"
+                              }`}>
+                              {g.charAt(0).toUpperCase() + g.slice(1)}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-[#6B6B6B] mb-1">Area</label>
-                    <input value={form.area} onChange={e => update("area", e.target.value)} placeholder="e.g., Navrangpura"
-                      className="w-full h-10 px-3 input-base focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488]/20" />
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-[0.04em] mb-1.5">City</label>
+                      <div className="relative group">
+                        <div className="absolute left-0 top-0 bottom-0 w-10 flex items-center justify-center pointer-events-none">
+                          <MapPin className="w-4 h-4 text-[#A1A1AA] group-focus-within:text-[#0D9488] transition-colors" />
+                        </div>
+                        <input value={form.city} onChange={e => update("city", e.target.value)} placeholder="Ahmedabad"
+                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[12px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-[0.04em] mb-1.5">Area</label>
+                      <input value={form.area} onChange={e => update("area", e.target.value)} placeholder="e.g., Navrangpura"
+                        className="w-full h-11 px-4 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[12px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
+                    </div>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-[20px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] space-y-4 mt-4">
-                  <h3 className="text-[11px] font-bold text-[#6B6B6B] uppercase tracking-[0.04em]">Work Info</h3>
-                  <div>
-                    <label className="block text-xs font-medium text-[#6B6B6B] mb-1">Skills (comma separated)</label>
-                    <div className="relative">
-                      <Award className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A1A1AA]" />
-                      <input value={form.skills} onChange={e => update("skills", e.target.value)}
-                        placeholder="e.g., Promotion, Event setup, Crowd management"
-                        className="w-full h-10 pl-9 pr-3 input-base focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488]/20" />
+                {/* Section: Work Info */}
+                <div className="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden">
+                  <div className="px-5 pt-5 pb-3 border-b border-[rgba(0,0,0,0.04)]">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-[10px] bg-teal-50 flex items-center justify-center">
+                        <Briefcase className="w-4 h-4 text-[#0D9488]" />
+                      </div>
+                      <span className="text-sm font-bold text-[#1A1A1A]">Work Info</span>
                     </div>
                   </div>
-                  <div>
-                    <label className="block text-xs font-medium text-[#6B6B6B] mb-1">Experience</label>
-                    <div className="relative">
-                      <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A1A1AA]" />
-                      <input value={form.experience} onChange={e => update("experience", e.target.value)}
-                        placeholder="e.g., 2 years in event management"
-                        className="w-full h-10 pl-9 pr-3 input-base focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488]/20" />
+                  <div className="px-5 py-4 space-y-4">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-[0.04em] mb-1.5">Skills</label>
+                      <div className="relative group">
+                        <div className="absolute left-0 top-0 bottom-0 w-10 flex items-center justify-center pointer-events-none">
+                          <Award className="w-4 h-4 text-[#A1A1AA] group-focus-within:text-[#0D9488] transition-colors" />
+                        </div>
+                        <input value={form.skills} onChange={e => update("skills", e.target.value)}
+                          placeholder="e.g., Promotion, Event setup, Crowd management"
+                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[12px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
+                      </div>
+                      {form.skills && (
+                        <div className="flex flex-wrap gap-1.5 mt-2.5">
+                          {form.skills.split(",").map(s => s.trim()).filter(Boolean).map((s, i) => (
+                            <span key={i}
+                              className="text-[11px] font-medium bg-teal-50 text-[#0D9488] px-2.5 py-1 rounded-full border border-teal-200/50">
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-[#6B6B6B] mb-1">Availability</label>
-                    <div className="relative">
-                      <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#A1A1AA]" />
-                      <select value={form.availability} onChange={e => update("availability", e.target.value)}
-                        className="w-full h-10 pl-9 pr-3 input-base appearance-none focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488]/20">
-                        {AVAILABILITY_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                      </select>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-[0.04em] mb-1.5">Experience</label>
+                      <div className="relative group">
+                        <div className="absolute left-0 top-0 bottom-0 w-10 flex items-center justify-center pointer-events-none">
+                          <Briefcase className="w-4 h-4 text-[#A1A1AA] group-focus-within:text-[#0D9488] transition-colors" />
+                        </div>
+                        <input value={form.experience} onChange={e => update("experience", e.target.value)}
+                          placeholder="e.g., 2 years in event management"
+                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[12px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-[#6B6B6B] mb-1">About / Bio</label>
-                    <textarea value={form.bio} onChange={e => update("bio", e.target.value)}
-                      placeholder="Tell organizers about yourself..."
-                      className="w-full h-24 px-3 py-2 input-base resize-none focus:border-[#0D9488] focus:ring-1 focus:ring-[#0D9488]/20" />
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-[0.04em] mb-1.5">Availability</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {AVAILABILITY_OPTIONS.filter(o => o.value).map(o => (
+                          <button type="button" key={o.value}
+                            onClick={() => update("availability", form.availability === o.value ? "" : o.value)}
+                            className={`h-10 rounded-[12px] text-xs font-semibold transition-all active:scale-[0.97] ${
+                              form.availability === o.value
+                                ? "bg-[#0D9488] text-white shadow-[0_2px_8px_rgba(13,148,136,0.25)]"
+                                : "bg-[#F8F8F6] text-[#6B6B6B] hover:bg-gray-200"
+                            }`}>
+                            {o.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-[0.04em] mb-1.5">About / Bio</label>
+                      <textarea value={form.bio} onChange={e => update("bio", e.target.value)}
+                        placeholder="Tell organizers about yourself..."
+                        maxLength={500}
+                        className="w-full h-28 px-4 py-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[12px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all resize-none placeholder:text-[#A1A1AA]" />
+                      <div className="flex justify-end mt-1">
+                        <span className="text-[10px] text-[#A1A1AA]">{form.bio.length}/500</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="mt-4 flex gap-3">
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-1 pb-4">
                   <button type="button" onClick={() => setEditing(false)}
-                    className="flex-1 h-11 rounded-[12px] border border-gray-200 text-[#6B6B6B] text-sm font-semibold hover:bg-gray-50 transition-all active:scale-[0.97]">
+                    className="flex-1 h-12 rounded-[14px] border-2 border-gray-200 text-[#6B6B6B] text-sm font-semibold hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-[0.97]">
                     Cancel
                   </button>
                   <button type="submit" disabled={saving}
-                    className="flex-1 h-11 rounded-[12px] bg-[#0D9488] text-white text-sm font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
+                    className="flex-1 h-12 rounded-[14px] bg-[#0D9488] text-white text-sm font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
                     {saving ? (
                       <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Saving...</>
                     ) : (
