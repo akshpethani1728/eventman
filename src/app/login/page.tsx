@@ -10,7 +10,7 @@ import {
   Bell, Shield, Zap, CheckCircle,
   Sparkles, MapPin, UserCheck,
   ChevronRight, TrendingUp, Building2, LayoutDashboard,
-  RefreshCw, KeyRound,
+  RefreshCw, KeyRound, Star,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 
