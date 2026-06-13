@@ -192,7 +192,7 @@ function DashboardContent() {
       const browseCutoff = new Date(); browseCutoff.setDate(browseCutoff.getDate() - 1);
       const browseCutoffStr = browseCutoff.toISOString().split("T")[0];
       const { data: browseEvts } = await supabase
-        .from("events").select("*").in("status", ["published", "filling"]).gte("date", browseCutoffStr).order("date", { ascending: true });
+        .from("events").select("*").in("status", ["published", "filling"]).gte("date", browseCutoffStr).order("created_at", { ascending: false });
 
       let appliedEvts: any[] = [];
       if (appliedEventIds.length > 0) {
@@ -239,8 +239,6 @@ function DashboardContent() {
         organizer: orgMap[e.organizer_id],
         organizer_past_events: pastCountMap[e.organizer_id] || 0,
       }));
-
-      enriched.sort((a, b) => computePriorityScore(b) - computePriorityScore(a));
 
       setEvents(enriched);
     } catch (err) {
@@ -325,7 +323,7 @@ function DashboardContent() {
     if (isWaitlisted(app)) return false;
     if (app.status === "cancelled") return false;
     return true;
-  });
+  }).sort((a, b) => new Date(b.application!.created_at).getTime() - new Date(a.application!.created_at).getTime());
 
   const planCheck = profile ? checkPlanStatus(profile) : null;
   const canApply = planCheck?.canApply ?? true;
