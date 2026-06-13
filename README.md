@@ -262,6 +262,22 @@ The app uses a custom design system defined in `src/lib/design/tokens.ts`:
 - **Shadows**: 7 levels from subtle to floating
 - **Badges**: 20+ semantic color variants for status labels
 
+## Database Migrations
+
+When pulling new migrations from the repo, run them in your Supabase Dashboard (SQL Editor):
+
+```sql
+-- Paste the contents of supabase/migrations/<filename>.sql
+```
+
+Or if using Supabase CLI locally:
+```bash
+supabase migration up
+```
+
+Current migrations:
+- `00002_get_approved_count.sql` — creates a `get_approved_count()` function that counts approved applications across all workers (bypasses RLS).
+
 ## Notes
 
 - The app targets the Ahmedabad, Gujarat market with Gujarati-language locale (`lang="gu"`)

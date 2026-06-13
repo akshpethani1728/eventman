@@ -1,6 +1,5 @@
 "use server";
 
-import { createServerClient } from "@supabase/ssr";
 import { revalidatePath } from "next/cache";
 import { createServerSupabase } from "./server";
 
@@ -68,21 +67,6 @@ export async function getProfile(userId: string) {
     .eq("user_id", userId)
     .maybeSingle();
   return data;
-}
-
-export async function getApprovedCount(eventId: string) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-  if (!serviceKey) return 0;
-  const adminClient = createServerClient(supabaseUrl, serviceKey, {
-    cookies: { getAll() { return []; }, setAll() {} },
-  });
-  const { count } = await adminClient
-    .from("applications")
-    .select("id", { count: "exact", head: true })
-    .eq("event_id", eventId)
-    .eq("status", "approved");
-  return count || 0;
 }
 
 export async function signOut() {
