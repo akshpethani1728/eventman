@@ -154,50 +154,58 @@ const previewCards = [
     label: "Worker Feed",
     icon: Search,
     content: (
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between px-4 pt-4 pb-1">
-          <span className="text-[11px] font-bold text-gray-700">Available Near You</span>
-          <span className="text-[9px] font-medium text-teal-600">See all</span>
+      <div>
+        <div className="bg-gradient-to-r from-teal-600 to-teal-700 px-4 pt-4 pb-5">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold text-white/90">Available Near You</span>
+            <span className="text-[9px] font-semibold text-white/60">See all &rarr;</span>
+          </div>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-white/40" />
+            <input readOnly placeholder="Search events..." className="w-full h-9 rounded-[14px] bg-white/15 pl-9 pr-3 text-[10px] text-white placeholder:text-white/40 outline-none backdrop-blur-sm border border-white/10" />
+          </div>
         </div>
-        <div className="relative mx-4 mb-2">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-gray-300" />
-          <input readOnly placeholder="Search events..." className="w-full h-8 rounded-[14px] border border-gray-200/60 bg-gray-50/50 pl-8 pr-3 text-[10px] text-gray-400 outline-none placeholder:text-gray-300" />
-        </div>
-        <div className="space-y-2 px-4 pb-4">
+        <div className="px-4 -mt-3 space-y-2.5 pb-4">
           {[
-            { title: "Wedding Photography", org: "DreamCatcher Events", date: "Sat, May 30", pay: "₹1,500 - 2,500", spots: 8, urgent: false },
-            { title: "Corporate Gala Night", org: "Prime Occasions", date: "Tue, Jun 2", pay: "₹2,000 - 3,500", spots: 3, urgent: true },
-            { title: "Concert Setup & Support", org: "LiveNation India", date: "Fri, Jun 5", pay: "₹1,800 - 2,800", spots: 12, urgent: false },
-          ].map((ev, i) => (
-            <div key={i} className="rounded-[16px] bg-white border border-gray-100/80 overflow-hidden shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
-              <div className="p-3">
-                <div className="flex items-start justify-between mb-1.5">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <p className="text-[12px] font-bold text-gray-900 truncate">{ev.title}</p>
-                      {ev.urgent && <span className="shrink-0 px-1.5 py-0.5 rounded-full bg-red-50 text-[8px] font-bold text-red-600 border border-red-200/60">URGENT</span>}
+            { title: "Wedding Photography", org: "DreamCatcher Events", date: "Sat, May 30", pay: "₹1,500 - 2,500", spots: 8, type: "filling" as const },
+            { title: "Corporate Gala Night", org: "Prime Occasions", date: "Tue, Jun 2", pay: "₹2,000 - 3,500", spots: 3, type: "urgent" as const },
+            { title: "Concert Setup & Support", org: "LiveNation India", date: "Fri, Jun 5", pay: "₹1,800 - 2,800", spots: 12, type: "new" as const },
+          ].map((ev, i) => {
+            const typeStyles = {
+              urgent: { label: "Urgent", badge: "bg-red-500/10 text-red-600 border-red-200/50" },
+              filling: { label: "Filling", badge: "bg-teal-500/10 text-teal-600 border-teal-200/50" },
+              new: { label: "New", badge: "bg-emerald-500/10 text-emerald-600 border-emerald-200/50" },
+            };
+            const ts = typeStyles[ev.type];
+            return (
+              <div key={i} className="rounded-[16px] bg-white border border-gray-100/70 shadow-[0_2px_8px_rgba(0,0,0,0.04)] overflow-hidden">
+                <div className="p-3.5">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-[6px] border ${ts.badge}`}>{ts.label}</span>
+                        {ev.type === "urgent" && <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />}
+                      </div>
+                      <p className="text-[13px] font-bold text-gray-900 leading-snug mt-1">{ev.title}</p>
+                      <p className="text-[9px] text-gray-400 mt-0.5 flex items-center gap-1">
+                        <Building2 className="h-2.5 w-2.5" />{ev.org}
+                      </p>
                     </div>
-                    <p className="text-[9px] text-gray-400 mt-0.5">{ev.org}</p>
+                    <div className="shrink-0 text-right">
+                      <span className="inline-flex items-center px-2 py-1 rounded-[10px] bg-gradient-to-br from-teal-500 to-teal-700 text-white text-[10px] font-bold shadow-[0_2px_6px_rgba(13,148,136,0.25)]">{ev.pay}</span>
+                    </div>
                   </div>
-                  <div className="shrink-0 ml-2">
-                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-[10px] bg-gradient-to-br from-teal-500 to-teal-700 text-white text-[9px] font-bold shadow-[0_2px_6px_rgba(13,148,136,0.25)]">
-                      {ev.pay}
-                    </span>
+                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-50">
+                    <div className="flex items-center gap-3 text-[9px] text-gray-400">
+                      <div className="flex items-center gap-1"><Calendar className="h-2.5 w-2.5" />{ev.date}</div>
+                      <div className="flex items-center gap-1"><Users className="h-2.5 w-2.5" />{ev.spots} spots left</div>
+                    </div>
+                    <button className="px-4 py-1.5 rounded-[10px] bg-teal-700 text-white text-[9px] font-bold hover:bg-teal-800 transition-all active:scale-[0.97] shadow-[0_2px_6px_rgba(13,148,136,0.2)]">Apply Now</button>
                   </div>
-                </div>
-                <div className="flex items-center gap-3 text-[9px] text-gray-400">
-                  <div className="flex items-center gap-1"><Calendar className="h-2.5 w-2.5" />{ev.date}</div>
-                  <div className="flex items-center gap-1"><Users className="h-2.5 w-2.5" />{ev.spots} spots</div>
                 </div>
               </div>
-              <div className="flex gap-1.5 px-3 pb-3">
-                <div className="flex-1 h-[3px] rounded-full bg-gray-100 overflow-hidden">
-                  <div className={`h-full rounded-full ${ev.urgent ? "bg-amber-500" : "bg-teal-500"}`} style={{ width: `${Math.min(100, (ev.spots > 5 ? 30 : 80))}%` }} />
-                </div>
-                <button className="px-3 py-1 rounded-[10px] bg-teal-700 text-white text-[8px] font-bold hover:bg-teal-800 transition-colors">Apply</button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     ),
