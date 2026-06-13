@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ArrowLeft, Save, User, Phone, MapPin, BadgeCheck, ShieldCheck, ShieldAlert, Calendar, Users, Star, Target, LogOut, Edit3, X, CheckCircle, TrendingUp } from "lucide-react";
+import { ArrowLeft, Save, User, Phone, MapPin, BadgeCheck, ShieldCheck, ShieldAlert, Calendar, Users, Star, Target, LogOut, Edit3, X, CheckCircle, TrendingUp, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { PageLoader } from "@/lib/design/Loading";
 import type { Profile } from "@/lib/supabase/types";
@@ -67,6 +67,16 @@ export default function OrganizerProfilePage() {
 
   const signOut = async () => { await supabase.auth.signOut(); router.push("/login"); };
 
+  const shareApp = async () => {
+    const text = `Join EventMan - the best platform for event workers and organizers! Find events, hire workers, and manage everything in one place. 🚀\n\nDownload now: https://eventman2.vercel.app`;
+    if (navigator.share) {
+      try { await navigator.share({ title: "EventMan", text }); } catch {}
+    } else {
+      await navigator.clipboard.writeText(text);
+      toast.success("Link copied to clipboard!");
+    }
+  };
+
   if (loading) return <PageLoader />;
 
   return (
@@ -93,7 +103,11 @@ export default function OrganizerProfilePage() {
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
-        <div className="bg-gradient-to-br from-[#0D9488] via-[#0D9488] to-[#0F766E] rounded-[20px] p-6 text-center shadow-[0_8px_32px_rgba(13,148,136,0.2)]">
+        <div className="bg-gradient-to-br from-[#0D9488] via-[#0D9488] to-[#0F766E] rounded-[20px] p-6 text-center shadow-[0_8px_32px_rgba(13,148,136,0.2)] relative">
+          <button type="button" onClick={shareApp}
+            className="absolute top-4 right-4 w-9 h-9 rounded-[10px] bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/40 transition-all active:scale-90">
+            <Share2 className="w-4 h-4" />
+          </button>
           <div className="w-20 h-20 rounded-[16px] bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto ring-2 ring-white/30 shadow-[0_4px_12px_rgba(0,0,0,0.1)]" aria-hidden="true">
             <span className="text-3xl font-bold text-white">{profile?.full_name?.charAt(0)?.toUpperCase() || "O"}</span>
           </div>

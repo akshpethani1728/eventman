@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ArrowLeft, Save, User, Phone, MapPin, Award, Briefcase, AlertCircle, CheckCircle, Clock, Sparkles, BadgeCheck, Star, Target, Mail, Edit3, X, Pencil } from "lucide-react";
+import { ArrowLeft, Save, User, Phone, MapPin, Award, Briefcase, AlertCircle, CheckCircle, Clock, Sparkles, BadgeCheck, Star, Target, Mail, Edit3, X, Pencil, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/lib/design/Button";
 import { Badge } from "@/lib/design/Badge";
@@ -111,6 +111,16 @@ export default function WorkerProfilePage() {
 
   const update = useCallback((key: string, value: string) => setForm(p => ({ ...p, [key]: value })), []);
 
+  const shareApp = async () => {
+    const text = `Join EventMan - the best platform for event workers and organizers! Find events, hire workers, and manage everything in one place. 🚀\n\nDownload now: https://eventman2.vercel.app`;
+    if (navigator.share) {
+      try { await navigator.share({ title: "EventMan", text }); } catch {}
+    } else {
+      await navigator.clipboard.writeText(text);
+      toast.success("Link copied to clipboard!");
+    }
+  };
+
   if (loading) return <PageLoader />;
 
   return (
@@ -135,7 +145,11 @@ export default function WorkerProfilePage() {
         {profile && (
           <>
             {/* === PROFILE HEADER === */}
-            <div className="bg-white rounded-[20px] p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)] text-center">
+            <div className="bg-white rounded-[20px] p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)] text-center relative">
+              <button type="button" onClick={shareApp}
+                className="absolute top-4 right-4 w-9 h-9 rounded-[10px] bg-[#F8F8F6] flex items-center justify-center text-[#6B6B6B] hover:bg-[#0D9488] hover:text-white transition-all active:scale-90">
+                <Share2 className="w-4 h-4" />
+              </button>
               <div className="relative inline-block">
                 <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#0D9488] to-teal-700 flex items-center justify-center mx-auto ring-4 ring-[#0D9488]/20 shadow-[0_4px_12px_rgba(13,148,136,0.15)]">
                   <span className="text-2xl font-bold text-white">{profile?.full_name?.charAt(0)?.toUpperCase() || "W"}</span>
