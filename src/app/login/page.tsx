@@ -154,105 +154,94 @@ const previewCards = [
     label: "Worker Feed",
     icon: Search,
     content: (
-      <div className="space-y-4 p-4">
-        {[
-          {
+      <div className="p-4 space-y-3">
+        {/* Plan status chip */}
+        <div className="flex items-center justify-between">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold bg-teal-100 text-teal-700">
+            <Sparkles className="w-3 h-3" /> Trial · 10d left
+          </div>
+          <span className="text-[11px] font-medium text-[#0D9488] flex items-center gap-0.5">
+            Details <ChevronRight className="w-3 h-3" />
+          </span>
+        </div>
+
+        {/* Overview status card */}
+        <div className="bg-white rounded-[20px] p-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { icon: Search, value: "12", label: "Available", color: "bg-teal-50", iconColor: "text-[#0D9488]" },
+              { icon: ArrowUpRight, value: "3", label: "Applied", color: "bg-emerald-50", iconColor: "text-emerald-600" },
+              { icon: Sparkles, value: "Trial", label: "Plan", color: "bg-amber-50", iconColor: "text-amber-600" },
+            ].map((s, i) => {
+              const Icon = s.icon;
+              return (
+                <div key={i} className="text-center">
+                  <div className={`w-8 h-8 rounded-[10px] ${s.color} flex items-center justify-center mx-auto mb-1.5`}>
+                    <Icon className={`w-4 h-4 ${s.iconColor}`} />
+                  </div>
+                  <p className="text-[16px] font-bold text-[#1A1A1A] leading-none">{s.value}</p>
+                  <p className="text-[9px] text-[#6B6B6B] mt-0.5 font-medium">{s.label}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex gap-2">
+          <div className="flex-1 h-9 rounded-[12px] bg-[#0D9488] text-white text-sm font-semibold flex items-center justify-center shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
+            Browse (12)
+          </div>
+          <div className="flex-1 h-9 rounded-[12px] bg-white text-[#6B6B6B] text-sm font-semibold flex items-center justify-center shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+            Applied (3)
+          </div>
+        </div>
+
+        {/* Category filter chips */}
+        <div className="flex gap-2 overflow-x-auto scrollbar-none pb-1">
+          {["All", "Photography", "Setup", "Hospitality"].map((c, i) => (
+            <span key={i} className={`h-7 px-3.5 rounded-full text-[10px] font-semibold whitespace-nowrap flex items-center ${
+              i === 0 ? "bg-[#0D9488] text-white shadow-[0_2px_8px_rgba(13,148,136,0.2)]" : "bg-white text-[#6B6B6B] border border-gray-200/60"
+            }`}>{c}</span>
+          ))}
+        </div>
+
+        {/* Single Event Card */}
+        {(() => {
+          const ev = {
             org: "DreamCatcher Events", category: "Photography", trusted: true,
-            title: "Wedding Photography Coverage", date: "Sat, May 30", time: "8:00 AM", end_time: "6:00 PM",
-            location: "The Grand Palace, Ahmedabad", payment: "₹1,500", spots: 20, filled: 12,
-            hoursSinceCreated: 3, gender_req: "any", min_age: 18, max_age: 45,
-            food: true, skills: ["Photography", "Videography"], deadline: "May 28",
-            isNew: true, isPopular: false, isHighDemand: true, spotsNearlyFull: false, deadlineSoon: true,
-          },
-          {
-            org: "Prime Occasions", category: "event_setup", trusted: false,
-            title: "Corporate Gala Setup & Support", date: "Tue, Jun 2", time: "10:00 AM", end_time: "11:00 PM",
-            location: "Hotel Royal Orchid, Ahmedabad", payment: "₹2,000", spots: 15, filled: 5,
-            hoursSinceCreated: 14, gender_req: "male", min_age: 20, max_age: 50,
-            food: true, travel: true, skills: ["Heavy Lifting", "Setup"], deadline: "May 30",
-            isNew: false, isPopular: false, isHighDemand: false, spotsNearlyFull: false, deadlineSoon: false,
-          },
-          {
-            org: "Live Events Co.", category: "crowd_management", trusted: true,
-            title: "Music Festival Crowd Management", date: "Fri, Jun 5", time: "4:00 PM", end_time: "1:00 AM",
-            location: "Riverfront Ground, Ahmedabad", payment: "₹1,800", spots: 30, filled: 27,
-            hoursSinceCreated: 8, gender_req: "male", min_age: 21, max_age: 45,
-            food: true, travel: true, skills: ["Crowd Control", "Security"],
-            deadline: "Jun 3", isNew: false, isPopular: true, isHighDemand: true, spotsNearlyFull: true, deadlineSoon: false,
-          },
-        ].map((ev, idx) => {
+            title: "Wedding Photography Coverage",
+            date: "Sat, May 30", time: "8:00 AM", end_time: "6:00 PM",
+            location: "The Grand Palace, Ahmedabad", payment: "₹1,500",
+            spots: 20, filled: 12, hoursSinceCreated: 3,
+            gender_req: "any", min_age: 18, max_age: 45,
+            food: true, skills: ["Photography", "Videography"],
+            isNew: true, isHighDemand: true, spotsNearlyFull: false,
+          };
           const remaining = ev.spots - ev.filled;
           const fillPercent = Math.round((ev.filled / ev.spots) * 100);
-          const daysUntil = Math.ceil((new Date(ev.date).getTime() - Date.now()) / 86400000);
-          const isToday = daysUntil === 0;
-          const isUrgent = daysUntil <= 2 && daysUntil > 0;
-          const hoursSinceCreated = ev.hoursSinceCreated;
-          const isNewlyPosted = hoursSinceCreated < 6;
+          const isNewlyPosted = ev.hoursSinceCreated < 6;
           const isNearlyFull = remaining <= 3;
-          const isFull = remaining <= 0;
-          const categoryColors: Record<string, string> = {
-            Photography: "bg-teal-500/10 text-teal-600",
-            event_setup: "bg-violet-500/10 text-violet-600",
-            crowd_management: "bg-orange-500/10 text-orange-600",
-          };
-          const categoryLabels: Record<string, string> = {
-            Photography: "Photography", event_setup: "Setup", crowd_management: "Crowd Mgmt",
-          };
-          const isTrusted = ev.trusted;
           return (
-            <div key={idx}
-              className="block bg-white rounded-[16px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all duration-300 active:scale-[0.98]">
-
-              {/* Preview bar */}
+            <div className="block bg-white rounded-[16px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
               <div className="px-4 pt-3.5 pb-1 flex items-center justify-between">
                 <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                  <div className={`w-9 h-9 rounded-[12px] flex items-center justify-center text-white font-bold text-sm shrink-0 ${
-                    isTrusted
-                      ? "bg-gradient-to-br from-teal-600 to-teal-700"
-                      : "bg-gradient-to-br from-[#0D9488] to-teal-700"
-                  }`}>
-                    {ev.org.charAt(0)}
-                  </div>
+                  <div className="w-9 h-9 rounded-[12px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center text-white font-bold text-sm shrink-0">D</div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
                       <span className="text-sm font-semibold text-[#1A1A1A] truncate">{ev.org}</span>
-                      {isTrusted && <BadgeCheck className="w-3.5 h-3.5 text-[#0D9488] shrink-0" />}
+                      <BadgeCheck className="w-3.5 h-3.5 text-[#0D9488] shrink-0" />
                     </div>
-                    <span className={`text-[10px] font-semibold capitalize ${categoryColors[ev.category]?.split(" ")[1] || "text-[#6B6B6B]"}`}>
-                      {categoryLabels[ev.category] || ev.category}
-                    </span>
+                    <span className="text-[10px] font-semibold text-teal-600">Photography</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
                   <div className="flex items-center gap-0.5 text-emerald-700 font-bold text-sm">
-                    <IndianRupee className="w-3.5 h-3.5" />
-                    {ev.payment}
+                    <IndianRupee className="w-3.5 h-3.5" />{ev.payment}
                   </div>
                 </div>
               </div>
-
-              {/* Intelligence badges row */}
               <div className="px-4 py-1.5 flex flex-wrap gap-1.5">
-                {isToday && (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200/60 animate-pulse">
-                    <Flame className="w-3 h-3" /> Today
-                  </span>
-                )}
-                {daysUntil === 1 && !isToday && (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200/60">
-                    <Clock3 className="w-3 h-3" /> Tomorrow
-                  </span>
-                )}
-                {isUrgent && !isToday && daysUntil !== 1 && (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200/60">
-                    <Clock3 className="w-3 h-3" /> {daysUntil}d away
-                  </span>
-                )}
-                {isNearlyFull && (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200/60 animate-pulse">
-                    <Users className="w-3 h-3" /> {remaining} left
-                  </span>
-                )}
                 {isNewlyPosted && (
                   <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-teal-500 text-white border border-teal-600">
                     <Sparkles className="w-3 h-3" /> New
@@ -263,84 +252,46 @@ const previewCards = [
                     <Flame className="w-3 h-3" /> High Demand
                   </span>
                 )}
-                {ev.deadlineSoon && (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-red-50 text-red-700 border border-red-200/60 animate-pulse">
-                    <Clock className="w-3 h-3" /> Deadline Today
-                  </span>
-                )}
               </div>
-
-              {/* Title */}
               <div className="px-4">
                 <h3 className="text-[16px] font-bold leading-snug text-[#1A1A1A]">{ev.title}</h3>
               </div>
-
-              {/* Info row */}
               <div className="px-4 mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-[#6B6B6B]">
                 <div className="flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5 shrink-0 text-[#A1A1AA]" />
-                  <span>{ev.date}</span>
+                  <Calendar className="w-3.5 h-3.5 shrink-0 text-[#A1A1AA]" /><span>{ev.date}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 shrink-0 text-[#A1A1AA]" />
-                  <span>{ev.time}{ev.end_time ? `-${ev.end_time}` : ""}</span>
+                  <Clock className="w-3.5 h-3.5 shrink-0 text-[#A1A1AA]" /><span>{ev.time}-{ev.end_time}</span>
                 </div>
-                <div className="flex items-center gap-1.5 truncate max-w-[160px]">
-                  <MapPin className="w-3.5 h-3.5 shrink-0 text-[#A1A1AA]" />
-                  <span className="truncate">{ev.location}</span>
+                <div className="flex items-center gap-1.5 truncate max-w-[140px]">
+                  <MapPin className="w-3.5 h-3.5 shrink-0 text-[#A1A1AA]" /><span className="truncate">{ev.location}</span>
                 </div>
               </div>
-
-              {/* Requirements chips */}
               <div className="px-4 mt-3 flex flex-wrap gap-1.5">
-                {ev.gender_req && (
-                  <span className="text-[10px] font-medium bg-gray-50 text-[#6B6B6B] px-2.5 py-0.5 rounded-full capitalize">{ev.gender_req}</span>
-                )}
-                {(ev.min_age || ev.max_age) && (
-                  <span className="text-[10px] font-medium bg-gray-50 text-[#6B6B6B] px-2.5 py-0.5 rounded-full">{ev.min_age || 0}-{ev.max_age || 99} yrs</span>
-                )}
-                {ev.food && (
-                  <span className="text-[10px] font-medium bg-green-50 text-green-700 px-2.5 py-0.5 rounded-full">Food</span>
-                )}
-                {ev.travel && (
-                  <span className="text-[10px] font-medium bg-teal-50 text-teal-700 px-2.5 py-0.5 rounded-full">Travel</span>
-                )}
-                {ev.skills && ev.skills.length > 0 && (
-                  <span className="text-[10px] font-medium bg-violet-50 text-violet-700 px-2.5 py-0.5 rounded-full">
-                    {ev.skills.slice(0, 2).join(", ")}{ev.skills.length > 2 ? ` +${ev.skills.length - 2}` : ""}
-                  </span>
-                )}
+                <span className="text-[10px] font-medium bg-gray-50 text-[#6B6B6B] px-2.5 py-0.5 rounded-full capitalize">{ev.gender_req}</span>
+                <span className="text-[10px] font-medium bg-gray-50 text-[#6B6B6B] px-2.5 py-0.5 rounded-full">{ev.min_age}-{ev.max_age} yrs</span>
+                <span className="text-[10px] font-medium bg-green-50 text-green-700 px-2.5 py-0.5 rounded-full">Food</span>
+                {ev.skills.map((s, i) => (
+                  <span key={i} className="text-[10px] font-medium bg-violet-50 text-violet-700 px-2.5 py-0.5 rounded-full">{s}</span>
+                ))}
               </div>
-
-              {/* Progress + Deadline */}
               <div className="px-4 mt-3">
                 <div className="flex items-center justify-between text-[11px] mb-1.5">
-                  <span className={`font-medium ${remaining === 0 ? "text-red-600" : remaining <= 3 ? "text-amber-600" : "text-[#6B6B6B]"}`}>
-                    {remaining} of {ev.spots} spots
-                  </span>
+                  <span className="font-medium text-[#6B6B6B]">{remaining} of {ev.spots} spots</span>
                   <span className="text-[#A1A1AA]">{fillPercent}%</span>
                 </div>
                 <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-700 ease-out ${
-                      fillPercent >= 80 ? "bg-red-500" : fillPercent >= 50 ? "bg-amber-500" : "bg-[#0D9488]"
-                    } ${isNearlyFull ? "animate-pulse" : ""}`}
-                    style={{ width: `${Math.max(2, fillPercent)}%` }}
-                  />
+                  <div className="h-full rounded-full bg-[#0D9488]" style={{ width: `${Math.max(2, fillPercent)}%` }} />
                 </div>
               </div>
-
-              {/* Bottom: deadline + CTA */}
-              <div className="px-4 py-3.5 flex items-center gap-3 border-t border-[rgba(0,0,0,0.04)] mt-3">
-                <div className="ml-auto">
-                  <div className="h-9 px-4 rounded-[10px] bg-[#0D9488] text-white text-[11px] font-semibold flex items-center gap-1.5 shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
-                    <ArrowUpRight className="w-3.5 h-3.5" /> Apply
-                  </div>
+              <div className="px-4 py-3.5 flex items-center justify-end border-t border-[rgba(0,0,0,0.04)] mt-3">
+                <div className="h-9 px-4 rounded-[10px] bg-[#0D9488] text-white text-[11px] font-semibold flex items-center gap-1.5 shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
+                  <ArrowUpRight className="w-3.5 h-3.5" /> Apply
                 </div>
               </div>
             </div>
           );
-        })}
+        })()}
       </div>
     ),
   },
