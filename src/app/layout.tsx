@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
 import { OfflineBanner, InstallPrompt, PWARegistration } from "@/components/PWA";
+import { SessionKeeper } from "@/components/SessionKeeper";
 import "./globals.css";
 
 const inter = Inter({
@@ -47,6 +48,7 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className="min-h-screen safe-area-padding" style={{ backgroundColor: "#F8F8F6" }}>
+        <SessionKeeper />
         {children}
         <Toaster richColors position="top-center" />
         <PWARegistration />

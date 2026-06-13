@@ -599,6 +599,8 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
     if (signInError) {
       if (signInError.message.includes("Invalid login")) {
         setError("Wrong email or password. Try again, or use Create Account.");
+      } else if (signInError.message.includes("fetch") || signInError.message === "NetworkError") {
+        setError("Network error. Check your connection and try again.");
       } else {
         setError(signInError.message);
       }
