@@ -334,12 +334,12 @@ const previewCards = [
 
 // â”€â”€â”€ FEATURES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const features = [
-  { icon: Shield, title: "Verified Organizers", desc: "Every event creator is verified for trust and reliability" },
-  { icon: Lock, title: "Contact Privacy", desc: "Your contact stays private until you're approved for an event" },
-  { icon: Bell, title: "Real-time Updates", desc: "Instant notifications for approvals, events, and changes" },
-  { icon: Zap, title: "Smart Matching", desc: "Find events matching your skills and location" },
-  { icon: Users, title: "Professional Network", desc: "Join Ahmedabad's growing event workforce ecosystem" },
-  { icon: TrendingUp, title: "Grow Faster", desc: "Build your profile, get rated, and earn more" },
+  { icon: Shield, title: "Verified Organizers", desc: "Every event creator is verified so you can work with confidence" },
+  { icon: Lock, title: "Privacy First", desc: "Your contact stays private until you are approved for an event" },
+  { icon: Bell, title: "Instant Alerts", desc: "Real-time notifications for approvals, new events, and updates" },
+  { icon: Zap, title: "Smart Matching", desc: "Get events that match your skills, location, and availability" },
+  { icon: Users, title: "Build Your Network", desc: "Connect with Ahmedabad's top event organizers and workers" },
+  { icon: TrendingUp, title: "Earn More", desc: "Get rated higher, unlock better events, and grow your income" },
 ];
 
 // â”€â”€â”€ DASHBOARD MOCKUP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -354,7 +354,7 @@ function EcosystemPreview() {
             <span className="inline-block rounded-full bg-teal-700 px-4 py-1 text-[11px] font-semibold tracking-wide text-white uppercase">Ecosystem Preview</span>
             <h2 className="mt-4 text-2xl font-bold tracking-tight text-gray-900 md:text-4xl">See the Platform in Action</h2>
             <p className="mx-auto mt-3 max-w-2xl text-sm text-gray-500 md:text-base">
-              Real interfaces you will use every day â€” worker feed, organizer dashboard, profile, and live notifications
+              Real app screens you will use every day &mdash; worker feed, organizer dashboard, profile, and live notifications
             </p>
           </div>
         </FadeSection>
@@ -391,8 +391,8 @@ const roleCards = [
     type: "worker" as const,
     icon: HardHat,
     title: "I'm a Worker",
-    subtitle: "Find event work & earn",
-    features: ["Browse event opportunities", "Apply in one tap", "Build a trusted profile", "Get approved faster"],
+    subtitle: "Find events & earn",
+    features: ["Browse event opportunities", "Apply in one tap", "Build a trusted reputation", "Get approved faster"],
     gradient: "from-teal-600 to-teal-700",
     shadow: "shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]",
   },
@@ -415,7 +415,7 @@ function RoleSelection({ selected, onSelect }: { selected: string; onSelect: (r:
           <div className="text-center">
             <h2 className="text-2xl font-bold tracking-tight text-gray-900 md:text-4xl">Choose Your Path</h2>
             <p className="mx-auto mt-3 max-w-xl text-sm text-gray-500">
-              Whether you are looking for event work or need to hire staff, EventMan is built for you
+              Whether you are looking for event jobs or need to hire staff, EventMan is built for you
             </p>
           </div>
         </FadeSection>
@@ -478,7 +478,7 @@ function TrustSection() {
           <div className="text-center">
             <h2 className="text-2xl font-bold tracking-tight text-gray-900 md:text-4xl">Trusted by Ahmedabad&apos;s Event Ecosystem</h2>
             <p className="mx-auto mt-3 max-w-2xl text-sm text-gray-500">
-              Growing community of workers and organizers using EventMan to coordinate manpower
+              A growing community of workers and organizers using EventMan to manage event manpower effortlessly
             </p>
           </div>
         </FadeSection>
@@ -871,7 +871,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                     />
                     <span className="text-xs text-gray-500 leading-relaxed group-hover:text-gray-700 transition-colors">
                       I agree to the{" "}
-                      <Link href="/terms" target="_blank" className="text-teal-700 hover:text-slate-900 underline font-medium">Terms &amp; Conditions</Link>
+                      <Link href="/terms" target="_blank" className="text-teal-700 hover:text-slate-900 underline font-medium">Terms of Service</Link>
                       {" "}and{" "}
                       <Link href="/privacy" target="_blank" className="text-teal-700 hover:text-slate-900 underline font-medium">Privacy Policy</Link>
                     </span>
@@ -910,7 +910,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                   </div>
 
                   <p className="text-xs text-gray-400 text-center -mt-1">
-                    New here? Set up your account in seconds
+                    New here? Create your account in seconds
                   </p>
 
                   <button
@@ -964,7 +964,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
               )}
 
               <div>
-                <label className="mb-3 block text-center text-sm font-medium text-gray-700">Verification code</label>
+                <label className="mb-3 block text-center text-sm font-medium text-gray-700">Verification Code</label>
                 <OtpInput value={otp} onChange={setOtp} onComplete={handleVerifyOtp} />
               </div>
 
@@ -984,7 +984,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
               </button>
 
               <p className="text-center text-xs text-gray-400 leading-relaxed">
-                You can also click the sign-in link sent to your email
+                You can also click the login link sent to your email
               </p>
 
               <p className="text-center text-sm text-gray-500">
@@ -1036,7 +1036,7 @@ function AuthForm({ step, onStepChange }: { step: "auth" | "otp" | "profile"; on
                 <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-[22px] bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-[0_2px_8px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] shadow-black/[0.03]">
                   <User className="h-6 w-6 text-white" />
                 </div>
-                <h2 className="text-xl font-bold text-gray-900">Complete Profile</h2>
+                <h2 className="text-xl font-bold text-gray-900">Complete Your Profile</h2>
                 <p className="mt-1 text-sm text-gray-500">Just a few more details to get started</p>
               </div>
 
@@ -1125,17 +1125,17 @@ function HeroSection({ onCta }: { onCta: () => void }) {
 
         {/* Headline */}
         <FadeSection className="mt-2">
-          <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-white md:text-6xl lg:text-7xl">
+            <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-white md:text-6xl lg:text-7xl">
             Ahmedabad&apos;s Event<br />
-            <span className="bg-gradient-to-r from-teal-100 to-teal-200 bg-clip-text text-transparent">Workforce Platform</span>
+            <span className="bg-gradient-to-r from-teal-100 to-teal-200 bg-clip-text text-transparent">Manpower Platform</span>
           </h1>
         </FadeSection>
 
         {/* Subheading */}
         <FadeSection className="mt-6">
           <p className="mx-auto max-w-xl text-base leading-relaxed text-teal-100/80 md:text-lg">
-            Find event work or hire trusted staff â€” all in one place.
-            No WhatsApp groups. No confusion. Just professional manpower coordination.
+            Find event jobs or hire trusted staff &mdash; all in one place.
+            No WhatsApp groups. No confusion. Just seamless manpower management.
           </p>
         </FadeSection>
 
