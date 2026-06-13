@@ -53,8 +53,13 @@ export default function EventDetailPage() {
       if (!evt) { router.push("/worker/dashboard"); return; }
       setEvent(evt);
 
-      const { data: count } = await supabase.rpc("get_approved_count", { event_id_param: id });
-      setApprovedCount(count ?? 0);
+      try {
+        const res = await fetch(`/api/applications/count-approved?eventId=${id}`);
+        const { count } = await res.json();
+        setApprovedCount(count ?? 0);
+      } catch {
+        setApprovedCount(0);
+      }
 
       const { data: org } = await supabase.from("profiles").select("*").eq("user_id", evt.organizer_id).maybeSingle();
       if (org) {
