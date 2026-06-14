@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
+import { Analytics } from "@vercel/analytics/next";
 import { OfflineBanner, InstallPrompt, PWARegistration } from "@/components/PWA";
 import { SessionKeeper } from "@/components/SessionKeeper";
 import "./globals.css";
@@ -54,6 +55,7 @@ export default function RootLayout({
         <PWARegistration />
         <OfflineBanner />
         <InstallPrompt />
+        <Analytics />
         <div id="build-id" className="fixed bottom-2 left-2 z-50 text-[8px] text-gray-300 bg-white/80 px-1.5 py-0.5 rounded">v3</div>
       </body>
     </html>
