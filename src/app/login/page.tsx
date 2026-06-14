@@ -60,49 +60,133 @@ function FadeIn({ children, className = "" }: { children: React.ReactNode; class
   );
 }
 
-// ─── AUTH FORM WITH PASSWORD ──────────────────────────────────
+// ─── SMART AUTH: detects existing/new, password or OTP ──────
+function OtpInput({ value, onChange, onComplete }: {
+  value: string[]; onChange: (v: string[]) => void; onComplete: (code: string) => void;
+}) {
+  const refs = useRef<(HTMLInputElement | null)[]>([]);
+  const valRef = useRef(value);
+  valRef.current = value;
+  const change = (i: number, ch: string) => {
+    const digit = ch.replace(/\D/g, "").slice(-1);
+    if (!digit && ch) return;
+    const next = [...valRef.current]; next[i] = digit; valRef.current = next; onChange(next);
+    if (digit && i < 5) refs.current[i + 1]?.focus();
+    if (digit && i === 5) onComplete(next.join(""));
+  };
+  const keyDown = (i: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace" && !valRef.current[i] && i > 0) {
+      const next = [...valRef.current]; next[i - 1] = ""; valRef.current = next; onChange(next);
+      refs.current[i - 1]?.focus();
+    }
+    if (e.key === "Enter" && valRef.current.join("").length === 6) onComplete(valRef.current.join(""));
+  };
+  const paste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const p = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    if (!p) return; e.preventDefault();
+    const next = [...valRef.current];
+    for (let i = 0; i < p.length; i++) next[i] = p[i];
+    valRef.current = next; onChange(next);
+    refs.current[Math.min(p.length, 5)]?.focus();
+    if (p.length === 6) onComplete(next.join(""));
+  };
+  return (
+    <div className="flex items-center justify-center gap-2">
+      {value.map((d, i) => (
+        <input key={i} ref={el => { refs.current[i] = el; }}
+          type="text" inputMode="numeric" autoComplete="one-time-code" maxLength={1}
+          value={d} onChange={e => change(i, e.target.value)}
+          onKeyDown={e => keyDown(i, e)} onPaste={i === 0 ? paste : undefined}
+          className={`h-14 w-11 rounded-[16px] border-2 text-center text-lg font-bold tracking-wider outline-none transition-all ${d ? "border-teal-700 bg-teal-50 text-teal-700" : "border-gray-200 bg-gray-50 text-gray-900"} focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20`} />
+      ))}
+    </div>
+  );
+}
+
 function AuthSection({ onRedirect }: { onRedirect: () => void }) {
   const supabase = createClient();
   const router = useRouter();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [step, setStep] = useState<"email" | "signin" | "signup_otp" | "profile">("email");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [role, setRole] = useState<"worker" | "organizer">("worker");
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const emailRef = useRef<HTMLInputElement>(null);
+  const [resendTimer, setResendTimer] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => { emailRef.current?.focus(); }, [mode]);
+  useEffect(() => { if (step === "email" || step === "signin") inputRef.current?.focus(); }, [step]);
+  useEffect(() => { if (resendTimer > 0) { const t = setInterval(() => setResendTimer(p => p - 1), 1000); return () => clearInterval(t); } }, [resendTimer]);
+
+  const checkEmail = async () => {
+    setError("");
+    if (!email.trim()) { setError("Enter your email"); return; }
+    setLoading(true);
+    const { data: existing } = await supabase.from("profiles").select("id").eq("email", email.trim()).maybeSingle();
+    setLoading(false);
+    if (existing) {
+      setStep("signin");
+    } else {
+      setStep("signup_otp");
+    }
+  };
 
   const handleSignIn = async () => {
     setError("");
-    if (!email.trim()) { setError("Enter your email"); return; }
     if (!password) { setError("Enter your password"); return; }
     setLoading(true);
     const { error: signInError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     setLoading(false);
     if (signInError) {
-      if (signInError.message.includes("Invalid login credentials")) setError("Wrong email or password");
+      if (signInError.message.includes("Invalid login credentials")) setError("Wrong password");
       else setError(signInError.message);
       return;
     }
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    const { data: profile } = await supabase.from("profiles").select("role").eq("user_id", user.id).maybeSingle();
-    router.replace(profile?.role === "admin" ? "/admin" : `/${profile?.role || "worker"}/dashboard`);
+    if (user) {
+      const { data: profile } = await supabase.from("profiles").select("role").eq("user_id", user.id).maybeSingle();
+      router.replace(profile?.role === "admin" ? "/admin" : `/${profile?.role || "worker"}/dashboard`);
+    }
   };
 
-  const handleSignUp = async () => {
+  const sendOtp = async () => {
     setError("");
-    if (!email.trim()) { setError("Enter your email"); return; }
-    if (!password) { setError("Enter your password"); return; }
-    if (password.length < 6) { setError("Password must be at least 6 characters"); return; }
-    if (!name.trim()) { setError("Enter your full name"); return; }
     setLoading(true);
-    const { data: { user }, error: signUpError } = await supabase.auth.signUp({ email: email.trim(), password });
-    if (signUpError || !user) { setLoading(false); setError(signUpError?.message || "Something went wrong"); return; }
+    const { error: sendError } = await supabase.auth.signInWithOtp({ email: email.trim() });
+    setLoading(false);
+    if (sendError) { setError(sendError.message); return; }
+    setResendTimer(30);
+  };
+
+  const verifyOtp = async () => {
+    const token = otp.join("");
+    if (token.length < 6) { setError("Enter the 6-digit code"); return; }
+    setError(""); setLoading(true);
+    const { error: verError } = await supabase.auth.verifyOtp({ email: email.trim(), token, type: "email" });
+    setLoading(false);
+    if (verError) {
+      if (verError.message.includes("expired")) setError("Code expired. Request a new one.");
+      else if (verError.message.includes("Invalid") || verError.message.includes("otp")) setError("Wrong code. Try again.");
+      else setError(verError.message);
+      return;
+    }
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: profile } = await supabase.from("profiles").select("role").eq("user_id", user.id).maybeSingle();
+      if (profile) { router.replace(profile.role === "admin" ? "/admin" : `/${profile.role}/dashboard`); return; }
+    }
+    setStep("profile");
+  };
+
+  const createProfile = async () => {
+    setError("");
+    if (!name.trim()) { setError("Enter your name"); return; }
+    setLoading(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setError("Session expired. Try again."); setLoading(false); setStep("email"); return; }
     const now = new Date();
     const trialEnd = new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000).toISOString();
     const { error: insError } = await supabase.from("profiles").insert({
@@ -121,7 +205,7 @@ function AuthSection({ onRedirect }: { onRedirect: () => void }) {
     router.replace(`/${role}/dashboard`);
   };
 
-  const ic = "w-full h-12 pl-10 pr-10 rounded-[16px] border border-gray-200 bg-white text-sm outline-none transition-all focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20";
+  const ic = "w-full h-12 pl-10 pr-3 rounded-[16px] border border-gray-200 bg-white text-sm outline-none transition-all focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20";
 
   return (
     <section className="bg-[#F8F8F6] py-20 md:py-28" id="auth">
@@ -129,128 +213,157 @@ function AuthSection({ onRedirect }: { onRedirect: () => void }) {
         <div className="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden">
           <div className="h-1 bg-gradient-to-r from-teal-600 to-teal-700" />
 
-          {/* Tabs */}
-          <div className="grid grid-cols-2">
-            <button onClick={() => { setMode("signin"); setError(""); }}
-              className={`h-12 text-sm font-semibold transition-all ${mode === "signin" ? "text-teal-700 border-b-2 border-teal-700" : "text-gray-400 border-b border-gray-100"}`}>
-              Sign In
-            </button>
-            <button onClick={() => { setMode("signup"); setError(""); }}
-              className={`h-12 text-sm font-semibold transition-all ${mode === "signup" ? "text-teal-700 border-b-2 border-teal-700" : "text-gray-400 border-b border-gray-100"}`}>
-              Create Account
-            </button>
-          </div>
-
-          <div className="p-6">
-            {/* Icon */}
-            <div className="text-center mb-6">
-              <div className="mx-auto w-14 h-14 rounded-[20px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-lg shadow-teal-700/20">
-                {mode === "signin" ? <Lock className="w-7 h-7 text-white" /> : <User className="w-7 h-7 text-white" />}
+          {/* ── Step: Email ── */}
+          {step === "email" && (
+            <div className="p-6 text-center">
+              <div className="mx-auto mb-4 w-14 h-14 rounded-[20px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-lg shadow-teal-700/20">
+                <Mail className="w-7 h-7 text-white" />
               </div>
-              <h2 className="mt-3 text-xl font-bold text-gray-900">{mode === "signin" ? "Welcome Back" : "Join EventMan"}</h2>
-              <p className="mt-1 text-sm text-gray-500">{mode === "signin" ? "Sign in to your account" : "Create your account in seconds"}</p>
-            </div>
-
-            {/* Error */}
-            {error && (
-              <div className="mb-5 rounded-[16px] bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>
-            )}
-
-            {/* Email */}
-            <div className="text-left">
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input ref={emailRef} type="email" value={email}
-                  onChange={e => { setEmail(e.target.value); setError(""); }}
-                  placeholder="you@example.com" autoComplete="email"
-                  className={ic} />
-              </div>
-            </div>
-
-            {/* Password */}
-            <div className="mt-4 text-left">
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input type={showPassword ? "text" : "password"} value={password}
-                  onChange={e => { setPassword(e.target.value); setError(""); }}
-                  placeholder={mode === "signup" ? "Create a password" : "Enter your password"}
-                  autoComplete={mode === "signup" ? "new-password" : "current-password"}
-                  className={ic}
-                  onKeyDown={e => { if (e.key === "Enter" && mode === "signin") handleSignIn(); }} />
-                <button type="button" onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-
-            {/* Forgot password (sign in only) */}
-            {mode === "signin" && (
-              <div className="mt-2 text-right">
-                <button className="text-xs text-teal-700 hover:text-teal-800 font-medium">
-                  Forgot password?
-                </button>
-              </div>
-            )}
-
-            {/* Name + Role (sign up only) */}
-            {mode === "signup" && (
-              <>
-                <div className="mt-4 text-left">
-                  <label className="mb-1.5 block text-sm font-medium text-gray-700">Full Name</label>
-                  <div className="relative">
-                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input type="text" value={name} onChange={e => { setName(e.target.value); setError(""); }}
-                      placeholder="Your full name" className={ic} />
-                  </div>
+              <h2 className="text-xl font-bold text-gray-900">Welcome to EventMan</h2>
+              <p className="mt-1.5 text-sm text-gray-500">Enter your email to get started</p>
+              {error && <div className="mt-5 rounded-[16px] bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>}
+              <div className="mt-6 text-left">
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">Email address</label>
+                <div className="relative">
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input ref={inputRef} type="email" value={email}
+                    onChange={e => { setEmail(e.target.value); setError(""); }}
+                    placeholder="you@example.com" autoComplete="email"
+                    className={ic}
+                    onKeyDown={e => { if (e.key === "Enter") checkEmail(); }} />
                 </div>
-                <div className="mt-4 text-left">
-                  <label className="mb-2 block text-sm font-medium text-gray-700">I want to join as</label>
-                  <div className="grid grid-cols-2 gap-3">
-                    {(["worker", "organizer"] as const).map(r => (
-                      <button key={r} type="button" onClick={() => setRole(r)}
-                        className={`flex h-14 flex-col items-center justify-center gap-1 rounded-[16px] border-2 transition-all ${
-                          role === r ? "border-teal-700 bg-teal-50 text-teal-700" : "border-gray-200 bg-gray-50 text-gray-500"
-                        }`}>
-                        {r === "worker" ? <HardHat className="w-5 h-5" /> : <Briefcase className="w-5 h-5" />}
-                        <span className="text-xs font-semibold capitalize">{r}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* Submit */}
-            <button onClick={mode === "signin" ? handleSignIn : handleSignUp} disabled={loading}
-              className="mt-6 w-full h-12 rounded-[16px] bg-teal-700 text-sm font-semibold text-white hover:bg-teal-800 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2">
-              {loading ? (
-                <><RefreshCw className="w-4 h-4 animate-spin" /> {mode === "signin" ? "Signing in..." : "Creating account..."}</>
-              ) : (
-                <>{mode === "signin" ? "Sign In" : "Create Account"} <ArrowRight className="w-4 h-4" /></>
-              )}
-            </button>
-
-            {/* TOS */}
-            <p className="mt-4 text-xs text-gray-400 text-center">
-              By continuing, you agree to our{" "}
-              <Link href="/terms" className="text-teal-700 underline">Terms</Link>{" "}
-              and <Link href="/privacy" className="text-teal-700 underline">Privacy Policy</Link>
-            </p>
-
-            {/* Switch mode */}
-            <div className="mt-5 pt-4 border-t border-gray-100 text-center">
-              <p className="text-sm text-gray-500">
-                {mode === "signin" ? "Don&apos;t have an account?" : "Already have an account?"}{" "}
-                <button onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setError(""); }}
-                  className="text-teal-700 font-semibold hover:text-teal-800">
-                  {mode === "signin" ? "Create one" : "Sign in"}
-                </button>
+              </div>
+              <button onClick={checkEmail} disabled={loading}
+                className="mt-5 w-full h-12 rounded-[16px] bg-teal-700 text-sm font-semibold text-white hover:bg-teal-800 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2">
+                {loading ? <><RefreshCw className="w-4 h-4 animate-spin" /> Checking...</> : <>Continue <ArrowRight className="w-4 h-4" /></>}
+              </button>
+              <p className="mt-4 text-xs text-gray-400">
+                Existing users sign in. New users verify by email.{" "}
+                <Link href="/terms" className="text-teal-700 underline">Terms</Link>
               </p>
             </div>
-          </div>
+          )}
+
+          {/* ── Step: Sign In (password) ── */}
+          {step === "signin" && (
+            <div className="p-6 text-center">
+              <div className="mx-auto mb-4 w-14 h-14 rounded-[20px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-lg shadow-teal-700/20">
+                <Lock className="w-7 h-7 text-white" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900">Welcome Back</h2>
+              <p className="mt-1.5 text-sm text-gray-500">
+                Sign in as <span className="font-semibold text-gray-700">{email}</span>
+              </p>
+              {error && <div className="mt-5 rounded-[16px] bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>}
+              <div className="mt-6 text-left">
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input ref={inputRef} type={showPassword ? "text" : "password"} value={password}
+                    onChange={e => { setPassword(e.target.value); setError(""); }}
+                    placeholder="Enter your password" autoComplete="current-password"
+                    className="w-full h-12 pl-10 pr-10 rounded-[16px] border border-gray-200 bg-white text-sm outline-none transition-all focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20"
+                    onKeyDown={e => { if (e.key === "Enter") handleSignIn(); }} />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+              <div className="mt-2 text-right">
+                <button onClick={() => { sendOtp(); setStep("signup_otp"); setPassword(""); }}
+                  className="text-xs text-teal-700 hover:text-teal-800 font-medium">
+                  Forgot password? Sign in with code
+                </button>
+              </div>
+              <button onClick={handleSignIn} disabled={loading}
+                className="mt-5 w-full h-12 rounded-[16px] bg-teal-700 text-sm font-semibold text-white hover:bg-teal-800 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2">
+                {loading ? <><RefreshCw className="w-4 h-4 animate-spin" /> Signing in...</> : <>Sign In <ArrowRight className="w-4 h-4" /></>}
+              </button>
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <button onClick={() => { setStep("email"); setError(""); }}
+                  className="text-xs text-gray-400 underline hover:text-gray-600">
+                  Use a different email
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ── Step: Sign Up (OTP verify) ── */}
+          {step === "signup_otp" && (
+            <div className="p-6 text-center">
+              <div className="mx-auto mb-4 w-14 h-14 rounded-[20px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-lg shadow-teal-700/20">
+                <Mail className="w-7 h-7 text-white" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900">Verify Your Email</h2>
+              <p className="mt-1.5 text-sm text-gray-500">
+                We sent a code to <span className="font-semibold text-gray-700">{email}</span>
+              </p>
+              {error && <div className="mt-5 rounded-[16px] bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>}
+              <div className="mt-6">
+                <OtpInput value={otp} onChange={setOtp} onComplete={verifyOtp} />
+              </div>
+              {loading && (
+                <div className="mt-4 flex items-center justify-center gap-2 text-sm text-teal-700">
+                  <RefreshCw className="w-4 h-4 animate-spin" /> Verifying...
+                </div>
+              )}
+              <div className="mt-5">
+                {resendTimer > 0 ? (
+                  <span className="text-sm text-gray-400">Resend in <span className="font-semibold text-gray-600">{resendTimer}s</span></span>
+                ) : (
+                  <button onClick={sendOtp} className="text-sm font-semibold text-teal-700 hover:text-teal-800">
+                    Resend code
+                  </button>
+                )}
+              </div>
+              <div className="mt-4 pt-4 border-t border-gray-100 space-y-2">
+                <button onClick={() => { setStep("email"); setError(""); setOtp(["", "", "", "", "", ""]); }}
+                  className="block mx-auto text-xs text-gray-400 underline hover:text-gray-600">
+                  Use a different email
+                </button>
+                <button onClick={() => { setStep("signin"); setPassword(""); setError(""); }}
+                  className="block mx-auto text-xs text-teal-700 font-medium hover:text-teal-800">
+                  Already have an account? Sign in
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ── Step: Profile (new user) ── */}
+          {step === "profile" && (
+            <div className="p-6">
+              <div className="text-center mb-6">
+                <div className="mx-auto mb-4 w-14 h-14 rounded-[20px] bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg shadow-teal-700/20">
+                  <User className="w-7 h-7 text-white" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">Almost Done!</h2>
+                <p className="mt-1.5 text-sm text-gray-500">Just your name and role</p>
+                {error && <div className="mt-4 rounded-[16px] bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>}
+              </div>
+              <div className="text-left">
+                <label className="mb-1.5 block text-sm font-medium text-gray-700">Full Name</label>
+                <input type="text" value={name} onChange={e => { setName(e.target.value); setError(""); }}
+                  placeholder="Your full name" className={ic} />
+              </div>
+              <div className="mt-5 text-left">
+                <label className="mb-2 block text-sm font-medium text-gray-700">I want to join as</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {(["worker", "organizer"] as const).map(r => (
+                    <button key={r} type="button" onClick={() => setRole(r)}
+                      className={`flex h-16 flex-col items-center justify-center gap-1 rounded-[16px] border-2 transition-all ${role === r ? "border-teal-700 bg-teal-50 text-teal-700" : "border-gray-200 bg-gray-50 text-gray-500"}`}>
+                      {r === "worker" ? <HardHat className="w-5 h-5" /> : <Briefcase className="w-5 h-5" />}
+                      <span className="text-xs font-semibold capitalize">{r}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <button onClick={createProfile} disabled={loading}
+                className="mt-6 w-full h-12 rounded-[16px] bg-teal-700 text-sm font-semibold text-white hover:bg-teal-800 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2">
+                {loading ? <><RefreshCw className="w-4 h-4 animate-spin" /> Setting up...</> : <>Continue <ArrowRight className="w-4 h-4" /></>}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </section>
