@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -9,9 +9,10 @@ import {
   Mail, ArrowRight, Briefcase, HardHat, CheckCircle,
   Sparkles, ArrowUpRight, Calendar, Clock, MapPin,
   IndianRupee, BadgeCheck, Flame, Users,
-  Building2, Bell, Shield, ShieldCheck, Zap, TrendingUp, User,
+  Building2, Bell, Shield, Zap, TrendingUp, User,
   ChevronRight, Search, Star, LayoutDashboard, UserCheck,
-  Lock, Eye, EyeOff, RefreshCw, ArrowDown,
+  KeyRound, RefreshCw, ArrowDown,
+  ShieldCheck,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
@@ -60,111 +61,120 @@ function FadeIn({ children, className = "" }: { children: React.ReactNode; class
   );
 }
 
-// ─── SMART AUTH: detects existing/new, password or OTP ──────
 function OtpInput({ value, onChange, onComplete }: {
   value: string[]; onChange: (v: string[]) => void; onComplete: (code: string) => void;
 }) {
   const refs = useRef<(HTMLInputElement | null)[]>([]);
   const valRef = useRef(value);
   valRef.current = value;
+
   const change = (i: number, ch: string) => {
     const digit = ch.replace(/\D/g, "").slice(-1);
     if (!digit && ch) return;
-    const next = [...valRef.current]; next[i] = digit; valRef.current = next; onChange(next);
+    const next = [...valRef.current];
+    next[i] = digit;
+    valRef.current = next;
+    onChange(next);
     if (digit && i < 5) refs.current[i + 1]?.focus();
     if (digit && i === 5) onComplete(next.join(""));
   };
+
   const keyDown = (i: number, e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Backspace" && !valRef.current[i] && i > 0) {
-      const next = [...valRef.current]; next[i - 1] = ""; valRef.current = next; onChange(next);
+      const next = [...valRef.current];
+      next[i - 1] = "";
+      valRef.current = next;
+      onChange(next);
       refs.current[i - 1]?.focus();
     }
     if (e.key === "Enter" && valRef.current.join("").length === 6) onComplete(valRef.current.join(""));
   };
+
   const paste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     const p = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
-    if (!p) return; e.preventDefault();
+    if (!p) return;
+    e.preventDefault();
     const next = [...valRef.current];
     for (let i = 0; i < p.length; i++) next[i] = p[i];
-    valRef.current = next; onChange(next);
+    valRef.current = next;
+    onChange(next);
     refs.current[Math.min(p.length, 5)]?.focus();
     if (p.length === 6) onComplete(next.join(""));
   };
+
   return (
     <div className="flex items-center justify-center gap-2">
       {value.map((d, i) => (
-        <input key={i} ref={el => { refs.current[i] = el; }}
+        <input
+          key={i}
+          ref={el => { refs.current[i] = el; }}
           type="text" inputMode="numeric" autoComplete="one-time-code" maxLength={1}
-          value={d} onChange={e => change(i, e.target.value)}
-          onKeyDown={e => keyDown(i, e)} onPaste={i === 0 ? paste : undefined}
-          className={`h-14 w-11 rounded-[16px] border-2 text-center text-lg font-bold tracking-wider outline-none transition-all ${d ? "border-teal-700 bg-teal-50 text-teal-700" : "border-gray-200 bg-gray-50 text-gray-900"} focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20`} />
+          value={d}
+          onChange={e => change(i, e.target.value)}
+          onKeyDown={e => keyDown(i, e)}
+          onPaste={i === 0 ? paste : undefined}
+          className={`h-14 w-11 rounded-[16px] border-2 text-center text-lg font-bold tracking-wider outline-none transition-all ${
+            d ? "border-teal-700 bg-teal-50 text-teal-700" : "border-gray-200 bg-gray-50 text-gray-900"
+          } focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20`}
+        />
       ))}
     </div>
   );
 }
 
+// ─── SIMPLE AUTH FORM ──────────────────────────────────────────
 function AuthSection({ onRedirect }: { onRedirect: () => void }) {
   const supabase = createClient();
   const router = useRouter();
-  const [step, setStep] = useState<"email" | "signin" | "signup_otp" | "profile">("email");
+  const [step, setStep] = useState<"email" | "otp" | "profile">("email");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [role, setRole] = useState<"worker" | "organizer">("worker");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
+  const [error, setError] = useState("");
+  const [name, setName] = useState("");
+  const [role, setRole] = useState<"worker" | "organizer">("worker");
+
   const inputRef = useRef<HTMLInputElement>(null);
+  const signedInRef = useRef(false);
 
-  useEffect(() => { if (step === "email" || step === "signin") inputRef.current?.focus(); }, [step]);
+  // Handle auth state changes (magic link clicks)
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session && !signedInRef.current) {
+        signedInRef.current = true;
+        const { data: profile } = await supabase
+          .from("profiles").select("role").eq("user_id", session.user.id).maybeSingle();
+        if (profile) {
+          router.push(profile.role === "admin" ? "/admin" : `/${profile.role}/dashboard`);
+        } else {
+          setStep("profile");
+        }
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [router]);
+
   useEffect(() => { if (resendTimer > 0) { const t = setInterval(() => setResendTimer(p => p - 1), 1000); return () => clearInterval(t); } }, [resendTimer]);
-
-  const checkEmail = async () => {
-    setError("");
-    if (!email.trim()) { setError("Enter your email"); return; }
-    setLoading(true);
-    const { data: existing } = await supabase.from("profiles").select("id").eq("email", email.trim()).maybeSingle();
-    setLoading(false);
-    if (existing) {
-      setStep("signin");
-    } else {
-      setStep("signup_otp");
-    }
-  };
-
-  const handleSignIn = async () => {
-    setError("");
-    if (!password) { setError("Enter your password"); return; }
-    setLoading(true);
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-    setLoading(false);
-    if (signInError) {
-      if (signInError.message.includes("Invalid login credentials")) setError("Wrong password");
-      else setError(signInError.message);
-      return;
-    }
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data: profile } = await supabase.from("profiles").select("role").eq("user_id", user.id).maybeSingle();
-      router.replace(profile?.role === "admin" ? "/admin" : `/${profile?.role || "worker"}/dashboard`);
-    }
-  };
+  useEffect(() => { if (step === "email") inputRef.current?.focus(); }, [step]);
 
   const sendOtp = async () => {
     setError("");
+    const trimmed = email.trim();
+    if (!trimmed) { setError("Enter your email"); return; }
     setLoading(true);
-    const { error: sendError } = await supabase.auth.signInWithOtp({ email: email.trim() });
+    const { error: sendError } = await supabase.auth.signInWithOtp({ email: trimmed });
     setLoading(false);
     if (sendError) { setError(sendError.message); return; }
     setResendTimer(30);
+    setStep("otp");
   };
 
-  const verifyOtp = async () => {
-    const token = otp.join("");
+  const verifyOtpCode = async (code?: string) => {
+    const token = code || otp.join("");
     if (token.length < 6) { setError("Enter the 6-digit code"); return; }
-    setError(""); setLoading(true);
+    setError("");
+    setLoading(true);
     const { error: verError } = await supabase.auth.verifyOtp({ email: email.trim(), token, type: "email" });
     setLoading(false);
     if (verError) {
@@ -175,10 +185,23 @@ function AuthSection({ onRedirect }: { onRedirect: () => void }) {
     }
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      const { data: profile } = await supabase.from("profiles").select("role").eq("user_id", user.id).maybeSingle();
-      if (profile) { router.replace(profile.role === "admin" ? "/admin" : `/${profile.role}/dashboard`); return; }
+      const { data: profile } = await supabase
+        .from("profiles").select("role").eq("user_id", user.id).maybeSingle();
+      if (profile) {
+        router.push(profile.role === "admin" ? "/admin" : `/${profile.role}/dashboard`);
+        return;
+      }
     }
     setStep("profile");
+  };
+
+  const resendCode = async () => {
+    if (resendTimer > 0) return;
+    setError("");
+    const { error: sendError } = await supabase.auth.signInWithOtp({ email: email.trim() });
+    if (sendError) { setError(sendError.message); return; }
+    setResendTimer(30);
+    setOtp(["", "", "", "", "", ""]);
   };
 
   const createProfile = async () => {
@@ -186,7 +209,7 @@ function AuthSection({ onRedirect }: { onRedirect: () => void }) {
     if (!name.trim()) { setError("Enter your name"); return; }
     setLoading(true);
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { setError("Session expired. Try again."); setLoading(false); setStep("email"); return; }
+    if (!user) { setError("Session expired. Login again."); setLoading(false); setStep("email"); return; }
     const now = new Date();
     const trialEnd = new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000).toISOString();
     const { error: insError } = await supabase.from("profiles").insert({
@@ -197,7 +220,7 @@ function AuthSection({ onRedirect }: { onRedirect: () => void }) {
     if (insError) {
       if (insError.message.includes("duplicate")) {
         const { data } = await supabase.from("profiles").select("role").eq("user_id", user.id).maybeSingle();
-        if (data) { router.replace(data.role === "admin" ? "/admin" : `/${data.role}/dashboard`); return; }
+        if (data) { router.push(data.role === "admin" ? "/admin" : `/${data.role}/dashboard`); return; }
       }
       setError(insError.message);
       return;
@@ -210,161 +233,141 @@ function AuthSection({ onRedirect }: { onRedirect: () => void }) {
   return (
     <section className="bg-[#F8F8F6] py-20 md:py-28" id="auth">
       <div className="mx-auto max-w-md px-4">
-        <div className="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden">
-          <div className="h-1 bg-gradient-to-r from-teal-600 to-teal-700" />
-
-          {/* ── Step: Email ── */}
-          {step === "email" && (
-            <div className="p-6 text-center">
+        {step === "email" && (
+          <div className="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden">
+            <div className="h-1 bg-gradient-to-r from-teal-600 to-teal-700" />
+            <div className="p-8 text-center">
               <div className="mx-auto mb-4 w-14 h-14 rounded-[20px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-lg shadow-teal-700/20">
                 <Mail className="w-7 h-7 text-white" />
               </div>
               <h2 className="text-xl font-bold text-gray-900">Welcome to EventMan</h2>
               <p className="mt-1.5 text-sm text-gray-500">Enter your email to get started</p>
-              {error && <div className="mt-5 rounded-[16px] bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>}
+
+              {error && (
+                <div className="mt-5 rounded-[16px] bg-red-50 border border-red-200 px-4 py-3">
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
+              )}
+
               <div className="mt-6 text-left">
                 <label className="mb-1.5 block text-sm font-medium text-gray-700">Email address</label>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input ref={inputRef} type="email" value={email}
+                  <input
+                    ref={inputRef}
+                    type="email" value={email}
                     onChange={e => { setEmail(e.target.value); setError(""); }}
-                    placeholder="you@example.com" autoComplete="email"
+                    placeholder="you@example.com"
+                    autoComplete="email"
                     className={ic}
-                    onKeyDown={e => { if (e.key === "Enter") checkEmail(); }} />
+                    onKeyDown={e => { if (e.key === "Enter") sendOtp(); }}
+                  />
                 </div>
               </div>
-              <button onClick={checkEmail} disabled={loading}
+
+              <button onClick={sendOtp} disabled={loading}
                 className="mt-5 w-full h-12 rounded-[16px] bg-teal-700 text-sm font-semibold text-white hover:bg-teal-800 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2">
-                {loading ? <><RefreshCw className="w-4 h-4 animate-spin" /> Checking...</> : <>Continue <ArrowRight className="w-4 h-4" /></>}
+                {loading ? <><RefreshCw className="w-4 h-4 animate-spin" /> Sending...</> : <>Send Code <ArrowRight className="w-4 h-4" /></>}
               </button>
+
               <p className="mt-4 text-xs text-gray-400">
-                Existing users sign in. New users verify by email.{" "}
+                We&apos;ll send a 6-digit code to your email.{" "}
                 <Link href="/terms" className="text-teal-700 underline">Terms</Link>
               </p>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* ── Step: Sign In (password) ── */}
-          {step === "signin" && (
-            <div className="p-6 text-center">
+        {step === "otp" && (
+          <div className="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden">
+            <div className="h-1 bg-gradient-to-r from-teal-600 to-teal-700" />
+            <div className="p-8 text-center">
               <div className="mx-auto mb-4 w-14 h-14 rounded-[20px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-lg shadow-teal-700/20">
-                <Lock className="w-7 h-7 text-white" />
+                <KeyRound className="w-7 h-7 text-white" />
               </div>
-              <h2 className="text-xl font-bold text-gray-900">Welcome Back</h2>
-              <p className="mt-1.5 text-sm text-gray-500">
-                Sign in as <span className="font-semibold text-gray-700">{email}</span>
-              </p>
-              {error && <div className="mt-5 rounded-[16px] bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>}
-              <div className="mt-6 text-left">
-                <label className="mb-1.5 block text-sm font-medium text-gray-700">Password</label>
-                <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input ref={inputRef} type={showPassword ? "text" : "password"} value={password}
-                    onChange={e => { setPassword(e.target.value); setError(""); }}
-                    placeholder="Enter your password" autoComplete="current-password"
-                    className="w-full h-12 pl-10 pr-10 rounded-[16px] border border-gray-200 bg-white text-sm outline-none transition-all focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20"
-                    onKeyDown={e => { if (e.key === "Enter") handleSignIn(); }} />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-              <div className="mt-2 text-right">
-                <button onClick={() => { sendOtp(); setStep("signup_otp"); setPassword(""); }}
-                  className="text-xs text-teal-700 hover:text-teal-800 font-medium">
-                  Forgot password? Sign in with code
-                </button>
-              </div>
-              <button onClick={handleSignIn} disabled={loading}
-                className="mt-5 w-full h-12 rounded-[16px] bg-teal-700 text-sm font-semibold text-white hover:bg-teal-800 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2">
-                {loading ? <><RefreshCw className="w-4 h-4 animate-spin" /> Signing in...</> : <>Sign In <ArrowRight className="w-4 h-4" /></>}
-              </button>
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <button onClick={() => { setStep("email"); setError(""); }}
-                  className="text-xs text-gray-400 underline hover:text-gray-600">
-                  Use a different email
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* ── Step: Sign Up (OTP verify) ── */}
-          {step === "signup_otp" && (
-            <div className="p-6 text-center">
-              <div className="mx-auto mb-4 w-14 h-14 rounded-[20px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-lg shadow-teal-700/20">
-                <Mail className="w-7 h-7 text-white" />
-              </div>
-              <h2 className="text-xl font-bold text-gray-900">Verify Your Email</h2>
+              <h2 className="text-xl font-bold text-gray-900">Check Your Email</h2>
               <p className="mt-1.5 text-sm text-gray-500">
                 We sent a code to <span className="font-semibold text-gray-700">{email}</span>
               </p>
-              {error && <div className="mt-5 rounded-[16px] bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>}
+
+              {error && (
+                <div className="mt-5 rounded-[16px] bg-red-50 border border-red-200 px-4 py-3">
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
+              )}
+
               <div className="mt-6">
-                <OtpInput value={otp} onChange={setOtp} onComplete={verifyOtp} />
+                <OtpInput value={otp} onChange={setOtp} onComplete={verifyOtpCode} />
               </div>
+
               {loading && (
                 <div className="mt-4 flex items-center justify-center gap-2 text-sm text-teal-700">
                   <RefreshCw className="w-4 h-4 animate-spin" /> Verifying...
                 </div>
               )}
+
               <div className="mt-5">
                 {resendTimer > 0 ? (
                   <span className="text-sm text-gray-400">Resend in <span className="font-semibold text-gray-600">{resendTimer}s</span></span>
                 ) : (
-                  <button onClick={sendOtp} className="text-sm font-semibold text-teal-700 hover:text-teal-800">
+                  <button onClick={resendCode} className="text-sm font-semibold text-teal-700 hover:text-teal-800">
                     Resend code
                   </button>
                 )}
               </div>
-              <div className="mt-4 pt-4 border-t border-gray-100 space-y-2">
-                <button onClick={() => { setStep("email"); setError(""); setOtp(["", "", "", "", "", ""]); }}
-                  className="block mx-auto text-xs text-gray-400 underline hover:text-gray-600">
-                  Use a different email
-                </button>
-                <button onClick={() => { setStep("signin"); setPassword(""); setError(""); }}
-                  className="block mx-auto text-xs text-teal-700 font-medium hover:text-teal-800">
-                  Already have an account? Sign in
-                </button>
-              </div>
-            </div>
-          )}
 
-          {/* ── Step: Profile (new user) ── */}
-          {step === "profile" && (
-            <div className="p-6">
+              <button onClick={() => { setStep("email"); setError(""); setOtp(["", "", "", "", "", ""]); }}
+                className="mt-4 text-xs text-gray-400 underline hover:text-gray-600">
+                Use a different email
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === "profile" && (
+          <div className="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden">
+            <div className="h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
+            <div className="p-8">
               <div className="text-center mb-6">
-                <div className="mx-auto mb-4 w-14 h-14 rounded-[20px] bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg shadow-teal-700/20">
+                <div className="mx-auto mb-4 w-14 h-14 rounded-[20px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-lg shadow-teal-700/20">
                   <User className="w-7 h-7 text-white" />
                 </div>
                 <h2 className="text-xl font-bold text-gray-900">Almost Done!</h2>
                 <p className="mt-1.5 text-sm text-gray-500">Just your name and role</p>
-                {error && <div className="mt-4 rounded-[16px] bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>}
+
+                {error && (
+                  <div className="mt-4 rounded-[16px] bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>
+                )}
               </div>
+
               <div className="text-left">
                 <label className="mb-1.5 block text-sm font-medium text-gray-700">Full Name</label>
                 <input type="text" value={name} onChange={e => { setName(e.target.value); setError(""); }}
                   placeholder="Your full name" className={ic} />
               </div>
+
               <div className="mt-5 text-left">
                 <label className="mb-2 block text-sm font-medium text-gray-700">I want to join as</label>
                 <div className="grid grid-cols-2 gap-3">
                   {(["worker", "organizer"] as const).map(r => (
                     <button key={r} type="button" onClick={() => setRole(r)}
-                      className={`flex h-16 flex-col items-center justify-center gap-1 rounded-[16px] border-2 transition-all ${role === r ? "border-teal-700 bg-teal-50 text-teal-700" : "border-gray-200 bg-gray-50 text-gray-500"}`}>
+                      className={`flex h-16 flex-col items-center justify-center gap-1 rounded-[16px] border-2 transition-all ${
+                        role === r ? "border-teal-700 bg-teal-50 text-teal-700" : "border-gray-200 bg-gray-50 text-gray-500"
+                      }`}>
                       {r === "worker" ? <HardHat className="w-5 h-5" /> : <Briefcase className="w-5 h-5" />}
                       <span className="text-xs font-semibold capitalize">{r}</span>
                     </button>
                   ))}
                 </div>
               </div>
+
               <button onClick={createProfile} disabled={loading}
                 className="mt-6 w-full h-12 rounded-[16px] bg-teal-700 text-sm font-semibold text-white hover:bg-teal-800 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2">
                 {loading ? <><RefreshCw className="w-4 h-4 animate-spin" /> Setting up...</> : <>Continue <ArrowRight className="w-4 h-4" /></>}
               </button>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </section>
   );
@@ -512,7 +515,7 @@ const previewCards = [
 
 const features = [
   { icon: Shield, title: "Verified Organizers", desc: "Every event creator is verified so you can work with confidence" },
-  { icon: ShieldCheck, title: "Privacy First", desc: "Your contact stays private until you are approved for an event" },
+  { icon:   ShieldCheck, title: "Privacy First", desc: "Your contact stays private until you are approved for an event" },
   { icon: Bell, title: "Instant Alerts", desc: "Real-time notifications for approvals, new events, and updates" },
   { icon: Zap, title: "Smart Matching", desc: "Get events that match your skills, location, and availability" },
   { icon: Users, title: "Build Your Network", desc: "Connect with Ahmedabad's top event organizers and workers" },
