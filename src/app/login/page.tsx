@@ -9,10 +9,9 @@ import {
   Mail, ArrowRight, Briefcase, HardHat, CheckCircle,
   Sparkles, ArrowUpRight, Calendar, Clock, MapPin,
   IndianRupee, BadgeCheck, Flame, Users,
-  Building2, Bell, Shield, Zap, TrendingUp, User,
+  Building2, Bell, Shield, ShieldCheck, Zap, TrendingUp, User,
   ChevronRight, Search, Star, LayoutDashboard, UserCheck,
-  KeyRound, RefreshCw, ArrowDown,
-  ShieldCheck,
+  Lock, Eye, EyeOff, RefreshCw, ArrowDown,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
@@ -61,155 +60,67 @@ function FadeIn({ children, className = "" }: { children: React.ReactNode; class
   );
 }
 
-function OtpInput({ value, onChange, onComplete }: {
-  value: string[]; onChange: (v: string[]) => void; onComplete: (code: string) => void;
-}) {
-  const refs = useRef<(HTMLInputElement | null)[]>([]);
-  const valRef = useRef(value);
-  valRef.current = value;
-
-  const change = (i: number, ch: string) => {
-    const digit = ch.replace(/\D/g, "").slice(-1);
-    if (!digit && ch) return;
-    const next = [...valRef.current];
-    next[i] = digit;
-    valRef.current = next;
-    onChange(next);
-    if (digit && i < 5) refs.current[i + 1]?.focus();
-    if (digit && i === 5) onComplete(next.join(""));
-  };
-
-  const keyDown = (i: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && !valRef.current[i] && i > 0) {
-      const next = [...valRef.current];
-      next[i - 1] = "";
-      valRef.current = next;
-      onChange(next);
-      refs.current[i - 1]?.focus();
-    }
-    if (e.key === "Enter" && valRef.current.join("").length === 6) onComplete(valRef.current.join(""));
-  };
-
-  const paste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    const p = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
-    if (!p) return;
-    e.preventDefault();
-    const next = [...valRef.current];
-    for (let i = 0; i < p.length; i++) next[i] = p[i];
-    valRef.current = next;
-    onChange(next);
-    refs.current[Math.min(p.length, 5)]?.focus();
-    if (p.length === 6) onComplete(next.join(""));
-  };
-
-  return (
-    <div className="flex items-center justify-center gap-2">
-      {value.map((d, i) => (
-        <input
-          key={i}
-          ref={el => { refs.current[i] = el; }}
-          type="text" inputMode="numeric" autoComplete="one-time-code" maxLength={1}
-          value={d}
-          onChange={e => change(i, e.target.value)}
-          onKeyDown={e => keyDown(i, e)}
-          onPaste={i === 0 ? paste : undefined}
-          className={`h-14 w-11 rounded-[16px] border-2 text-center text-lg font-bold tracking-wider outline-none transition-all ${
-            d ? "border-teal-700 bg-teal-50 text-teal-700" : "border-gray-200 bg-gray-50 text-gray-900"
-          } focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20`}
-        />
-      ))}
-    </div>
-  );
-}
-
-// ─── SIMPLE AUTH FORM ──────────────────────────────────────────
+// ─── AUTH FORM WITH PASSWORD ──────────────────────────────────
 function AuthSection({ onRedirect }: { onRedirect: () => void }) {
   const supabase = createClient();
   const router = useRouter();
-  const [step, setStep] = useState<"email" | "otp" | "profile">("email");
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [loading, setLoading] = useState(false);
-  const [resendTimer, setResendTimer] = useState(0);
-  const [error, setError] = useState("");
+  const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [role, setRole] = useState<"worker" | "organizer">("worker");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [step, setStep] = useState<"form" | "otp">("form");
+  const [otp, setOtp] = useState("");
+  const emailRef = useRef<HTMLInputElement>(null);
+  const otpRefs = useRef<(HTMLInputElement | null)[]>(Array(6).fill(null));
 
-  const inputRef = useRef<HTMLInputElement>(null);
-  const signedInRef = useRef(false);
+  useEffect(() => { emailRef.current?.focus(); }, [mode]);
+  useEffect(() => { if (step === "otp") otpRefs.current[0]?.focus(); }, [step]);
 
-  // Handle auth state changes (magic link clicks)
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session && !signedInRef.current) {
-        signedInRef.current = true;
-        const { data: profile } = await supabase
-          .from("profiles").select("role").eq("user_id", session.user.id).maybeSingle();
-        if (profile) {
-          router.push(profile.role === "admin" ? "/admin" : `/${profile.role}/dashboard`);
-        } else {
-          setStep("profile");
-        }
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, [router]);
-
-  useEffect(() => { if (resendTimer > 0) { const t = setInterval(() => setResendTimer(p => p - 1), 1000); return () => clearInterval(t); } }, [resendTimer]);
-  useEffect(() => { if (step === "email") inputRef.current?.focus(); }, [step]);
-
-  const sendOtp = async () => {
+  const handleSignIn = async () => {
     setError("");
-    const trimmed = email.trim();
-    if (!trimmed) { setError("Enter your email"); return; }
+    if (!email.trim()) { setError("Enter your email"); return; }
+    if (!password) { setError("Enter your password"); return; }
     setLoading(true);
-    const { error: sendError } = await supabase.auth.signInWithOtp({ email: trimmed });
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     setLoading(false);
-    if (sendError) { setError(sendError.message); return; }
-    setResendTimer(30);
-    setStep("otp");
-  };
-
-  const verifyOtpCode = async (code?: string) => {
-    const token = code || otp.join("");
-    if (token.length < 6) { setError("Enter the 6-digit code"); return; }
-    setError("");
-    setLoading(true);
-    const { error: verError } = await supabase.auth.verifyOtp({ email: email.trim(), token, type: "email" });
-    setLoading(false);
-    if (verError) {
-      if (verError.message.includes("expired")) setError("Code expired. Request a new one.");
-      else if (verError.message.includes("Invalid") || verError.message.includes("otp")) setError("Wrong code. Try again.");
-      else setError(verError.message);
+    if (signInError) {
+      if (signInError.message.includes("Invalid login credentials")) setError("Wrong email or password");
+      else setError(signInError.message);
       return;
     }
     const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data: profile } = await supabase
-        .from("profiles").select("role").eq("user_id", user.id).maybeSingle();
-      if (profile) {
-        router.push(profile.role === "admin" ? "/admin" : `/${profile.role}/dashboard`);
-        return;
-      }
-    }
-    setStep("profile");
+    if (!user) return;
+    const { data: profile } = await supabase.from("profiles").select("role").eq("user_id", user.id).maybeSingle();
+    router.replace(profile?.role === "admin" ? "/admin" : `/${profile?.role || "worker"}/dashboard`);
   };
 
-  const resendCode = async () => {
-    if (resendTimer > 0) return;
+  const handleSignUp = async () => {
     setError("");
-    const { error: sendError } = await supabase.auth.signInWithOtp({ email: email.trim() });
-    if (sendError) { setError(sendError.message); return; }
-    setResendTimer(30);
-    setOtp(["", "", "", "", "", ""]);
-  };
-
-  const createProfile = async () => {
-    setError("");
-    if (!name.trim()) { setError("Enter your name"); return; }
+    if (!email.trim()) { setError("Enter your email"); return; }
+    if (!password) { setError("Enter your password"); return; }
+    if (password.length < 6) { setError("Password must be at least 6 characters"); return; }
+    if (!name.trim()) { setError("Enter your full name"); return; }
     setLoading(true);
+    const { data: { user }, error: signUpError } = await supabase.auth.signUp({ email: email.trim(), password });
+    if (signUpError || !user) { setLoading(false); setError(signUpError?.message || "Something went wrong"); return; }
+    const { error: otpError } = await supabase.auth.signInWithOtp({ email: email.trim() });
+    if (otpError) { setLoading(false); setError(otpError.message); return; }
+    setLoading(false);
+    setStep("otp");
+  };
+
+  const handleVerifyOtp = async () => {
+    setError("");
+    if (otp.length < 6) { setError("Enter the complete 6-digit code"); return; }
+    setLoading(true);
+    const { error: verifyError } = await supabase.auth.verifyOtp({ email: email.trim(), token: otp, type: "email" });
+    if (verifyError) { setLoading(false); setError(verifyError.message); return; }
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { setError("Session expired. Login again."); setLoading(false); setStep("email"); return; }
+    if (!user) { setLoading(false); setError("Verification failed. Try signing in."); return; }
     const now = new Date();
     const trialEnd = new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000).toISOString();
     const { error: insError } = await supabase.from("profiles").insert({
@@ -220,7 +131,7 @@ function AuthSection({ onRedirect }: { onRedirect: () => void }) {
     if (insError) {
       if (insError.message.includes("duplicate")) {
         const { data } = await supabase.from("profiles").select("role").eq("user_id", user.id).maybeSingle();
-        if (data) { router.push(data.role === "admin" ? "/admin" : `/${data.role}/dashboard`); return; }
+        if (data) { router.replace(data.role === "admin" ? "/admin" : `/${data.role}/dashboard`); return; }
       }
       setError(insError.message);
       return;
@@ -228,146 +139,194 @@ function AuthSection({ onRedirect }: { onRedirect: () => void }) {
     router.replace(`/${role}/dashboard`);
   };
 
-  const ic = "w-full h-12 pl-10 pr-3 rounded-[16px] border border-gray-200 bg-white text-sm outline-none transition-all focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20";
+  const handleResendOtp = async () => {
+    setError("");
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithOtp({ email: email.trim() });
+    setLoading(false);
+    if (error) { setError(error.message); return; }
+    toast.success("New code sent to your email");
+  };
+
+  const ic = "w-full h-12 pl-10 pr-10 rounded-[16px] border border-gray-200 bg-white text-sm outline-none transition-all focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20";
 
   return (
     <section className="bg-[#F8F8F6] py-20 md:py-28" id="auth">
       <div className="mx-auto max-w-md px-4">
-        {step === "email" && (
-          <div className="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden">
-            <div className="h-1 bg-gradient-to-r from-teal-600 to-teal-700" />
-            <div className="p-8 text-center">
-              <div className="mx-auto mb-4 w-14 h-14 rounded-[20px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-lg shadow-teal-700/20">
-                <Mail className="w-7 h-7 text-white" />
-              </div>
-              <h2 className="text-xl font-bold text-gray-900">Welcome to EventMan</h2>
-              <p className="mt-1.5 text-sm text-gray-500">Enter your email to get started</p>
+        <div className="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden">
+          <div className="h-1 bg-gradient-to-r from-teal-600 to-teal-700" />
 
-              {error && (
-                <div className="mt-5 rounded-[16px] bg-red-50 border border-red-200 px-4 py-3">
-                  <p className="text-sm text-red-700">{error}</p>
-                </div>
-              )}
-
-              <div className="mt-6 text-left">
-                <label className="mb-1.5 block text-sm font-medium text-gray-700">Email address</label>
-                <div className="relative">
-                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input
-                    ref={inputRef}
-                    type="email" value={email}
-                    onChange={e => { setEmail(e.target.value); setError(""); }}
-                    placeholder="you@example.com"
-                    autoComplete="email"
-                    className={ic}
-                    onKeyDown={e => { if (e.key === "Enter") sendOtp(); }}
-                  />
-                </div>
-              </div>
-
-              <button onClick={sendOtp} disabled={loading}
-                className="mt-5 w-full h-12 rounded-[16px] bg-teal-700 text-sm font-semibold text-white hover:bg-teal-800 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2">
-                {loading ? <><RefreshCw className="w-4 h-4 animate-spin" /> Sending...</> : <>Send Code <ArrowRight className="w-4 h-4" /></>}
-              </button>
-
-              <p className="mt-4 text-xs text-gray-400">
-                We&apos;ll send a 6-digit code to your email.{" "}
-                <Link href="/terms" className="text-teal-700 underline">Terms</Link>
-              </p>
-            </div>
-          </div>
-        )}
-
-        {step === "otp" && (
-          <div className="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden">
-            <div className="h-1 bg-gradient-to-r from-teal-600 to-teal-700" />
-            <div className="p-8 text-center">
-              <div className="mx-auto mb-4 w-14 h-14 rounded-[20px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-lg shadow-teal-700/20">
-                <KeyRound className="w-7 h-7 text-white" />
-              </div>
-              <h2 className="text-xl font-bold text-gray-900">Check Your Email</h2>
-              <p className="mt-1.5 text-sm text-gray-500">
-                We sent a code to <span className="font-semibold text-gray-700">{email}</span>
-              </p>
-
-              {error && (
-                <div className="mt-5 rounded-[16px] bg-red-50 border border-red-200 px-4 py-3">
-                  <p className="text-sm text-red-700">{error}</p>
-                </div>
-              )}
-
-              <div className="mt-6">
-                <OtpInput value={otp} onChange={setOtp} onComplete={verifyOtpCode} />
-              </div>
-
-              {loading && (
-                <div className="mt-4 flex items-center justify-center gap-2 text-sm text-teal-700">
-                  <RefreshCw className="w-4 h-4 animate-spin" /> Verifying...
-                </div>
-              )}
-
-              <div className="mt-5">
-                {resendTimer > 0 ? (
-                  <span className="text-sm text-gray-400">Resend in <span className="font-semibold text-gray-600">{resendTimer}s</span></span>
-                ) : (
-                  <button onClick={resendCode} className="text-sm font-semibold text-teal-700 hover:text-teal-800">
-                    Resend code
-                  </button>
-                )}
-              </div>
-
-              <button onClick={() => { setStep("email"); setError(""); setOtp(["", "", "", "", "", ""]); }}
-                className="mt-4 text-xs text-gray-400 underline hover:text-gray-600">
-                Use a different email
-              </button>
-            </div>
-          </div>
-        )}
-
-        {step === "profile" && (
-          <div className="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden">
-            <div className="h-1 bg-gradient-to-r from-emerald-500 to-teal-500" />
-            <div className="p-8">
+          {step === "otp" ? (
+            <div className="p-6">
               <div className="text-center mb-6">
-                <div className="mx-auto mb-4 w-14 h-14 rounded-[20px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-lg shadow-teal-700/20">
-                  <User className="w-7 h-7 text-white" />
+                <div className="mx-auto w-14 h-14 rounded-[20px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-lg shadow-teal-700/20">
+                  <Mail className="w-7 h-7 text-white" />
                 </div>
-                <h2 className="text-xl font-bold text-gray-900">Almost Done!</h2>
-                <p className="mt-1.5 text-sm text-gray-500">Just your name and role</p>
-
-                {error && (
-                  <div className="mt-4 rounded-[16px] bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>
-                )}
+                <h2 className="mt-3 text-xl font-bold text-gray-900">Verify Your Email</h2>
+                <p className="mt-1 text-sm text-gray-500">Enter the 6-digit code sent to {email}</p>
               </div>
-
-              <div className="text-left">
-                <label className="mb-1.5 block text-sm font-medium text-gray-700">Full Name</label>
-                <input type="text" value={name} onChange={e => { setName(e.target.value); setError(""); }}
-                  placeholder="Your full name" className={ic} />
+              {error && (
+                <div className="mb-5 rounded-[16px] bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>
+              )}
+              <div className="flex items-center justify-center gap-2">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <input key={i} ref={el => { otpRefs.current[i] = el; }} type="text" maxLength={1}
+                    value={otp[i] || ""}
+                    onChange={e => {
+                      const v = e.target.value.replace(/\D/g, "").slice(0, 1);
+                      const next = [...otp]; next[i] = v; setOtp(next.join(""));
+                      if (v && i < 5) otpRefs.current[i + 1]?.focus();
+                      setError("");
+                    }}
+                    onKeyDown={e => {
+                      if (e.key === "Backspace" && !otp[i] && i > 0) otpRefs.current[i - 1]?.focus();
+                      if (e.key === "Enter" && otp.length === 6) handleVerifyOtp();
+                    }}
+                    onPaste={e => {
+                      const paste = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+                      if (paste.length === 6) { setOtp(paste); otpRefs.current[5]?.focus(); }
+                    }}
+                    className="w-11 h-12 rounded-[14px] border border-gray-200 bg-white text-center text-lg font-bold outline-none transition-all focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20" />
+                ))}
               </div>
-
-              <div className="mt-5 text-left">
-                <label className="mb-2 block text-sm font-medium text-gray-700">I want to join as</label>
-                <div className="grid grid-cols-2 gap-3">
-                  {(["worker", "organizer"] as const).map(r => (
-                    <button key={r} type="button" onClick={() => setRole(r)}
-                      className={`flex h-16 flex-col items-center justify-center gap-1 rounded-[16px] border-2 transition-all ${
-                        role === r ? "border-teal-700 bg-teal-50 text-teal-700" : "border-gray-200 bg-gray-50 text-gray-500"
-                      }`}>
-                      {r === "worker" ? <HardHat className="w-5 h-5" /> : <Briefcase className="w-5 h-5" />}
-                      <span className="text-xs font-semibold capitalize">{r}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <button onClick={createProfile} disabled={loading}
+              <button onClick={handleVerifyOtp} disabled={loading || otp.length < 6}
                 className="mt-6 w-full h-12 rounded-[16px] bg-teal-700 text-sm font-semibold text-white hover:bg-teal-800 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2">
-                {loading ? <><RefreshCw className="w-4 h-4 animate-spin" /> Setting up...</> : <>Continue <ArrowRight className="w-4 h-4" /></>}
+                {loading ? <><RefreshCw className="w-4 h-4 animate-spin" /> Verifying...</> : <>Verify <ArrowRight className="w-4 h-4" /></>}
               </button>
+              <div className="mt-4 text-center">
+                <button onClick={handleResendOtp} disabled={loading}
+                  className="text-sm text-teal-700 font-semibold hover:text-teal-800">
+                  Resend code
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          ) : (
+            <>
+              {/* Tabs */}
+              <div className="grid grid-cols-2">
+                <button onClick={() => { setMode("signin"); setError(""); }}
+                  className={`h-12 text-sm font-semibold transition-all ${mode === "signin" ? "text-teal-700 border-b-2 border-teal-700" : "text-gray-400 border-b border-gray-100"}`}>
+                  Sign In
+                </button>
+                <button onClick={() => { setMode("signup"); setError(""); }}
+                  className={`h-12 text-sm font-semibold transition-all ${mode === "signup" ? "text-teal-700 border-b-2 border-teal-700" : "text-gray-400 border-b border-gray-100"}`}>
+                  Create Account
+                </button>
+              </div>
+
+              <div className="p-6">
+                {/* Icon */}
+                <div className="text-center mb-6">
+                  <div className="mx-auto w-14 h-14 rounded-[20px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-lg shadow-teal-700/20">
+                    {mode === "signin" ? <Lock className="w-7 h-7 text-white" /> : <User className="w-7 h-7 text-white" />}
+                  </div>
+                  <h2 className="mt-3 text-xl font-bold text-gray-900">{mode === "signin" ? "Welcome Back" : "Join EventMan"}</h2>
+                  <p className="mt-1 text-sm text-gray-500">{mode === "signin" ? "Sign in to your account" : "Create your account in seconds"}</p>
+                </div>
+
+                {/* Error */}
+                {error && (
+                  <div className="mb-5 rounded-[16px] bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>
+                )}
+
+                {/* Email */}
+                <div className="text-left">
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">Email</label>
+                  <div className="relative">
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input ref={emailRef} type="email" value={email}
+                      onChange={e => { setEmail(e.target.value); setError(""); }}
+                      placeholder="you@example.com" autoComplete="email"
+                      className={ic} />
+                  </div>
+                </div>
+
+                {/* Password */}
+                <div className="mt-4 text-left">
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700">Password</label>
+                  <div className="relative">
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input type={showPassword ? "text" : "password"} value={password}
+                      onChange={e => { setPassword(e.target.value); setError(""); }}
+                      placeholder={mode === "signup" ? "Create a password" : "Enter your password"}
+                      autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                      className={ic}
+                      onKeyDown={e => { if (e.key === "Enter" && mode === "signin") handleSignIn(); }} />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Forgot password (sign in only) */}
+                {mode === "signin" && (
+                  <div className="mt-2 text-right">
+                    <button className="text-xs text-teal-700 hover:text-teal-800 font-medium">
+                      Forgot password?
+                    </button>
+                  </div>
+                )}
+
+                {/* Name + Role (sign up only) */}
+                {mode === "signup" && (
+                  <>
+                    <div className="mt-4 text-left">
+                      <label className="mb-1.5 block text-sm font-medium text-gray-700">Full Name</label>
+                      <div className="relative">
+                        <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input type="text" value={name} onChange={e => { setName(e.target.value); setError(""); }}
+                          placeholder="Your full name" className={ic} />
+                      </div>
+                    </div>
+                    <div className="mt-4 text-left">
+                      <label className="mb-2 block text-sm font-medium text-gray-700">I want to join as</label>
+                      <div className="grid grid-cols-2 gap-3">
+                        {(["worker", "organizer"] as const).map(r => (
+                          <button key={r} type="button" onClick={() => setRole(r)}
+                            className={`flex h-14 flex-col items-center justify-center gap-1 rounded-[16px] border-2 transition-all ${
+                              role === r ? "border-teal-700 bg-teal-50 text-teal-700" : "border-gray-200 bg-gray-50 text-gray-500"
+                            }`}>
+                            {r === "worker" ? <HardHat className="w-5 h-5" /> : <Briefcase className="w-5 h-5" />}
+                            <span className="text-xs font-semibold capitalize">{r}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Submit */}
+                <button onClick={mode === "signin" ? handleSignIn : handleSignUp} disabled={loading}
+                  className="mt-6 w-full h-12 rounded-[16px] bg-teal-700 text-sm font-semibold text-white hover:bg-teal-800 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2">
+                  {loading ? (
+                    <><RefreshCw className="w-4 h-4 animate-spin" /> {mode === "signin" ? "Signing in..." : "Creating account..."}</>
+                  ) : (
+                    <>{mode === "signin" ? "Sign In" : "Create Account"} <ArrowRight className="w-4 h-4" /></>
+                  )}
+                </button>
+
+                {/* TOS */}
+                <p className="mt-4 text-xs text-gray-400 text-center">
+                  By continuing, you agree to our{" "}
+                  <Link href="/terms" className="text-teal-700 underline">Terms</Link>{" "}
+                  and <Link href="/privacy" className="text-teal-700 underline">Privacy Policy</Link>
+                </p>
+
+                {/* Switch mode */}
+                <div className="mt-5 pt-4 border-t border-gray-100 text-center">
+                  <p className="text-sm text-gray-500">
+                    {mode === "signin" ? "Don&apos;t have an account?" : "Already have an account?"}{" "}
+                    <button onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setError(""); }}
+                      className="text-teal-700 font-semibold hover:text-teal-800">
+                      {mode === "signin" ? "Create one" : "Sign in"}
+                    </button>
+                  </p>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </section>
   );
@@ -515,7 +474,7 @@ const previewCards = [
 
 const features = [
   { icon: Shield, title: "Verified Organizers", desc: "Every event creator is verified so you can work with confidence" },
-  { icon:   ShieldCheck, title: "Privacy First", desc: "Your contact stays private until you are approved for an event" },
+  { icon: ShieldCheck, title: "Privacy First", desc: "Your contact stays private until you are approved for an event" },
   { icon: Bell, title: "Instant Alerts", desc: "Real-time notifications for approvals, new events, and updates" },
   { icon: Zap, title: "Smart Matching", desc: "Get events that match your skills, location, and availability" },
   { icon: Users, title: "Build Your Network", desc: "Connect with Ahmedabad's top event organizers and workers" },
