@@ -1,4 +1,5 @@
 ﻿"use client";
+export const dynamic = "force-dynamic";
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -14,8 +15,6 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { toast } from "sonner";
-
-const supabase = createClient();
 
 function AnimatedCounter({ end, suffix = "" }: { end: number; suffix?: string }) {
   const [val, setVal] = useState(0);
@@ -124,6 +123,7 @@ function OtpInput({ value, onChange, onComplete }: {
 
 // ─── SIMPLE AUTH FORM ──────────────────────────────────────────
 function AuthSection({ onRedirect }: { onRedirect: () => void }) {
+  const supabase = createClient();
   const router = useRouter();
   const [step, setStep] = useState<"email" | "otp" | "profile">("email");
   const [email, setEmail] = useState("");
@@ -522,6 +522,7 @@ const features = [
 ];
 
 export default function LoginPage() {
+  const supabase = createClient();
   const router = useRouter();
   const authRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
