@@ -34,8 +34,6 @@ export async function createProfile(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
 
-  if (role === "admin") return { error: "Cannot create admin account" };
-
   const now = new Date();
   const trialEnd = new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000).toISOString();
   const profileData: Record<string, any> = {

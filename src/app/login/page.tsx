@@ -8,7 +8,7 @@ import {
   Mail, ArrowRight, Briefcase, HardHat, CheckCircle,
   Sparkles, ArrowUpRight, Calendar, Clock, MapPin,
   IndianRupee, BadgeCheck, Flame, Users,
-  Building2, Bell, Shield, Zap, TrendingUp, User,
+  Building2, Bell, Shield, ShieldCheck, Zap, TrendingUp, User,
   ChevronRight, Search, Star, LayoutDashboard, UserCheck,
   KeyRound, RefreshCw, ArrowDown,
 } from "lucide-react";
@@ -514,7 +514,7 @@ const previewCards = [
 
 const features = [
   { icon: Shield, title: "Verified Organizers", desc: "Every event creator is verified so you can work with confidence" },
-  { icon: Lock, title: "Privacy First", desc: "Your contact stays private until you are approved for an event" },
+  { icon: ShieldCheck, title: "Privacy First", desc: "Your contact stays private until you are approved for an event" },
   { icon: Bell, title: "Instant Alerts", desc: "Real-time notifications for approvals, new events, and updates" },
   { icon: Zap, title: "Smart Matching", desc: "Get events that match your skills, location, and availability" },
   { icon: Users, title: "Build Your Network", desc: "Connect with Ahmedabad's top event organizers and workers" },
