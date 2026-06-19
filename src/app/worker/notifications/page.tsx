@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ArrowLeft, Bell, CheckCheck, CheckCircle, XCircle, X, Clock, AlertCircle, BadgeCheck } from "lucide-react";
+import { ArrowLeft, Bell, CheckCheck, CheckCircle, XCircle, X, Clock, AlertCircle, BadgeCheck, Share2 } from "lucide-react";
 import type { Notification } from "@/lib/supabase/types";
 
 const ICONS: Record<string, any> = {
@@ -28,6 +28,17 @@ export default function WorkerNotificationsPage() {
   const supabase = createClient();
 
   useEffect(() => { loadNotifications(); }, []);
+
+  const shareApp = async () => {
+    const text = "Join EventMan - the best platform for event workers and organizers! Find events, hire workers, and manage everything in one place. 🚀\n\nDownload now: https://eventman2.vercel.app";
+    if (navigator.share) {
+      try { await navigator.share({ title: "EventMan", text }); } catch {}
+    } else {
+      await navigator.clipboard.writeText(text);
+      const { toast } = await import("sonner");
+      toast.success("Link copied to clipboard!");
+    }
+  };
 
   const loadNotifications = async () => {
     try {
@@ -103,6 +114,20 @@ export default function WorkerNotificationsPage() {
             <CheckCheck className="w-4 h-4" /> Mark all as read
           </button>
         )}
+
+        <div className="mb-4 rounded-[16px] bg-gradient-to-r from-teal-600 to-teal-700 p-4 flex items-center gap-3 shadow-lg shadow-teal-700/20">
+          <div className="w-10 h-10 rounded-[12px] bg-white/20 flex items-center justify-center shrink-0">
+            <Share2 className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-white">Share with Friends</p>
+            <p className="text-xs text-teal-100 mt-0.5">Help your friends discover EventMan</p>
+          </div>
+          <button onClick={shareApp}
+            className="h-9 px-4 rounded-[12px] bg-white text-teal-700 text-xs font-bold shadow-lg active:scale-95 transition-all">
+            Share
+          </button>
+        </div>
 
         {notifications.length === 0 && (
           <div className="text-center py-20">
