@@ -113,6 +113,30 @@ export interface Notification {
   created_at: string;
 }
 
+export interface PushSubscription {
+  id: number;
+  user_id: string;
+  role: string;
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  user_agent: string | null;
+  created_at: string;
+}
+
+export interface NotificationLog {
+  id: number;
+  user_id: string;
+  role: string;
+  title: string;
+  body: string;
+  random_number: number;
+  delivered: boolean;
+  clicked: boolean;
+  error: string | null;
+  created_at: string;
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -145,6 +169,16 @@ export interface Database {
         Row: Notification;
         Insert: Omit<Notification, "created_at">;
         Update: Partial<Notification>;
+      };
+      push_subscriptions: {
+        Row: PushSubscription;
+        Insert: Omit<PushSubscription, "id" | "created_at">;
+        Update: Partial<PushSubscription>;
+      };
+      notification_log: {
+        Row: NotificationLog;
+        Insert: Omit<NotificationLog, "id" | "created_at">;
+        Update: Partial<NotificationLog>;
       };
     };
   };

@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
 import { OfflineBanner, InstallPrompt, PWARegistration } from "@/components/PWA";
 import { SessionKeeper } from "@/components/SessionKeeper";
+import { NotificationGate, NotificationTest } from "@/components/NotificationPermission";
 import "./globals.css";
 
 const inter = Inter({
@@ -54,6 +55,8 @@ export default function RootLayout({
         <PWARegistration />
         <OfflineBanner />
         <InstallPrompt />
+        <NotificationGate />
+        <NotificationTest />
         <div id="build-id" className="fixed bottom-2 left-2 z-50 text-[8px] text-gray-300 bg-white/80 px-1.5 py-0.5 rounded">v3</div>
       </body>
     </html>

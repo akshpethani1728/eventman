@@ -29,3 +29,37 @@ self.addEventListener("fetch", (event) => {
       .catch(() => caches.match(event.request))
   );
 });
+
+self.addEventListener("push", (event) => {
+  let data;
+  if (event.data) {
+    try { data = event.data.json(); } catch {}
+  }
+  if (!data) data = { title: "EventMan", body: "You have a new update." };
+  const options = {
+    body: data.body || "",
+    icon: "/favicon.svg",
+    badge: "/favicon.svg",
+    tag: "eventman-push",
+    data: { url: data.url || "/login" },
+    vibrate: [200, 100, 200],
+    requireInteraction: true,
+  };
+  event.waitUntil(self.registration.showNotification(data.title || "EventMan", options));
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url || "/login";
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
+      for (const client of clients) {
+        if (client.url.includes(self.location.origin) && "focus" in client) {
+          client.postMessage({ type: "notification-click", url });
+          return client.focus().then(() => client.navigate(url));
+        }
+      }
+      if (clients.openWindow) return self.clients.openWindow(url);
+    })
+  );
+});
