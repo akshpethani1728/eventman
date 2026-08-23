@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import {
-  ArrowLeft, Send, Users, Building2, Globe,
+  ArrowLeft, Send, Users, Building2,
   CheckCircle, AlertTriangle
 } from "lucide-react";
 import { Button } from "@/lib/design/Button";
@@ -18,7 +18,7 @@ type Audience = "workers" | "organizers" | "everyone";
 const AUDIENCE_OPTIONS: { value: Audience; label: string; icon: React.ReactNode; desc: string }[] = [
   { value: "workers", label: "Workers", icon: <Users className="w-4 h-4" />, desc: "All subscribed workers" },
   { value: "organizers", label: "Organizers", icon: <Building2 className="w-4 h-4" />, desc: "All subscribed organizers" },
-  { value: "everyone", label: "Everyone", icon: <Globe className="w-4 h-4" />, desc: "All subscribed users" },
+  { value: "everyone", label: "Everyone", icon: <Users className="w-4 h-4" />, desc: "All subscribed users" },
 ];
 
 interface SendResult {
