@@ -9,7 +9,7 @@ import {
   LogOut, Shield, Ban, Users, Calendar, BadgeCheck, ShieldCheck,
   ShieldAlert, Crown, Trash2, CreditCard, Clock, ChevronRight, Plus,
   Search, X, RefreshCw, Building2, Flag, MoreHorizontal, AlertTriangle,
-  CheckCircle, XCircle, Filter
+  CheckCircle, XCircle, Filter, Bell
 } from "lucide-react";
 import { Button } from "@/lib/design/Button";
 import { Card, CardHeader, CardTitle, CardStat, CardStats } from "@/lib/design/Card";
@@ -17,7 +17,7 @@ import { Badge, StatusDot, Divider } from "@/lib/design/Badge";
 import { PageLoader } from "@/lib/design/Loading";
 import type { Profile, Event } from "@/lib/supabase/types";
 
-type AdminTab = "users" | "events";
+type AdminTab = "users" | "events" | "notifications";
 
 const ROLE_ICONS: Record<string, React.ReactNode> = {
   admin: <Shield className="w-3.5 h-3.5 text-indigo-500" />,
@@ -190,18 +190,21 @@ export default function AdminDashboard() {
         {/* Tabs + Search Bar */}
         <div className="card-floating p-1.5 flex items-center gap-2">
           <div className="flex gap-1 flex-1">
-            {(["users", "events"] as AdminTab[]).map(t => (
-              <button key={t} onClick={() => setTab(t)}
+            {(["users", "events", "notifications"] as AdminTab[]).map(t => (
+              <button key={t} onClick={() => {
+                if (t === "notifications") { router.push("/admin/notifications"); return; }
+                setTab(t);
+              }}
                 className={`flex-1 h-10 rounded-[12px] text-xs font-semibold capitalize transition-all ${
                   tab === t
                     ? "bg-[#0D9488] text-white shadow-[0_2px_8px_rgba(13,148,136,0.25)]"
                     : "text-gray-500 hover:text-gray-800 hover:bg-gray-100"
                 }`}>
                 <span className="hidden sm:inline">{t}</span>
-                <span className="sm:hidden">{t === "users" ? "👤" : "📅"}</span>
+                <span className="sm:hidden">{t === "users" ? "👤" : t === "events" ? "📅" : "🔔"}</span>
                 {" "}
                 <span className={`text-[10px] ${tab === t ? "text-white/70" : "text-gray-400"}`}>
-                  ({t === "users" ? users.length : events.length})
+                  ({t === "users" ? users.length : t === "events" ? events.length : "Push"})
                 </span>
               </button>
             ))}

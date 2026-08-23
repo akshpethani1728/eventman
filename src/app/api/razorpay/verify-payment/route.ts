@@ -5,7 +5,7 @@ import crypto from "crypto";
 
 export async function POST(request: NextRequest) {
   try {
-    const { orderId, paymentId, signature } = await request.json();
+    const { orderId, paymentId, signature, planType } = await request.json();
 
     const keySecret = process.env.RAZORPAY_KEY_SECRET!;
 
@@ -43,7 +43,8 @@ export async function POST(request: NextRequest) {
     );
 
     const now = new Date();
-    const subEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    const planDays = planType === "yearly" ? 365 : 30;
+    const subEnd = new Date(now.getTime() + planDays * 24 * 60 * 60 * 1000).toISOString();
 
     const { error: updateError } = await adminClient
       .from("profiles")

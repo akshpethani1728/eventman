@@ -12,8 +12,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-const MONTHLY_PRICE = 149;
-const PER_DAY = (MONTHLY_PRICE / 30).toFixed(0);
+const MONTHLY_PRICE = 100;
+const YEARLY_PRICE = 850;
+const MONTHLY_PER_DAY = (MONTHLY_PRICE / 30).toFixed(0);
+const YEARLY_PER_DAY = (YEARLY_PRICE / 365).toFixed(0);
 
 declare global {
   interface Window { Razorpay: any; }
@@ -43,6 +45,7 @@ export default function WorkerPlansPage() {
   const [paymentStatus, setPaymentStatus] = useState<"idle" | "success" | "failed" | "cancelled">("idle");
   const [paymentError, setPaymentError] = useState("");
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<"monthly" | "yearly">("monthly");
   const router = useRouter();
   const supabase = createClient();
 
@@ -83,11 +86,13 @@ export default function WorkerPlansPage() {
     setPurchasing(true);
     setPaymentStatus("idle");
     setPaymentError("");
+    const price = selectedPlan === "yearly" ? YEARLY_PRICE : MONTHLY_PRICE;
+    const description = selectedPlan === "yearly" ? "Yearly Worker Plan" : "Monthly Worker Plan";
     try {
       const orderRes = await fetch("/api/razorpay/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: MONTHLY_PRICE, currency: "INR", receipt: `worker_${Date.now()}` }),
+        body: JSON.stringify({ amount: price, currency: "INR", receipt: `worker_${selectedPlan}_${Date.now()}` }),
       });
       const orderData = await orderRes.json();
       if (!orderRes.ok) { setPaymentError(`${orderData.code ? orderData.code + ": " : ""}${orderData.error || "Order creation failed"}`); throw new Error(orderData.error || "Order creation failed"); }
@@ -96,7 +101,7 @@ export default function WorkerPlansPage() {
         amount: orderData.amount,
         currency: orderData.currency,
         name: "EventMan",
-        description: "Monthly Worker Plan",
+        description,
         order_id: orderData.orderId,
         prefill: { name: profile?.full_name || "", email: profile?.email || "", contact: profile?.phone || "" },
         theme: { color: "#0D9488" },
@@ -108,6 +113,7 @@ export default function WorkerPlansPage() {
               orderId: response.razorpay_order_id,
               paymentId: response.razorpay_payment_id,
               signature: response.razorpay_signature,
+              planType: selectedPlan,
             }),
           });
           const verifyData = await verifyRes.json();
@@ -149,6 +155,15 @@ export default function WorkerPlansPage() {
   const daysRemaining = planStatus?.daysRemaining ?? 0;
   const endDate = isActive ? profile?.subscription_end_date : profile?.trial_end_date;
   const barrier = isExpired;
+
+  const planTotalDays = (() => {
+    if (isActive && profile?.subscription_start_date && profile?.subscription_end_date) {
+      const start = new Date(profile.subscription_start_date).getTime();
+      const end = new Date(profile.subscription_end_date).getTime();
+      return Math.ceil((end - start) / 86400000);
+    }
+    return 30;
+  })();
 
   return (
     <div className="min-h-dvh bg-[#F8F8F6] pb-28">
@@ -245,7 +260,7 @@ export default function WorkerPlansPage() {
                 </div>
                 <ProgressBar
                   value={daysRemaining}
-                  max={isActive ? 30 : 10}
+                  max={isActive ? planTotalDays : 10}
                   color={isActive ? "bg-emerald-400" : "bg-[#0D9488]"}
                 />
               </div>
@@ -279,108 +294,151 @@ export default function WorkerPlansPage() {
           </div>
         </div>
 
-        {/* ─── PLAN CARD ─── */}
-        <div className="relative">
-          {/* Premium corner badge */}
-          <div className="absolute -top-[1px] -right-[1px] z-10">
-            <div className="bg-gradient-to-l from-[#0D9488] to-[#0A7C73] text-white text-[9px] font-bold px-4 py-1.5 rounded-bl-2xl rounded-tr-2xl tracking-wider flex items-center gap-1">
-              <BadgeCheck className="w-2.5 h-2.5" /> BEST VALUE
+        {/* ─── PLAN SELECTION ─── */}
+        {!isActive && (
+          <div className="space-y-3">
+            <p className="text-xs font-semibold text-[#6B6B6B] uppercase tracking-wider">Choose your plan</p>
+
+            {/* Monthly Plan */}
+            <button
+              onClick={() => setSelectedPlan("monthly")}
+              className={`w-full text-left card-base overflow-hidden transition-all duration-200 ${
+                selectedPlan === "monthly"
+                  ? "border-2 border-[#0D9488] shadow-[0_4px_16px_rgba(13,148,136,0.12)]"
+                  : "border-2 border-transparent hover:border-gray-200"
+              }`}
+            >
+              <div className="relative">
+                {selectedPlan === "monthly" && (
+                  <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#0D9488] to-[#0A7C73]" />
+                )}
+                <div className="p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-[14px] flex items-center justify-center ${
+                        selectedPlan === "monthly" ? "bg-[#0D9488]" : "bg-gray-100"
+                      }`}>
+                        <Clock className={`w-5 h-5 ${selectedPlan === "monthly" ? "text-white" : "text-gray-400"}`} />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-[15px] text-[#1A1A1A]">Monthly</h3>
+                        <p className="text-[11px] text-[#6B6B6B] mt-0.5">30 days access</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="flex items-baseline gap-0.5">
+                        <span className="text-lg font-bold text-[#1A1A1A]">₹{MONTHLY_PRICE}</span>
+                        <span className="text-[10px] text-[#A1A1AA]">/month</span>
+                      </div>
+                      <p className="text-[10px] text-[#A1A1AA]">₹{MONTHLY_PER_DAY}/day</p>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex items-center gap-4 text-[10px] text-[#A1A1AA]">
+                    <span className="flex items-center gap-1"><Zap className="w-3 h-3" /> Unlimited applications</span>
+                    <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> 30-day access</span>
+                  </div>
+                </div>
+              </div>
+            </button>
+
+            {/* Yearly Plan */}
+            <button
+              onClick={() => setSelectedPlan("yearly")}
+              className={`w-full text-left card-base overflow-hidden transition-all duration-200 ${
+                selectedPlan === "yearly"
+                  ? "border-2 border-[#0D9488] shadow-[0_4px_16px_rgba(13,148,136,0.12)]"
+                  : "border-2 border-transparent hover:border-gray-200"
+              }`}
+            >
+              <div className="relative">
+                {selectedPlan === "yearly" && (
+                  <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#0D9488] to-[#0A7C73]" />
+                )}
+                <div className="p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-[14px] flex items-center justify-center ${
+                        selectedPlan === "yearly" ? "bg-[#0D9488]" : "bg-gray-100"
+                      }`}>
+                        <Crown className={`w-5 h-5 ${selectedPlan === "yearly" ? "text-white" : "text-gray-400"}`} />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-bold text-[15px] text-[#1A1A1A]">Yearly</h3>
+                          <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200/60">SAVE ₹350</span>
+                        </div>
+                        <p className="text-[11px] text-[#6B6B6B] mt-0.5">365 days access</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="flex items-baseline gap-0.5">
+                        <span className="text-lg font-bold text-[#1A1A1A]">₹{YEARLY_PRICE}</span>
+                        <span className="text-[10px] text-[#A1A1AA]">/year</span>
+                      </div>
+                      <p className="text-[10px] text-emerald-600 font-medium">₹{YEARLY_PER_DAY}/day</p>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex items-center gap-4 text-[10px] text-[#A1A1AA]">
+                    <span className="flex items-center gap-1"><Zap className="w-3 h-3" /> Unlimited applications</span>
+                    <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> 365-day access</span>
+                  </div>
+                </div>
+              </div>
+            </button>
+          </div>
+        )}
+
+        {/* ─── ACTIVE PLAN DETAIL ─── */}
+        {isActive && (
+          <div className="card-base overflow-hidden">
+            <div className="px-5 py-4 bg-gradient-to-r from-[#0D9488] to-[#0A7C73]">
+              <div className="flex items-center gap-2.5">
+                <Crown className="w-5 h-5 text-white" />
+                <div>
+                  <p className="text-sm font-bold text-white">Your Active Plan</p>
+                  <p className="text-[10px] text-white/70">{daysRemaining} day{daysRemaining !== 1 ? "s" : ""} remaining</p>
+                </div>
+              </div>
+            </div>
+            <div className="p-5">
+              <div className="flex items-center justify-center text-emerald-600 font-semibold text-sm gap-2">
+                <CheckCircle className="w-4 h-4" /> Currently Active
+              </div>
+              <p className="text-[11px] text-[#6B6B6B] text-center mt-2.5">Your hustle today builds the life you want tomorrow. Keep going.</p>
             </div>
           </div>
+        )}
 
-          <div className="card-base border-2 border-[#0D9488]/20 shadow-[0_4px_16px_rgba(13,148,136,0.08)]">
-            {/* Plan header */}
-            <div className="px-6 pt-7 pb-2 text-center">
-              <div className="mx-auto mb-3 w-14 h-14 rounded-[18px] bg-gradient-to-br from-[#0D9488] to-[#0A7C73] flex items-center justify-center ring-4 ring-[#0D9488]/10">
-                <Crown className="w-7 h-7 text-white" />
-              </div>
-              <h2 className="text-xl font-extrabold text-[#1A1A1A] tracking-tight">Monthly Access</h2>
-              <p className="text-xs text-[#6B6B6B] mt-1">Everything you need to find event work</p>
-            </div>
-
-            {/* Pricing */}
-            <div className="px-6 py-5 text-center border-b border-[rgba(0,0,0,0.06)]">
-              <div className="flex items-baseline justify-center gap-0.5">
-                <span className="text-3xl font-bold text-[#1A1A1A]">₹</span>
-                <span className="text-5xl font-black text-[#1A1A1A] tracking-tight">{MONTHLY_PRICE}</span>
-                <span className="text-sm text-[#A1A1AA] ml-1 font-medium">/month</span>
-              </div>
-              <p className="text-xs text-[#A1A1AA] mt-2 flex items-center justify-center gap-1">
-                <Zap className="w-3 h-3 text-[#A1A1AA]" />
-                Just <span className="font-semibold text-[#6B6B6B]">₹{PER_DAY}/day</span> — less than a cup of chai
-              </p>
-            </div>
-
-            {/* Benefits */}
-            <div className="px-6 pt-5 pb-2 space-y-3">
-              {[
-                { icon: Zap, text: "Unlimited event applications", sub: "Apply to as many events as you want" },
-                { icon: TrendingUp, text: "Stay ahead of the crowd", sub: "Get priority visibility to organizers" },
-                { icon: Users, text: "Keep growing your profile", sub: "Build reputation with every approval" },
-                { icon: Calendar, text: "Full 30-day access", sub: "No restrictions, cancel anytime" },
-              ].map((item, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <div className="w-7 h-7 rounded-[10px] bg-teal-50 flex items-center justify-center shrink-0 mt-0.5">
-                    <item.icon className="w-3.5 h-3.5 text-[#0D9488]" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-[#1A1A1A]">{item.text}</p>
-                    <p className="text-[11px] text-[#A1A1AA]">{item.sub}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* CTA */}
-            <div className="px-6 pt-4 pb-6">
-              {isActive ? (
-                <div className="w-full h-12 rounded-[16px] bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 font-semibold text-sm gap-2">
-                  <CheckCircle className="w-4 h-4" /> Currently Active
-                </div>
-              ) : barrier ? (
-                <button
-                  onClick={handlePurchase}
-                  disabled={purchasing || !razorpayLoaded}
-                  className="w-full h-13 rounded-[16px] bg-gradient-to-r from-[#0D9488] to-[#0A7C73] text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:from-[#0A7C73] hover:to-[#086B62] flex items-center justify-center gap-2"
-                >
-                  {purchasing ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
-                  ) : !razorpayLoaded ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> Loading...</>
-                  ) : (
-                    <><CreditCard className="w-4 h-4" /> Renew — ₹{MONTHLY_PRICE}/mo</>
-                  )}
-                </button>
+        {/* ─── CTA ─── */}
+        {!isActive && (
+          <div className="card-base p-5">
+            <button
+              onClick={handlePurchase}
+              disabled={purchasing || !razorpayLoaded}
+              className="w-full h-13 rounded-[16px] bg-gradient-to-r from-[#0D9488] to-[#0A7C73] text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:from-[#0A7C73] hover:to-[#086B62] flex items-center justify-center gap-2"
+            >
+              {purchasing ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
+              ) : !razorpayLoaded ? (
+                <><Loader2 className="w-4 h-4 animate-spin" /> Loading...</>
               ) : (
-                <button
-                  onClick={handlePurchase}
-                  disabled={purchasing || !razorpayLoaded}
-                  className="w-full h-13 rounded-[16px] bg-gradient-to-r from-[#0D9488] to-[#0A7C73] text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:from-[#0A7C73] hover:to-[#086B62] flex items-center justify-center gap-2"
-                >
-                  {purchasing ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
-                  ) : !razorpayLoaded ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> Loading...</>
-                  ) : (
-                    <><CreditCard className="w-4 h-4" /> Subscribe — ₹{MONTHLY_PRICE}/mo</>
-                  )}
-                </button>
+                <><CreditCard className="w-4 h-4" /> Pay ₹{selectedPlan === "yearly" ? YEARLY_PRICE : MONTHLY_PRICE}</>
               )}
+            </button>
 
-              {!barrier && !isActive && (
-                <p className="text-[10px] text-[#A1A1AA] text-center mt-3">
-                  Your free trial continues. Subscribe before it ends to keep applying.
-                </p>
-              )}
+            {!barrier && !isActive && (
+              <p className="text-[10px] text-[#A1A1AA] text-center mt-3">
+                Your free trial continues. Subscribe before it ends to keep applying.
+              </p>
+            )}
 
-              {isExpired && (
-                <p className="text-[10px] text-[#A1A1AA] text-center mt-3">
-                  Your plan has expired. Renew to start applying again.
-                </p>
-              )}
-            </div>
+            {isExpired && (
+              <p className="text-[10px] text-[#A1A1AA] text-center mt-3">
+                Your plan has expired. Renew to start applying again.
+              </p>
+            )}
           </div>
-        </div>
+        )}
 
         {/* ─── TRUST STRIP ─── */}
         <div className="card-base p-4">

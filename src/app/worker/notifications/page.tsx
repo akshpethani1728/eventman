@@ -4,16 +4,13 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { ArrowLeft, Bell, CheckCheck, CheckCircle, XCircle, X, Clock, AlertCircle, BadgeCheck, Share2 } from "lucide-react";
+import { ArrowLeft, Bell, CheckCheck, CheckCircle, XCircle, X, Share2 } from "lucide-react";
 import type { Notification } from "@/lib/supabase/types";
 
 const ICONS: Record<string, any> = {
   "Application Approved": <CheckCircle className="w-4 h-4 text-green-600" />,
   "Application Rejected": <XCircle className="w-4 h-4 text-red-600" />,
-  "Trial Ending Soon": <Clock className="w-4 h-4 text-[#0D9488]" />,
-  "Trial Expired": <AlertCircle className="w-4 h-4 text-amber-600" />,
-  "Welcome": <BadgeCheck className="w-4 h-4 text-emerald-600" />,
-  "Subscription Active": <CheckCircle className="w-4 h-4 text-emerald-600" />,
+  "Removed from Event": <XCircle className="w-4 h-4 text-red-600" />,
 };
 
 function extractEventTitle(message: string): string | null {
