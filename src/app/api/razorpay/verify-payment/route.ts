@@ -43,7 +43,10 @@ export async function POST(request: NextRequest) {
     );
 
     const now = new Date();
-    const planDays = planType === "yearly" ? 365 : 30;
+    let planDays: number;
+    if (planType === "yearly") planDays = 365;
+    else if (planType === "lifetime") planDays = 36500;
+    else planDays = 30;
     const subEnd = new Date(now.getTime() + planDays * 24 * 60 * 60 * 1000).toISOString();
 
     const { error: updateError } = await adminClient

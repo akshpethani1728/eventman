@@ -12,8 +12,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-const MONTHLY_PRICE = 100;
-const YEARLY_PRICE = 850;
+const MONTHLY_PRICE = 81;
+const YEARLY_PRICE = 899;
+const LIFETIME_PRICE = 1499;
 const MONTHLY_PER_DAY = (MONTHLY_PRICE / 30).toFixed(0);
 const YEARLY_PER_DAY = (YEARLY_PRICE / 365).toFixed(0);
 
@@ -45,7 +46,7 @@ export default function WorkerPlansPage() {
   const [paymentStatus, setPaymentStatus] = useState<"idle" | "success" | "failed" | "cancelled">("idle");
   const [paymentError, setPaymentError] = useState("");
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<"monthly" | "yearly">("monthly");
+  const [selectedPlan, setSelectedPlan] = useState<"monthly" | "yearly" | "lifetime">("monthly");
   const router = useRouter();
   const supabase = createClient();
 
@@ -86,8 +87,8 @@ export default function WorkerPlansPage() {
     setPurchasing(true);
     setPaymentStatus("idle");
     setPaymentError("");
-    const price = selectedPlan === "yearly" ? YEARLY_PRICE : MONTHLY_PRICE;
-    const description = selectedPlan === "yearly" ? "Yearly Worker Plan" : "Monthly Worker Plan";
+    const price = selectedPlan === "yearly" ? YEARLY_PRICE : selectedPlan === "lifetime" ? LIFETIME_PRICE : MONTHLY_PRICE;
+    const description = selectedPlan === "yearly" ? "Yearly Worker Plan" : selectedPlan === "lifetime" ? "Lifetime Worker Plan" : "Monthly Worker Plan";
     try {
       const orderRes = await fetch("/api/razorpay/create-order", {
         method: "POST",
@@ -385,6 +386,51 @@ export default function WorkerPlansPage() {
                 </div>
               </div>
             </button>
+
+            {/* Lifetime Plan */}
+            <button
+              onClick={() => setSelectedPlan("lifetime")}
+              className={`w-full text-left card-base overflow-hidden transition-all duration-200 ${
+                selectedPlan === "lifetime"
+                  ? "border-2 border-[#0D9488] shadow-[0_4px_16px_rgba(13,148,136,0.12)]"
+                  : "border-2 border-transparent hover:border-gray-200"
+              }`}
+            >
+              <div className="relative">
+                {selectedPlan === "lifetime" && (
+                  <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#0D9488] to-[#0A7C73]" />
+                )}
+                <div className="p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-[14px] flex items-center justify-center ${
+                        selectedPlan === "lifetime" ? "bg-[#0D9488]" : "bg-gray-100"
+                      }`}>
+                        <Sparkles className={`w-5 h-5 ${selectedPlan === "lifetime" ? "text-white" : "text-gray-400"}`} />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-bold text-[15px] text-[#1A1A1A]">Lifetime</h3>
+                          <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200/60">ONE TIME</span>
+                        </div>
+                        <p className="text-[11px] text-[#6B6B6B] mt-0.5">Forever access, no renewals</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="flex items-baseline gap-0.5">
+                        <span className="text-lg font-bold text-[#1A1A1A]">₹{LIFETIME_PRICE}</span>
+                        <span className="text-[10px] text-[#A1A1AA]">once</span>
+                      </div>
+                      <p className="text-[10px] text-purple-600 font-medium">₹4/day (est.)</p>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex items-center gap-4 text-[10px] text-[#A1A1AA]">
+                    <span className="flex items-center gap-1"><Zap className="w-3 h-3" /> Unlimited applications</span>
+                    <span className="flex items-center gap-1"><BadgeCheck className="w-3 h-3" /> Lifetime access</span>
+                  </div>
+                </div>
+              </div>
+            </button>
           </div>
         )}
 
@@ -422,7 +468,7 @@ export default function WorkerPlansPage() {
               ) : !razorpayLoaded ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /> Loading...</>
               ) : (
-                <><CreditCard className="w-4 h-4" /> Pay ₹{selectedPlan === "yearly" ? YEARLY_PRICE : MONTHLY_PRICE}</>
+                <><CreditCard className="w-4 h-4" /> Pay ₹{selectedPlan === "yearly" ? YEARLY_PRICE : selectedPlan === "lifetime" ? LIFETIME_PRICE : MONTHLY_PRICE}</>
               )}
             </button>
 
