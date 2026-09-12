@@ -66,52 +66,53 @@ function computePriorityScore(event: any): number {
   const now = Date.now();
   const eventDate = new Date(event.date).getTime();
   const hoursUntil = (eventDate - now) / 3600000;
-  const daysUntil = hoursUntil / 24;
   const createdAt = new Date(event.created_at).getTime();
   const hoursSinceCreated = (now - createdAt) / 3600000;
   const remaining = event.worker_count - (event.approved_count || 0);
   const fillPercent = event.worker_count ? ((event.approved_count || 0) / event.worker_count) * 100 : 0;
   let score = 0;
 
-  if (hoursUntil >= 0 && hoursUntil < 96) {
-    if (hoursUntil < 12) score += 35;
-    else if (hoursUntil < 24) score += 30;
-    else if (hoursUntil < 48) score += 22;
-    else if (hoursUntil < 72) score += 12;
-    else score += 6;
-  }
+  if (hoursUntil < 0) return -1000;
 
-  if (fillPercent >= 95) score += 28;
-  else if (fillPercent >= 80) score += 22;
-  else if (fillPercent >= 60) score += 15;
-  else if (fillPercent >= 40) score += 8;
-  else if (fillPercent >= 20) score += 3;
+  if (hoursUntil < 12) score += 40;
+  else if (hoursUntil < 24) score += 32;
+  else if (hoursUntil < 48) score += 24;
+  else if (hoursUntil < 72) score += 14;
+  else if (hoursUntil < 168) score += 6;
+  else score += 2;
 
-  if (event.organizer?.is_trusted_organizer) score += 18;
+  if (fillPercent >= 90) score += 26;
+  else if (fillPercent >= 70) score += 20;
+  else if (fillPercent >= 50) score += 13;
+  else if (fillPercent >= 30) score += 6;
+  else if (fillPercent >= 10) score += 2;
 
-  if (hoursSinceCreated < 12) score += 18;
+  if (event.organizer?.is_trusted_organizer) score += 16;
+
+  if (hoursSinceCreated < 6) score += 20;
   else if (hoursSinceCreated < 24) score += 14;
-  else if (hoursSinceCreated < 48) score += 8;
+  else if (hoursUntil < 48) score += 6;
   else if (hoursSinceCreated < 72) score += 3;
 
   const totalApps = event.total_applications || 0;
-  if (totalApps >= 15) score += 12;
-  else if (totalApps >= 10) score += 8;
-  else if (totalApps >= 5) score += 5;
-  else if (totalApps >= 2) score += 2;
+  if (totalApps >= 15) score += 10;
+  else if (totalApps >= 8) score += 6;
+  else if (totalApps >= 3) score += 3;
 
   if (event.application_deadline) {
     const deadlineMs = new Date(event.application_deadline).getTime();
     const hoursUntilDeadline = (deadlineMs - now) / 3600000;
-    if (hoursUntilDeadline > 0 && hoursUntilDeadline < 12) score += 14;
+    if (hoursUntilDeadline > 0 && hoursUntilDeadline < 6) score += 16;
     else if (hoursUntilDeadline < 24) score += 10;
-    else if (hoursUntilDeadline < 48) score += 6;
-    else if (hoursUntilDeadline < 96) score += 3;
+    else if (hoursUntilDeadline < 48) score += 5;
   }
 
-  if (remaining <= 1) score += 10;
-  else if (remaining <= 3) score += 6;
-  else if (remaining <= 5) score += 2;
+  if (remaining <= 1) score += 12;
+  else if (remaining <= 3) score += 7;
+  else if (remaining <= 6) score += 3;
+
+  if (event.food_included) score += 4;
+  if (event.payment_info) score += 3;
 
   return score;
 }
@@ -316,6 +317,8 @@ function DashboardContent() {
     return false;
   });
   if (categoryFilter) browseEvents = browseEvents.filter(e => e.category === categoryFilter);
+
+  browseEvents.sort((a, b) => computePriorityScore(b) - computePriorityScore(a));
 
   const appliedEvents = events.filter(e => {
     const app = e.application;
