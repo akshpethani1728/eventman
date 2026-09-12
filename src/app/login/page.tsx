@@ -262,9 +262,9 @@ function AuthSection({ onRedirect }: { onRedirect: () => void }) {
                 {/* Forgot password (sign in only) */}
                 {mode === "signin" && (
                   <div className="mt-2 text-right">
-                    <button className="text-xs text-teal-700 hover:text-teal-800 font-medium">
+                    <Link href="/auth/forgot-password" className="text-xs text-teal-700 hover:text-teal-800 font-medium">
                       Forgot password?
-                    </button>
+                    </Link>
                   </div>
                 )}
 
