@@ -1,4 +1,4 @@
-ï»¿"use client";
+"use client";
 
 import { useEffect, useState, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -90,22 +90,22 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-6 p-3 overflow-y-auto modal-overlay" ref={modalRef} role="dialog" aria-modal="true" aria-label="Applicants for event">
-      <div className="w-full max-w-xl bg-white rounded-[20px] shadow-[0_24px_64px_rgba(0,0,0,0.15),0_8px_20px_rgba(0,0,0,0.08)]">
+      <div className="w-full max-w-xl bg-white rounded-[5px] shadow-[0_24px_64px_rgba(0,0,0,0.15),0_8px_20px_rgba(0,0,0,0.08)]">
         <div className="flex items-center justify-between p-4 border-b border-[rgba(0,0,0,0.06)] sticky top-0 bg-white z-10 rounded-t-[20px]">
           <div className="min-w-0 flex-1 mr-3">
             <h2 className="font-semibold text-base text-gray-900 truncate">{event.title}</h2>
             <p className="text-xs text-gray-500 mt-0.5">
               {applicants.length} applicant{applicants.length !== 1 ? "s" : ""}
-              {pendingCount > 0 && <span className="text-amber-600 font-medium"> Â· {pendingCount} to review</span>}
-              {approvedCount > 0 && <span className="text-emerald-600 font-medium"> Â· {approvedCount} selected</span>}
+              {pendingCount > 0 && <span className="text-amber-600 font-medium"> · {pendingCount} to review</span>}
+              {approvedCount > 0 && <span className="text-emerald-600 font-medium"> · {approvedCount} selected</span>}
             </p>
           </div>
           <div className="flex items-center gap-1">
             <button onClick={() => setShowFilters(!showFilters)}
-              className={`p-2 rounded-[10px] ${showFilters ? "bg-[#0D9488]/10 text-[#0D9488]" : "hover:bg-gray-100 text-gray-500"}`} aria-label="Toggle filters">
+              className={`p-2 rounded-[5px] ${showFilters ? "bg-[#0D9488]/10 text-[#0D9488]" : "hover:bg-gray-100 text-gray-500"}`} aria-label="Toggle filters">
               <Filter className="w-4 h-4" />
             </button>
-            <button onClick={onClose} data-close-modal className="p-2 hover:bg-gray-100 rounded-[10px]" aria-label="Close">
+            <button onClick={onClose} data-close-modal className="p-2 hover:bg-gray-100 rounded-[5px]" aria-label="Close">
               <X className="w-4 h-4 text-gray-500" />
             </button>
           </div>
@@ -117,12 +117,12 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
             <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
               placeholder="Search by name, area, skills..."
-              className="w-full h-9 pl-9 pr-3 rounded-[10px] border border-[rgba(0,0,0,0.08)] bg-white text-xs outline-none transition-all focus:border-[#0D9488]" />
+              className="w-full h-9 pl-9 pr-3 rounded-[5px] border border-[rgba(0,0,0,0.08)] bg-white text-xs outline-none transition-all focus:border-[#0D9488]" />
           </div>
           <div className="flex gap-1.5 overflow-x-auto pb-1">
             {(["all", "pending", "approved", "rejected"] as const).map(tab => (
               <button key={tab} onClick={() => setFilterTab(tab)}
-                className={`h-8 px-3 rounded-[10px] text-[11px] font-semibold transition-all capitalize shrink-0 ${
+                className={`h-8 px-3 rounded-[5px] text-[11px] font-semibold transition-all capitalize shrink-0 ${
                   filterTab === tab
                     ? "bg-[#0D9488] text-white shadow-[0_2px_8px_rgba(13,148,136,0.2)]"
                     : "bg-white text-gray-600 hover:bg-gray-100"
@@ -174,9 +174,9 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
           {loading && (
             <div className="space-y-2">
               {[1,2,3].map(i => (
-                <div key={i} className="bg-white rounded-[14px] p-4 border border-[rgba(0,0,0,0.06)] animate-pulse">
+                <div key={i} className="bg-white rounded-[7px] p-4 border border-[rgba(0,0,0,0.06)] animate-pulse">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-[10px] bg-gray-100" />
+                    <div className="w-9 h-9 rounded-[5px] bg-gray-100" />
                     <div className="flex-1 space-y-1.5">
                       <div className="w-24 h-2.5 bg-gray-100 rounded-full" />
                       <div className="w-16 h-2 bg-gray-50 rounded-full" />
@@ -199,11 +199,11 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
           )}
 
           {filtered.map(app => (
-            <div key={app.id} className="bg-white rounded-[14px] border border-[rgba(0,0,0,0.06)] overflow-hidden transition-all hover:border-[rgba(0,0,0,0.12)]">
+            <div key={app.id} className="bg-white rounded-[7px] border border-[rgba(0,0,0,0.06)] overflow-hidden transition-all hover:border-[rgba(0,0,0,0.12)]">
               <div className="p-3.5">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <div className="w-10 h-10 rounded-[12px] bg-gradient-to-br from-[#0D9488]/10 to-[#0D9488]/20 flex items-center justify-center text-[#0D9488] font-semibold text-sm shrink-0" aria-hidden="true">
+                    <div className="w-10 h-10 rounded-[6px] bg-gradient-to-br from-[#0D9488]/10 to-[#0D9488]/20 flex items-center justify-center text-[#0D9488] font-semibold text-sm shrink-0" aria-hidden="true">
                       {app.profile.full_name?.charAt(0) || "W"}
                     </div>
                     <div className="min-w-0">
@@ -212,7 +212,7 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
                         {app.profile.status === "trusted" && <BadgeCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />}
                       </div>
                       <p className="text-xs text-gray-500 truncate">
-                        {[app.profile.age && `${app.profile.age}y`, app.profile.gender, app.profile.city].filter(Boolean).join(" Â· ")}
+                        {[app.profile.age && `${app.profile.age}y`, app.profile.gender, app.profile.city].filter(Boolean).join(" · ")}
                       </p>
                     </div>
                   </div>
@@ -225,18 +225,18 @@ export default function ApplicantList({ event, onClose, onUpdate }: Props) {
                     {app.status === "pending" && (
                       <>
                         <button onClick={() => handleUpdateStatus(app.id, "approved")}
-                          className="h-8 w-8 rounded-[10px] bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-100 hover:text-emerald-700 transition-all active:scale-90" aria-label="Approve">
+                          className="h-8 w-8 rounded-[5px] bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-100 hover:text-emerald-700 transition-all active:scale-90" aria-label="Approve">
                           <Check className="w-4 h-4" />
                         </button>
                         <button onClick={() => handleUpdateStatus(app.id, "rejected")}
-                          className="h-8 w-8 rounded-[10px] bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 hover:text-red-600 transition-all active:scale-90" aria-label="Reject">
+                          className="h-8 w-8 rounded-[5px] bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 hover:text-red-600 transition-all active:scale-90" aria-label="Reject">
                           <X className="w-4 h-4" />
                         </button>
                       </>
                     )}
                     {app.status === "approved" && (
                       <button onClick={() => setRemoveTarget(app.id)}
-                        className="h-7 px-2.5 rounded-[10px] bg-red-50 text-red-600 text-[10px] font-medium flex items-center gap-1 hover:bg-red-100 border border-red-200 transition-all active:scale-95">
+                        className="h-7 px-2.5 rounded-[5px] bg-red-50 text-red-600 text-[10px] font-medium flex items-center gap-1 hover:bg-red-100 border border-red-200 transition-all active:scale-95">
                         <XCircle className="w-3 h-3" /> Remove
                       </button>
                     )}

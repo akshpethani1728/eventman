@@ -80,13 +80,12 @@ export default function ForgotPasswordPage() {
     router.push("/login");
   };
 
-  const ic = "w-full h-12 pl-10 pr-10 rounded-[16px] border border-gray-200 bg-white text-sm outline-none transition-all focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20";
+  const ic = "w-full h-12 pl-10 pr-10 rounded-[8px] border border-gray-200 bg-white text-sm outline-none transition-all focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20";
 
   return (
     <div className="min-h-dvh bg-[#F8F8F6] flex flex-col">
       {/* HEADER */}
       <header className="bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)]">
-        <div className="h-0.5 bg-gradient-to-r from-teal-600/20 via-teal-600 to-teal-600/20" />
         <div className="max-w-md mx-auto px-4 h-14 flex items-center">
           <Link href="/login" className="p-1 -ml-1 text-gray-500 hover:text-gray-700 transition-colors">
             <ArrowLeft className="w-5 h-5" />
@@ -97,13 +96,12 @@ export default function ForgotPasswordPage() {
       {/* CONTENT */}
       <div className="flex-1 flex items-center justify-center py-12 px-4">
         <div className="w-full max-w-md">
-          <div className="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden">
-            <div className="h-1 bg-gradient-to-r from-teal-600 to-teal-700" />
+          <div className="bg-white rounded-[6px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden">
 
             <div className="p-6">
               {/* ICON + TITLE */}
               <div className="text-center mb-6">
-                <div className="mx-auto w-14 h-14 rounded-[20px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-lg shadow-teal-700/20">
+                <div className="mx-auto w-14 h-14 rounded-[5px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-lg shadow-teal-700/20">
                   {step === "email" ? <Mail className="w-7 h-7 text-white" /> :
                    step === "otp" ? <Shield className="w-7 h-7 text-white" /> :
                    <Lock className="w-7 h-7 text-white" />}
@@ -122,7 +120,7 @@ export default function ForgotPasswordPage() {
 
               {/* ERROR */}
               {error && (
-                <div className="mb-5 rounded-[16px] bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>
+                <div className="mb-5 rounded-[8px] bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>
               )}
 
               {/* STEP: EMAIL */}
@@ -140,7 +138,7 @@ export default function ForgotPasswordPage() {
                     </div>
                   </div>
                   <button onClick={handleSendOtp} disabled={loading}
-                    className="mt-6 w-full h-12 rounded-[16px] bg-teal-700 text-sm font-semibold text-white hover:bg-teal-800 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2">
+                    className="mt-6 w-full h-12 rounded-[8px] bg-teal-700 text-sm font-semibold text-white hover:bg-teal-800 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2">
                     {loading ? (
                       <><RefreshCw className="w-4 h-4 animate-spin" /> Sending...</>
                     ) : (
@@ -171,11 +169,11 @@ export default function ForgotPasswordPage() {
                           const paste = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
                           if (paste.length === 6) { setOtp(paste); otpRefs.current[5]?.focus(); }
                         }}
-                        className="w-11 h-12 rounded-[14px] border border-gray-200 bg-white text-center text-lg font-bold outline-none transition-all focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20" />
+                        className="w-11 h-12 rounded-[7px] border border-gray-200 bg-white text-center text-lg font-bold outline-none transition-all focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20" />
                     ))}
                   </div>
                   <button onClick={handleVerifyOtp} disabled={loading || otp.length < 6}
-                    className="mt-6 w-full h-12 rounded-[16px] bg-teal-700 text-sm font-semibold text-white hover:bg-teal-800 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2">
+                    className="mt-6 w-full h-12 rounded-[8px] bg-teal-700 text-sm font-semibold text-white hover:bg-teal-800 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2">
                     {loading ? (
                       <><RefreshCw className="w-4 h-4 animate-spin" /> Verifying...</>
                     ) : (
@@ -220,7 +218,7 @@ export default function ForgotPasswordPage() {
                     </div>
                   </div>
                   <button onClick={handleUpdatePassword} disabled={loading}
-                    className="mt-6 w-full h-12 rounded-[16px] bg-teal-700 text-sm font-semibold text-white hover:bg-teal-800 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2">
+                    className="mt-6 w-full h-12 rounded-[8px] bg-teal-700 text-sm font-semibold text-white hover:bg-teal-800 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2">
                     {loading ? (
                       <><RefreshCw className="w-4 h-4 animate-spin" /> Updating...</>
                     ) : (

@@ -51,16 +51,16 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" onClick={handleOverlayClick} />
       <div className="relative w-full max-w-md bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] animate-slide-right overflow-y-auto overscroll-behavior-contain">
         <button onClick={onClose} data-close-modal
-          className="absolute top-4 right-4 z-10 w-8 h-8 rounded-[10px] bg-white/90 backdrop-blur-sm shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center justify-center text-gray-500 hover:text-gray-800 hover:bg-white transition-all" aria-label="Close">
+          className="absolute top-4 right-4 z-10 w-8 h-8 rounded-[5px] bg-white/90 backdrop-blur-sm shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center justify-center text-gray-500 hover:text-gray-800 hover:bg-white transition-all" aria-label="Close">
           <X className="w-4 h-4" />
         </button>
 
         <div className="bg-gradient-to-br from-[#0D9488] via-[#0D9488] to-[#0F766E] px-5 pt-10 pb-6">
           <div className="flex items-end gap-4">
             <div className="relative shrink-0">
-              <div className="w-16 h-16 rounded-[16px] bg-white/20 backdrop-blur-sm flex items-center justify-center text-white text-2xl font-bold ring-2 ring-white/30 shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+              <div className="w-16 h-16 rounded-[8px] bg-white/20 backdrop-blur-sm flex items-center justify-center text-white text-2xl font-bold ring-2 ring-white/30 shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
                 {worker.avatar_url ? (
-                  <img src={worker.avatar_url} alt={worker.full_name || "Worker avatar"} className="w-16 h-16 rounded-[16px] object-cover" />
+                  <img src={worker.avatar_url} alt={worker.full_name || "Worker avatar"} className="w-16 h-16 rounded-[8px] object-cover" />
                 ) : (
                   worker.full_name?.charAt(0) || "W"
                 )}
@@ -91,7 +91,7 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
         </div>
 
         <div className="p-5 space-y-5">
-          <div className="bg-white rounded-[14px] p-4 border border-[rgba(0,0,0,0.06)]">
+          <div className="bg-white rounded-[7px] p-4 border border-[rgba(0,0,0,0.06)]">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Profile Strength</span>
               <span className={`text-sm font-bold ${completion.percent >= 80 ? "text-emerald-600" : completion.percent >= 50 ? "text-amber-600" : "text-gray-500"}`}>{completion.percent}%</span>
@@ -114,7 +114,7 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
             )}
           </div>
 
-          <div className="bg-white rounded-[14px] border border-[rgba(0,0,0,0.06)] overflow-hidden">
+          <div className="bg-white rounded-[7px] border border-[rgba(0,0,0,0.06)] overflow-hidden">
             <div className="px-4 py-2.5 bg-gray-50/80 border-b border-[rgba(0,0,0,0.04)]">
               <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest">Personal Info</span>
             </div>
@@ -141,7 +141,7 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
             </div>
           </div>
 
-          <div className="bg-white rounded-[14px] border border-[rgba(0,0,0,0.06)] overflow-hidden">
+          <div className="bg-white rounded-[7px] border border-[rgba(0,0,0,0.06)] overflow-hidden">
             <div className="px-4 py-2.5 bg-gray-50/80 border-b border-[rgba(0,0,0,0.04)]">
               <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest">Skills & Experience</span>
             </div>
@@ -149,7 +149,7 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
               {worker.skills && worker.skills.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
                   {worker.skills.map((s, i) => (
-                    <span key={i} className="text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-[10px] font-medium">{s}</span>
+                    <span key={i} className="text-[11px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-[5px] font-medium">{s}</span>
                   ))}
                 </div>
               )}
@@ -166,7 +166,7 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
           </div>
 
           {worker.bio && (
-            <div className="bg-white rounded-[14px] border border-[rgba(0,0,0,0.06)] overflow-hidden">
+            <div className="bg-white rounded-[7px] border border-[rgba(0,0,0,0.06)] overflow-hidden">
               <div className="px-4 py-2.5 bg-gray-50/80 border-b border-[rgba(0,0,0,0.04)]">
                 <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest">About</span>
               </div>
@@ -177,7 +177,7 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
           )}
 
           {canViewContact && (
-            <div className="bg-white rounded-[14px] border border-emerald-200/60 overflow-hidden">
+            <div className="bg-white rounded-[7px] border border-emerald-200/60 overflow-hidden">
               <div className="px-4 py-2.5 bg-emerald-50/80 border-b border-emerald-100 flex items-center gap-2">
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
                 <span className="text-[10px] font-semibold text-emerald-700 uppercase tracking-widest">Contact Details</span>
@@ -204,7 +204,7 @@ export default function WorkerProfilePanel({ worker, organizerId, onClose }: Pro
           )}
 
           {!canViewContact && !checkingContact && (
-            <div className="bg-white rounded-[14px] border border-[rgba(0,0,0,0.06)] overflow-hidden">
+            <div className="bg-white rounded-[7px] border border-[rgba(0,0,0,0.06)] overflow-hidden">
               <div className="px-4 py-2.5 bg-gray-50/80 border-b border-[rgba(0,0,0,0.04)]">
                 <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest">Contact</span>
               </div>

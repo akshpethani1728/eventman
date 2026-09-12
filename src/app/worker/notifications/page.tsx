@@ -94,7 +94,6 @@ export default function WorkerNotificationsPage() {
   return (
     <div className="min-h-screen bg-[#F8F8F6] pb-24">
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10">
-        <div className="h-0.5 bg-gradient-to-r from-[#0D9488]/20 via-[#0D9488] to-[#0D9488]/20" />
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
           <Link href="/worker/dashboard" className="p-1 -ml-1 text-gray-500"><ArrowLeft className="w-5 h-5" /></Link>
           <h1 className="font-semibold text-sm text-[#1A1A1A]">Notifications</h1>
@@ -107,13 +106,13 @@ export default function WorkerNotificationsPage() {
       <main className="max-w-lg mx-auto px-4 py-4">
         {unreadCount > 0 && (
           <button onClick={markAllRead}
-            className="w-full h-9 mb-4 rounded-[10px] bg-white text-[#6B6B6B] text-sm font-medium flex items-center justify-center gap-2 border border-[rgba(0,0,0,0.06)] hover:bg-[#F8F8F6] active:scale-[0.98] transition-all">
+            className="w-full h-9 mb-4 rounded-[5px] bg-white text-[#6B6B6B] text-sm font-medium flex items-center justify-center gap-2 border border-[rgba(0,0,0,0.06)] hover:bg-[#F8F8F6] active:scale-[0.98] transition-all">
             <CheckCheck className="w-4 h-4" /> Mark all as read
           </button>
         )}
 
-        <div className="mb-4 rounded-[16px] bg-gradient-to-r from-teal-600 to-teal-700 p-4 flex items-center gap-3 shadow-lg shadow-teal-700/20">
-          <div className="w-10 h-10 rounded-[12px] bg-white/20 flex items-center justify-center shrink-0">
+        <div className="mb-4 rounded-[8px] bg-gradient-to-r from-teal-600 to-teal-700 p-4 flex items-center gap-3 shadow-lg shadow-teal-700/20">
+          <div className="w-10 h-10 rounded-[6px] bg-white/20 flex items-center justify-center shrink-0">
             <Share2 className="w-5 h-5 text-white" />
           </div>
           <div className="flex-1 min-w-0">
@@ -121,7 +120,7 @@ export default function WorkerNotificationsPage() {
             <p className="text-xs text-teal-100 mt-0.5">Help your friends discover EventMan</p>
           </div>
           <button onClick={shareApp}
-            className="h-9 px-4 rounded-[12px] bg-white text-teal-700 text-xs font-bold shadow-lg active:scale-95 transition-all">
+            className="h-9 px-4 rounded-[6px] bg-white text-teal-700 text-xs font-bold shadow-lg active:scale-95 transition-all">
             Share
           </button>
         </div>

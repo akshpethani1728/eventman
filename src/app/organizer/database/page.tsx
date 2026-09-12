@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -15,9 +15,9 @@ const PAGE_SIZE = 20;
 
 function SkeletonWorkerCard() {
   return (
-    <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] animate-pulse">
+    <div className="bg-white rounded-[8px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] animate-pulse">
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-[12px] bg-gray-100" />
+        <div className="w-10 h-10 rounded-[6px] bg-gray-100" />
         <div className="flex-1 space-y-2">
           <div className="w-28 h-3 bg-gray-100 rounded-full" />
           <div className="w-20 h-2.5 bg-gray-50 rounded-full" />
@@ -94,7 +94,7 @@ export default function WorkerDatabasePage() {
     <div className="min-h-screen bg-[#F8F8F6] pb-24">
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
-          <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-[10px] transition-all active:scale-90"><ArrowLeft className="w-5 h-5" /></Link>
+          <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-[5px] transition-all active:scale-90"><ArrowLeft className="w-5 h-5" /></Link>
           <h1 className="font-semibold text-sm">Talent Discovery</h1>
           <span className="text-xs text-gray-400 ml-auto font-medium" aria-live="polite">{workers.length} workers</span>
         </div>
@@ -105,11 +105,11 @@ export default function WorkerDatabasePage() {
           <div className="relative flex-1">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search talent by name, area, skills..."
-              className="w-full h-11 pl-10 pr-3 rounded-[12px] border border-[rgba(0,0,0,0.08)] bg-white text-sm outline-none transition-all focus:border-[#0D9488] focus:shadow-[0_0_0_3px_rgba(13,148,136,0.08)]"
+              className="w-full h-11 pl-10 pr-3 rounded-[6px] border border-[rgba(0,0,0,0.08)] bg-white text-sm outline-none transition-all focus:border-[#0D9488] focus:shadow-[0_0_0_3px_rgba(13,148,136,0.08)]"
               aria-label="Search workers" />
           </div>
           <button onClick={() => setShowFilters(!showFilters)}
-            className={`h-11 px-4 rounded-[12px] text-sm font-semibold transition-all active:scale-[0.97] flex items-center gap-1.5 ${
+            className={`h-11 px-4 rounded-[6px] text-sm font-semibold transition-all active:scale-[0.97] flex items-center gap-1.5 ${
               showFilters ? "bg-[#0D9488] text-white shadow-[0_2px_8px_rgba(13,148,136,0.2)]" : "bg-white text-gray-600 border border-[rgba(0,0,0,0.08)] hover:border-[rgba(0,0,0,0.14)]"
             }`} aria-label="Toggle filters" aria-expanded={showFilters}>
             <Filter className="w-4 h-4" /> Filters
@@ -139,7 +139,7 @@ export default function WorkerDatabasePage() {
         </div>
 
         {showFilters && (
-          <div className="bg-white rounded-[14px] p-4 mb-4 space-y-3 shadow-[0_2px_8px_rgba(0,0,0,0.04)] animate-fade-in border border-[rgba(0,0,0,0.06)]">
+          <div className="bg-white rounded-[7px] p-4 mb-4 space-y-3 shadow-[0_2px_8px_rgba(0,0,0,0.04)] animate-fade-in border border-[rgba(0,0,0,0.06)]">
             <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Advanced Filters</p>
             <div className="grid grid-cols-2 gap-2.5">
               <select value={filters.gender} onChange={e => setFilters(f => ({ ...f, gender: e.target.value }))}
@@ -173,13 +173,13 @@ export default function WorkerDatabasePage() {
 
         {filtered.length === 0 && (
           <div className="text-center py-16">
-            <div className="w-16 h-16 rounded-[20px] bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 rounded-[5px] bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center mx-auto mb-4">
               <Search className="w-8 h-8 text-gray-300" />
             </div>
             <p className="text-lg font-bold text-gray-900">No workers found</p>
             <p className="text-sm text-gray-500 mt-1.5">Try adjusting your search or filters to discover talent.</p>
             <button onClick={() => { setQuery(""); setFilters({ gender: "", availability: "", city: "", skills: "" }); setAvailableOnly(false); setVerifiedOnly(false); }}
-              className="mt-5 h-10 px-5 rounded-[12px] bg-[#0D9488] text-white text-sm font-semibold hover:bg-teal-700 transition-all active:scale-[0.97]">Clear All Filters</button>
+              className="mt-5 h-10 px-5 rounded-[6px] bg-[#0D9488] text-white text-sm font-semibold hover:bg-teal-700 transition-all active:scale-[0.97]">Clear All Filters</button>
           </div>
         )}
 
@@ -189,12 +189,12 @@ export default function WorkerDatabasePage() {
             const avail = w.availability ? AVAIL_CONFIG[w.availability] : null;
             return (
               <div key={w.id}
-                className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all duration-200 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] cursor-pointer active:scale-[0.99]"
+                className="bg-white rounded-[8px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all duration-200 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] cursor-pointer active:scale-[0.99]"
                 onClick={() => setSelectedWorker(w)} role="button" tabIndex={0}
                 onKeyDown={e => { if (e.key === "Enter") setSelectedWorker(w); }}>
                 <div className="flex items-start gap-3">
                   <div className="relative shrink-0">
-                    <div className="w-11 h-11 rounded-[12px] bg-gradient-to-br from-[#0D9488]/10 to-[#0D9488]/20 flex items-center justify-center text-[#0D9488] font-bold text-base" aria-hidden="true">
+                    <div className="w-11 h-11 rounded-[6px] bg-gradient-to-br from-[#0D9488]/10 to-[#0D9488]/20 flex items-center justify-center text-[#0D9488] font-bold text-base" aria-hidden="true">
                       {w.full_name?.charAt(0) || "W"}
                     </div>
                     {avail && <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-[2px] border-white ${avail.dot}`} />}
@@ -223,7 +223,7 @@ export default function WorkerDatabasePage() {
                       )}
                     </div>
                     <p className="text-xs text-gray-500 mt-0.5">
-                      {[w.age && `${w.age}y`, w.gender && w.gender, w.city].filter(Boolean).join(" · ")}
+                      {[w.age && `${w.age}y`, w.gender && w.gender, w.city].filter(Boolean).join(" � ")}
                     </p>
                     <div className="flex flex-wrap gap-1 mt-1.5">
                       {w.skills?.slice(0, 3).map((s, i) => <span key={i} className="text-[11px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-[8px] font-medium">{s}</span>)}
@@ -252,7 +252,7 @@ export default function WorkerDatabasePage() {
 
           {hasMore && (
             <button onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
-              className="w-full h-12 rounded-[14px] bg-white border border-[rgba(0,0,0,0.08)] text-gray-500 text-sm font-semibold hover:bg-gray-50 transition-all active:scale-[0.98]">
+              className="w-full h-12 rounded-[7px] bg-white border border-[rgba(0,0,0,0.08)] text-gray-500 text-sm font-semibold hover:bg-gray-50 transition-all active:scale-[0.98]">
               Show {Math.min(PAGE_SIZE, filtered.length - visibleCount)} more workers
             </button>
           )}

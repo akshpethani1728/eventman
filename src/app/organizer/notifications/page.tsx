@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -21,8 +21,8 @@ function extractEventTitle(message: string): string | null {
 
 function SkeletonNotification() {
   return (
-    <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] animate-pulse flex items-start gap-3">
-      <div className="w-8 h-8 rounded-[10px] bg-gray-100 shrink-0" />
+    <div className="bg-white rounded-[8px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] animate-pulse flex items-start gap-3">
+      <div className="w-8 h-8 rounded-[5px] bg-gray-100 shrink-0" />
       <div className="flex-1 space-y-1.5">
         <div className="w-24 h-2.5 bg-gray-100 rounded-full" />
         <div className="w-48 h-2 bg-gray-50 rounded-full" />
@@ -41,7 +41,7 @@ export default function NotificationsPage() {
   useEffect(() => { loadNotifications(); }, []);
 
   const shareApp = async () => {
-    const text = "Join EventMan - the best platform for event workers and organizers! Find events, hire workers, and manage everything in one place. 🚀\n\nDownload now: https://eventman2.vercel.app";
+    const text = "Join EventMan - the best platform for event workers and organizers! Find events, hire workers, and manage everything in one place. ??\n\nDownload now: https://eventman2.vercel.app";
     if (navigator.share) {
       try { await navigator.share({ title: "EventMan", text }); } catch {}
     } else {
@@ -106,7 +106,7 @@ export default function NotificationsPage() {
     <div className="min-h-screen bg-[#F8F8F6] pb-24">
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
-          <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-[10px] transition-all active:scale-90"><ArrowLeft className="w-5 h-5" /></Link>
+          <Link href="/organizer/dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-[5px] transition-all active:scale-90"><ArrowLeft className="w-5 h-5" /></Link>
           <h1 className="font-semibold text-sm">Activity Feed</h1>
           {unreadCount > 0 && (
             <span className="text-xs bg-[#0D9488]/10 text-[#0D9488] px-2.5 py-0.5 rounded-full ml-auto font-semibold">{unreadCount} new</span>
@@ -117,13 +117,13 @@ export default function NotificationsPage() {
       <main className="max-w-lg mx-auto px-4 py-4">
         {unreadCount > 0 && (
           <button onClick={markAllRead}
-            className="w-full h-11 mb-5 rounded-[14px] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center justify-center gap-2 text-sm font-semibold text-gray-600 hover:text-[#0D9488] active:scale-[0.98] transition-all">
+            className="w-full h-11 mb-5 rounded-[7px] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center justify-center gap-2 text-sm font-semibold text-gray-600 hover:text-[#0D9488] active:scale-[0.98] transition-all">
             <CheckCheck className="w-4 h-4" /> Mark All as Read
           </button>
         )}
 
-        <div className="mb-5 rounded-[16px] bg-gradient-to-r from-teal-600 to-teal-700 p-4 flex items-center gap-3 shadow-lg shadow-teal-700/20">
-          <div className="w-10 h-10 rounded-[12px] bg-white/20 flex items-center justify-center shrink-0">
+        <div className="mb-5 rounded-[8px] bg-gradient-to-r from-teal-600 to-teal-700 p-4 flex items-center gap-3 shadow-lg shadow-teal-700/20">
+          <div className="w-10 h-10 rounded-[6px] bg-white/20 flex items-center justify-center shrink-0">
             <Share2 className="w-5 h-5 text-white" />
           </div>
           <div className="flex-1 min-w-0">
@@ -131,14 +131,14 @@ export default function NotificationsPage() {
             <p className="text-xs text-teal-100 mt-0.5">Help your friends discover EventMan</p>
           </div>
           <button onClick={shareApp}
-            className="h-9 px-4 rounded-[12px] bg-white text-teal-700 text-xs font-bold shadow-lg active:scale-95 transition-all">
+            className="h-9 px-4 rounded-[6px] bg-white text-teal-700 text-xs font-bold shadow-lg active:scale-95 transition-all">
             Share
           </button>
         </div>
 
         {notifications.length === 0 && (
           <div className="text-center py-20 animate-fade-in">
-            <div className="w-16 h-16 rounded-[20px] bg-gradient-to-br from-teal-50 to-teal-100 flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 rounded-[5px] bg-gradient-to-br from-teal-50 to-teal-100 flex items-center justify-center mx-auto mb-4">
               <Bell className="w-8 h-8 text-[#0D9488]" />
             </div>
             <p className="text-lg font-bold text-gray-900">All Clear</p>
@@ -160,10 +160,10 @@ export default function NotificationsPage() {
                   const cfg = ICONS[n.title] || { icon: Bell, bg: "bg-gray-50" };
                   const IconComp = cfg.icon;
                   return (
-                    <div key={n.id} className={`bg-white rounded-[14px] p-3.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-start gap-3 transition-all ${
+                    <div key={n.id} className={`bg-white rounded-[7px] p-3.5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-start gap-3 transition-all ${
                       n.read ? "" : "ring-1 ring-[#0D9488]/20"
                     }`}>
-                      <div className={`w-9 h-9 rounded-[10px] ${cfg.bg} flex items-center justify-center shrink-0`}>
+                      <div className={`w-9 h-9 rounded-[5px] ${cfg.bg} flex items-center justify-center shrink-0`}>
                         <IconComp className="w-4 h-4 text-gray-600" />
                       </div>
                       <div className="min-w-0 flex-1">

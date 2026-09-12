@@ -103,7 +103,7 @@ export default function AdminNotificationsPage() {
       <header className="sticky top-0 bg-white/80 backdrop-blur-2xl border-b border-[rgba(0,0,0,0.06)] z-10">
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center gap-3">
           <button onClick={() => router.push("/admin")}
-            className="w-9 h-9 rounded-[10px] hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors">
+            className="w-9 h-9 rounded-[5px] hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors">
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div>
@@ -128,7 +128,7 @@ export default function AdminNotificationsPage() {
                 onChange={e => setTitle(e.target.value)}
                 placeholder="Notification title"
                 maxLength={100}
-                className="w-full h-11 px-4 rounded-[10px] bg-gray-50 border border-[rgba(0,0,0,0.08)] text-[14px] outline-none focus:ring-2 focus:ring-[#0D9488]/20 transition-all"
+                className="w-full h-11 px-4 rounded-[5px] bg-gray-50 border border-[rgba(0,0,0,0.08)] text-[14px] outline-none focus:ring-2 focus:ring-[#0D9488]/20 transition-all"
               />
             </div>
 
@@ -140,7 +140,7 @@ export default function AdminNotificationsPage() {
                 placeholder="Write your notification message..."
                 maxLength={500}
                 rows={3}
-                className="w-full px-4 py-3 rounded-[10px] bg-gray-50 border border-[rgba(0,0,0,0.08)] text-[14px] outline-none focus:ring-2 focus:ring-[#0D9488]/20 transition-all resize-none"
+                className="w-full px-4 py-3 rounded-[5px] bg-gray-50 border border-[rgba(0,0,0,0.08)] text-[14px] outline-none focus:ring-2 focus:ring-[#0D9488]/20 transition-all resize-none"
               />
               <p className="text-[11px] text-gray-400 mt-1 text-right">{message.length}/500</p>
             </div>
@@ -152,7 +152,7 @@ export default function AdminNotificationsPage() {
                   <button
                     key={opt.value}
                     onClick={() => setAudience(opt.value)}
-                    className={`h-20 rounded-[12px] border-2 flex flex-col items-center justify-center gap-1.5 transition-all ${
+                    className={`h-20 rounded-[6px] border-2 flex flex-col items-center justify-center gap-1.5 transition-all ${
                       audience === opt.value
                         ? "border-[#0D9488] bg-[#0D9488]/5 text-[#0D9488]"
                         : "border-[rgba(0,0,0,0.06)] bg-white text-gray-500 hover:border-gray-300"
@@ -183,7 +183,7 @@ export default function AdminNotificationsPage() {
         {result && result.ok && (
           <Card className="animate-fade-in">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-[10px] bg-emerald-100 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-[5px] bg-emerald-100 flex items-center justify-center shrink-0">
                 <CheckCircle className="w-5 h-5 text-emerald-600" />
               </div>
               <div>
@@ -214,7 +214,7 @@ export default function AdminNotificationsPage() {
         {result && !result.ok && (
           <Card className="animate-fade-in">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-[10px] bg-red-100 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-[5px] bg-red-100 flex items-center justify-center shrink-0">
                 <AlertTriangle className="w-5 h-5 text-red-600" />
               </div>
               <div>

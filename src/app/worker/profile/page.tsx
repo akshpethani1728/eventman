@@ -126,7 +126,6 @@ export default function WorkerProfilePage() {
   return (
     <div className="min-h-screen bg-[#F8F8F6] pb-24">
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10">
-        <div className="h-0.5 bg-gradient-to-r from-[#0D9488]/20 via-[#0D9488] to-[#0D9488]/20" />
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/worker/dashboard" className="p-1 -ml-1 text-gray-500 active:scale-90 transition-transform"><ArrowLeft className="w-5 h-5" /></Link>
@@ -134,7 +133,7 @@ export default function WorkerProfilePage() {
           </div>
           {!editing && (
             <button onClick={() => setEditing(true)}
-              className="h-9 px-3.5 rounded-[10px] bg-[#0D9488] text-white text-xs font-semibold flex items-center gap-1.5 hover:bg-teal-700 transition-all active:scale-95">
+              className="h-9 px-3.5 rounded-[5px] bg-[#0D9488] text-white text-xs font-semibold flex items-center gap-1.5 hover:bg-teal-700 transition-all active:scale-95">
               <Pencil className="w-3.5 h-3.5" /> Edit
             </button>
           )}
@@ -145,9 +144,9 @@ export default function WorkerProfilePage() {
         {profile && (
           <>
             {/* === PROFILE HEADER === */}
-            <div className="bg-white rounded-[20px] p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)] text-center relative">
+            <div className="bg-white rounded-[5px] p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)] text-center relative">
               <button type="button" onClick={shareApp}
-                className="absolute top-4 right-4 w-9 h-9 rounded-[10px] bg-[#F8F8F6] flex items-center justify-center text-[#6B6B6B] hover:bg-[#0D9488] hover:text-white transition-all active:scale-90">
+                className="absolute top-4 right-4 w-9 h-9 rounded-[5px] bg-[#F8F8F6] flex items-center justify-center text-[#6B6B6B] hover:bg-[#0D9488] hover:text-white transition-all active:scale-90">
                 <Share2 className="w-4 h-4" />
               </button>
               <div className="relative inline-block">
@@ -180,7 +179,7 @@ export default function WorkerProfilePage() {
             </div>
 
             {/* === PROFILE STRENGTH === */}
-            <div className="bg-white rounded-[20px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+            <div className="bg-white rounded-[5px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-semibold text-[#6B6B6B] uppercase tracking-wide flex items-center gap-1.5">
                   <Target className="w-3.5 h-3.5" /> Profile Strength
@@ -209,11 +208,11 @@ export default function WorkerProfilePage() {
             {/* === PERSONAL INFO (Display Mode) === */}
             {!editing && (
               <>
-                <div className="bg-white rounded-[20px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+                <div className="bg-white rounded-[5px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
                   <h3 className="text-[11px] font-bold text-[#6B6B6B] uppercase tracking-[0.04em] mb-4">Personal Information</h3>
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-[10px] bg-teal-50 flex items-center justify-center shrink-0">
+                      <div className="w-8 h-8 rounded-[5px] bg-teal-50 flex items-center justify-center shrink-0">
                         <User className="w-4 h-4 text-[#0D9488]" />
                       </div>
                       <div className="flex-1">
@@ -223,7 +222,7 @@ export default function WorkerProfilePage() {
                     </div>
                     <div className="border-t border-[rgba(0,0,0,0.04)]" />
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-[10px] bg-teal-50 flex items-center justify-center shrink-0">
+                      <div className="w-8 h-8 rounded-[5px] bg-teal-50 flex items-center justify-center shrink-0">
                         <Phone className="w-4 h-4 text-[#0D9488]" />
                       </div>
                       <div className="flex-1">
@@ -233,7 +232,7 @@ export default function WorkerProfilePage() {
                     </div>
                     <div className="border-t border-[rgba(0,0,0,0.04)]" />
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-[10px] bg-teal-50 flex items-center justify-center shrink-0">
+                      <div className="w-8 h-8 rounded-[5px] bg-teal-50 flex items-center justify-center shrink-0">
                         <Mail className="w-4 h-4 text-[#0D9488]" />
                       </div>
                       <div className="flex-1">
@@ -243,7 +242,7 @@ export default function WorkerProfilePage() {
                     </div>
                     <div className="border-t border-[rgba(0,0,0,0.04)]" />
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-[10px] bg-teal-50 flex items-center justify-center shrink-0">
+                      <div className="w-8 h-8 rounded-[5px] bg-teal-50 flex items-center justify-center shrink-0">
                         <MapPin className="w-4 h-4 text-[#0D9488]" />
                       </div>
                       <div className="flex-1">
@@ -256,11 +255,11 @@ export default function WorkerProfilePage() {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-[20px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+                <div className="bg-white rounded-[5px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
                   <h3 className="text-[11px] font-bold text-[#6B6B6B] uppercase tracking-[0.04em] mb-4">Work Information</h3>
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-[10px] bg-teal-50 flex items-center justify-center shrink-0">
+                      <div className="w-8 h-8 rounded-[5px] bg-teal-50 flex items-center justify-center shrink-0">
                         <Award className="w-4 h-4 text-[#0D9488]" />
                       </div>
                       <div className="flex-1">
@@ -277,7 +276,7 @@ export default function WorkerProfilePage() {
                     </div>
                     <div className="border-t border-[rgba(0,0,0,0.04)]" />
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-[10px] bg-teal-50 flex items-center justify-center shrink-0">
+                      <div className="w-8 h-8 rounded-[5px] bg-teal-50 flex items-center justify-center shrink-0">
                         <Briefcase className="w-4 h-4 text-[#0D9488]" />
                       </div>
                       <div className="flex-1">
@@ -287,7 +286,7 @@ export default function WorkerProfilePage() {
                     </div>
                     <div className="border-t border-[rgba(0,0,0,0.04)]" />
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-[10px] bg-teal-50 flex items-center justify-center shrink-0">
+                      <div className="w-8 h-8 rounded-[5px] bg-teal-50 flex items-center justify-center shrink-0">
                         <Clock className="w-4 h-4 text-[#0D9488]" />
                       </div>
                       <div className="flex-1">
@@ -303,7 +302,7 @@ export default function WorkerProfilePage() {
                       <>
                         <div className="border-t border-[rgba(0,0,0,0.04)]" />
                         <div className="flex items-start gap-3">
-                          <div className="w-8 h-8 rounded-[10px] bg-teal-50 flex items-center justify-center shrink-0">
+                          <div className="w-8 h-8 rounded-[5px] bg-teal-50 flex items-center justify-center shrink-0">
                             <Star className="w-4 h-4 text-[#0D9488]" />
                           </div>
                           <div className="flex-1">
@@ -323,10 +322,10 @@ export default function WorkerProfilePage() {
               <form onSubmit={(e) => { e.preventDefault(); saveProfile(); }}
                 className="space-y-3">
                 {/* Section: Basic Info */}
-                <div className="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden">
+                <div className="bg-white rounded-[5px] shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden">
                   <div className="px-5 pt-5 pb-3 flex items-center justify-between border-b border-[rgba(0,0,0,0.04)]">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-[10px] bg-teal-50 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-[5px] bg-teal-50 flex items-center justify-center">
                         <User className="w-4 h-4 text-[#0D9488]" />
                       </div>
                       <span className="text-sm font-bold text-[#1A1A1A]">Basic Info</span>
@@ -344,7 +343,7 @@ export default function WorkerProfilePage() {
                           <User className="w-4 h-4 text-[#A1A1AA] group-focus-within:text-[#0D9488] transition-colors" />
                         </div>
                         <input value={form.full_name} onChange={e => update("full_name", e.target.value)}
-                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[12px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
+                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
                       </div>
                     </div>
                     <div>
@@ -354,14 +353,14 @@ export default function WorkerProfilePage() {
                           <Phone className="w-4 h-4 text-[#A1A1AA] group-focus-within:text-[#0D9488] transition-colors" />
                         </div>
                         <input value={form.phone} onChange={e => update("phone", e.target.value)} placeholder="9876543210"
-                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[12px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
+                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="block text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-[0.04em] mb-1.5">Age</label>
                         <input type="number" value={form.age} onChange={e => update("age", e.target.value)} placeholder="25"
-                          className="w-full h-11 px-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[12px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
+                          className="w-full h-11 px-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
                       </div>
                       <div>
                         <label className="block text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-[0.04em] mb-1.5">Gender</label>
@@ -369,7 +368,7 @@ export default function WorkerProfilePage() {
                           {["male", "female"].map(g => (
                             <button type="button" key={g}
                               onClick={() => update("gender", form.gender === g ? "" : g)}
-                              className={`flex-1 rounded-[12px] text-sm font-semibold transition-all active:scale-[0.97] ${
+                              className={`flex-1 rounded-[6px] text-sm font-semibold transition-all active:scale-[0.97] ${
                                 form.gender === g
                                   ? "bg-[#0D9488] text-white shadow-[0_2px_8px_rgba(13,148,136,0.25)]"
                                   : "bg-[#F8F8F6] text-[#6B6B6B] hover:bg-gray-200"
@@ -387,22 +386,22 @@ export default function WorkerProfilePage() {
                           <MapPin className="w-4 h-4 text-[#A1A1AA] group-focus-within:text-[#0D9488] transition-colors" />
                         </div>
                         <input value={form.city} onChange={e => update("city", e.target.value)} placeholder="Ahmedabad"
-                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[12px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
+                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
                       </div>
                     </div>
                     <div>
                       <label className="block text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-[0.04em] mb-1.5">Area</label>
                       <input value={form.area} onChange={e => update("area", e.target.value)} placeholder="e.g., Navrangpura"
-                        className="w-full h-11 px-4 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[12px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
+                        className="w-full h-11 px-4 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
                     </div>
                   </div>
                 </div>
 
                 {/* Section: Work Info */}
-                <div className="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden">
+                <div className="bg-white rounded-[5px] shadow-[0_2px_12px_rgba(0,0,0,0.04)] overflow-hidden">
                   <div className="px-5 pt-5 pb-3 border-b border-[rgba(0,0,0,0.04)]">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-[10px] bg-teal-50 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-[5px] bg-teal-50 flex items-center justify-center">
                         <Briefcase className="w-4 h-4 text-[#0D9488]" />
                       </div>
                       <span className="text-sm font-bold text-[#1A1A1A]">Work Info</span>
@@ -417,7 +416,7 @@ export default function WorkerProfilePage() {
                         </div>
                         <input value={form.skills} onChange={e => update("skills", e.target.value)}
                           placeholder="e.g., Promotion, Event setup, Crowd management"
-                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[12px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
+                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
                       </div>
                       {form.skills && (
                         <div className="flex flex-wrap gap-1.5 mt-2.5">
@@ -438,7 +437,7 @@ export default function WorkerProfilePage() {
                         </div>
                         <input value={form.experience} onChange={e => update("experience", e.target.value)}
                           placeholder="e.g., 2 years in event management"
-                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[12px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
+                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
                       </div>
                     </div>
                     <div>
@@ -447,7 +446,7 @@ export default function WorkerProfilePage() {
                         {AVAILABILITY_OPTIONS.filter(o => o.value).map(o => (
                           <button type="button" key={o.value}
                             onClick={() => update("availability", form.availability === o.value ? "" : o.value)}
-                            className={`h-10 rounded-[12px] text-xs font-semibold transition-all active:scale-[0.97] ${
+                            className={`h-10 rounded-[6px] text-xs font-semibold transition-all active:scale-[0.97] ${
                               form.availability === o.value
                                 ? "bg-[#0D9488] text-white shadow-[0_2px_8px_rgba(13,148,136,0.25)]"
                                 : "bg-[#F8F8F6] text-[#6B6B6B] hover:bg-gray-200"
@@ -462,7 +461,7 @@ export default function WorkerProfilePage() {
                       <textarea value={form.bio} onChange={e => update("bio", e.target.value)}
                         placeholder="Tell organizers about yourself..."
                         maxLength={500}
-                        className="w-full h-28 px-4 py-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[12px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all resize-none placeholder:text-[#A1A1AA]" />
+                        className="w-full h-28 px-4 py-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all resize-none placeholder:text-[#A1A1AA]" />
                       <div className="flex justify-end mt-1">
                         <span className="text-[10px] text-[#A1A1AA]">{form.bio.length}/500</span>
                       </div>
@@ -473,11 +472,11 @@ export default function WorkerProfilePage() {
                 {/* Action Buttons */}
                 <div className="flex gap-3 pt-1 pb-4">
                   <button type="button" onClick={() => setEditing(false)}
-                    className="flex-1 h-12 rounded-[14px] border-2 border-gray-200 text-[#6B6B6B] text-sm font-semibold hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-[0.97]">
+                    className="flex-1 h-12 rounded-[7px] border-2 border-gray-200 text-[#6B6B6B] text-sm font-semibold hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-[0.97]">
                     Cancel
                   </button>
                   <button type="submit" disabled={saving}
-                    className="flex-1 h-12 rounded-[14px] bg-[#0D9488] text-white text-sm font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
+                    className="flex-1 h-12 rounded-[7px] bg-[#0D9488] text-white text-sm font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
                     {saving ? (
                       <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Saving...</>
                     ) : (

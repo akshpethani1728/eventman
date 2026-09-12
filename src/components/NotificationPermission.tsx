@@ -120,7 +120,7 @@ export function NotificationGate() {
 
   return (
     <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-xs z-50 animate-fade-in">
-      <div className="bg-white rounded-[14px] shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-[rgba(0,0,0,0.06)] p-3 flex items-start gap-3">
+      <div className="bg-white rounded-[7px] shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-[rgba(0,0,0,0.06)] p-3 flex items-start gap-3">
         <div className="w-8 h-8 rounded-[8px] bg-amber-50 flex items-center justify-center shrink-0 mt-0.5">
           <Bell className="w-4 h-4 text-amber-600" />
         </div>

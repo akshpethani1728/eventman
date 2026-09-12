@@ -182,7 +182,6 @@ export default function EventDetailPage() {
     <div className="min-h-screen bg-[#F8F8F6]">
       {/* Header */}
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10">
-        <div className="h-0.5 bg-gradient-to-r from-[#0D9488]/20 via-[#0D9488] to-[#0D9488]/20" />
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
           <Link href="/worker/dashboard" className="p-1 -ml-1 text-[#6B6B6B] active:scale-90 transition-transform"><ArrowLeft className="w-5 h-5" /></Link>
           <h1 className="font-semibold text-[#1A1A1A] truncate">Event Details</h1>
@@ -191,7 +190,7 @@ export default function EventDetailPage() {
 
       <main className="max-w-lg mx-auto px-4 py-4 pb-32">
         {/* === HERO SECTION === */}
-        <div className="bg-white rounded-[20px] overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.04)] mb-4">
+        <div className="bg-white rounded-[5px] overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.04)] mb-4">
           {/* Gradient header */}
           <div className="relative bg-gradient-to-br from-[#0D9488] to-teal-800 px-5 pt-6 pb-8 overflow-hidden">
             <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
@@ -218,15 +217,15 @@ export default function EventDetailPage() {
 
             {/* Info chips */}
             <div className="relative z-10 mt-4 flex flex-wrap gap-2">
-              <div className="inline-flex items-center gap-1.5 text-[11px] text-white/90 bg-white/10 rounded-[10px] px-3 py-1.5 backdrop-blur-sm">
+              <div className="inline-flex items-center gap-1.5 text-[11px] text-white/90 bg-white/10 rounded-[5px] px-3 py-1.5 backdrop-blur-sm">
                 <Calendar className="w-3.5 h-3.5" />
                 {event.date_display || new Date(event.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
               </div>
-              <div className="inline-flex items-center gap-1.5 text-[11px] text-white/90 bg-white/10 rounded-[10px] px-3 py-1.5 backdrop-blur-sm">
+              <div className="inline-flex items-center gap-1.5 text-[11px] text-white/90 bg-white/10 rounded-[5px] px-3 py-1.5 backdrop-blur-sm">
                 <Clock className="w-3.5 h-3.5" />
                 {event.time}{event.end_time ? ` — ${event.end_time}` : ""}
               </div>
-              <div className="inline-flex items-center gap-1.5 text-[11px] text-white/90 bg-white/10 rounded-[10px] px-3 py-1.5 backdrop-blur-sm max-w-[180px]">
+              <div className="inline-flex items-center gap-1.5 text-[11px] text-white/90 bg-white/10 rounded-[5px] px-3 py-1.5 backdrop-blur-sm max-w-[180px]">
                 <MapPin className="w-3.5 h-3.5 shrink-0" />
                 <span className="truncate">{event.location}</span>
               </div>
@@ -284,7 +283,7 @@ export default function EventDetailPage() {
 
         {/* === APPROVED HERO === */}
         {application?.status === "approved" && (
-          <div className="mb-4 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-[20px] p-5 text-white shadow-[0_8px_24px_rgba(5,150,105,0.2)] overflow-hidden relative">
+          <div className="mb-4 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-[5px] p-5 text-white shadow-[0_8px_24px_rgba(5,150,105,0.2)] overflow-hidden relative">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
             <div className="relative">
@@ -311,7 +310,7 @@ export default function EventDetailPage() {
                 </div>
               </div>
               {hoursUntilEvent > 0 && (
-                <div className={`mt-3 flex items-center gap-2 text-xs font-semibold ${isEventUrgent ? "text-amber-200" : "text-emerald-100"} bg-white/10 rounded-[14px] px-3 py-2`}>
+                <div className={`mt-3 flex items-center gap-2 text-xs font-semibold ${isEventUrgent ? "text-amber-200" : "text-emerald-100"} bg-white/10 rounded-[7px] px-3 py-2`}>
                   <Timer className={`w-4 h-4 ${isEventUrgent ? "animate-pulse" : ""}`} />
                   {isEventToday
                     ? "Event starts today — get ready!"
@@ -326,7 +325,7 @@ export default function EventDetailPage() {
 
         {/* === APPLICATION STATUS (pending/other) === */}
         {application && application.status !== "approved" && !isWaitlisted(application) && (
-          <div className={`mb-4 rounded-[20px] p-5 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] ${
+          <div className={`mb-4 rounded-[5px] p-5 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] ${
             application.status === "pending" ? "border-l-4 border-amber-400" : "border-l-4 border-gray-300"
           }`}>
             <div className="flex items-center gap-3">
@@ -358,7 +357,7 @@ export default function EventDetailPage() {
 
         {/* === WAITLISTED STATUS === */}
         {waitlisted && (
-          <div className="mb-4 rounded-[20px] p-5 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] border-l-4 border-purple-400">
+          <div className="mb-4 rounded-[5px] p-5 bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] border-l-4 border-purple-400">
             <div className="flex items-center gap-3">
               <ListPlus className="w-5 h-5 text-purple-500 shrink-0" />
               <div>
@@ -371,18 +370,18 @@ export default function EventDetailPage() {
 
         {/* === ABOUT / DESCRIPTION === */}
         {event.work_description && (
-          <div className="bg-white rounded-[20px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] mb-4">
+          <div className="bg-white rounded-[5px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] mb-4">
             <h3 className="text-[11px] font-bold text-[#6B6B6B] uppercase tracking-[0.04em] mb-3">About This Event</h3>
             <p className="text-sm text-[#1A1A1A] leading-relaxed whitespace-pre-wrap">{event.work_description}</p>
           </div>
         )}
 
         {/* === EVENT DETAILS === */}
-        <div className="bg-white rounded-[20px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] mb-4">
+        <div className="bg-white rounded-[5px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] mb-4">
           <h3 className="text-[11px] font-bold text-[#6B6B6B] uppercase tracking-[0.04em] mb-4">Event Details</h3>
           <div className="space-y-3">
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-[12px] bg-teal-50 flex items-center justify-center shrink-0">
+              <div className="w-9 h-9 rounded-[6px] bg-teal-50 flex items-center justify-center shrink-0">
                 <MapPin className="w-4 h-4 text-[#0D9488]" />
               </div>
               <div className="flex-1 min-w-0">
@@ -394,7 +393,7 @@ export default function EventDetailPage() {
             </div>
             <div className="border-t border-[rgba(0,0,0,0.04)]" />
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-[12px] bg-teal-50 flex items-center justify-center shrink-0">
+              <div className="w-9 h-9 rounded-[6px] bg-teal-50 flex items-center justify-center shrink-0">
                 <Calendar className="w-4 h-4 text-[#0D9488]" />
               </div>
               <div>
@@ -404,7 +403,7 @@ export default function EventDetailPage() {
             </div>
             <div className="border-t border-[rgba(0,0,0,0.04)]" />
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-[12px] bg-teal-50 flex items-center justify-center shrink-0">
+              <div className="w-9 h-9 rounded-[6px] bg-teal-50 flex items-center justify-center shrink-0">
                 <Clock className="w-4 h-4 text-[#0D9488]" />
               </div>
               <div>
@@ -414,7 +413,7 @@ export default function EventDetailPage() {
             </div>
             <div className="border-t border-[rgba(0,0,0,0.04)]" />
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-[12px] bg-teal-50 flex items-center justify-center shrink-0">
+              <div className="w-9 h-9 rounded-[6px] bg-teal-50 flex items-center justify-center shrink-0">
                 <Users className="w-4 h-4 text-[#0D9488]" />
               </div>
               <div>
@@ -426,7 +425,7 @@ export default function EventDetailPage() {
               <>
                 <div className="border-t border-[rgba(0,0,0,0.04)]" />
                 <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-[12px] bg-teal-50 flex items-center justify-center shrink-0">
+                  <div className="w-9 h-9 rounded-[6px] bg-teal-50 flex items-center justify-center shrink-0">
                     <Briefcase className="w-4 h-4 text-[#0D9488]" />
                   </div>
                   <div>
@@ -441,29 +440,29 @@ export default function EventDetailPage() {
 
         {/* === REQUIREMENTS === */}
         {(event.gender_requirement || event.min_age || event.max_age || event.dress_code || event.skill_requirements || event.grooming_notes) && (
-          <div className="bg-white rounded-[20px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] mb-4">
+          <div className="bg-white rounded-[5px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] mb-4">
             <h3 className="text-[11px] font-bold text-[#6B6B6B] uppercase tracking-[0.04em] mb-4">Requirements</h3>
             <div className="flex flex-wrap gap-2">
               {event.gender_requirement && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] bg-gray-50 border border-gray-100">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] bg-gray-50 border border-gray-100">
                   <User className="w-3.5 h-3.5 text-[#6B6B6B]" />
                   <span className="text-xs font-medium text-[#6B6B6B] capitalize">{event.gender_requirement}</span>
                 </div>
               )}
               {(event.min_age || event.max_age) && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] bg-gray-50 border border-gray-100">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] bg-gray-50 border border-gray-100">
                   <AlertCircle className="w-3.5 h-3.5 text-[#6B6B6B]" />
                   <span className="text-xs font-medium text-[#6B6B6B]">{event.min_age || 0} - {event.max_age || 99} yrs</span>
                 </div>
               )}
               {event.dress_code && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] bg-gray-50 border border-gray-100">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] bg-gray-50 border border-gray-100">
                   <Shirt className="w-3.5 h-3.5 text-[#6B6B6B]" />
                   <span className="text-xs font-medium text-[#6B6B6B]">{event.dress_code}</span>
                 </div>
               )}
               {event.grooming_notes && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] bg-gray-50 border border-gray-100">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] bg-gray-50 border border-gray-100">
                   <Info className="w-3.5 h-3.5 text-[#6B6B6B]" />
                   <span className="text-xs font-medium text-[#6B6B6B]">{event.grooming_notes}</span>
                 </div>
@@ -480,12 +479,12 @@ export default function EventDetailPage() {
               </div>
             )}
             {event.food_included && (
-              <div className="mt-3 text-xs text-green-700 font-medium flex items-center gap-1.5 bg-green-50 px-3 py-2 rounded-[10px]">
+              <div className="mt-3 text-xs text-green-700 font-medium flex items-center gap-1.5 bg-green-50 px-3 py-2 rounded-[5px]">
                 <UtensilsCrossed className="w-3.5 h-3.5" /> Food Included
               </div>
             )}
             {event.travel_included && (
-              <div className="mt-2 text-xs text-teal-700 font-medium flex items-center gap-1.5 bg-teal-50 px-3 py-2 rounded-[10px]">
+              <div className="mt-2 text-xs text-teal-700 font-medium flex items-center gap-1.5 bg-teal-50 px-3 py-2 rounded-[5px]">
                 <Car className="w-3.5 h-3.5" /> Travel Included
               </div>
             )}
@@ -494,7 +493,7 @@ export default function EventDetailPage() {
 
         {/* === REQUIRED DOCUMENTS === */}
         {event.required_documents && event.required_documents.length > 0 && (
-          <div className="bg-white rounded-[20px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] mb-4">
+          <div className="bg-white rounded-[5px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] mb-4">
             <h3 className="text-[11px] font-bold text-[#6B6B6B] uppercase tracking-[0.04em] mb-3">Required Documents</h3>
             <div className="flex flex-wrap gap-2">
               {event.required_documents.map((doc, i) => (
@@ -506,9 +505,9 @@ export default function EventDetailPage() {
 
         {/* === REPORTING DETAILS === */}
         {event.reporting_details && (
-          <div className="bg-white rounded-[20px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] mb-4">
+          <div className="bg-white rounded-[5px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] mb-4">
             <h3 className="text-[11px] font-bold text-[#6B6B6B] uppercase tracking-[0.04em] mb-3">Reporting Details</h3>
-            <div className="flex items-start gap-3 bg-amber-50/50 px-3 py-3 rounded-[12px] border border-amber-100/50">
+            <div className="flex items-start gap-3 bg-amber-50/50 px-3 py-3 rounded-[6px] border border-amber-100/50">
               <MapPin className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <p className="text-sm text-[#1A1A1A] leading-relaxed whitespace-pre-wrap">{event.reporting_details}</p>
             </div>
@@ -517,9 +516,9 @@ export default function EventDetailPage() {
 
         {/* === INSTRUCTIONS === */}
         {event.instructions && (
-          <div className="bg-white rounded-[20px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] mb-4">
+          <div className="bg-white rounded-[5px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] mb-4">
             <h3 className="text-[11px] font-bold text-[#6B6B6B] uppercase tracking-[0.04em] mb-3">Instructions</h3>
-            <div className="flex items-start gap-3 px-3 py-3 rounded-[12px] bg-gray-50 border border-gray-100">
+            <div className="flex items-start gap-3 px-3 py-3 rounded-[6px] bg-gray-50 border border-gray-100">
               <Info className="w-4 h-4 text-[#A1A1AA] shrink-0 mt-0.5" />
               <p className="text-sm text-[#1A1A1A] leading-relaxed whitespace-pre-wrap">{event.instructions}</p>
             </div>
@@ -528,7 +527,7 @@ export default function EventDetailPage() {
 
         {/* === ORGANIZER SECTION === */}
         {organizer && (
-          <div className="bg-white rounded-[20px] overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.04)] mb-4">
+          <div className="bg-white rounded-[5px] overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.04)] mb-4">
             <div className="bg-gradient-to-r from-[#0D9488]/5 to-teal-50/50 px-5 py-4">
               <h3 className="text-[11px] font-bold text-[#6B6B6B] uppercase tracking-[0.04em]">Organized by</h3>
             </div>
@@ -575,7 +574,7 @@ export default function EventDetailPage() {
 
                   {/* Contact */}
                   {showContact && organizer.phone && (
-                    <div className="flex items-center gap-3 mt-3 px-3 py-2.5 rounded-[14px] bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-100">
+                    <div className="flex items-center gap-3 mt-3 px-3 py-2.5 rounded-[7px] bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-100">
                       <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shrink-0">
                         <Phone className="w-4 h-4 text-white" />
                       </div>
@@ -586,7 +585,7 @@ export default function EventDetailPage() {
                     </div>
                   )}
                   {!showContact && (
-                    <div className="flex items-center gap-2 mt-3 px-3 py-2 rounded-[12px] bg-gray-50 border border-gray-100">
+                    <div className="flex items-center gap-2 mt-3 px-3 py-2 rounded-[6px] bg-gray-50 border border-gray-100">
                       <Info className="w-3.5 h-3.5 text-[#A1A1AA]" />
                       <p className="text-xs text-[#A1A1AA]">{isEventPast && application?.status === "approved" ? "Contact hidden — event has ended" : "Contact revealed after approval"}</p>
                     </div>
@@ -599,10 +598,10 @@ export default function EventDetailPage() {
 
         {/* Additional application status blocks */}
         {application && !isWaitlisted(application) && application.status !== "approved" && application.status !== "pending" && !isRemovedByOrganizer(application) && (
-          <div className="bg-white rounded-[20px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] mb-4">
+          <div className="bg-white rounded-[5px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] mb-4">
             <h3 className="text-[11px] font-bold text-[#6B6B6B] uppercase tracking-[0.04em] mb-3">Application Status</h3>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-[12px] flex items-center justify-center bg-gray-100 text-[#6B6B6B]">
+              <div className="w-10 h-10 rounded-[6px] flex items-center justify-center bg-gray-100 text-[#6B6B6B]">
                 {application.status === "rejected" ? <XCircle className="w-5 h-5" /> : <Info className="w-5 h-5" />}
               </div>
               <div>
@@ -623,10 +622,10 @@ export default function EventDetailPage() {
         )}
 
         {application && isRemovedByOrganizer(application) && (
-          <div className="bg-white rounded-[20px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] mb-4 bg-amber-50/30">
+          <div className="bg-white rounded-[5px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] mb-4 bg-amber-50/30">
             <h3 className="text-[11px] font-bold text-[#6B6B6B] uppercase tracking-[0.04em] mb-3">Application Status</h3>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-[12px] flex items-center justify-center bg-amber-100 text-amber-600">
+              <div className="w-10 h-10 rounded-[6px] flex items-center justify-center bg-amber-100 text-amber-600">
                 <AlertCircle className="w-5 h-5" />
               </div>
               <div>
@@ -644,7 +643,7 @@ export default function EventDetailPage() {
       {!application && deadlinePassed && (
         <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-[rgba(0,0,0,0.06)] p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
-            <div className="w-full h-12 rounded-[14px] bg-gray-50 backdrop-blur-xl border border-[rgba(0,0,0,0.06)] flex items-center justify-center text-[#6B6B6B] font-medium text-sm gap-2">
+            <div className="w-full h-12 rounded-[7px] bg-gray-50 backdrop-blur-xl border border-[rgba(0,0,0,0.06)] flex items-center justify-center text-[#6B6B6B] font-medium text-sm gap-2">
               <Clock className="w-4 h-4 text-[#A1A1AA]" /> Applications Closed — deadline passed
             </div>
           </div>
@@ -655,7 +654,7 @@ export default function EventDetailPage() {
         <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-[rgba(0,0,0,0.06)] p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
             <button onClick={handleJoinWaitlist} disabled={applying}
-              className="w-full h-12 rounded-[14px] bg-purple-600 text-white font-semibold text-sm active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-purple-700 flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(147,51,234,0.25)]">
+              className="w-full h-12 rounded-[7px] bg-purple-600 text-white font-semibold text-sm active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-purple-700 flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(147,51,234,0.25)]">
               {applying ? (
                 <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
               ) : (
@@ -669,7 +668,7 @@ export default function EventDetailPage() {
       {!application && !deadlinePassed && isFull && !canApply && (
         <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-[rgba(0,0,0,0.06)] p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
-            <Link href="/worker/plans" className="w-full h-12 rounded-[14px] bg-amber-600 text-white font-semibold text-sm active:scale-[0.98] transition-all hover:bg-amber-700 flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(217,119,6,0.25)]">
+            <Link href="/worker/plans" className="w-full h-12 rounded-[7px] bg-amber-600 text-white font-semibold text-sm active:scale-[0.98] transition-all hover:bg-amber-700 flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(217,119,6,0.25)]">
               <CreditCard className="w-4 h-4" /> Subscribe to Join Waitlist
             </Link>
           </div>
@@ -680,7 +679,7 @@ export default function EventDetailPage() {
         <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-[rgba(0,0,0,0.06)] p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
             <button onClick={handleApply} disabled={applying}
-              className="w-full h-12 rounded-[14px] bg-[#0D9488] text-white font-semibold text-sm active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-[#0B7C71] flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
+              className="w-full h-12 rounded-[7px] bg-[#0D9488] text-white font-semibold text-sm active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-[#0B7C71] flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
               {applying ? (
                 <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
               ) : (
@@ -694,7 +693,7 @@ export default function EventDetailPage() {
       {!application && !deadlinePassed && !isFull && (event.status === "published" || event.status === "filling") && !canApply && (
         <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-[rgba(0,0,0,0.06)] p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
-            <Link href="/worker/plans" className="w-full h-12 rounded-[14px] bg-amber-600 text-white font-semibold text-sm active:scale-[0.98] transition-all hover:bg-amber-700 flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(217,119,6,0.25)]">
+            <Link href="/worker/plans" className="w-full h-12 rounded-[7px] bg-amber-600 text-white font-semibold text-sm active:scale-[0.98] transition-all hover:bg-amber-700 flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(217,119,6,0.25)]">
               <CreditCard className="w-4 h-4" /> Subscribe to Apply
             </Link>
           </div>
@@ -704,7 +703,7 @@ export default function EventDetailPage() {
       {!application && !deadlinePassed && !isFull && event.status === "closed" && (
         <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-[rgba(0,0,0,0.06)] p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
-            <div className="w-full h-12 rounded-[14px] bg-gray-50 backdrop-blur-xl border border-[rgba(0,0,0,0.06)] flex items-center justify-center text-[#6B6B6B] font-medium text-sm gap-2">
+            <div className="w-full h-12 rounded-[7px] bg-gray-50 backdrop-blur-xl border border-[rgba(0,0,0,0.06)] flex items-center justify-center text-[#6B6B6B] font-medium text-sm gap-2">
               <Info className="w-4 h-4 text-[#A1A1AA]" /> No longer accepting applications
             </div>
           </div>
@@ -714,7 +713,7 @@ export default function EventDetailPage() {
       {application && application.status === "pending" && !isWaitlisted(application) && (
         <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-[rgba(0,0,0,0.06)] p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
-            <div className="w-full h-12 rounded-[14px] bg-amber-50 backdrop-blur-xl border border-amber-200 flex items-center justify-center text-amber-800 font-medium text-sm gap-2">
+            <div className="w-full h-12 rounded-[7px] bg-amber-50 backdrop-blur-xl border border-amber-200 flex items-center justify-center text-amber-800 font-medium text-sm gap-2">
               <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
               Application submitted — awaiting response
             </div>
@@ -726,7 +725,7 @@ export default function EventDetailPage() {
         <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-[rgba(0,0,0,0.06)] p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
             <button onClick={handleLeaveWaitlist} disabled={applying}
-              className="w-full h-12 rounded-[14px] border-2 border-purple-200 bg-purple-50 text-purple-700 font-semibold text-sm active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+              className="w-full h-12 rounded-[7px] border-2 border-purple-200 bg-purple-50 text-purple-700 font-semibold text-sm active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2">
               {applying ? (
                 <span className="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin inline-block" />
               ) : (
@@ -740,7 +739,7 @@ export default function EventDetailPage() {
       {application && application.status === "approved" && (
         <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-[rgba(0,0,0,0.06)] p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
-            <div className="w-full rounded-[14px] flex items-center justify-between px-5 py-3 bg-emerald-50 backdrop-blur-xl border border-emerald-200">
+            <div className="w-full rounded-[7px] flex items-center justify-between px-5 py-3 bg-emerald-50 backdrop-blur-xl border border-emerald-200">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-sm">
                   <CheckCircle className="w-5 h-5 text-white" />
@@ -766,7 +765,7 @@ export default function EventDetailPage() {
         <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-[rgba(0,0,0,0.06)] p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
             <button onClick={handleReApply} disabled={applying}
-              className="w-full h-12 rounded-[14px] bg-[#0D9488] text-white font-semibold text-sm active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-[#0B7C71] flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
+              className="w-full h-12 rounded-[7px] bg-[#0D9488] text-white font-semibold text-sm active:scale-[0.98] transition-all disabled:opacity-50 hover:bg-[#0B7C71] flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
               {applying ? (
                 <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
               ) : (
@@ -781,7 +780,7 @@ export default function EventDetailPage() {
         <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-[rgba(0,0,0,0.06)] p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
             <Link href="/worker/dashboard"
-              className="w-full h-12 rounded-[14px] bg-[#0D9488] text-white font-semibold text-sm flex items-center justify-center gap-2 hover:bg-[#0B7C71] shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
+              className="w-full h-12 rounded-[7px] bg-[#0D9488] text-white font-semibold text-sm flex items-center justify-center gap-2 hover:bg-[#0B7C71] shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
               <ArrowUpRight className="w-4 h-4" /> Browse More Events
             </Link>
           </div>

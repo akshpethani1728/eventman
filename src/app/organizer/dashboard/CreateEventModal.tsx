@@ -90,14 +90,14 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-6 p-3 overflow-y-auto modal-overlay" ref={modalRef} role="dialog" aria-modal="true" aria-label={template ? "Create from template" : "New event"}>
-      <div className="w-full max-w-xl bg-white rounded-[20px] shadow-[0_24px_64px_rgba(0,0,0,0.15),0_8px_20px_rgba(0,0,0,0.08)]">
+      <div className="w-full max-w-xl bg-white rounded-[5px] shadow-[0_24px_64px_rgba(0,0,0,0.15),0_8px_20px_rgba(0,0,0,0.08)]">
         <div className="px-5 pt-5 pb-3 border-b border-[rgba(0,0,0,0.06)]">
           <div className="flex items-center justify-between mb-3">
             <div>
               <h2 className="font-bold text-lg text-gray-900">{template ? "Create from Template" : "New Event"}</h2>
               <p className="text-xs text-gray-500 mt-0.5">Step {step + 1} of {STEPS.length} · {STEPS[step]}</p>
             </div>
-            <button onClick={onClose} data-close-modal className="p-1.5 hover:bg-gray-100 rounded-[10px] transition-colors" aria-label="Close">
+            <button onClick={onClose} data-close-modal className="p-1.5 hover:bg-gray-100 rounded-[5px] transition-colors" aria-label="Close">
               <X className="w-4 h-4 text-gray-500" />
             </button>
           </div>
@@ -291,14 +291,14 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
 
             {step === 5 && (
               <div className="space-y-3 animate-fade-in">
-                <div className="bg-emerald-50 rounded-[14px] p-4 flex items-start gap-3">
+                <div className="bg-emerald-50 rounded-[7px] p-4 flex items-start gap-3">
                   <Sparkles className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-semibold text-emerald-800">Ready to publish</p>
                     <p className="text-xs text-emerald-700 mt-0.5">Review the details below before publishing.</p>
                   </div>
                 </div>
-                <div className="space-y-2 bg-gray-50 rounded-[14px] p-4">
+                <div className="space-y-2 bg-gray-50 rounded-[7px] p-4">
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div><span className="text-gray-400 text-xs block">Title</span><span className="font-medium">{form.title}</span></div>
                     <div><span className="text-gray-400 text-xs block">Category</span><span className="font-medium capitalize">{form.category || "—"}</span></div>
@@ -322,12 +322,12 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
             <div>
               {step > 0 ? (
                 <button type="button" onClick={() => setStep(s => s - 1)}
-                  className="h-10 px-4 rounded-[10px] text-sm font-semibold text-gray-600 hover:bg-gray-100 transition-all active:scale-[0.97] flex items-center gap-1.5">
+                  className="h-10 px-4 rounded-[5px] text-sm font-semibold text-gray-600 hover:bg-gray-100 transition-all active:scale-[0.97] flex items-center gap-1.5">
                   <ArrowLeft className="w-4 h-4" /> Back
                 </button>
               ) : (
                 <button type="button" onClick={onClose}
-                  className="h-10 px-4 rounded-[10px] text-sm font-semibold text-gray-500 hover:bg-gray-100 transition-all active:scale-[0.97]">
+                  className="h-10 px-4 rounded-[5px] text-sm font-semibold text-gray-500 hover:bg-gray-100 transition-all active:scale-[0.97]">
                   Cancel
                 </button>
               )}
@@ -335,7 +335,7 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
             <div className="flex items-center gap-2">
               {step < STEPS.length - 1 ? (
                 <button type="button" onClick={nextStep}
-                  className={`h-10 px-5 rounded-[10px] text-sm font-semibold transition-all active:scale-[0.97] flex items-center gap-1.5 ${
+                  className={`h-10 px-5 rounded-[5px] text-sm font-semibold transition-all active:scale-[0.97] flex items-center gap-1.5 ${
                     isStepValid() ? "bg-[#0D9488] text-white hover:bg-teal-700 shadow-[0_2px_8px_rgba(13,148,136,0.2)]" : "bg-gray-200 text-gray-400 cursor-not-allowed"
                   }`}>
                   Continue <ArrowRight className="w-4 h-4" />
@@ -343,11 +343,11 @@ export default function CreateEventModal({ onClose, onCreated, template }: Props
               ) : (
                 <div className="flex gap-2">
                   <button type="submit" onClick={() => setPublishAfter(false)} disabled={loading}
-                    className="h-10 px-5 rounded-[10px] border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center gap-1.5">
+                    className="h-10 px-5 rounded-[5px] border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center gap-1.5">
                     <Save className="w-4 h-4" /> Draft
                   </button>
                   <button type="submit" onClick={() => setPublishAfter(true)} disabled={loading}
-                    className="h-10 px-5 rounded-[10px] bg-[#0D9488] text-white text-sm font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] flex items-center gap-1.5 shadow-[0_2px_8px_rgba(13,148,136,0.2)] disabled:opacity-50">
+                    className="h-10 px-5 rounded-[5px] bg-[#0D9488] text-white text-sm font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] flex items-center gap-1.5 shadow-[0_2px_8px_rgba(13,148,136,0.2)] disabled:opacity-50">
                     {loading ? (
                       <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Publishing...</>
                     ) : (

@@ -36,7 +36,7 @@ function BottomNav() {
             <Link
               key={href}
               href={href}
-              className={`relative flex flex-col items-center justify-center gap-1 min-w-0 px-3 py-1 rounded-[12px] transition-all duration-200 ${
+              className={`relative flex flex-col items-center justify-center gap-1 min-w-0 px-3 py-1 rounded-[6px] transition-all duration-200 ${
                 active
                   ? "text-[#0D9488]"
                   : "text-gray-400 hover:text-gray-600"

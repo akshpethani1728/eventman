@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -24,20 +24,20 @@ function SkeletonDashboard() {
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-20">
         <div className="max-w-lg mx-auto px-4 h-12 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-[10px] bg-gray-100 animate-pulse" />
+            <div className="w-7 h-7 rounded-[5px] bg-gray-100 animate-pulse" />
             <div className="w-20 h-3 bg-gray-100 rounded-full animate-pulse" />
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-7 h-7 rounded-[10px] bg-gray-100 animate-pulse" />
-            <div className="w-7 h-7 rounded-[10px] bg-gray-100 animate-pulse" />
+            <div className="w-7 h-7 rounded-[5px] bg-gray-100 animate-pulse" />
+            <div className="w-7 h-7 rounded-[5px] bg-gray-100 animate-pulse" />
           </div>
         </div>
       </header>
       <main className="max-w-lg mx-auto px-4 pt-5 space-y-4">
-        <div className="w-full h-[180px] rounded-[20px] bg-gradient-to-br from-gray-100 to-gray-50 animate-pulse" />
-        <div className="w-full h-12 rounded-[14px] bg-gray-100 animate-pulse" />
-        <div className="w-full h-12 rounded-[14px] bg-gray-100 animate-pulse" />
-        <div className="w-full h-12 rounded-[14px] bg-gray-100 animate-pulse" />
+        <div className="w-full h-[180px] rounded-[5px] bg-gradient-to-br from-gray-100 to-gray-50 animate-pulse" />
+        <div className="w-full h-12 rounded-[7px] bg-gray-100 animate-pulse" />
+        <div className="w-full h-12 rounded-[7px] bg-gray-100 animate-pulse" />
+        <div className="w-full h-12 rounded-[7px] bg-gray-100 animate-pulse" />
       </main>
     </div>
   );
@@ -55,9 +55,9 @@ function StatCard({ icon: Icon, value, label, color, attention }: {
   };
   const c = colorMap[color] || colorMap.teal;
   return (
-    <div className={`bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all duration-200 active:scale-[0.98] ${attention ? "ring-2 ring-red-200/60" : ""}`}>
+    <div className={`bg-white rounded-[8px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all duration-200 active:scale-[0.98] ${attention ? "ring-2 ring-red-200/60" : ""}`}>
       <div className="flex items-center justify-between mb-3">
-        <div className={`w-9 h-9 rounded-[12px] ${c.iconBg} flex items-center justify-center`}>
+        <div className={`w-9 h-9 rounded-[6px] ${c.iconBg} flex items-center justify-center`}>
           <Icon className={`w-[18px] h-[18px] ${c.text}`} />
         </div>
         {attention && <span className={`w-2 h-2 rounded-full ${c.dot} animate-pulse`} />}
@@ -246,10 +246,10 @@ export default function OrganizerDashboard() {
             <span className="text-[13px] font-bold text-gray-900 tracking-tight">EventMan</span>
           </div>
           <div className="flex items-center gap-1">
-            <Link href="/organizer/database" aria-label="Search talent" className="w-8 h-8 rounded-[10px] flex items-center justify-center text-gray-400 hover:text-[#0D9488] hover:bg-[#0D9488]/10 transition-all active:scale-90">
+            <Link href="/organizer/database" aria-label="Search talent" className="w-8 h-8 rounded-[5px] flex items-center justify-center text-gray-400 hover:text-[#0D9488] hover:bg-[#0D9488]/10 transition-all active:scale-90">
               <Search className="w-[16px] h-[16px]" />
             </Link>
-            <Link href="/organizer/notifications" aria-label="Notifications" className="relative w-8 h-8 rounded-[10px] flex items-center justify-center text-gray-400 hover:text-[#0D9488] hover:bg-[#0D9488]/10 transition-all active:scale-90">
+            <Link href="/organizer/notifications" aria-label="Notifications" className="relative w-8 h-8 rounded-[5px] flex items-center justify-center text-gray-400 hover:text-[#0D9488] hover:bg-[#0D9488]/10 transition-all active:scale-90">
               <Bell className="w-[16px] h-[16px]" />
             </Link>
             <Link href="/organizer/profile" className="ml-0.5">
@@ -257,7 +257,7 @@ export default function OrganizerDashboard() {
                 {profile?.full_name?.charAt(0) || "O"}
               </div>
             </Link>
-            <button onClick={signOut} aria-label="Sign out" className="w-8 h-8 rounded-[10px] flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all active:scale-90">
+            <button onClick={signOut} aria-label="Sign out" className="w-8 h-8 rounded-[5px] flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all active:scale-90">
               <LogOut className="w-[16px] h-[16px]" />
             </button>
           </div>
@@ -265,7 +265,7 @@ export default function OrganizerDashboard() {
       </header>
 
       <main className="max-w-lg mx-auto px-4 pt-4">
-        <div className="bg-gradient-to-r from-[#0D9488] to-[#0F766E] rounded-[16px] px-4 py-3.5 mb-4 shadow-[0_4px_16px_rgba(13,148,136,0.2)]">
+        <div className="bg-gradient-to-r from-[#0D9488] to-[#0F766E] rounded-[8px] px-4 py-3.5 mb-4 shadow-[0_4px_16px_rgba(13,148,136,0.2)]">
           <div className="flex items-center justify-between mb-2.5">
             <h2 className="text-white text-[11px] font-semibold uppercase tracking-[0.08em]">Command Center</h2>
             <div className="flex items-center gap-1.5">
@@ -274,19 +274,19 @@ export default function OrganizerDashboard() {
             </div>
           </div>
           <div className="grid grid-cols-4 gap-2">
-            <div className="bg-white/10 rounded-[12px] px-2.5 py-2 text-center backdrop-blur-sm">
+            <div className="bg-white/10 rounded-[6px] px-2.5 py-2 text-center backdrop-blur-sm">
               <p className="text-white text-base font-bold leading-none">{activeEvents.length}</p>
               <p className="text-white/60 text-[8px] font-semibold mt-1 uppercase tracking-wider">Active</p>
             </div>
-            <div className="bg-white/10 rounded-[12px] px-2.5 py-2 text-center backdrop-blur-sm">
+            <div className="bg-white/10 rounded-[6px] px-2.5 py-2 text-center backdrop-blur-sm">
               <p className="text-white text-base font-bold leading-none">{totalPendingApprovals}</p>
               <p className="text-white/60 text-[8px] font-semibold mt-1 uppercase tracking-wider">Pending</p>
             </div>
-            <div className="bg-white/10 rounded-[12px] px-2.5 py-2 text-center backdrop-blur-sm">
+            <div className="bg-white/10 rounded-[6px] px-2.5 py-2 text-center backdrop-blur-sm">
               <p className="text-white text-base font-bold leading-none">{needsAttention.length}</p>
               <p className="text-white/60 text-[8px] font-semibold mt-1 uppercase tracking-wider">Urgent</p>
             </div>
-            <div className="bg-white/10 rounded-[12px] px-2.5 py-2 text-center backdrop-blur-sm">
+            <div className="bg-white/10 rounded-[6px] px-2.5 py-2 text-center backdrop-blur-sm">
               <p className="text-white text-base font-bold leading-none">
                 {activeEvents.length > 0
                   ? Math.round(activeEvents.reduce((s, e) => s + (e.approvedCount || 0), 0) / Math.max(1, activeEvents.reduce((s, e) => s + e.worker_count, 0)) * 100)
@@ -298,14 +298,14 @@ export default function OrganizerDashboard() {
         </div>
 
         <button onClick={() => { setCreateFromTemplate(null); setShowCreate(true); }}
-          className="w-full h-14 mb-5 rounded-[16px] bg-gradient-to-r from-[#0D9488] to-[#0F766E] text-white font-bold text-base flex items-center justify-center gap-2.5 shadow-[0_4px_16px_rgba(13,148,136,0.3)] transition-all duration-200 hover:shadow-[0_8px_24px_rgba(13,148,136,0.4)] active:scale-[0.98]">
+          className="w-full h-14 mb-5 rounded-[8px] bg-gradient-to-r from-[#0D9488] to-[#0F766E] text-white font-bold text-base flex items-center justify-center gap-2.5 shadow-[0_4px_16px_rgba(13,148,136,0.3)] transition-all duration-200 hover:shadow-[0_8px_24px_rgba(13,148,136,0.4)] active:scale-[0.98]">
           <Plus className="w-5 h-5" /> Create New Event
         </button>
 
         <div className="flex gap-2 mb-5">
           {(["active", "past"] as const).map(t => (
             <button key={t} onClick={() => { setTab(t); setVisibleCount(PAGE_SIZE); }}
-              className={`flex-1 h-10 rounded-[12px] text-sm font-semibold transition-all active:scale-[0.97] ${
+              className={`flex-1 h-10 rounded-[6px] text-sm font-semibold transition-all active:scale-[0.97] ${
                 tab === t
                   ? "bg-[#0D9488] text-white shadow-[0_4px_12px_rgba(13,148,136,0.25)]"
                   : "bg-white text-gray-500 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:text-gray-800"
@@ -315,7 +315,7 @@ export default function OrganizerDashboard() {
           ))}
           {templates.length > 0 && (
             <button onClick={() => setTab("templates")}
-              className={`h-10 px-4 rounded-[12px] text-sm font-semibold transition-all active:scale-[0.97] ${
+              className={`h-10 px-4 rounded-[6px] text-sm font-semibold transition-all active:scale-[0.97] ${
                 tab === "templates"
                   ? "bg-[#0D9488] text-white shadow-[0_4px_12px_rgba(13,148,136,0.25)]"
                   : "bg-white text-gray-500 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:text-gray-800"
@@ -330,7 +330,7 @@ export default function OrganizerDashboard() {
             <p className="text-xs text-gray-500 mb-3">Click a template to create a new event instantly.</p>
             {templates.length === 0 && (
               <div className="text-center py-16">
-                <div className="w-16 h-16 rounded-[20px] bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 rounded-[5px] bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center mx-auto mb-4">
                   <BookTemplate className="w-8 h-8 text-gray-300" />
                 </div>
                 <p className="text-lg font-bold text-gray-900">No templates</p>
@@ -338,20 +338,20 @@ export default function OrganizerDashboard() {
               </div>
             )}
             {templates.map(tmpl => (
-              <div key={tmpl.id} className="bg-white rounded-[14px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center justify-between gap-3 transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
+              <div key={tmpl.id} className="bg-white rounded-[7px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center justify-between gap-3 transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-sm text-gray-900 truncate">{tmpl.template_name || tmpl.title}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{tmpl.worker_count} workers · {CATEGORY_LABELS[tmpl.category || ""] || tmpl.category || "General"}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{tmpl.worker_count} workers � {CATEGORY_LABELS[tmpl.category || ""] || tmpl.category || "General"}</p>
                 </div>
                 <div className="flex gap-1.5 shrink-0">
                   <button onClick={() => { setCreateFromTemplate(tmpl); setShowCreate(true); }}
-                    className="h-8 px-4 rounded-[10px] bg-[#0D9488] text-white text-xs font-semibold hover:bg-teal-700 transition-all active:scale-95">Use</button>
+                    className="h-8 px-4 rounded-[5px] bg-[#0D9488] text-white text-xs font-semibold hover:bg-teal-700 transition-all active:scale-95">Use</button>
                   <button onClick={() => setDeleteConfirm(tmpl.id)}
-                    className="h-8 w-8 rounded-[10px] bg-red-50 text-red-600 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90"><Trash2 className="w-3.5 h-3.5" /></button>
+                    className="h-8 w-8 rounded-[5px] bg-red-50 text-red-600 hover:bg-red-100 flex items-center justify-center transition-all active:scale-90"><Trash2 className="w-3.5 h-3.5" /></button>
                 </div>
               </div>
             ))}
-            <button onClick={() => setTab("active")} className="text-xs text-[#0D9488] font-medium hover:text-[#0F766E] transition-colors active:scale-[0.97]">← Back to active</button>
+            <button onClick={() => setTab("active")} className="text-xs text-[#0D9488] font-medium hover:text-[#0F766E] transition-colors active:scale-[0.97]">? Back to active</button>
           </div>
         )}
 
@@ -359,7 +359,7 @@ export default function OrganizerDashboard() {
           <div className="space-y-3">
             {sortedActive.length === 0 && (
               <div className="text-center py-16">
-                <div className="w-16 h-16 rounded-[20px] bg-gradient-to-br from-teal-50 to-teal-100 flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 rounded-[5px] bg-gradient-to-br from-teal-50 to-teal-100 flex items-center justify-center mx-auto mb-4">
                   <Sparkles className="w-8 h-8 text-[#0D9488]" />
                 </div>
                 <p className="text-lg font-bold text-gray-900">No active events</p>
@@ -367,7 +367,7 @@ export default function OrganizerDashboard() {
                   Your first event is the beginning of great operations. Create one to start receiving applications.
                 </p>
                 <button onClick={() => { setCreateFromTemplate(null); setShowCreate(true); }}
-                  className="mt-6 h-11 px-6 rounded-[14px] bg-[#0D9488] text-white text-sm font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
+                  className="mt-6 h-11 px-6 rounded-[7px] bg-[#0D9488] text-white text-sm font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
                   <Plus className="w-4 h-4" /> Create Event
                 </button>
               </div>
@@ -387,7 +387,7 @@ export default function OrganizerDashboard() {
 
               return (
                 <div key={event.id}
-                  className="bg-white rounded-[16px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all duration-200 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] active:scale-[0.99]">
+                  className="bg-white rounded-[8px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all duration-200 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] active:scale-[0.99]">
                   
                   <div className="px-4 pt-4 pb-2 flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
@@ -410,54 +410,54 @@ export default function OrganizerDashboard() {
                     </div>
                     <div className="relative shrink-0">
                       <button onClick={() => setActionMenu(actionMenu === event.id ? null : event.id)}
-                        className="w-8 h-8 rounded-[10px] hover:bg-gray-100 flex items-center justify-center text-gray-400 transition-all active:scale-90" aria-label="Event actions" aria-haspopup="true">
+                        className="w-8 h-8 rounded-[5px] hover:bg-gray-100 flex items-center justify-center text-gray-400 transition-all active:scale-90" aria-label="Event actions" aria-haspopup="true">
                         <MoreVertical className="w-4 h-4" />
                       </button>
                       {actionMenu === event.id && (
                         <>
                           <div className="fixed inset-0 z-10" onClick={() => setActionMenu(null)} />
-                          <div className="absolute right-0 top-9 w-48 bg-white rounded-[12px] shadow-[0_12px_48px_rgba(0,0,0,0.12),0_4px_12px_rgba(0,0,0,0.06)] z-20 py-1.5 overflow-hidden animate-scale-in" role="menu">
+                          <div className="absolute right-0 top-9 w-48 bg-white rounded-[6px] shadow-[0_12px_48px_rgba(0,0,0,0.12),0_4px_12px_rgba(0,0,0,0.06)] z-20 py-1.5 overflow-hidden animate-scale-in" role="menu">
                             <div className="px-3 pb-1.5 mb-1 border-b border-[rgba(0,0,0,0.06)]">
                               <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Actions</p>
                             </div>
                             {["draft", "published", "filling"].includes(event.status) && (
                               <button onClick={() => { setEditingEvent(event); setActionMenu(null); }} role="menuitem"
-                                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-all rounded-[10px] active:scale-[0.97]">
+                                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-all rounded-[5px] active:scale-[0.97]">
                                 <Edit3 className="w-3.5 h-3.5" /> Edit Event
                               </button>
                             )}
                             <button onClick={() => { setSelectedEvent(event); setActionMenu(null); }} role="menuitem"
-                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-all rounded-[10px] active:scale-[0.97]">
+                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-all rounded-[5px] active:scale-[0.97]">
                               <Users className="w-3.5 h-3.5" /> View Applicants
                             </button>
                             <Link href={`/organizer/events/${event.id}`} onClick={() => setActionMenu(null)} role="menuitem"
-                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-all rounded-[10px] active:scale-[0.97]">
+                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-all rounded-[5px] active:scale-[0.97]">
                               <Eye className="w-3.5 h-3.5" /> Open Detail
                             </Link>
                             <div className="h-px bg-[rgba(0,0,0,0.06)] my-1 mx-3" />
                             <button onClick={() => { duplicateEvent(event); setActionMenu(null); }} role="menuitem"
-                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-all rounded-[10px] active:scale-[0.97]">
+                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-all rounded-[5px] active:scale-[0.97]">
                               <Copy className="w-3.5 h-3.5" /> Duplicate
                             </button>
                             <button onClick={() => { saveAsTemplate(event); setActionMenu(null); }} role="menuitem"
-                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-all rounded-[10px] active:scale-[0.97]">
+                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-all rounded-[5px] active:scale-[0.97]">
                               <BookTemplate className="w-3.5 h-3.5" /> Save as Template
                             </button>
                             <div className="h-px bg-[rgba(0,0,0,0.06)] my-1 mx-3" />
                             {["draft", "published", "filling"].includes(event.status) && (
                               <button onClick={() => { updateEventStatus(event.id, "closed"); }} role="menuitem"
-                                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-amber-700 hover:bg-amber-50 transition-all rounded-[10px] active:scale-[0.97]">
+                                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-amber-700 hover:bg-amber-50 transition-all rounded-[5px] active:scale-[0.97]">
                                 <XCircle className="w-3.5 h-3.5" /> Close Event
                               </button>
                             )}
                             {["draft", "published", "filling"].includes(event.status) && (
                               <button onClick={() => { updateEventStatus(event.id, "completed"); }} role="menuitem"
-                                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-gray-50 transition-all rounded-[10px] active:scale-[0.97]">
+                                className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-gray-700 hover:bg-gray-50 transition-all rounded-[5px] active:scale-[0.97]">
                                 <CheckCircle className="w-3.5 h-3.5" /> Mark Completed
                               </button>
                             )}
                             <button onClick={() => { setActionMenu(null); setDeleteConfirm(event.id); }} role="menuitem"
-                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-red-600 hover:bg-red-50 transition-all rounded-[10px] active:scale-[0.97]">
+                              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-red-600 hover:bg-red-50 transition-all rounded-[5px] active:scale-[0.97]">
                               <Trash2 className="w-3.5 h-3.5" /> Delete
                             </button>
                           </div>
@@ -484,21 +484,21 @@ export default function OrganizerDashboard() {
                   </div>
 
                   <div className="px-4 mt-3 grid grid-cols-4 gap-2">
-                    <div className="bg-emerald-50 rounded-[10px] p-2.5 text-center">
+                    <div className="bg-emerald-50 rounded-[5px] p-2.5 text-center">
                       <p className="text-sm font-bold text-emerald-700 leading-none">{event.approvedCount || 0}</p>
                       <p className="text-[9px] text-emerald-600/70 mt-0.5 font-medium">Approved</p>
                     </div>
-                    <div className="bg-amber-50 rounded-[10px] p-2.5 text-center">
+                    <div className="bg-amber-50 rounded-[5px] p-2.5 text-center">
                       <p className="text-sm font-bold text-amber-700 leading-none">{event.pendingCount || 0}</p>
                       <p className="text-[9px] text-amber-600/70 mt-0.5 font-medium">Pending</p>
                     </div>
-                    <div className={`rounded-[10px] p-2.5 text-center ${remaining <= 0 ? "bg-purple-50" : remaining <= 3 ? "bg-red-50" : "bg-gray-50"}`}>
+                    <div className={`rounded-[5px] p-2.5 text-center ${remaining <= 0 ? "bg-purple-50" : remaining <= 3 ? "bg-red-50" : "bg-gray-50"}`}>
                       <p className={`text-sm font-bold leading-none ${remaining <= 0 ? "text-purple-700" : remaining <= 3 ? "text-red-700" : "text-gray-700"}`}>
                         {remaining <= 0 ? "Full" : remaining}
                       </p>
                       <p className="text-[9px] text-gray-500/70 mt-0.5 font-medium">Seats Left</p>
                     </div>
-                    <div className="bg-blue-50 rounded-[10px] p-2.5 text-center">
+                    <div className="bg-blue-50 rounded-[5px] p-2.5 text-center">
                       <p className="text-sm font-bold text-blue-700 leading-none">{fillPercent}%</p>
                       <p className="text-[9px] text-blue-600/70 mt-0.5 font-medium">Filled</p>
                     </div>
@@ -520,15 +520,15 @@ export default function OrganizerDashboard() {
 
                   <div className="px-4 py-3 mt-3 border-t border-[rgba(0,0,0,0.06)] flex gap-2 flex-wrap">
                     <button onClick={() => { setEditingEvent(event); }}
-                      className="flex-1 min-w-[90px] h-9 rounded-[10px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center justify-center gap-1.5">
+                      className="flex-1 min-w-[90px] h-9 rounded-[5px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center justify-center gap-1.5">
                       <Edit3 className="w-3.5 h-3.5" /> Edit
                     </button>
                     <button onClick={() => { setSelectedEvent(event); }}
-                      className="flex-1 min-w-[90px] h-9 rounded-[10px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center justify-center gap-1.5">
+                      className="flex-1 min-w-[90px] h-9 rounded-[5px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center justify-center gap-1.5">
                       <Users className="w-3.5 h-3.5" /> Applicants
                     </button>
                     <Link href={`/organizer/events/${event.id}`}
-                      className="flex-1 min-w-[90px] h-9 rounded-[10px] bg-[#0D9488] text-white text-xs font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] flex items-center justify-center gap-1.5 shadow-[0_2px_8px_rgba(13,148,136,0.2)]">
+                      className="flex-1 min-w-[90px] h-9 rounded-[5px] bg-[#0D9488] text-white text-xs font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] flex items-center justify-center gap-1.5 shadow-[0_2px_8px_rgba(13,148,136,0.2)]">
                       Manage <ChevronRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>
@@ -538,7 +538,7 @@ export default function OrganizerDashboard() {
 
             {hasMore && (
               <button onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
-                className="w-full h-12 rounded-[14px] bg-white border border-[rgba(0,0,0,0.08)] text-gray-500 text-sm font-semibold hover:bg-gray-50 transition-all active:scale-[0.98]">
+                className="w-full h-12 rounded-[7px] bg-white border border-[rgba(0,0,0,0.08)] text-gray-500 text-sm font-semibold hover:bg-gray-50 transition-all active:scale-[0.98]">
                 Show {Math.min(PAGE_SIZE, sortedActive.length - visibleCount)} more events
               </button>
             )}
@@ -549,7 +549,7 @@ export default function OrganizerDashboard() {
           <div className="space-y-3 animate-fade-in">
             {pastEvents.length === 0 && (
               <div className="text-center py-16">
-                <div className="w-16 h-16 rounded-[20px] bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 rounded-[5px] bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center mx-auto mb-4">
                   <Clock className="w-8 h-8 text-gray-300" />
                 </div>
                 <p className="text-lg font-bold text-gray-900">No past events</p>
@@ -558,7 +558,7 @@ export default function OrganizerDashboard() {
             )}
             {pastEvents.map(event => (
               <div key={event.id}
-                className="bg-white rounded-[14px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
+                className="bg-white rounded-[7px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
                 <div className="px-4 pt-4 pb-1 flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
                     <Link href={`/organizer/events/${event.id}`} className="hover:text-[#0D9488] transition-colors active:scale-[0.99]">
@@ -588,15 +588,15 @@ export default function OrganizerDashboard() {
                 </div>
                 <div className="px-4 py-2.5 border-t border-[rgba(0,0,0,0.06)] flex gap-1.5">
                   <button onClick={() => { setSelectedEvent(event); }}
-                    className="flex-1 h-8 rounded-[10px] border border-gray-200 text-gray-600 text-[11px] font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center justify-center gap-1">
+                    className="flex-1 h-8 rounded-[5px] border border-gray-200 text-gray-600 text-[11px] font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center justify-center gap-1">
                     <Users className="w-3 h-3" /> Applicants
                   </button>
                   <Link href={`/organizer/events/${event.id}`}
-                    className="flex-1 h-8 rounded-[10px] bg-[#0D9488] text-white text-[11px] font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] flex items-center justify-center gap-1 shadow-[0_2px_8px_rgba(13,148,136,0.2)]">
+                    className="flex-1 h-8 rounded-[5px] bg-[#0D9488] text-white text-[11px] font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] flex items-center justify-center gap-1 shadow-[0_2px_8px_rgba(13,148,136,0.2)]">
                     Details <ChevronRight className="w-3 h-3" />
                   </Link>
                   <button onClick={() => { duplicateEvent(event); }}
-                    className="h-8 px-3 rounded-[10px] border border-gray-200 text-gray-600 text-[11px] font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center justify-center gap-1">
+                    className="h-8 px-3 rounded-[5px] border border-gray-200 text-gray-600 text-[11px] font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center justify-center gap-1">
                     <Copy className="w-3 h-3" /> Duplicate
                   </button>
                 </div>

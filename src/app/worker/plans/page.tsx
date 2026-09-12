@@ -170,7 +170,6 @@ export default function WorkerPlansPage() {
     <div className="min-h-dvh bg-[#F8F8F6] pb-28">
       {/* HEADER */}
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10">
-        <div className="h-0.5 bg-gradient-to-r from-[#0D9488]/20 via-[#0D9488] to-[#0D9488]/20" />
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
           <Link href="/worker/dashboard" className="p-1 -ml-1 text-gray-500">
             <ArrowLeft className="w-5 h-5" />
@@ -225,7 +224,7 @@ export default function WorkerPlansPage() {
           }`}>
             <div className="flex items-center justify-between relative z-10">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-[14px] bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                <div className="w-8 h-8 rounded-[7px] bg-white/20 flex items-center justify-center backdrop-blur-sm">
                   {isActive ? <Crown className="w-4 h-4 text-white" /> :
                    isTrialing ? <Sparkles className="w-4 h-4 text-white" /> :
                    <Clock className="w-4 h-4 text-white" />}
@@ -268,7 +267,7 @@ export default function WorkerPlansPage() {
             )}
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-[#F8F8F6] rounded-[16px] p-3 text-center">
+              <div className="bg-[#F8F8F6] rounded-[8px] p-3 text-center">
                 <p className="text-[10px] text-[#6B6B6B] uppercase tracking-wider font-medium">Status</p>
                 <p className={`text-sm font-bold mt-0.5 ${
                   isActive ? "text-emerald-600" : isTrialing ? "text-[#0D9488]" : "text-red-500"
@@ -276,7 +275,7 @@ export default function WorkerPlansPage() {
                   {isActive ? "Active" : isTrialing ? "In Trial" : "Expired"}
                 </p>
               </div>
-              <div className="bg-[#F8F8F6] rounded-[16px] p-3 text-center">
+              <div className="bg-[#F8F8F6] rounded-[8px] p-3 text-center">
                 <p className="text-[10px] text-[#6B6B6B] uppercase tracking-wider font-medium">Expires</p>
                 <p className="text-sm font-bold text-[#1A1A1A] mt-0.5">
                   {endDate
@@ -287,7 +286,7 @@ export default function WorkerPlansPage() {
             </div>
 
             {isExpired && (
-              <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 rounded-[16px] px-3 py-2.5">
+              <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 rounded-[8px] px-3 py-2.5">
                 <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                 Renew your plan to continue applying for events.
               </div>
@@ -310,13 +309,10 @@ export default function WorkerPlansPage() {
               }`}
             >
               <div className="relative">
-                {selectedPlan === "monthly" && (
-                  <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#0D9488] to-[#0A7C73]" />
-                )}
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-[14px] flex items-center justify-center ${
+                      <div className={`w-10 h-10 rounded-[7px] flex items-center justify-center ${
                         selectedPlan === "monthly" ? "bg-[#0D9488]" : "bg-gray-100"
                       }`}>
                         <Clock className={`w-5 h-5 ${selectedPlan === "monthly" ? "text-white" : "text-gray-400"}`} />
@@ -352,13 +348,10 @@ export default function WorkerPlansPage() {
               }`}
             >
               <div className="relative">
-                {selectedPlan === "yearly" && (
-                  <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#0D9488] to-[#0A7C73]" />
-                )}
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-[14px] flex items-center justify-center ${
+                      <div className={`w-10 h-10 rounded-[7px] flex items-center justify-center ${
                         selectedPlan === "yearly" ? "bg-[#0D9488]" : "bg-gray-100"
                       }`}>
                         <Crown className={`w-5 h-5 ${selectedPlan === "yearly" ? "text-white" : "text-gray-400"}`} />
@@ -397,13 +390,10 @@ export default function WorkerPlansPage() {
               }`}
             >
               <div className="relative">
-                {selectedPlan === "lifetime" && (
-                  <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#0D9488] to-[#0A7C73]" />
-                )}
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-[14px] flex items-center justify-center ${
+                      <div className={`w-10 h-10 rounded-[7px] flex items-center justify-center ${
                         selectedPlan === "lifetime" ? "bg-[#0D9488]" : "bg-gray-100"
                       }`}>
                         <Sparkles className={`w-5 h-5 ${selectedPlan === "lifetime" ? "text-white" : "text-gray-400"}`} />
@@ -461,7 +451,7 @@ export default function WorkerPlansPage() {
             <button
               onClick={handlePurchase}
               disabled={purchasing || !razorpayLoaded}
-              className="w-full h-13 rounded-[16px] bg-gradient-to-r from-[#0D9488] to-[#0A7C73] text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:from-[#0A7C73] hover:to-[#086B62] flex items-center justify-center gap-2"
+              className="w-full h-13 rounded-[8px] bg-gradient-to-r from-[#0D9488] to-[#0A7C73] text-white font-bold text-base active:scale-[0.98] transition-all disabled:opacity-50 hover:from-[#0A7C73] hover:to-[#086B62] flex items-center justify-center gap-2"
             >
               {purchasing ? (
                 <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>

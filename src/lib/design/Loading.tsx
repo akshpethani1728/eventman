@@ -17,14 +17,14 @@ export function PageLoader() {
 }
 
 export function SkeletonBlock({ className = "" }: { className?: string }) {
-  return <div className={`bg-[rgba(0,0,0,0.04)] animate-pulse rounded-[10px] ${className}`} />;
+  return <div className={`bg-[rgba(0,0,0,0.04)] animate-pulse rounded-[5px] ${className}`} />;
 }
 
 export function SkeletonCard() {
   return (
     <div className="card-base overflow-hidden">
       <div className="px-5 pt-4 pb-2 flex items-center gap-3">
-        <SkeletonBlock className="w-9 h-9 rounded-[10px]" />
+        <SkeletonBlock className="w-9 h-9 rounded-[5px]" />
         <div className="space-y-2 flex-1">
           <SkeletonBlock className="w-28 h-3.5" />
           <SkeletonBlock className="w-20 h-3" />
@@ -58,7 +58,7 @@ export function EmptyState({ icon, title, description, action }: {
   return (
     <div className="text-center py-16 px-6">
       {icon && (
-        <div className="w-16 h-16 rounded-[20px] bg-[#F0F0EE] flex items-center justify-center mx-auto mb-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div className="w-16 h-16 rounded-[5px] bg-[#F0F0EE] flex items-center justify-center mx-auto mb-4 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
           {icon}
         </div>
       )}

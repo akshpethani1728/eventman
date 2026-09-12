@@ -89,21 +89,21 @@ export default function EditEventModal({ event, onClose, onUpdated }: Props) {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-6 p-3 overflow-y-auto modal-overlay" ref={modalRef} role="dialog" aria-modal="true" aria-label="Edit event">
-      <div className="w-full max-w-xl bg-white rounded-[20px] shadow-[0_24px_64px_rgba(0,0,0,0.15),0_8px_20px_rgba(0,0,0,0.08)]">
+      <div className="w-full max-w-xl bg-white rounded-[5px] shadow-[0_24px_64px_rgba(0,0,0,0.15),0_8px_20px_rgba(0,0,0,0.08)]">
         <div className="px-5 pt-5 pb-3 border-b border-[rgba(0,0,0,0.06)]">
           <div className="flex items-center justify-between mb-1">
             <div>
               <h2 className="font-bold text-lg text-gray-900">Edit Event</h2>
               <p className="text-xs text-gray-500 mt-0.5 truncate max-w-[350px]">{event.title}</p>
             </div>
-            <button onClick={onClose} data-close-modal className="p-1.5 hover:bg-gray-100 rounded-[10px] transition-colors" aria-label="Close">
+            <button onClick={onClose} data-close-modal className="p-1.5 hover:bg-gray-100 rounded-[5px] transition-colors" aria-label="Close">
               <X className="w-4 h-4 text-gray-500" />
             </button>
           </div>
           <div className="mt-3 flex items-center gap-2">
             <label htmlFor="edit-status" className="text-xs text-gray-500 font-medium">Status:</label>
             <select id="edit-status" value={form.status} onChange={e => update("status", e.target.value)}
-              className="h-8 px-3 rounded-[10px] border border-[rgba(0,0,0,0.08)] bg-white text-xs font-medium outline-none focus:border-[#0D9488]">
+              className="h-8 px-3 rounded-[5px] border border-[rgba(0,0,0,0.08)] bg-white text-xs font-medium outline-none focus:border-[#0D9488]">
               {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
           </div>
@@ -274,11 +274,11 @@ export default function EditEventModal({ event, onClose, onUpdated }: Props) {
           <div className="px-5 py-3 border-t border-[rgba(0,0,0,0.06)] bg-gray-50/50 rounded-b-[20px]">
             <div className="flex gap-2">
               <button type="button" onClick={onClose}
-                className="flex-1 h-11 rounded-[12px] border border-gray-200 text-gray-600 text-sm font-semibold hover:bg-gray-50 transition-all active:scale-[0.97]">
+                className="flex-1 h-11 rounded-[6px] border border-gray-200 text-gray-600 text-sm font-semibold hover:bg-gray-50 transition-all active:scale-[0.97]">
                 Cancel
               </button>
               <button type="submit" disabled={loading}
-                className="flex-1 h-11 rounded-[12px] bg-[#0D9488] text-white text-sm font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
+                className="flex-1 h-11 rounded-[6px] bg-[#0D9488] text-white text-sm font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
                 {loading ? (
                   <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Saving...</>
                 ) : (

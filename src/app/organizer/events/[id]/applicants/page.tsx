@@ -159,7 +159,7 @@ export default function ApplicantManagementPage() {
       <header className="bg-white border-b border-[rgba(0,0,0,0.06)]">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center gap-3 mb-3">
-            <Link href={`/organizer/events/${id}`} aria-label="Back to event" className="p-1.5 -ml-1.5 text-gray-500 hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-[10px] transition-all active:scale-90">
+            <Link href={`/organizer/events/${id}`} aria-label="Back to event" className="p-1.5 -ml-1.5 text-gray-500 hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-[5px] transition-all active:scale-90">
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="min-w-0 flex-1">
@@ -202,17 +202,17 @@ export default function ApplicantManagementPage() {
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Search by name, city, skills..."
-                className="w-full h-11 pl-10 pr-3 rounded-[12px] border border-[rgba(0,0,0,0.08)] bg-white text-sm outline-none transition-all focus:border-[#0D9488] focus:shadow-[0_0_0_3px_rgba(13,148,136,0.08)]"
+                className="w-full h-11 pl-10 pr-3 rounded-[6px] border border-[rgba(0,0,0,0.08)] bg-white text-sm outline-none transition-all focus:border-[#0D9488] focus:shadow-[0_0_0_3px_rgba(13,148,136,0.08)]"
                 aria-label="Search applicants" />
             </div>
             <button onClick={() => setShowFilters(!showFilters)}
-              className={`h-11 px-4 rounded-[12px] text-sm font-semibold transition-all active:scale-[0.97] flex items-center gap-1.5 ${
+              className={`h-11 px-4 rounded-[6px] text-sm font-semibold transition-all active:scale-[0.97] flex items-center gap-1.5 ${
                 showFilters ? "bg-[#0D9488] text-white shadow-[0_2px_8px_rgba(13,148,136,0.2)]" : "bg-white text-gray-600 border border-[rgba(0,0,0,0.08)] hover:border-[rgba(0,0,0,0.14)]"
               }`} aria-label="Toggle filters" aria-expanded={showFilters}>
               <Filter className="w-4 h-4" /> Filters
             </button>
             <button onClick={downloadCSV}
-              className="h-11 px-4 rounded-[12px] text-sm font-semibold transition-all active:scale-[0.97] bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 flex items-center gap-1.5" aria-label="Download CSV">
+              className="h-11 px-4 rounded-[6px] text-sm font-semibold transition-all active:scale-[0.97] bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 flex items-center gap-1.5" aria-label="Download CSV">
               <Download className="w-4 h-4" /> CSV
             </button>
           </div>
@@ -221,7 +221,7 @@ export default function ApplicantManagementPage() {
           <div className="flex gap-2">
             {(["all", "pending", "approved", "rejected"] as const).map(t => (
               <button key={t} onClick={() => setTab(t)}
-                className={`flex-1 h-10 rounded-[12px] text-xs sm:text-sm font-semibold transition-all active:scale-[0.97] capitalize ${
+                className={`flex-1 h-10 rounded-[6px] text-xs sm:text-sm font-semibold transition-all active:scale-[0.97] capitalize ${
                   tab === t
                     ? "bg-[#0D9488] text-white shadow-[0_4px_12px_rgba(13,148,136,0.25)]"
                     : "bg-white text-gray-500 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:text-gray-800"
@@ -233,7 +233,7 @@ export default function ApplicantManagementPage() {
 
           {/* Filters Panel */}
           {showFilters && (
-            <div className="mt-3 bg-white rounded-[14px] p-4 space-y-3 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-[rgba(0,0,0,0.06)] animate-fade-in">
+            <div className="mt-3 bg-white rounded-[7px] p-4 space-y-3 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-[rgba(0,0,0,0.06)] animate-fade-in">
               <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Advanced Filters</p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                 <select value={filters.gender} onChange={e => setFilters(f => ({ ...f, gender: e.target.value }))}
@@ -288,13 +288,13 @@ export default function ApplicantManagementPage() {
             const completion = computeCompletion(app.profile);
 
             return (
-              <div key={app.id} className="bg-white rounded-[16px] shadow-[0_2px_8px_rgba(0,0,0,0.04)] overflow-hidden">
+              <div key={app.id} className="bg-white rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)] overflow-hidden">
                 <div className="p-5">
                   {/* Row 1: Avatar + Name + Rating + Badge */}
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div className="flex items-center gap-3 min-w-0 flex-1">
                       <div className="relative shrink-0">
-                        <div className="w-12 h-12 rounded-[14px] bg-gradient-to-br from-[#0D9488]/10 to-[#0D9488]/20 flex items-center justify-center text-[#0D9488] font-bold text-base">
+                        <div className="w-12 h-12 rounded-[7px] bg-gradient-to-br from-[#0D9488]/10 to-[#0D9488]/20 flex items-center justify-center text-[#0D9488] font-bold text-base">
                           {app.profile.full_name?.charAt(0) || "W"}
                         </div>
                         {availConfig && (
@@ -374,7 +374,7 @@ export default function ApplicantManagementPage() {
                   <div className="pt-3 border-t border-[rgba(0,0,0,0.06)]">
                     {/* Contact for approved (hidden for past events) */}
                     {app.status === "approved" && !isPast && (
-                      <div className="mb-3 bg-emerald-50/80 rounded-[12px] p-3 border border-emerald-100">
+                      <div className="mb-3 bg-emerald-50/80 rounded-[6px] p-3 border border-emerald-100">
                         <div className="flex items-center gap-2 mb-2">
                           <span className="text-[10px] font-semibold text-emerald-700 uppercase tracking-wider">Contact</span>
                           <span className="text-[9px] text-emerald-500 font-medium">· visible</span>
@@ -398,7 +398,7 @@ export default function ApplicantManagementPage() {
                       </div>
                     )}
                     {app.status === "approved" && isPast && (
-                      <div className="mb-3 bg-gray-50 rounded-[12px] p-3 border border-gray-100">
+                      <div className="mb-3 bg-gray-50 rounded-[6px] p-3 border border-gray-100">
                         <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-1">Contact</p>
                         <p className="text-xs text-gray-400 flex items-center gap-1">
                           <AlertCircle className="w-3 h-3" /> Contact hidden — event has ended
@@ -409,45 +409,45 @@ export default function ApplicantManagementPage() {
                     {/* Action buttons */}
                     <div className="flex gap-2 flex-wrap">
                       <Link href={`/organizer/events/${id}/applicants/${app.worker_id}`}
-                        className="flex-1 min-w-[100px] h-9 rounded-[10px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center justify-center gap-1.5">
+                        className="flex-1 min-w-[100px] h-9 rounded-[5px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center justify-center gap-1.5">
                         View Profile
                       </Link>
 
                       {app.status === "pending" && (
                         <>
                           <button onClick={() => handleApprove(app.id)} disabled={applying === app.id}
-                            className="flex-1 min-w-[90px] h-9 rounded-[10px] bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-600 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-[0_2px_8px_rgba(16,185,129,0.2)]">
+                            className="flex-1 min-w-[90px] h-9 rounded-[5px] bg-emerald-500 text-white text-xs font-semibold hover:bg-emerald-600 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-[0_2px_8px_rgba(16,185,129,0.2)]">
                             <Check className="w-3.5 h-3.5" /> Approve
                           </button>
                           <button onClick={() => handleReject(app.id)} disabled={applying === app.id}
-                            className="flex-1 min-w-[90px] h-9 rounded-[10px] bg-red-50 text-red-600 text-xs font-semibold hover:bg-red-100 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-1.5">
+                            className="flex-1 min-w-[90px] h-9 rounded-[5px] bg-red-50 text-red-600 text-xs font-semibold hover:bg-red-100 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-1.5">
                             <XIcon className="w-3.5 h-3.5" /> Reject
                           </button>
                         </>
                       )}
                       {app.status === "approved" && (
                         <button onClick={() => setRemoveTarget(app.id)}
-                          className="h-9 px-4 rounded-[10px] bg-red-50 text-red-600 text-xs font-semibold hover:bg-red-100 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
+                          className="h-9 px-4 rounded-[5px] bg-red-50 text-red-600 text-xs font-semibold hover:bg-red-100 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
                           <XCircle className="w-3.5 h-3.5" /> Remove
                         </button>
                       )}
                       {app.status === "rejected" && (
                         <button onClick={() => handleRestore(app.id)} disabled={applying === app.id}
-                          className="h-9 px-4 rounded-[10px] bg-amber-50 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center gap-1.5 shrink-0">
+                          className="h-9 px-4 rounded-[5px] bg-amber-50 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center gap-1.5 shrink-0">
                           <ChevronUp className="w-3.5 h-3.5" /> Restore
                         </button>
                       )}
 
                       {app.status === "approved" && (
                         <button onClick={() => setRemoveTarget(app.id)}
-                          className="h-9 px-4 rounded-[10px] bg-red-50 text-red-600 text-xs font-semibold hover:bg-red-100 transition-all active:scale-[0.97] flex items-center gap-1.5">
+                          className="h-9 px-4 rounded-[5px] bg-red-50 text-red-600 text-xs font-semibold hover:bg-red-100 transition-all active:scale-[0.97] flex items-center gap-1.5">
                           <XCircle className="w-3.5 h-3.5" /> Remove
                         </button>
                       )}
 
                       {app.status === "rejected" && (
                         <button onClick={() => handleRestore(app.id)} disabled={applying === app.id}
-                          className="h-9 px-4 rounded-[10px] bg-amber-50 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center gap-1.5">
+                          className="h-9 px-4 rounded-[5px] bg-amber-50 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center gap-1.5">
                           <ChevronUp className="w-3.5 h-3.5" /> Restore
                         </button>
                       )}

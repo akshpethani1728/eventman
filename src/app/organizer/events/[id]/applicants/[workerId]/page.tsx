@@ -125,12 +125,12 @@ export default function WorkerProfilePage() {
   if (!event || !applicant) return (
     <div className="min-h-screen bg-[#F8F8F6] flex items-center justify-center px-4">
       <div className="text-center">
-        <div className="w-16 h-16 rounded-[20px] bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 rounded-[5px] bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center mx-auto mb-4">
           <User className="w-8 h-8 text-gray-300" />
         </div>
         <p className="text-lg font-bold text-gray-900">Worker not found</p>
         <p className="text-sm text-gray-500 mt-1.5">This applicant may have been removed or the link is invalid.</p>
-        <Link href={`/organizer/events/${eventId}/applicants`} className="mt-6 inline-flex h-11 px-6 rounded-[14px] bg-[#0D9488] text-white text-sm font-semibold items-center gap-2 hover:bg-teal-700 transition-all active:scale-[0.97] shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
+        <Link href={`/organizer/events/${eventId}/applicants`} className="mt-6 inline-flex h-11 px-6 rounded-[7px] bg-[#0D9488] text-white text-sm font-semibold items-center gap-2 hover:bg-teal-700 transition-all active:scale-[0.97] shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
           <ArrowLeft className="w-4 h-4" /> Back to Applicants
         </Link>
       </div>
@@ -148,7 +148,7 @@ export default function WorkerProfilePage() {
       {/* Header */}
       <header className="bg-white border-b border-[rgba(0,0,0,0.06)]">
         <div className="max-w-4xl mx-auto px-4 h-14 flex items-center gap-3">
-          <Link href={`/organizer/events/${eventId}/applicants`} aria-label="Back to applicants" className="p-1.5 -ml-1.5 text-gray-500 hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-[10px] transition-all active:scale-90">
+          <Link href={`/organizer/events/${eventId}/applicants`} aria-label="Back to applicants" className="p-1.5 -ml-1.5 text-gray-500 hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-[5px] transition-all active:scale-90">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <h1 className="font-semibold text-sm truncate">Worker Profile</h1>
@@ -164,10 +164,10 @@ export default function WorkerProfilePage() {
 
       <main className="max-w-2xl mx-auto px-4 pt-5 space-y-4">
         {/* Hero Section */}
-        <div className="bg-gradient-to-br from-[#0D9488] via-[#0D9488] to-[#0F766E] rounded-[20px] p-6 shadow-[0_8px_32px_rgba(13,148,136,0.2)]">
+        <div className="bg-gradient-to-br from-[#0D9488] via-[#0D9488] to-[#0F766E] rounded-[5px] p-6 shadow-[0_8px_32px_rgba(13,148,136,0.2)]">
           <div className="flex items-center gap-5">
             <div className="relative shrink-0">
-              <div className="w-16 h-16 rounded-[16px] bg-white/20 backdrop-blur-sm flex items-center justify-center text-white text-2xl font-bold ring-2 ring-white/30 shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
+              <div className="w-16 h-16 rounded-[8px] bg-white/20 backdrop-blur-sm flex items-center justify-center text-white text-2xl font-bold ring-2 ring-white/30 shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
                 {p.full_name?.charAt(0) || "W"}
               </div>
               {avail && <div className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-[2px] border-[#0D9488] ${avail.dot}`} />}
@@ -208,17 +208,17 @@ export default function WorkerProfilePage() {
         </div>
 
         {/* Skills */}
-        <div className="bg-white rounded-[16px] p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+        <div className="bg-white rounded-[8px] p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
           <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Skills</p>
           <div className="flex flex-wrap gap-1.5">
             {p.skills && p.skills.length > 0 ? p.skills.map((s, i) => (
-              <span key={i} className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-[10px] font-medium">{s}</span>
+              <span key={i} className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-[5px] font-medium">{s}</span>
             )) : <p className="text-xs text-gray-400">No skills listed</p>}
           </div>
         </div>
 
         {/* Experience */}
-        <div className="bg-white rounded-[16px] p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+        <div className="bg-white rounded-[8px] p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
           <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Experience</p>
           {p.experience ? (
             <p className="text-sm text-gray-700 flex items-start gap-2">
@@ -229,7 +229,7 @@ export default function WorkerProfilePage() {
         </div>
 
         {/* About */}
-        <div className="bg-white rounded-[16px] p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+        <div className="bg-white rounded-[8px] p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
           <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">About</p>
           {p.bio ? (
             <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{p.bio}</p>
@@ -237,7 +237,7 @@ export default function WorkerProfilePage() {
         </div>
 
         {/* Location */}
-        <div className="bg-white rounded-[16px] p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+        <div className="bg-white rounded-[8px] p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
           <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Location</p>
           <div className="flex items-center gap-2 text-sm text-gray-700">
             <MapPin className="w-4 h-4 text-gray-400 shrink-0" />
@@ -247,7 +247,7 @@ export default function WorkerProfilePage() {
 
         {/* Contact (only if approved) */}
         {canViewContact && (
-          <div className="bg-white rounded-[16px] border border-emerald-200/60 shadow-[0_2px_8px_rgba(0,0,0,0.04)] overflow-hidden">
+          <div className="bg-white rounded-[8px] border border-emerald-200/60 shadow-[0_2px_8px_rgba(0,0,0,0.04)] overflow-hidden">
             <div className="px-5 py-3 bg-emerald-50/80 border-b border-emerald-100 flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-emerald-600" />
               <span className="text-[10px] font-semibold text-emerald-700 uppercase tracking-wider">Contact Information</span>
@@ -278,7 +278,7 @@ export default function WorkerProfilePage() {
         )}
 
         {!canViewContact && (
-          <div className="bg-white rounded-[16px] p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+          <div className="bg-white rounded-[8px] p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
             <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Contact</p>
             <p className="text-xs text-gray-400 flex items-center gap-1.5">
               <AlertCircle className="w-3.5 h-3.5" />
@@ -292,24 +292,24 @@ export default function WorkerProfilePage() {
           {applicant.status === "pending" && (
             <>
               <button onClick={handleApprove} disabled={applying}
-                className="flex-1 h-12 rounded-[14px] bg-emerald-500 text-white text-sm font-semibold hover:bg-emerald-600 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(16,185,129,0.25)]">
+                className="flex-1 h-12 rounded-[7px] bg-emerald-500 text-white text-sm font-semibold hover:bg-emerald-600 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(16,185,129,0.25)]">
                 <Check className="w-4 h-4" /> Approve
               </button>
               <button onClick={handleReject} disabled={applying}
-                className="flex-1 h-12 rounded-[14px] bg-red-50 text-red-600 text-sm font-semibold hover:bg-red-100 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-2">
+                className="flex-1 h-12 rounded-[7px] bg-red-50 text-red-600 text-sm font-semibold hover:bg-red-100 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-2">
                 <XIcon className="w-4 h-4" /> Reject
               </button>
             </>
           )}
           {applicant.status === "approved" && (
             <button onClick={() => setRemoveConfirm(true)} disabled={applying}
-              className="w-full h-12 rounded-[14px] bg-red-50 text-red-600 text-sm font-semibold hover:bg-red-100 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-2">
+              className="w-full h-12 rounded-[7px] bg-red-50 text-red-600 text-sm font-semibold hover:bg-red-100 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-2">
               <XCircle className="w-4 h-4" /> Remove Worker
             </button>
           )}
           {applicant.status === "rejected" && (
             <button onClick={handleRestore} disabled={applying}
-              className="w-full h-12 rounded-[14px] bg-amber-50 text-amber-700 text-sm font-semibold hover:bg-amber-100 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-2">
+              className="w-full h-12 rounded-[7px] bg-amber-50 text-amber-700 text-sm font-semibold hover:bg-amber-100 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-2">
               <ChevronUp className="w-4 h-4" /> Restore to Pending
             </button>
           )}

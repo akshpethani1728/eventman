@@ -148,25 +148,24 @@ function AuthSection({ onRedirect }: { onRedirect: () => void }) {
     toast.success("New code sent to your email");
   };
 
-  const ic = "w-full h-12 pl-10 pr-10 rounded-[16px] border border-gray-200 bg-white text-sm outline-none transition-all focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20";
+  const ic = "w-full h-12 pl-10 pr-10 rounded-[8px] border border-gray-200 bg-white text-sm outline-none transition-all focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20";
 
   return (
     <section className="bg-[#F8F8F6] py-20 md:py-28" id="auth">
       <div className="mx-auto max-w-md px-4">
-        <div className="bg-white rounded-[24px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden">
-          <div className="h-1 bg-gradient-to-r from-teal-600 to-teal-700" />
+        <div className="bg-white rounded-[6px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden">
 
           {step === "otp" ? (
             <div className="p-6">
               <div className="text-center mb-6">
-                <div className="mx-auto w-14 h-14 rounded-[20px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-lg shadow-teal-700/20">
+                <div className="mx-auto w-14 h-14 rounded-[5px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-lg shadow-teal-700/20">
                   <Mail className="w-7 h-7 text-white" />
                 </div>
                 <h2 className="mt-3 text-xl font-bold text-gray-900">Verify Your Email</h2>
                 <p className="mt-1 text-sm text-gray-500">Enter the 6-digit code sent to {email}</p>
               </div>
               {error && (
-                <div className="mb-5 rounded-[16px] bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>
+                <div className="mb-5 rounded-[8px] bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>
               )}
               <div className="flex items-center justify-center gap-2">
                 {Array.from({ length: 6 }).map((_, i) => (
@@ -186,11 +185,11 @@ function AuthSection({ onRedirect }: { onRedirect: () => void }) {
                       const paste = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
                       if (paste.length === 6) { setOtp(paste); otpRefs.current[5]?.focus(); }
                     }}
-                    className="w-11 h-12 rounded-[14px] border border-gray-200 bg-white text-center text-lg font-bold outline-none transition-all focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20" />
+                    className="w-11 h-12 rounded-[7px] border border-gray-200 bg-white text-center text-lg font-bold outline-none transition-all focus:border-teal-500 focus:ring-1 focus:ring-teal-500/20" />
                 ))}
               </div>
               <button onClick={handleVerifyOtp} disabled={loading || otp.length < 6}
-                className="mt-6 w-full h-12 rounded-[16px] bg-teal-700 text-sm font-semibold text-white hover:bg-teal-800 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2">
+                className="mt-6 w-full h-12 rounded-[8px] bg-teal-700 text-sm font-semibold text-white hover:bg-teal-800 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2">
                 {loading ? <><RefreshCw className="w-4 h-4 animate-spin" /> Verifying...</> : <>Verify <ArrowRight className="w-4 h-4" /></>}
               </button>
               <div className="mt-4 text-center">
@@ -217,7 +216,7 @@ function AuthSection({ onRedirect }: { onRedirect: () => void }) {
               <div className="p-6">
                 {/* Icon */}
                 <div className="text-center mb-6">
-                  <div className="mx-auto w-14 h-14 rounded-[20px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-lg shadow-teal-700/20">
+                  <div className="mx-auto w-14 h-14 rounded-[5px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center shadow-lg shadow-teal-700/20">
                     {mode === "signin" ? <Lock className="w-7 h-7 text-white" /> : <User className="w-7 h-7 text-white" />}
                   </div>
                   <h2 className="mt-3 text-xl font-bold text-gray-900">{mode === "signin" ? "Welcome Back" : "Join EventMan"}</h2>
@@ -226,7 +225,7 @@ function AuthSection({ onRedirect }: { onRedirect: () => void }) {
 
                 {/* Error */}
                 {error && (
-                  <div className="mb-5 rounded-[16px] bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>
+                  <div className="mb-5 rounded-[8px] bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>
                 )}
 
                 {/* Email */}
@@ -284,7 +283,7 @@ function AuthSection({ onRedirect }: { onRedirect: () => void }) {
                       <div className="grid grid-cols-2 gap-3">
                         {(["worker", "organizer"] as const).map(r => (
                           <button key={r} type="button" onClick={() => setRole(r)}
-                            className={`flex h-14 flex-col items-center justify-center gap-1 rounded-[16px] border-2 transition-all ${
+                            className={`flex h-14 flex-col items-center justify-center gap-1 rounded-[8px] border-2 transition-all ${
                               role === r ? "border-teal-700 bg-teal-50 text-teal-700" : "border-gray-200 bg-gray-50 text-gray-500"
                             }`}>
                             {r === "worker" ? <HardHat className="w-5 h-5" /> : <Briefcase className="w-5 h-5" />}
@@ -298,7 +297,7 @@ function AuthSection({ onRedirect }: { onRedirect: () => void }) {
 
                 {/* Submit */}
                 <button onClick={mode === "signin" ? handleSignIn : handleSignUp} disabled={loading}
-                  className="mt-6 w-full h-12 rounded-[16px] bg-teal-700 text-sm font-semibold text-white hover:bg-teal-800 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2">
+                  className="mt-6 w-full h-12 rounded-[8px] bg-teal-700 text-sm font-semibold text-white hover:bg-teal-800 transition-all active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2">
                   {loading ? (
                     <><RefreshCw className="w-4 h-4 animate-spin" /> {mode === "signin" ? "Signing in..." : "Creating account..."}</>
                   ) : (
@@ -344,7 +343,7 @@ const previewCards = [
           </div>
           <span className="text-[11px] font-medium text-[#0D9488] flex items-center gap-0.5">Details <ChevronRight className="w-3 h-3" /></span>
         </div>
-        <div className="bg-white rounded-[20px] p-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
+        <div className="bg-white rounded-[5px] p-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
           <div className="grid grid-cols-3 gap-3">
             {[
               { icon: Search, value: "12", label: "Available", color: "bg-teal-50", iconColor: "text-[#0D9488]" },
@@ -354,7 +353,7 @@ const previewCards = [
               const Icon = s.icon;
               return (
                 <div key={i} className="text-center">
-                  <div className={`w-8 h-8 rounded-[10px] ${s.color} flex items-center justify-center mx-auto mb-1.5`}>
+                  <div className={`w-8 h-8 rounded-[5px] ${s.color} flex items-center justify-center mx-auto mb-1.5`}>
                     <Icon className={`w-4 h-4 ${s.iconColor}`} />
                   </div>
                   <p className="text-[16px] font-bold text-[#1A1A1A] leading-none">{s.value}</p>
@@ -365,8 +364,8 @@ const previewCards = [
           </div>
         </div>
         <div className="flex gap-2">
-          <div className="flex-1 h-9 rounded-[12px] bg-[#0D9488] text-white text-sm font-semibold flex items-center justify-center shadow-[0_4px_12px_rgba(13,148,136,0.25)]">Browse (12)</div>
-          <div className="flex-1 h-9 rounded-[12px] bg-white text-[#6B6B6B] text-sm font-semibold flex items-center justify-center shadow-[0_1px_3px_rgba(0,0,0,0.04)]">Applied (3)</div>
+          <div className="flex-1 h-9 rounded-[6px] bg-[#0D9488] text-white text-sm font-semibold flex items-center justify-center shadow-[0_4px_12px_rgba(13,148,136,0.25)]">Browse (12)</div>
+          <div className="flex-1 h-9 rounded-[6px] bg-white text-[#6B6B6B] text-sm font-semibold flex items-center justify-center shadow-[0_1px_3px_rgba(0,0,0,0.04)]">Applied (3)</div>
         </div>
         <div className="flex gap-2 overflow-x-auto scrollbar-none pb-1">
           {["All", "Photography", "Setup", "Hospitality"].map((c, i) => (
@@ -378,10 +377,10 @@ const previewCards = [
           const remaining = ev.spots - ev.filled;
           const fillPercent = Math.round((ev.filled / ev.spots) * 100);
           return (
-            <div className="block bg-white rounded-[16px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+            <div className="block bg-white rounded-[8px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
               <div className="px-4 pt-3.5 pb-1 flex items-center justify-between">
                 <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                  <div className="w-9 h-9 rounded-[12px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center text-white font-bold text-sm shrink-0">D</div>
+                  <div className="w-9 h-9 rounded-[6px] bg-gradient-to-br from-teal-600 to-teal-700 flex items-center justify-center text-white font-bold text-sm shrink-0">D</div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5"><span className="text-sm font-semibold text-[#1A1A1A] truncate">{ev.org}</span><BadgeCheck className="w-3.5 h-3.5 text-[#0D9488] shrink-0" /></div>
                     <span className="text-[10px] font-semibold text-teal-600">Photography</span>
@@ -410,7 +409,7 @@ const previewCards = [
                 <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden"><div className="h-full rounded-full bg-[#0D9488]" style={{ width: `${Math.max(2, fillPercent)}%` }} /></div>
               </div>
               <div className="px-4 py-3.5 flex items-center justify-end border-t border-[rgba(0,0,0,0.04)] mt-3">
-                <div className="h-9 px-4 rounded-[10px] bg-[#0D9488] text-white text-[11px] font-semibold flex items-center gap-1.5 shadow-[0_4px_12px_rgba(13,148,136,0.25)]"><ArrowUpRight className="w-3.5 h-3.5" /> Apply</div>
+                <div className="h-9 px-4 rounded-[5px] bg-[#0D9488] text-white text-[11px] font-semibold flex items-center gap-1.5 shadow-[0_4px_12px_rgba(13,148,136,0.25)]"><ArrowUpRight className="w-3.5 h-3.5" /> Apply</div>
               </div>
             </div>
           );
@@ -425,16 +424,16 @@ const previewCards = [
         <div className="flex items-center justify-between"><span className="text-[11px] font-bold text-gray-700">Management Hub</span><span className="text-[8px] font-medium text-teal-600">Last 30 days</span></div>
         <div className="grid grid-cols-3 gap-2">
           {[{ label: "Active", value: "4", color: "text-teal-700", bg: "bg-teal-50" }, { label: "Filling", value: "7", color: "text-amber-700", bg: "bg-amber-50" }, { label: "Hired", value: "43", color: "text-emerald-700", bg: "bg-emerald-50" }].map((s, i) => (
-            <div key={i} className={`${s.bg} rounded-[14px] p-2.5 text-center`}><p className={`text-base font-black ${s.color}`}>{s.value}</p><p className="text-[8px] text-gray-500 font-medium mt-0.5">{s.label}</p></div>
+            <div key={i} className={`${s.bg} rounded-[7px] p-2.5 text-center`}><p className={`text-base font-black ${s.color}`}>{s.value}</p><p className="text-[8px] text-gray-500 font-medium mt-0.5">{s.label}</p></div>
           ))}
         </div>
         <div className="space-y-2">
           <span className="text-[9px] font-semibold text-gray-600">Event Fill Progress</span>
           {[{ title: "Wedding at The Grand", filled: 18, total: 20, color: "bg-emerald-500" }, { title: "Tech Conference 2026", filled: 9, total: 15, color: "bg-amber-500" }, { title: "Music Festival Prep", filled: 28, total: 30, color: "bg-teal-500" }].map((ev, i) => (
-            <div key={i} className="rounded-[14px] bg-white border border-gray-100/80 p-2.5"><div className="flex items-center justify-between mb-1.5"><p className="text-[9px] font-semibold text-gray-700 truncate mr-2">{ev.title}</p><span className="text-[8px] font-bold text-gray-400 shrink-0">{ev.filled}/{ev.total}</span></div><div className="h-1.5 rounded-full bg-gray-100 overflow-hidden"><div className={`h-full rounded-full ${ev.color}`} style={{ width: `${(ev.filled / ev.total) * 100}%` }} /></div></div>
+            <div key={i} className="rounded-[7px] bg-white border border-gray-100/80 p-2.5"><div className="flex items-center justify-between mb-1.5"><p className="text-[9px] font-semibold text-gray-700 truncate mr-2">{ev.title}</p><span className="text-[8px] font-bold text-gray-400 shrink-0">{ev.filled}/{ev.total}</span></div><div className="h-1.5 rounded-full bg-gray-100 overflow-hidden"><div className={`h-full rounded-full ${ev.color}`} style={{ width: `${(ev.filled / ev.total) * 100}%` }} /></div></div>
           ))}
         </div>
-        <div className="flex items-center justify-between rounded-[14px] bg-gradient-to-r from-teal-600 to-teal-700 p-2.5"><div className="flex items-center gap-2"><Bell className="h-3 w-3 text-white/80" /><span className="text-[9px] font-semibold text-white">12 pending approvals</span></div><ChevronRight className="h-3 w-3 text-white/60" /></div>
+        <div className="flex items-center justify-between rounded-[7px] bg-gradient-to-r from-teal-600 to-teal-700 p-2.5"><div className="flex items-center gap-2"><Bell className="h-3 w-3 text-white/80" /><span className="text-[9px] font-semibold text-white">12 pending approvals</span></div><ChevronRight className="h-3 w-3 text-white/60" /></div>
       </div>
     ),
   },
@@ -442,8 +441,8 @@ const previewCards = [
     id: "profile", label: "Worker Profile", icon: UserCheck,
     content: (
       <div className="px-4 pt-4 pb-4 w-[320px]">
-        <div className="bg-gradient-to-br from-teal-600 to-teal-700 rounded-[16px] p-4"><div className="flex items-center gap-3"><div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg ring-2 ring-white/30">RS</div><div className="flex-1 min-w-0"><p className="text-sm font-bold text-white">Rahul Sharma</p><div className="flex items-center gap-1.5 mt-0.5"><div className="flex items-center gap-1 text-[9px] text-white/70"><MapPin className="h-2.5 w-2.5" />Ahmedabad</div><span className="w-1 h-1 rounded-full bg-white/30" /><div className="flex items-center gap-1 text-[9px] text-white/70"><Star className="h-2.5 w-2.5 text-amber-300" />4.8</div></div></div></div></div>
-        <div className="flex items-center justify-around mt-3 py-2 bg-gray-50/80 rounded-[14px]">
+        <div className="bg-gradient-to-br from-teal-600 to-teal-700 rounded-[8px] p-4"><div className="flex items-center gap-3"><div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg ring-2 ring-white/30">RS</div><div className="flex-1 min-w-0"><p className="text-sm font-bold text-white">Rahul Sharma</p><div className="flex items-center gap-1.5 mt-0.5"><div className="flex items-center gap-1 text-[9px] text-white/70"><MapPin className="h-2.5 w-2.5" />Ahmedabad</div><span className="w-1 h-1 rounded-full bg-white/30" /><div className="flex items-center gap-1 text-[9px] text-white/70"><Star className="h-2.5 w-2.5 text-amber-300" />4.8</div></div></div></div></div>
+        <div className="flex items-center justify-around mt-3 py-2 bg-gray-50/80 rounded-[7px]">
           {[{ label: "Events", value: "24", icon: Calendar }, { label: "Rating", value: "4.8", icon: Star }, { label: "Hired", value: "92%", icon: TrendingUp }].map((s, i) => {
             const Icon = s.icon;
             return (<div key={i} className="text-center"><Icon className="h-3 w-3 text-teal-600 mx-auto mb-0.5" /><p className="text-xs font-black text-gray-900">{s.value}</p><p className="text-[7px] text-gray-400 font-medium uppercase tracking-wider">{s.label}</p></div>);
@@ -465,7 +464,7 @@ const previewCards = [
           { icon: Bell, text: "Organizer sent you a message about Saturday", time: "2 hours ago", color: "text-violet-600", bg: "bg-violet-50" },
         ].map((n, i) => {
           const Icon = n.icon;
-          return (<div key={i} className="flex items-start gap-2.5 rounded-[14px] bg-white border border-gray-100/80 p-2.5"><div className={`mt-0.5 w-7 h-7 rounded-[10px] ${n.bg} flex items-center justify-center shrink-0`}><Icon className={`h-3 w-3 ${n.color}`} /></div><div className="flex-1 min-w-0"><p className="text-[9px] font-medium text-gray-700 leading-relaxed">{n.text}</p><p className="mt-0.5 text-[8px] text-gray-400">{n.time}</p></div>{i === 0 && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 mt-1" />}</div>);
+          return (<div key={i} className="flex items-start gap-2.5 rounded-[7px] bg-white border border-gray-100/80 p-2.5"><div className={`mt-0.5 w-7 h-7 rounded-[5px] ${n.bg} flex items-center justify-center shrink-0`}><Icon className={`h-3 w-3 ${n.color}`} /></div><div className="flex-1 min-w-0"><p className="text-[9px] font-medium text-gray-700 leading-relaxed">{n.text}</p><p className="mt-0.5 text-[8px] text-gray-400">{n.time}</p></div>{i === 0 && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 mt-1" />}</div>);
         })}
       </div>
     ),
@@ -508,7 +507,7 @@ export default function LoginPage() {
           <div className="absolute -bottom-32 -right-32 h-80 w-80 rounded-full bg-teal-600/15 blur-3xl" />
         </div>
         <div className="relative z-10 mx-auto max-w-4xl px-4 text-center">
-          <div className="mb-6 inline-flex items-center gap-3 rounded-[22px] bg-white/10 px-5 py-2.5 backdrop-blur-md">
+          <div className="mb-6 inline-flex items-center gap-3 rounded-[11px] bg-white/10 px-5 py-2.5 backdrop-blur-md">
             <Logo showText={false} />
             <span className="text-sm font-bold tracking-wide text-white">EventMan</span>
           </div>
@@ -520,7 +519,7 @@ export default function LoginPage() {
             Find event jobs or hire trusted staff &mdash; all in one place.
           </p>
           <button onClick={scrollToAuth}
-            className="mt-10 inline-flex items-center gap-2.5 rounded-[22px] bg-white px-8 py-4 text-base font-bold text-teal-700 transition-all hover:scale-105 active:scale-[0.97]">
+            className="mt-10 inline-flex items-center gap-2.5 rounded-[11px] bg-white px-8 py-4 text-base font-bold text-teal-700 transition-all hover:scale-105 active:scale-[0.97]">
             Get Started <ArrowDown className="h-4 w-4" />
           </button>
           <div className="mt-12 flex items-center justify-center gap-4 sm:gap-8 text-teal-100/70">
@@ -541,7 +540,7 @@ export default function LoginPage() {
         <div className="mt-12 mx-auto max-w-7xl px-4">
           <div className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 scroll-smooth scrollbar-none md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-6 md:overflow-visible md:pb-0">
             {previewCards.map(card => (
-              <div key={card.id} className="w-[78vw] shrink-0 snap-center md:w-auto rounded-[22px] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+              <div key={card.id} className="w-[78vw] shrink-0 snap-center md:w-auto rounded-[11px] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
                 {card.content}
               </div>
             ))}
@@ -574,8 +573,8 @@ export default function LoginPage() {
               ].map((s, i) => {
                 const Icon = s.icon;
                 return (
-                  <div key={i} className="rounded-[22px] bg-white p-6 text-center shadow-[0_2px_8px_rgba(0,0,0,0.04)] ring-1 ring-gray-100">
-                    <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-[18px] bg-gradient-to-br from-teal-50 to-teal-50">
+                  <div key={i} className="rounded-[11px] bg-white p-6 text-center shadow-[0_2px_8px_rgba(0,0,0,0.04)] ring-1 ring-gray-100">
+                    <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-[9px] bg-gradient-to-br from-teal-50 to-teal-50">
                       <Icon className="h-6 w-6 text-teal-700" />
                     </div>
                     <p className="text-3xl font-bold tracking-tight text-gray-900 md:text-4xl"><AnimatedCounter end={s.value} suffix={s.suffix} /></p>
@@ -590,8 +589,8 @@ export default function LoginPage() {
               {features.map((f, i) => {
                 const Icon = f.icon;
                 return (
-                  <div key={i} className="rounded-[18px] bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] ring-1 ring-gray-100">
-                    <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-[18px] bg-teal-50"><Icon className="h-5 w-5 text-teal-700" /></div>
+                  <div key={i} className="rounded-[9px] bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.04)] ring-1 ring-gray-100">
+                    <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-[9px] bg-teal-50"><Icon className="h-5 w-5 text-teal-700" /></div>
                     <h3 className="text-sm font-semibold text-gray-900">{f.title}</h3>
                     <p className="mt-1 text-xs text-gray-500 leading-relaxed">{f.desc}</p>
                   </div>

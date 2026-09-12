@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -135,7 +135,7 @@ export default function OrganizerEventDetailPage() {
     <div className="min-h-screen bg-[#F8F8F6] pb-24">
       <header className="sticky top-0 bg-white/80 backdrop-blur-xl border-b border-[rgba(0,0,0,0.06)] z-10">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
-          <Link href="/organizer/dashboard" aria-label="Back to dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-[10px] transition-all active:scale-90"><ArrowLeft className="w-5 h-5" /></Link>
+          <Link href="/organizer/dashboard" aria-label="Back to dashboard" className="p-1.5 -ml-1.5 text-gray-500 hover:text-[#0D9488] hover:bg-[#0D9488]/10 rounded-[5px] transition-all active:scale-90"><ArrowLeft className="w-5 h-5" /></Link>
           <div className="min-w-0 flex-1">
             <h1 className="font-semibold text-sm truncate">{event.title}</h1>
             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${STATUS_STYLES[event.status]}`}>
@@ -147,15 +147,15 @@ export default function OrganizerEventDetailPage() {
 
       <main className="max-w-lg mx-auto px-4 pt-4 space-y-4">
         <div className="space-y-1.5 animate-fade-in">
-          {isToday && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-[10px] px-3.5 py-2.5 flex items-center gap-2"><Clock3 className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Starts today</span></div>}
-          {isTomorrow && <div className="text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-[10px] px-3.5 py-2.5 flex items-center gap-2"><Clock3 className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Starts tomorrow</span></div>}
-          {remaining <= 3 && remaining > 0 && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-[10px] px-3.5 py-2.5 flex items-center gap-2"><AlertTriangle className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Only {remaining} seat{remaining !== 1 ? "s" : ""} left</span></div>}
-          {deadlineToday && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-[10px] px-3.5 py-2.5 flex items-center gap-2"><AlertTriangle className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Application deadline is today</span></div>}
-          {deadlineSoon && !deadlineToday && <div className="text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-[10px] px-3.5 py-2.5 flex items-center gap-2"><Clock3 className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Deadline closing soon</span></div>}
-          {pendingCount > 0 && <div className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-[10px] px-3.5 py-2.5 flex items-center gap-2"><Users className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">{pendingCount} pending approval{pendingCount !== 1 ? "s" : ""}</span></div>}
+          {isToday && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-[5px] px-3.5 py-2.5 flex items-center gap-2"><Clock3 className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Starts today</span></div>}
+          {isTomorrow && <div className="text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-[5px] px-3.5 py-2.5 flex items-center gap-2"><Clock3 className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Starts tomorrow</span></div>}
+          {remaining <= 3 && remaining > 0 && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-[5px] px-3.5 py-2.5 flex items-center gap-2"><AlertTriangle className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Only {remaining} seat{remaining !== 1 ? "s" : ""} left</span></div>}
+          {deadlineToday && <div className="text-xs bg-red-50 text-red-700 border border-red-200 rounded-[5px] px-3.5 py-2.5 flex items-center gap-2"><AlertTriangle className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Application deadline is today</span></div>}
+          {deadlineSoon && !deadlineToday && <div className="text-xs bg-amber-50 text-amber-700 border border-amber-200 rounded-[5px] px-3.5 py-2.5 flex items-center gap-2"><Clock3 className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">Deadline closing soon</span></div>}
+          {pendingCount > 0 && <div className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-[5px] px-3.5 py-2.5 flex items-center gap-2"><Users className="w-3.5 h-3.5 shrink-0" /><span className="font-medium">{pendingCount} pending approval{pendingCount !== 1 ? "s" : ""}</span></div>}
         </div>
 
-        <div className="bg-gradient-to-br from-[#0D9488] via-[#0D9488] to-[#0F766E] rounded-[20px] p-5 shadow-[0_8px_32px_rgba(13,148,136,0.2)]">
+        <div className="bg-gradient-to-br from-[#0D9488] via-[#0D9488] to-[#0F766E] rounded-[5px] p-5 shadow-[0_8px_32px_rgba(13,148,136,0.2)]">
           <div className="flex items-start justify-between mb-4">
             <div className="min-w-0 flex-1">
               <h2 className="text-white text-lg font-bold leading-tight">{event.title}</h2>
@@ -189,7 +189,7 @@ export default function OrganizerEventDetailPage() {
           </div>
         </div>
 
-          <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+          <div className="bg-white rounded-[8px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
           <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Operation Metrics</p>
           <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
             <div className="text-center">
@@ -221,24 +221,24 @@ export default function OrganizerEventDetailPage() {
           <p className="text-[10px] text-gray-400 mt-1 text-right">{approvedCount}/{event.worker_count} filled ({remaining > 0 ? `${remaining} open` : "full"})</p>
         </div>
 
-        <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+        <div className="bg-white rounded-[8px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
           <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Event Schedule</p>
           <div className="grid grid-cols-2 gap-2 text-sm">
-            <div className="flex items-center gap-2 text-gray-600 bg-gray-50 rounded-[10px] px-3 py-2.5">
+            <div className="flex items-center gap-2 text-gray-600 bg-gray-50 rounded-[5px] px-3 py-2.5">
               <Calendar className="w-4 h-4 text-gray-400 shrink-0" />
               <span className="font-medium">{formatDate(event.date, event.date_display)}</span>
             </div>
-            <div className="flex items-center gap-2 text-gray-600 bg-gray-50 rounded-[10px] px-3 py-2.5">
+            <div className="flex items-center gap-2 text-gray-600 bg-gray-50 rounded-[5px] px-3 py-2.5">
               <Clock className="w-4 h-4 text-gray-400 shrink-0" />
               <span className="font-medium">{event.time}{event.end_time ? `-${event.end_time}` : ""}</span>
             </div>
-            <div className="col-span-2 flex items-center gap-2 text-gray-600 bg-gray-50 rounded-[10px] px-3 py-2.5">
+            <div className="col-span-2 flex items-center gap-2 text-gray-600 bg-gray-50 rounded-[5px] px-3 py-2.5">
               <MapPin className="w-4 h-4 text-gray-400 shrink-0" />
               <span className="font-medium truncate">{event.location}</span>
             </div>
           </div>
           {event.application_deadline && (
-            <div className="mt-2 flex items-center gap-1.5 text-[11px] text-gray-500 bg-amber-50 rounded-[10px] px-3 py-2">
+            <div className="mt-2 flex items-center gap-1.5 text-[11px] text-gray-500 bg-amber-50 rounded-[5px] px-3 py-2">
               <Clock3 className="w-3.5 h-3.5 text-amber-600" />
               <span className="font-medium">Apply by {new Date(event.application_deadline).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</span>
             </div>
@@ -246,10 +246,10 @@ export default function OrganizerEventDetailPage() {
         </div>
 
         {(event.gender_requirement || event.min_age || event.max_age || event.work_description || event.experience_required || event.skill_requirements || event.dress_code) && (
-          <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+          <div className="bg-white rounded-[8px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
             <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Worker Requirements</p>
             {event.work_description && (
-              <p className="text-sm text-gray-700 leading-relaxed mb-3 bg-gray-50 rounded-[10px] px-3 py-2.5">{event.work_description}</p>
+              <p className="text-sm text-gray-700 leading-relaxed mb-3 bg-gray-50 rounded-[5px] px-3 py-2.5">{event.work_description}</p>
             )}
             <div className="flex flex-wrap gap-1.5">
               {event.gender_requirement && <span className="text-[11px] bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full font-medium capitalize">{event.gender_requirement}</span>}
@@ -266,7 +266,7 @@ export default function OrganizerEventDetailPage() {
           </div>
         )}
 
-        <div className="bg-white rounded-[16px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+        <div className="bg-white rounded-[8px] overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
           <div className="px-4 pt-4 pb-3 border-b border-[rgba(0,0,0,0.06)]">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -277,7 +277,7 @@ export default function OrganizerEventDetailPage() {
             <div className="flex gap-1.5 overflow-x-auto pb-1">
               {([["", `All`], ["pending", `Pending (${pendingCount})`], ["approved", `Selected (${approvedCount})`], ["rejected", `Declined (${rejectedCount})`]] as const).map(([key, label]) => (
                 <button key={key} onClick={() => setFilter(key)}
-                  className={`h-8 px-3 rounded-[10px] text-[11px] font-semibold transition-all active:scale-[0.97] whitespace-nowrap shrink-0 ${
+                  className={`h-8 px-3 rounded-[5px] text-[11px] font-semibold transition-all active:scale-[0.97] whitespace-nowrap shrink-0 ${
                     filter === key ? "bg-[#0D9488] text-white shadow-[0_2px_8px_rgba(13,148,136,0.2)]" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}>{label}</button>
               ))}
@@ -296,12 +296,12 @@ export default function OrganizerEventDetailPage() {
               const avail = app.profile.availability ? AVAIL_CONFIG[app.profile.availability] : null;
               const completion = computeCompletion(app.profile);
               return (
-              <div key={app.id} className="bg-white rounded-[14px] border border-[rgba(0,0,0,0.06)] overflow-hidden transition-all hover:border-[rgba(0,0,0,0.12)]">
+              <div key={app.id} className="bg-white rounded-[7px] border border-[rgba(0,0,0,0.06)] overflow-hidden transition-all hover:border-[rgba(0,0,0,0.12)]">
                 <div className="p-3.5">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3 min-w-0 flex-1">
                       <div className="relative shrink-0">
-                        <div className="w-10 h-10 rounded-[12px] bg-gradient-to-br from-[#0D9488]/10 to-[#0D9488]/20 flex items-center justify-center text-[#0D9488] font-bold text-sm">
+                        <div className="w-10 h-10 rounded-[6px] bg-gradient-to-br from-[#0D9488]/10 to-[#0D9488]/20 flex items-center justify-center text-[#0D9488] font-bold text-sm">
                           {app.profile.full_name?.charAt(0) || "W"}
                         </div>
                         {avail && (
@@ -334,18 +334,18 @@ export default function OrganizerEventDetailPage() {
                       {app.status === "pending" && (
                         <>
                           <button onClick={() => handleApprove(app.id)} disabled={applying === app.id}
-                            className="h-8 w-8 rounded-[10px] bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-100 hover:text-emerald-700 disabled:opacity-50 transition-all active:scale-90" aria-label="Approve">
+                            className="h-8 w-8 rounded-[5px] bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-100 hover:text-emerald-700 disabled:opacity-50 transition-all active:scale-90" aria-label="Approve">
                             <Check className="w-4 h-4" />
                           </button>
                           <button onClick={() => handleReject(app.id)} disabled={applying === app.id}
-                            className="h-8 w-8 rounded-[10px] bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 hover:text-red-600 disabled:opacity-50 transition-all active:scale-90" aria-label="Reject">
+                            className="h-8 w-8 rounded-[5px] bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 hover:text-red-600 disabled:opacity-50 transition-all active:scale-90" aria-label="Reject">
                             <XIcon className="w-4 h-4" />
                           </button>
                         </>
                       )}
                       {app.status === "approved" && (
                         <button onClick={() => handleRemove(app.id)} disabled={applying === app.id}
-                          className="h-7 px-2.5 rounded-[10px] bg-red-50 text-red-600 text-[10px] font-medium flex items-center gap-1 hover:bg-red-100 disabled:opacity-50 border border-red-200 transition-all active:scale-95">
+                          className="h-7 px-2.5 rounded-[5px] bg-red-50 text-red-600 text-[10px] font-medium flex items-center gap-1 hover:bg-red-100 disabled:opacity-50 border border-red-200 transition-all active:scale-95">
                           <XCircle className="w-3 h-3" /> Remove
                         </button>
                       )}
@@ -390,7 +390,7 @@ export default function OrganizerEventDetailPage() {
                       {app.profile.skills && app.profile.skills.length > 0 && (
                         <div className="flex flex-wrap gap-1">
                           {app.profile.skills.map((s, i) => (
-                            <span key={i} className="text-[11px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-[10px]">{s}</span>
+                            <span key={i} className="text-[11px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-[5px]">{s}</span>
                           ))}
                         </div>
                       )}
@@ -403,13 +403,13 @@ export default function OrganizerEventDetailPage() {
         </div>
 
         {(event.reporting_details || event.instructions || event.contact_person_notes) && (
-          <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+          <div className="bg-white rounded-[8px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
             <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Reporting & Instructions</p>
             <div className="space-y-2.5">
-              {event.reporting_details && <p className="text-sm text-gray-700 bg-gray-50 rounded-[10px] px-3 py-2.5 leading-relaxed">{event.reporting_details}</p>}
-              {event.instructions && <p className="text-sm text-gray-700 bg-gray-50 rounded-[10px] px-3 py-2.5 leading-relaxed">{event.instructions}</p>}
+              {event.reporting_details && <p className="text-sm text-gray-700 bg-gray-50 rounded-[5px] px-3 py-2.5 leading-relaxed">{event.reporting_details}</p>}
+              {event.instructions && <p className="text-sm text-gray-700 bg-gray-50 rounded-[5px] px-3 py-2.5 leading-relaxed">{event.instructions}</p>}
               {event.contact_person_notes && (
-                <p className="text-sm text-gray-700 bg-amber-50 rounded-[10px] px-3 py-2.5 flex items-center gap-2">
+                <p className="text-sm text-gray-700 bg-amber-50 rounded-[5px] px-3 py-2.5 flex items-center gap-2">
                   <Phone className="w-4 h-4 text-amber-600 shrink-0" />
                   <span>{event.contact_person_notes}</span>
                 </p>
@@ -430,33 +430,33 @@ export default function OrganizerEventDetailPage() {
       <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-[rgba(0,0,0,0.06)] z-10 pb-[env(safe-area-inset-bottom,0px)] shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
         <div className="max-w-lg mx-auto px-4 py-2.5 flex gap-2 overflow-x-auto">
           <button onClick={() => setShowEdit(true)} disabled={!canEdit}
-            className="h-9 px-4 rounded-[10px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
+            className="h-9 px-4 rounded-[5px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
             <Edit3 className="w-3.5 h-3.5" /> Edit
           </button>
             <button onClick={duplicate}
-              className="h-9 px-4 rounded-[10px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
+              className="h-9 px-4 rounded-[5px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
               <Copy className="w-3.5 h-3.5" /> Duplicate
             </button>
             {(event.status === "published" || event.status === "filling") && (
             <button onClick={() => updateStatus("closed")}
-              className="h-9 px-4 rounded-[10px] bg-amber-50 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
+              className="h-9 px-4 rounded-[5px] bg-amber-50 text-amber-700 text-xs font-semibold hover:bg-amber-100 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
               <XCircle className="w-3.5 h-3.5" /> Close
             </button>
           )}
           {event.status === "draft" && (
             <button onClick={() => updateStatus("published")}
-              className="h-9 px-4 rounded-[10px] bg-[#0D9488] text-white text-xs font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0 shadow-[0_2px_8px_rgba(13,148,136,0.2)]">
+              className="h-9 px-4 rounded-[5px] bg-[#0D9488] text-white text-xs font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0 shadow-[0_2px_8px_rgba(13,148,136,0.2)]">
               <Sparkles className="w-3.5 h-3.5" /> Publish
             </button>
           )}
           {event.status !== "completed" && event.status !== "cancelled" && event.status !== "draft" && (
             <button onClick={() => setConfirmAction({ type: "complete" })}
-              className="h-9 px-4 rounded-[10px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
+              className="h-9 px-4 rounded-[5px] border border-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-50 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
               <CheckCircle className="w-3.5 h-3.5" /> Complete
             </button>
           )}
           <button onClick={() => setConfirmAction({ type: "delete" })}
-            className="h-9 px-4 rounded-[10px] bg-red-50 text-red-600 text-xs font-semibold hover:bg-red-100 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
+            className="h-9 px-4 rounded-[5px] bg-red-50 text-red-600 text-xs font-semibold hover:bg-red-100 transition-all active:scale-[0.97] flex items-center gap-1.5 shrink-0">
             <Trash2 className="w-3.5 h-3.5" /> Delete
           </button>
         </div>

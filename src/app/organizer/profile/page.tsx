@@ -1,4 +1,4 @@
-ï»¿"use client";
+"use client";
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -68,7 +68,7 @@ export default function OrganizerProfilePage() {
   const signOut = async () => { await supabase.auth.signOut(); router.push("/login"); };
 
   const shareApp = async () => {
-    const text = `Join EventMan - the best platform for event workers and organizers! Find events, hire workers, and manage everything in one place. ðŸš€\n\nDownload now: https://eventman2.vercel.app`;
+    const text = `Join EventMan - the best platform for event workers and organizers! Find events, hire workers, and manage everything in one place. ??\n\nDownload now: https://eventman2.vercel.app`;
     if (navigator.share) {
       try { await navigator.share({ title: "EventMan", text }); } catch {}
     } else {
@@ -90,12 +90,12 @@ export default function OrganizerProfilePage() {
           <div className="flex items-center gap-1">
             {!editing && (
               <button onClick={() => setEditing(true)}
-                className="h-9 px-3.5 rounded-[10px] bg-[#0D9488] text-white text-xs font-semibold flex items-center gap-1.5 hover:bg-teal-700 transition-all active:scale-95">
+                className="h-9 px-3.5 rounded-[5px] bg-[#0D9488] text-white text-xs font-semibold flex items-center gap-1.5 hover:bg-teal-700 transition-all active:scale-95">
                 <Edit3 className="w-3.5 h-3.5" /> Edit
               </button>
             )}
             <button onClick={signOut} aria-label="Sign out"
-              className="h-9 w-9 rounded-[10px] text-gray-400 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-all active:scale-90">
+              className="h-9 w-9 rounded-[5px] text-gray-400 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-all active:scale-90">
               <LogOut className="w-4 h-4" />
             </button>
           </div>
@@ -103,12 +103,12 @@ export default function OrganizerProfilePage() {
       </header>
 
       <main className="max-w-lg mx-auto px-4 py-4 space-y-4">
-        <div className="bg-gradient-to-br from-[#0D9488] via-[#0D9488] to-[#0F766E] rounded-[20px] p-6 text-center shadow-[0_8px_32px_rgba(13,148,136,0.2)] relative">
+        <div className="bg-gradient-to-br from-[#0D9488] via-[#0D9488] to-[#0F766E] rounded-[5px] p-6 text-center shadow-[0_8px_32px_rgba(13,148,136,0.2)] relative">
           <button type="button" onClick={shareApp}
-            className="absolute top-4 right-4 w-9 h-9 rounded-[10px] bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/40 transition-all active:scale-90">
+            className="absolute top-4 right-4 w-9 h-9 rounded-[5px] bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/40 transition-all active:scale-90">
             <Share2 className="w-4 h-4" />
           </button>
-          <div className="w-20 h-20 rounded-[16px] bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto ring-2 ring-white/30 shadow-[0_4px_12px_rgba(0,0,0,0.1)]" aria-hidden="true">
+          <div className="w-20 h-20 rounded-[8px] bg-white/20 backdrop-blur-sm flex items-center justify-center mx-auto ring-2 ring-white/30 shadow-[0_4px_12px_rgba(0,0,0,0.1)]" aria-hidden="true">
             <span className="text-3xl font-bold text-white">{profile?.full_name?.charAt(0)?.toUpperCase() || "O"}</span>
           </div>
           <h2 className="text-white text-xl font-bold mt-4">{profile?.full_name}</h2>
@@ -132,20 +132,20 @@ export default function OrganizerProfilePage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+        <div className="bg-white rounded-[8px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
           <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
             <TrendingUp className="w-3.5 h-3.5" /> Performance Overview
           </p>
           <div className="grid grid-cols-3 gap-3">
-            <div className="text-center bg-gray-50 rounded-[12px] p-3">
+            <div className="text-center bg-gray-50 rounded-[6px] p-3">
               <p className="text-xl font-bold text-gray-900">{pastEventCount}</p>
               <p className="text-[10px] text-gray-500 font-medium mt-0.5">Past Events</p>
             </div>
-            <div className="text-center bg-gray-50 rounded-[12px] p-3">
+            <div className="text-center bg-gray-50 rounded-[6px] p-3">
               <p className="text-xl font-bold text-[#0D9488]">{totalWorkersHired}</p>
               <p className="text-[10px] text-gray-500 font-medium mt-0.5">Workers Hired</p>
             </div>
-            <div className="text-center bg-gray-50 rounded-[12px] p-3">
+            <div className="text-center bg-gray-50 rounded-[6px] p-3">
               <p className="text-xl font-bold text-emerald-600">{activeEventsCount}</p>
               <p className="text-[10px] text-gray-500 font-medium mt-0.5">Active Now</p>
             </div>
@@ -153,37 +153,37 @@ export default function OrganizerProfilePage() {
         </div>
 
         {!editing && (
-          <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+          <div className="bg-white rounded-[8px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
             <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Business Information</p>
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-[10px] bg-emerald-50 flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 rounded-[5px] bg-emerald-50 flex items-center justify-center shrink-0">
                   <User className="w-4 h-4 text-[#0D9488]" />
                 </div>
                 <div className="flex-1">
                   <p className="text-[10px] text-gray-400 font-medium">Organization Name</p>
-                  <p className="text-sm font-semibold text-gray-900">{profile?.full_name || "â€”"}</p>
+                  <p className="text-sm font-semibold text-gray-900">{profile?.full_name || "—"}</p>
                 </div>
               </div>
               <div className="border-t border-[rgba(0,0,0,0.04)]" />
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-[10px] bg-emerald-50 flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 rounded-[5px] bg-emerald-50 flex items-center justify-center shrink-0">
                   <Phone className="w-4 h-4 text-[#0D9488]" />
                 </div>
                 <div className="flex-1">
                   <p className="text-[10px] text-gray-400 font-medium">Contact Number</p>
-                  <p className="text-sm font-semibold text-gray-900">{profile?.phone || "â€”"}</p>
+                  <p className="text-sm font-semibold text-gray-900">{profile?.phone || "—"}</p>
                 </div>
               </div>
               <div className="border-t border-[rgba(0,0,0,0.04)]" />
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-[10px] bg-emerald-50 flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 rounded-[5px] bg-emerald-50 flex items-center justify-center shrink-0">
                   <MapPin className="w-4 h-4 text-[#0D9488]" />
                 </div>
                 <div className="flex-1">
                   <p className="text-[10px] text-gray-400 font-medium">Location</p>
                   <p className="text-sm font-semibold text-gray-900">
-                    {[profile?.city, profile?.area].filter(Boolean).join(", ") || "â€”"}
+                    {[profile?.city, profile?.area].filter(Boolean).join(", ") || "—"}
                   </p>
                 </div>
               </div>
@@ -191,7 +191,7 @@ export default function OrganizerProfilePage() {
                 <>
                   <div className="border-t border-[rgba(0,0,0,0.04)]" />
                   <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-[10px] bg-emerald-50 flex items-center justify-center shrink-0 mt-0.5">
+                    <div className="w-8 h-8 rounded-[5px] bg-emerald-50 flex items-center justify-center shrink-0 mt-0.5">
                       <Star className="w-4 h-4 text-[#0D9488]" />
                     </div>
                     <div className="flex-1">
@@ -207,7 +207,7 @@ export default function OrganizerProfilePage() {
 
         {editing && (
           <form onSubmit={(e) => { e.preventDefault(); saveProfile(); }}>
-            <div className="bg-white rounded-[16px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] space-y-4">
+            <div className="bg-white rounded-[8px] p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] space-y-4">
               <div className="flex items-center justify-between">
                 <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Edit Information</p>
                 <button type="button" onClick={() => setEditing(false)}
@@ -218,38 +218,38 @@ export default function OrganizerProfilePage() {
               <div>
                 <label htmlFor="profile-name" className="block text-xs font-medium text-gray-600 mb-1.5">Organization Name</label>
                 <input id="profile-name" value={form.full_name} onChange={e => setForm(p => ({ ...p, full_name: e.target.value }))}
-                  className="w-full h-11 px-3.5 rounded-[10px] border border-[rgba(0,0,0,0.08)] bg-white text-sm outline-none transition-all focus:border-[#0D9488] focus:shadow-[0_0_0_3px_rgba(13,148,136,0.08)]" />
+                  className="w-full h-11 px-3.5 rounded-[5px] border border-[rgba(0,0,0,0.08)] bg-white text-sm outline-none transition-all focus:border-[#0D9488] focus:shadow-[0_0_0_3px_rgba(13,148,136,0.08)]" />
               </div>
               <div>
                 <label htmlFor="profile-phone" className="block text-xs font-medium text-gray-600 mb-1.5">Phone</label>
                 <input id="profile-phone" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
                   placeholder="9876543210"
-                  className="w-full h-11 px-3.5 rounded-[10px] border border-[rgba(0,0,0,0.08)] bg-white text-sm outline-none transition-all focus:border-[#0D9488] focus:shadow-[0_0_0_3px_rgba(13,148,136,0.08)]" />
+                  className="w-full h-11 px-3.5 rounded-[5px] border border-[rgba(0,0,0,0.08)] bg-white text-sm outline-none transition-all focus:border-[#0D9488] focus:shadow-[0_0_0_3px_rgba(13,148,136,0.08)]" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label htmlFor="profile-city" className="block text-xs font-medium text-gray-600 mb-1.5">City</label>
                   <input id="profile-city" value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))}
                     placeholder="Ahmedabad"
-                    className="w-full h-11 px-3.5 rounded-[10px] border border-[rgba(0,0,0,0.08)] bg-white text-sm outline-none transition-all focus:border-[#0D9488] focus:shadow-[0_0_0_3px_rgba(13,148,136,0.08)]" />
+                    className="w-full h-11 px-3.5 rounded-[5px] border border-[rgba(0,0,0,0.08)] bg-white text-sm outline-none transition-all focus:border-[#0D9488] focus:shadow-[0_0_0_3px_rgba(13,148,136,0.08)]" />
                 </div>
                 <div>
                   <label htmlFor="profile-area" className="block text-xs font-medium text-gray-600 mb-1.5">Area</label>
                   <input id="profile-area" value={form.area} onChange={e => setForm(p => ({ ...p, area: e.target.value }))}
                     placeholder="e.g., Navrangpura"
-                    className="w-full h-11 px-3.5 rounded-[10px] border border-[rgba(0,0,0,0.08)] bg-white text-sm outline-none transition-all focus:border-[#0D9488] focus:shadow-[0_0_0_3px_rgba(13,148,136,0.08)]" />
+                    className="w-full h-11 px-3.5 rounded-[5px] border border-[rgba(0,0,0,0.08)] bg-white text-sm outline-none transition-all focus:border-[#0D9488] focus:shadow-[0_0_0_3px_rgba(13,148,136,0.08)]" />
                 </div>
               </div>
               <div>
                 <label htmlFor="profile-bio" className="block text-xs font-medium text-gray-600 mb-1.5">About Organization</label>
                 <textarea id="profile-bio" value={form.bio} onChange={e => setForm(p => ({ ...p, bio: e.target.value }))}
                   placeholder="Tell workers about your organization..."
-                  className="w-full h-24 px-3.5 py-2.5 rounded-[10px] border border-[rgba(0,0,0,0.08)] bg-white text-sm outline-none transition-all focus:border-[#0D9488] focus:shadow-[0_0_0_3px_rgba(13,148,136,0.08)] resize-none" />
+                  className="w-full h-24 px-3.5 py-2.5 rounded-[5px] border border-[rgba(0,0,0,0.08)] bg-white text-sm outline-none transition-all focus:border-[#0D9488] focus:shadow-[0_0_0_3px_rgba(13,148,136,0.08)] resize-none" />
               </div>
             </div>
             <div className="mt-4">
               <button type="submit" disabled={saving}
-                className="w-full h-12 rounded-[12px] bg-[#0D9488] text-white text-sm font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
+                className="w-full h-12 rounded-[6px] bg-[#0D9488] text-white text-sm font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
                 {saving ? (
                   <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Saving...</>
                 ) : (

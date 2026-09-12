@@ -29,7 +29,7 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="min-h-screen bg-[#F8F8F6] flex items-center justify-center p-6">
           <div className="text-center max-w-sm">
-            <div className="w-16 h-16 rounded-[20px] bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 rounded-[5px] bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center mx-auto mb-4">
               <AlertTriangle className="w-8 h-8 text-red-500" />
             </div>
             <p className="text-lg font-bold text-gray-900 mb-2">Something went wrong</p>
@@ -37,7 +37,7 @@ export class ErrorBoundary extends Component<Props, State> {
               {this.state.error?.message || "An unexpected error occurred. Please try again."}
             </p>
             <button onClick={() => window.location.reload()}
-              className="h-11 px-6 rounded-[12px] bg-[#0D9488] text-white text-sm font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] flex items-center gap-2 mx-auto shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
+              className="h-11 px-6 rounded-[6px] bg-[#0D9488] text-white text-sm font-semibold hover:bg-teal-700 transition-all active:scale-[0.97] flex items-center gap-2 mx-auto shadow-[0_4px_12px_rgba(13,148,136,0.25)]">
               <RefreshCw className="w-4 h-4" /> Reload Page
             </button>
           </div>

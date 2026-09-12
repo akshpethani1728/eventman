@@ -1,4 +1,4 @@
-ï»¿"use client";
+"use client";
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -192,7 +192,7 @@ export default function AdminDashboard() {
       <div className="min-h-screen bg-[#F8F8F6] flex items-center justify-center p-4">
         <div className="w-full max-w-sm">
           <div className="card-floating p-8 text-center">
-            <div className="w-14 h-14 rounded-[14px] bg-gradient-to-br from-[#0D9488] to-[#0F766E] flex items-center justify-center mx-auto mb-4 shadow-[0_4px_16px_rgba(13,148,136,0.3)]">
+            <div className="w-14 h-14 rounded-[7px] bg-gradient-to-br from-[#0D9488] to-[#0F766E] flex items-center justify-center mx-auto mb-4 shadow-[0_4px_16px_rgba(13,148,136,0.3)]">
               <Lock className="w-6 h-6 text-white" />
             </div>
             <h1 className="font-bold text-[18px] text-gray-900 mb-1">Admin Access</h1>
@@ -204,7 +204,7 @@ export default function AdminDashboard() {
                 onChange={e => setPassword(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && verifyPassword()}
                 placeholder="Enter password"
-                className="w-full h-12 px-4 pr-12 rounded-[12px] bg-gray-50 border border-[rgba(0,0,0,0.08)] text-[14px] outline-none focus:ring-2 focus:ring-[#0D9488]/20 transition-all"
+                className="w-full h-12 px-4 pr-12 rounded-[6px] bg-gray-50 border border-[rgba(0,0,0,0.08)] text-[14px] outline-none focus:ring-2 focus:ring-[#0D9488]/20 transition-all"
                 autoFocus
               />
               <button onClick={() => setShowPassword(!showPassword)}
@@ -229,7 +229,7 @@ export default function AdminDashboard() {
       <header className="sticky top-0 bg-white/80 backdrop-blur-2xl border-b border-[rgba(0,0,0,0.06)] z-10">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-[10px] bg-gradient-to-br from-[#0D9488] to-[#0F766E] flex items-center justify-center shadow-[0_2px_8px_rgba(13,148,136,0.25)]">
+            <div className="w-8 h-8 rounded-[5px] bg-gradient-to-br from-[#0D9488] to-[#0F766E] flex items-center justify-center shadow-[0_2px_8px_rgba(13,148,136,0.25)]">
               <Shield className="w-4 h-4 text-white" />
             </div>
             <div>
@@ -240,10 +240,10 @@ export default function AdminDashboard() {
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-500 truncate max-w-[120px]">{profile?.full_name}</span>
             <div className="w-px h-5 bg-[rgba(0,0,0,0.06)]" />
-            <button onClick={loadData} className="h-8 w-8 rounded-[10px] hover:bg-gray-100 flex items-center justify-center text-gray-400 transition-colors" title="Refresh">
+            <button onClick={loadData} className="h-8 w-8 rounded-[5px] hover:bg-gray-100 flex items-center justify-center text-gray-400 transition-colors" title="Refresh">
               <RefreshCw className="w-4 h-4" />
             </button>
-            <button onClick={signOut} className="h-8 px-3 rounded-[10px] text-xs font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 transition-all flex items-center gap-1.5">
+            <button onClick={signOut} className="h-8 px-3 rounded-[5px] text-xs font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 transition-all flex items-center gap-1.5">
               <LogOut className="w-3.5 h-3.5" /> Sign Out
             </button>
           </div>
@@ -269,7 +269,7 @@ export default function AdminDashboard() {
                 if (t === "notifications") { router.push("/admin/notifications"); return; }
                 setTab(t);
               }}
-                className={`flex-1 h-10 rounded-[12px] text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${
+                className={`flex-1 h-10 rounded-[6px] text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${
                   tab === t
                     ? "bg-[#0D9488] text-white shadow-[0_2px_8px_rgba(13,148,136,0.25)]"
                     : "text-gray-500 hover:text-gray-800 hover:bg-gray-100"
@@ -293,7 +293,7 @@ export default function AdminDashboard() {
             <div className="flex gap-2">
               {(["workers", "organizers"] as UserTab[]).map(ut => (
                 <button key={ut} onClick={() => { setUserTab(ut); setStatusFilter("all"); setSearchQuery(""); }}
-                  className={`flex-1 h-11 rounded-[12px] text-[13px] font-semibold transition-all flex items-center justify-center gap-2 ${
+                  className={`flex-1 h-11 rounded-[6px] text-[13px] font-semibold transition-all flex items-center justify-center gap-2 ${
                     userTab === ut
                       ? ut === "workers"
                         ? "bg-amber-50 text-amber-700 border-2 border-amber-200"
@@ -319,7 +319,7 @@ export default function AdminDashboard() {
                 <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
                   placeholder={`Search ${userTab}...`}
-                  className="w-full h-9 pl-9 pr-8 rounded-[10px] bg-white border border-[rgba(0,0,0,0.06)] text-xs outline-none focus:ring-2 focus:ring-[#0D9488]/20 transition-all" />
+                  className="w-full h-9 pl-9 pr-8 rounded-[5px] bg-white border border-[rgba(0,0,0,0.06)] text-xs outline-none focus:ring-2 focus:ring-[#0D9488]/20 transition-all" />
                 {searchQuery && (
                   <button onClick={() => setSearchQuery("")} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                     <X className="w-3.5 h-3.5" />
@@ -329,7 +329,7 @@ export default function AdminDashboard() {
               <div className="flex gap-1">
                 {["all", "unverified", "basic_verified", "trusted"].map(s => (
                   <button key={s} onClick={() => setStatusFilter(s)}
-                    className={`h-9 px-2.5 rounded-[10px] text-[11px] font-medium transition-all ${
+                    className={`h-9 px-2.5 rounded-[5px] text-[11px] font-medium transition-all ${
                       statusFilter === s ? "bg-[#0D9488] text-white" : "bg-white border border-[rgba(0,0,0,0.06)] text-gray-500 hover:bg-gray-50"
                     }`}>
                     {s === "all" ? "All" : s === "basic_verified" ? "Verified" : s.charAt(0).toUpperCase() + s.slice(1)}
@@ -354,7 +354,7 @@ export default function AdminDashboard() {
                   <Card key={u.id} padding="sm">
                     {/* Main Row */}
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-[10px] flex items-center justify-center text-white font-bold text-sm shrink-0 ${
+                      <div className={`w-10 h-10 rounded-[5px] flex items-center justify-center text-white font-bold text-sm shrink-0 ${
                         u.role === "organizer"
                           ? u.is_trusted_organizer ? "bg-gradient-to-br from-emerald-500 to-emerald-600" : "bg-gradient-to-br from-[#0D9488] to-[#0F766E]"
                           : u.plan_status === "active" ? "bg-gradient-to-br from-amber-500 to-amber-600" : "bg-gradient-to-br from-gray-400 to-gray-500"
@@ -375,9 +375,9 @@ export default function AdminDashboard() {
                           )}
                         </div>
                         <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-[11px] text-gray-400">{u.email || u.phone || "â€”"}</span>
-                          {u.city && <span className="text-[10px] text-gray-400">â€¢ {u.city}</span>}
-                          <span className="text-[10px] text-gray-300">â€¢ {formatRelativeDate(u.created_at)}</span>
+                          <span className="text-[11px] text-gray-400">{u.email || u.phone || "—"}</span>
+                          {u.city && <span className="text-[10px] text-gray-400">• {u.city}</span>}
+                          <span className="text-[10px] text-gray-300">• {formatRelativeDate(u.created_at)}</span>
                         </div>
                       </div>
 
@@ -485,7 +485,7 @@ export default function AdminDashboard() {
               <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Search events..."
-                className="w-full h-10 pl-9 pr-8 rounded-[10px] bg-white border border-[rgba(0,0,0,0.06)] text-xs outline-none focus:ring-2 focus:ring-[#0D9488]/20 transition-all" />
+                className="w-full h-10 pl-9 pr-8 rounded-[5px] bg-white border border-[rgba(0,0,0,0.06)] text-xs outline-none focus:ring-2 focus:ring-[#0D9488]/20 transition-all" />
               {searchQuery && (
                 <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                   <X className="w-3.5 h-3.5" />
@@ -502,7 +502,7 @@ export default function AdminDashboard() {
               {filteredEvents.map(e => (
                 <Card key={e.id} padding="sm">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-[10px] bg-gradient-to-br from-[#0D9488]/20 to-[#0F766E]/10 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-[5px] bg-gradient-to-br from-[#0D9488]/20 to-[#0F766E]/10 flex items-center justify-center shrink-0">
                       <Calendar className="w-4 h-4 text-[#0D9488]" />
                     </div>
                     <div className="min-w-0 flex-1">
