@@ -8,13 +8,12 @@ import {
   LogOut, MapPin, Calendar, Clock, Users, IndianRupee, ShieldCheck,
   UtensilsCrossed, Car, Timer, TrendingUp, Zap, CheckCircle, BadgeCheck,
   XCircle, Hourglass, ArrowUpRight, Clock3, Send, AlertCircle,
-  Heart, Flame, Gauge, Bell, Phone, Info, ListChecks, ListPlus, ListMinus, CreditCard,
-  Search, ChevronRight, Sparkles, Target, Star, Wallet,
+  Heart, Flame, Gauge, Bell, Phone, Info, ListChecks, ListPlus, ListMinus,
+  Search, ChevronRight, Sparkles, Target, Star,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Profile, Event, Application } from "@/lib/supabase/types";
 import { Logo } from "@/components/Logo";
-import { checkPlanStatus } from "@/lib/subscription";
 
 function isWaitlisted(app: Application) { return app.status === "pending" && app.notes === "waitlisted"; }
 function isRemovedByOrganizer(app: Application) { return app.status === "cancelled" && app.notes === "removed_by_organizer"; }
@@ -250,11 +249,6 @@ function DashboardContent() {
   };
 
   const apply = async (eventId: string) => {
-    if (profile && !checkPlanStatus(profile).canApply) {
-      toast.error("Your plan has expired. Subscribe to continue applying.");
-      router.push("/worker/plans");
-      return;
-    }
     setApplyingId(eventId);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setApplyingId(null); return; }
@@ -279,11 +273,6 @@ function DashboardContent() {
   };
 
   const joinWaitlist = async (eventId: string) => {
-    if (profile && !checkPlanStatus(profile).canApply) {
-      toast.error("Your plan has expired. Subscribe to continue applying.");
-      router.push("/worker/plans");
-      return;
-    }
     setApplyingId(eventId);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setApplyingId(null); return; }
@@ -327,9 +316,6 @@ function DashboardContent() {
     if (app.status === "cancelled") return false;
     return true;
   }).sort((a, b) => new Date(b.application!.created_at).getTime() - new Date(a.application!.created_at).getTime());
-
-  const planCheck = profile ? checkPlanStatus(profile) : null;
-  const canApply = planCheck?.canApply ?? true;
 
   const formatCount = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
 
@@ -408,33 +394,9 @@ function DashboardContent() {
       </header>
 
       <main className="max-w-lg mx-auto px-4 pt-4 pb-28">
-        {/* === PLAN STATUS CHIP === */}
-        {profile && profile.plan_status && (
-          <div className="mb-3 flex items-center justify-between">
-            <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold ${
-              profile.plan_status === "active"
-                ? "bg-emerald-100 text-emerald-700"
-                : profile.plan_status === "trial"
-                  ? "bg-teal-100 text-teal-700"
-                  : "bg-amber-100 text-amber-700"
-            }`}>
-              {profile.plan_status === "active" ? (
-                <><Sparkles className="w-3 h-3" /> Active Plan</>
-              ) : profile.plan_status === "trial" ? (
-                <><Clock className="w-3 h-3" /> Trial · {profile.trial_end_date ? `${Math.ceil((new Date(profile.trial_end_date).getTime() - Date.now()) / 86400000)}d left` : ""}</>
-              ) : (
-                <><AlertCircle className="w-3 h-3" /> Expired <Link href="/worker/plans" className="underline ml-1">Renew</Link></>
-              )}
-            </div>
-            <Link href="/worker/plans" className="text-[11px] font-medium text-[#0D9488] flex items-center gap-0.5">
-              Details <ChevronRight className="w-3 h-3" />
-            </Link>
-          </div>
-        )}
-
         {/* === OVERVIEW STATUS CARD === */}
         <div className="mb-5 bg-white rounded-[5px] p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div className="text-center">
               <div className="w-10 h-10 rounded-[6px] bg-teal-50 flex items-center justify-center mx-auto mb-2">
                 <Target className="w-5 h-5 text-[#0D9488]" />
@@ -448,15 +410,6 @@ function DashboardContent() {
               </div>
               <p className="text-[22px] font-bold text-[#1A1A1A] leading-none">{appliedEvents.length}</p>
               <p className="text-[10px] text-[#6B6B6B] mt-1 font-medium">Applied</p>
-            </div>
-            <div className="text-center">
-              <div className="w-10 h-10 rounded-[6px] bg-amber-50 flex items-center justify-center mx-auto mb-2">
-                <Wallet className="w-5 h-5 text-amber-600" />
-              </div>
-              <p className="text-[22px] font-bold text-[#1A1A1A] leading-none">
-                {planCheck?.isActive ? "Active" : planCheck?.isTrialing ? "Trial" : "Expired"}
-              </p>
-              <p className="text-[10px] text-[#6B6B6B] mt-1 font-medium">Plan</p>
             </div>
           </div>
         </div>
@@ -722,12 +675,6 @@ function DashboardContent() {
                               <><ListMinus className="w-3.5 h-3.5" /> Leave</>
                             )}
                           </button>
-                        ) : !canApply ? (
-                          <Link href="/worker/plans"
-                            onClick={(e) => { e.stopPropagation(); }}
-                            className="h-9 px-4 rounded-[5px] font-semibold text-[11px] bg-amber-600 text-white hover:bg-amber-700 transition-all active:scale-[0.97] flex items-center gap-1.5">
-                            <CreditCard className="w-3.5 h-3.5" /> Subscribe
-                          </Link>
                         ) : isFull ? (
                           <button
                             onClick={(e) => { e.preventDefault(); e.stopPropagation(); joinWaitlist(event.id); }}

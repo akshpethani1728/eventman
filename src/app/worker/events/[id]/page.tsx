@@ -8,7 +8,7 @@ import {
   ArrowLeft, ArrowUpRight, MapPin, Calendar, Clock, Users, IndianRupee, Shirt,
   AlertCircle, User, Briefcase, Award, ShieldCheck, CheckCircle, Hourglass,
   Phone, Timer, Info, ListChecks, XCircle, BadgeCheck, ListPlus, ListMinus,
-  CreditCard, RefreshCw, Star, ChevronDown, ChevronUp, Sparkles, Target,
+  RefreshCw, Star, ChevronDown, ChevronUp, Sparkles, Target,
   UtensilsCrossed, Car,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -17,7 +17,6 @@ import { Card } from "@/lib/design/Card";
 import { Badge, StatusDot, Divider } from "@/lib/design/Badge";
 import { PageLoader } from "@/lib/design/Loading";
 import type { Event, Application, Profile } from "@/lib/supabase/types";
-import { checkPlanStatus } from "@/lib/subscription";
 
 function isWaitlisted(app: Application) { return app.status === "pending" && app.notes === "waitlisted"; }
 function isRemovedByOrganizer(app: Application) { return app.status === "cancelled" && app.notes === "removed_by_organizer"; }
@@ -85,14 +84,6 @@ export default function EventDetailPage() {
   };
 
   const handleApply = async () => {
-    if (workerProfile) {
-      const status = checkPlanStatus(workerProfile);
-      if (!status.canApply) {
-        toast.error("Your trial or subscription has expired. Purchase a plan to continue applying for events.");
-        router.push("/worker/plans");
-        return;
-      }
-    }
     setApplying(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { toast.error("Please login"); setApplying(false); return; }
@@ -106,14 +97,6 @@ export default function EventDetailPage() {
   };
 
   const handleJoinWaitlist = async () => {
-    if (workerProfile) {
-      const status = checkPlanStatus(workerProfile);
-      if (!status.canApply) {
-        toast.error("Your trial or subscription has expired. Purchase a plan to continue applying for events.");
-        router.push("/worker/plans");
-        return;
-      }
-    }
     setApplying(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setApplying(false); toast.error("Please login"); return; }
@@ -137,14 +120,6 @@ export default function EventDetailPage() {
   };
 
   const handleReApply = async () => {
-    if (workerProfile) {
-      const status = checkPlanStatus(workerProfile);
-      if (!status.canApply) {
-        toast.error("Your trial or subscription has expired. Purchase a plan to continue applying for events.");
-        router.push("/worker/plans");
-        return;
-      }
-    }
     if (!application) return;
     setApplying(true);
     const { error: delError } = await supabase.from("applications").delete().eq("id", application.id);
@@ -163,8 +138,6 @@ export default function EventDetailPage() {
 
   const isEventPast = ["completed", "cancelled"].includes(event.status) || (event.date && event.date < new Date().toISOString().split("T")[0]);
   const showContact = application?.status === "approved" && !isEventPast;
-  const planCheck = workerProfile ? checkPlanStatus(workerProfile) : null;
-  const canApply = planCheck?.canApply ?? true;
   const hoursUntilEvent = event ? (new Date(event.date).getTime() - timeNow) / 3600000 : 0;
   const daysUntilEvent = Math.ceil(hoursUntilEvent / 24);
   const isEventUrgent = hoursUntilEvent > 0 && hoursUntilEvent < 24;
@@ -650,7 +623,7 @@ export default function EventDetailPage() {
         </div>
       )}
 
-      {!application && !deadlinePassed && isFull && canApply && (
+      {!application && !deadlinePassed && isFull && (
         <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-[rgba(0,0,0,0.06)] p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
             <button onClick={handleJoinWaitlist} disabled={applying}
@@ -665,17 +638,7 @@ export default function EventDetailPage() {
         </div>
       )}
 
-      {!application && !deadlinePassed && isFull && !canApply && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-[rgba(0,0,0,0.06)] p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
-          <div className="max-w-lg mx-auto">
-            <Link href="/worker/plans" className="w-full h-12 rounded-[7px] bg-amber-600 text-white font-semibold text-sm active:scale-[0.98] transition-all hover:bg-amber-700 flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(217,119,6,0.25)]">
-              <CreditCard className="w-4 h-4" /> Subscribe to Join Waitlist
-            </Link>
-          </div>
-        </div>
-      )}
-
-      {!application && !deadlinePassed && !isFull && (event.status === "published" || event.status === "filling") && canApply && (
+      {!application && !deadlinePassed && !isFull && (event.status === "published" || event.status === "filling") && (
         <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-[rgba(0,0,0,0.06)] p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
             <button onClick={handleApply} disabled={applying}
@@ -686,16 +649,6 @@ export default function EventDetailPage() {
                 <><Briefcase className="w-4 h-4" /> Apply for this Event</>
               )}
             </button>
-          </div>
-        </div>
-      )}
-
-      {!application && !deadlinePassed && !isFull && (event.status === "published" || event.status === "filling") && !canApply && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-[rgba(0,0,0,0.06)] p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
-          <div className="max-w-lg mx-auto">
-            <Link href="/worker/plans" className="w-full h-12 rounded-[7px] bg-amber-600 text-white font-semibold text-sm active:scale-[0.98] transition-all hover:bg-amber-700 flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(217,119,6,0.25)]">
-              <CreditCard className="w-4 h-4" /> Subscribe to Apply
-            </Link>
           </div>
         </div>
       )}

@@ -121,11 +121,8 @@ function AuthSection({ onRedirect }: { onRedirect: () => void }) {
     if (verifyError) { setLoading(false); setError(verifyError.message); return; }
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setLoading(false); setError("Verification failed. Try signing in."); return; }
-    const now = new Date();
-    const trialEnd = new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000).toISOString();
     const { error: insError } = await supabase.from("profiles").insert({
       user_id: user.id, full_name: name.trim(), role, email: user.email, status: "unverified",
-      plan_status: "trial", trial_start_date: now.toISOString(), trial_end_date: trialEnd,
     });
     setLoading(false);
     if (insError) {
