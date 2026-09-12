@@ -725,7 +725,7 @@ export default function EventDetailPage() {
         <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-[rgba(0,0,0,0.06)] p-4 z-10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
           <div className="max-w-lg mx-auto">
             <button onClick={handleLeaveWaitlist} disabled={applying}
-              className="w-full h-12 rounded-[7px] border-2 border-purple-200 bg-purple-50 text-purple-700 font-semibold text-sm active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+              className="w-full h-12 rounded-[7px] border border-purple-200 bg-purple-50 text-purple-700 font-semibold text-sm active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2">
               {applying ? (
                 <span className="w-5 h-5 border-2 border-purple-600 border-t-transparent rounded-full animate-spin inline-block" />
               ) : (

@@ -343,7 +343,7 @@ export default function WorkerProfilePage() {
                           <User className="w-4 h-4 text-[#A1A1AA] group-focus-within:text-[#0D9488] transition-colors" />
                         </div>
                         <input value={form.full_name} onChange={e => update("full_name", e.target.value)}
-                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
+                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
                       </div>
                     </div>
                     <div>
@@ -353,14 +353,14 @@ export default function WorkerProfilePage() {
                           <Phone className="w-4 h-4 text-[#A1A1AA] group-focus-within:text-[#0D9488] transition-colors" />
                         </div>
                         <input value={form.phone} onChange={e => update("phone", e.target.value)} placeholder="9876543210"
-                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
+                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="block text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-[0.04em] mb-1.5">Age</label>
                         <input type="number" value={form.age} onChange={e => update("age", e.target.value)} placeholder="25"
-                          className="w-full h-11 px-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
+                          className="w-full h-11 px-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
                       </div>
                       <div>
                         <label className="block text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-[0.04em] mb-1.5">Gender</label>
@@ -386,13 +386,13 @@ export default function WorkerProfilePage() {
                           <MapPin className="w-4 h-4 text-[#A1A1AA] group-focus-within:text-[#0D9488] transition-colors" />
                         </div>
                         <input value={form.city} onChange={e => update("city", e.target.value)} placeholder="Ahmedabad"
-                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
+                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
                       </div>
                     </div>
                     <div>
                       <label className="block text-[11px] font-semibold text-[#6B6B6B] uppercase tracking-[0.04em] mb-1.5">Area</label>
                       <input value={form.area} onChange={e => update("area", e.target.value)} placeholder="e.g., Navrangpura"
-                        className="w-full h-11 px-4 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
+                        className="w-full h-11 px-4 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
                     </div>
                   </div>
                 </div>
@@ -416,7 +416,7 @@ export default function WorkerProfilePage() {
                         </div>
                         <input value={form.skills} onChange={e => update("skills", e.target.value)}
                           placeholder="e.g., Promotion, Event setup, Crowd management"
-                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
+                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
                       </div>
                       {form.skills && (
                         <div className="flex flex-wrap gap-1.5 mt-2.5">
@@ -437,7 +437,7 @@ export default function WorkerProfilePage() {
                         </div>
                         <input value={form.experience} onChange={e => update("experience", e.target.value)}
                           placeholder="e.g., 2 years in event management"
-                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
+                          className="w-full h-11 pl-10 pr-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all placeholder:text-[#A1A1AA]" />
                       </div>
                     </div>
                     <div>
@@ -461,7 +461,7 @@ export default function WorkerProfilePage() {
                       <textarea value={form.bio} onChange={e => update("bio", e.target.value)}
                         placeholder="Tell organizers about yourself..."
                         maxLength={500}
-                        className="w-full h-28 px-4 py-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border-2 border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all resize-none placeholder:text-[#A1A1AA]" />
+                        className="w-full h-28 px-4 py-3 text-sm text-[#1A1A1A] bg-[#F8F8F6] rounded-[6px] border border-transparent focus:border-[#0D9488] focus:bg-white focus:ring-0 outline-none transition-all resize-none placeholder:text-[#A1A1AA]" />
                       <div className="flex justify-end mt-1">
                         <span className="text-[10px] text-[#A1A1AA]">{form.bio.length}/500</span>
                       </div>
@@ -472,7 +472,7 @@ export default function WorkerProfilePage() {
                 {/* Action Buttons */}
                 <div className="flex gap-3 pt-1 pb-4">
                   <button type="button" onClick={() => setEditing(false)}
-                    className="flex-1 h-12 rounded-[7px] border-2 border-gray-200 text-[#6B6B6B] text-sm font-semibold hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-[0.97]">
+                    className="flex-1 h-12 rounded-[7px] border border-gray-200 text-[#6B6B6B] text-sm font-semibold hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-[0.97]">
                     Cancel
                   </button>
                   <button type="submit" disabled={saving}

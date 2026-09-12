@@ -304,8 +304,8 @@ export default function WorkerPlansPage() {
               onClick={() => setSelectedPlan("monthly")}
               className={`w-full text-left card-base overflow-hidden transition-all duration-200 ${
                 selectedPlan === "monthly"
-                  ? "border-2 border-[#0D9488] shadow-[0_4px_16px_rgba(13,148,136,0.12)]"
-                  : "border-2 border-transparent hover:border-gray-200"
+                  ? "border border-[#0D9488] shadow-[0_4px_16px_rgba(13,148,136,0.12)]"
+                  : "border border-transparent hover:border-gray-200"
               }`}
             >
               <div className="relative">
@@ -343,8 +343,8 @@ export default function WorkerPlansPage() {
               onClick={() => setSelectedPlan("yearly")}
               className={`w-full text-left card-base overflow-hidden transition-all duration-200 ${
                 selectedPlan === "yearly"
-                  ? "border-2 border-[#0D9488] shadow-[0_4px_16px_rgba(13,148,136,0.12)]"
-                  : "border-2 border-transparent hover:border-gray-200"
+                  ? "border border-[#0D9488] shadow-[0_4px_16px_rgba(13,148,136,0.12)]"
+                  : "border border-transparent hover:border-gray-200"
               }`}
             >
               <div className="relative">
@@ -385,8 +385,8 @@ export default function WorkerPlansPage() {
               onClick={() => setSelectedPlan("lifetime")}
               className={`w-full text-left card-base overflow-hidden transition-all duration-200 ${
                 selectedPlan === "lifetime"
-                  ? "border-2 border-[#0D9488] shadow-[0_4px_16px_rgba(13,148,136,0.12)]"
-                  : "border-2 border-transparent hover:border-gray-200"
+                  ? "border border-[#0D9488] shadow-[0_4px_16px_rgba(13,148,136,0.12)]"
+                  : "border border-transparent hover:border-gray-200"
               }`}
             >
               <div className="relative">

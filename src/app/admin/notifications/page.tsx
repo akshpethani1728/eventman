@@ -152,7 +152,7 @@ export default function AdminNotificationsPage() {
                   <button
                     key={opt.value}
                     onClick={() => setAudience(opt.value)}
-                    className={`h-20 rounded-[6px] border-2 flex flex-col items-center justify-center gap-1.5 transition-all ${
+                    className={`h-20 rounded-[6px] border flex flex-col items-center justify-center gap-1.5 transition-all ${
                       audience === opt.value
                         ? "border-[#0D9488] bg-[#0D9488]/5 text-[#0D9488]"
                         : "border-[rgba(0,0,0,0.06)] bg-white text-gray-500 hover:border-gray-300"

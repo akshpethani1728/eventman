@@ -283,7 +283,7 @@ function AuthSection({ onRedirect }: { onRedirect: () => void }) {
                       <div className="grid grid-cols-2 gap-3">
                         {(["worker", "organizer"] as const).map(r => (
                           <button key={r} type="button" onClick={() => setRole(r)}
-                            className={`flex h-14 flex-col items-center justify-center gap-1 rounded-[8px] border-2 transition-all ${
+                            className={`flex h-14 flex-col items-center justify-center gap-1 rounded-[8px] border transition-all ${
                               role === r ? "border-teal-700 bg-teal-50 text-teal-700" : "border-gray-200 bg-gray-50 text-gray-500"
                             }`}>
                             {r === "worker" ? <HardHat className="w-5 h-5" /> : <Briefcase className="w-5 h-5" />}
@@ -507,7 +507,7 @@ export default function LoginPage() {
           <div className="absolute -bottom-32 -right-32 h-80 w-80 rounded-full bg-teal-600/15 blur-3xl" />
         </div>
         <div className="relative z-10 mx-auto max-w-4xl px-4 text-center">
-          <div className="mb-6 inline-flex items-center gap-3 rounded-[11px] bg-white/10 px-5 py-2.5 backdrop-blur-md">
+          <div className="mb-6 inline-flex items-center gap-3 rounded-[10px] bg-white/10 px-5 py-2.5 backdrop-blur-md">
             <Logo showText={false} />
             <span className="text-sm font-bold tracking-wide text-white">EventMan</span>
           </div>
@@ -519,7 +519,7 @@ export default function LoginPage() {
             Find event jobs or hire trusted staff &mdash; all in one place.
           </p>
           <button onClick={scrollToAuth}
-            className="mt-10 inline-flex items-center gap-2.5 rounded-[11px] bg-white px-8 py-4 text-base font-bold text-teal-700 transition-all hover:scale-105 active:scale-[0.97]">
+            className="mt-10 inline-flex items-center gap-2.5 rounded-[10px] bg-white px-8 py-4 text-base font-bold text-teal-700 transition-all hover:scale-105 active:scale-[0.97]">
             Get Started <ArrowDown className="h-4 w-4" />
           </button>
           <div className="mt-12 flex items-center justify-center gap-4 sm:gap-8 text-teal-100/70">
@@ -540,7 +540,7 @@ export default function LoginPage() {
         <div className="mt-12 mx-auto max-w-7xl px-4">
           <div className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-4 scroll-smooth scrollbar-none md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-6 md:overflow-visible md:pb-0">
             {previewCards.map(card => (
-              <div key={card.id} className="w-[78vw] shrink-0 snap-center md:w-auto rounded-[11px] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+              <div key={card.id} className="w-[78vw] shrink-0 snap-center md:w-auto rounded-[10px] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
                 {card.content}
               </div>
             ))}
@@ -573,7 +573,7 @@ export default function LoginPage() {
               ].map((s, i) => {
                 const Icon = s.icon;
                 return (
-                  <div key={i} className="rounded-[11px] bg-white p-6 text-center shadow-[0_2px_8px_rgba(0,0,0,0.04)] ring-1 ring-gray-100">
+                  <div key={i} className="rounded-[10px] bg-white p-6 text-center shadow-[0_2px_8px_rgba(0,0,0,0.04)] ring-1 ring-gray-100">
                     <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-[9px] bg-gradient-to-br from-teal-50 to-teal-50">
                       <Icon className="h-6 w-6 text-teal-700" />
                     </div>

@@ -296,9 +296,9 @@ export default function AdminDashboard() {
                   className={`flex-1 h-11 rounded-[6px] text-[13px] font-semibold transition-all flex items-center justify-center gap-2 ${
                     userTab === ut
                       ? ut === "workers"
-                        ? "bg-amber-50 text-amber-700 border-2 border-amber-200"
-                        : "bg-[#F0FDFA] text-[#0F766E] border-2 border-[#99F6E4]"
-                      : "bg-white text-gray-500 border-2 border-[rgba(0,0,0,0.06)] hover:border-gray-300"
+                        ? "bg-amber-50 text-amber-700 border border-amber-200"
+                        : "bg-[#F0FDFA] text-[#0F766E] border border-[#99F6E4]"
+                      : "bg-white text-gray-500 border border-[rgba(0,0,0,0.06)] hover:border-gray-300"
                   }`}>
                   {ut === "workers" ? <Users className="w-4 h-4" /> : <Building2 className="w-4 h-4" />}
                   {ut === "workers" ? "Workers" : "Organizers"}
@@ -375,9 +375,9 @@ export default function AdminDashboard() {
                           )}
                         </div>
                         <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-[11px] text-gray-400">{u.email || u.phone || "—"}</span>
-                          {u.city && <span className="text-[10px] text-gray-400">• {u.city}</span>}
-                          <span className="text-[10px] text-gray-300">• {formatRelativeDate(u.created_at)}</span>
+                          <span className="text-[11px] text-gray-400">{u.email || u.phone || "ï¿½"}</span>
+                          {u.city && <span className="text-[10px] text-gray-400">ï¿½ {u.city}</span>}
+                          <span className="text-[10px] text-gray-300">ï¿½ {formatRelativeDate(u.created_at)}</span>
                         </div>
                       </div>
 
