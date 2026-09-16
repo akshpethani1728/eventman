@@ -35,7 +35,7 @@ A full-stack web platform connecting event organizers with workers in Ahmedabad.
 | UI | React 19 + Tailwind CSS 4 |
 | Authentication | Supabase Auth (SSR, PKCE flow) |
 | Database | Supabase PostgreSQL |
-| Payments | Razorpay (orders, payments, webhooks) |
+| Payments | Razorpay (orders, payments) |
 | Hosting | Vercel |
 | PWA | Service worker + Web manifest |
 
@@ -64,12 +64,11 @@ eventman/
 │   │   │   ├── dashboard/          # Event feed + status
 │   │   │   ├── events/[id]/        # Event detail + apply
 │   │   │   ├── notifications/      # Notification list
-│   │   │   ├── plans/              # Subscription plans + payment history
+│   │   │   ├── plans/              # Redirects to dashboard
 │   │   │   └── profile/            # Worker profile
 │   │   ├── api/razorpay/           # Payment API routes
 │   │   │   ├── create-order/       # POST — create Razorpay order
-│   │   │   ├── verify-payment/     # POST — verify payment signature
-│   │   │   └── webhook/            # POST — receive Razorpay webhooks
+│   │   │   └── verify-payment/     # POST — verify payment signature
 │   │   ├── privacy/page.tsx
 │   │   ├── refund-policy/page.tsx
 │   │   ├── terms/page.tsx
@@ -176,7 +175,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
 # Razorpay (replace with your own keys from https://dashboard.razorpay.com)
 RAZORPAY_KEY_ID=rzp_live_xxxxxxxxxxxxxx
 RAZORPAY_KEY_SECRET=your-key-secret
-RAZORPAY_WEBHOOK_SECRET=your-webhook-secret
+
+# Admin
+ADMIN_PASSWORD=your_admin_password
 ```
 
 ## Getting Started
@@ -202,21 +203,17 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Payment & Subscription Flow
 
-1. Workers sign up and receive a **10-day free trial**
-2. After trial expires, they must subscribe to continue applying
-3. Subscription costs a flat monthly fee, processed via **Razorpay**
-4. Payment is verified server-side via webhook (`payment.captured` event)
-5. On successful payment, a 30-day active subscription is created
-6. Razorpay webhook uses signature verification (`x-razorpay-signature`)
-7. Workers can view payment history and plan status on `/worker/plans`
+1. EventMan is **free for all workers** — no subscription required
+2. Workers can browse, apply to, and join waitlists for events at no cost
+3. Payment infrastructure (Razorpay) is retained for potential future premium features
 
 ## Authentication Flow
 
 - Users sign up with email + password
 - OTP verification via email link
 - On first login, profile creation step (name + role selection)
-- Worker role: trial subscription created automatically
-- Organizer role: no subscription required
+- Worker role: can browse and apply to events immediately
+- Organizer role: can create and manage events
 - Session managed via Supabase SSR cookies (persisted up to 400 days)
 - Middleware refreshes session on every request
 
@@ -232,15 +229,12 @@ Set these in the Vercel dashboard (or using `vercel env add`):
 NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY
+NEXT_PUBLIC_VAPID_PUBLIC_KEY
+VAPID_PRIVATE_KEY
 RAZORPAY_KEY_ID
 RAZORPAY_KEY_SECRET
-RAZORPAY_WEBHOOK_SECRET
+ADMIN_PASSWORD
 ```
-
-### Razorpay Webhook Configuration
-
-- **URL**: `https://eventman2.vercel.app/api/razorpay/webhook`
-- **Events**: `payment.captured`
 
 ## API Routes
 
@@ -248,7 +242,6 @@ RAZORPAY_WEBHOOK_SECRET
 |---|---|---|---|
 | `/api/razorpay/create-order` | POST | Server action | Creates a Razorpay order |
 | `/api/razorpay/verify-payment` | POST | Server action | Verifies payment, activates subscription |
-| `/api/razorpay/webhook` | POST | Webhook | Handles Razorpay payment.captured events |
 
 ## Design System
 
@@ -282,5 +275,4 @@ Current migrations:
 
 - The app targets the Ahmedabad, Gujarat market with Gujarati-language locale (`lang="gu"`)
 - Database is IPv6-only on Supabase's new API gateway
-- Organizers never pay; only workers have a subscription model
-- All payments are idempotent — duplicate webhook events are ignored via `payment_id` uniqueness
+- The app is free for all workers — no subscription or payment required
